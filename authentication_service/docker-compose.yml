@@ -1,0 +1,73 @@
+version: '3.9'
+
+services:
+  auth-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: bidr_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bidr_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build: .
+    ports:
+      - "8067:8067"
+    environment:
+      - DEBUG=True
+      - DATABASE_ENGINE=django.db.backends.postgresql
+      - DATABASE_NAME=bidr_db
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_HOST=auth-db
+      - DATABASE_PORT=5432
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+      - SECRET_KEY=dev-secret-key-change-in-production
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - auth_static:/app/staticfiles
+      - auth_media:/app/media
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8067"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8067/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - auth_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  auth_postgres_data:
+  auth_static:
+  auth_media:
+  auth_redis_data:
+
+networks:
+  default:
+    name: bidr_network
+    external: true

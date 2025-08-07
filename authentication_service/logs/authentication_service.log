@@ -1,0 +1,1115 @@
+INFO 2025-08-02 01:20:20,963 autoreload 16240 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 01:20:41,410 basehttp 16240 6129545216 "GET /admin HTTP/1.1" 301 0
+INFO 2025-08-02 01:20:41,436 basehttp 16240 6146371584 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-02 01:20:41,454 basehttp 16240 6146371584 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4155
+INFO 2025-08-02 01:20:41,513 basehttp 16240 6129545216 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+INFO 2025-08-02 01:20:41,514 basehttp 16240 6180024320 "GET /static/admin/css/login.css HTTP/1.1" 200 958
+INFO 2025-08-02 01:20:41,514 basehttp 16240 6163197952 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2025-08-02 01:20:41,515 basehttp 16240 6146371584 "GET /static/admin/css/base.css HTTP/1.1" 200 21544
+INFO 2025-08-02 01:20:41,515 basehttp 16240 6213677056 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2025-08-02 01:20:41,515 basehttp 16240 6129545216 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-08-02 01:20:41,515 basehttp 16240 6196850688 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+WARNING 2025-08-02 01:20:41,542 log 16240 6196850688 Not Found: /favicon.ico
+WARNING 2025-08-02 01:20:41,542 basehttp 16240 6196850688 "GET /favicon.ico HTTP/1.1" 404 4037
+INFO 2025-08-02 01:25:46,902 autoreload 17234 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 01:26:09,915 basehttp 17234 6168784896 "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2025-08-02 01:26:09,943 basehttp 17234 6168784896 "GET /admin/ HTTP/1.1" 200 11150
+INFO 2025-08-02 01:26:09,981 basehttp 17234 6168784896 "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+INFO 2025-08-02 01:26:09,984 basehttp 17234 6168784896 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2025-08-02 01:26:09,984 basehttp 17234 6185611264 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+INFO 2025-08-02 01:26:09,985 basehttp 17234 6202437632 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+INFO 2025-08-02 01:26:25,523 basehttp 17234 6168784896 "GET /admin/user/appuser/ HTTP/1.1" 200 18496
+INFO 2025-08-02 01:26:25,531 basehttp 17234 6168784896 "GET /static/admin/css/changelists.css HTTP/1.1" 200 6811
+INFO 2025-08-02 01:26:25,536 basehttp 17234 6202437632 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2025-08-02 01:26:25,538 basehttp 17234 6219264000 "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+INFO 2025-08-02 01:26:25,539 basehttp 17234 6252916736 "GET /static/admin/js/actions.js HTTP/1.1" 200 8067
+INFO 2025-08-02 01:26:25,539 basehttp 17234 6236090368 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9042
+INFO 2025-08-02 01:26:25,540 basehttp 17234 6202437632 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2025-08-02 01:26:25,541 basehttp 17234 6219264000 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2025-08-02 01:26:25,541 basehttp 17234 6236090368 "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+INFO 2025-08-02 01:26:25,544 basehttp 17234 6252916736 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2025-08-02 01:26:25,546 basehttp 17234 6168784896 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 01:26:25,547 basehttp 17234 6185611264 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2025-08-02 01:26:25,548 basehttp 17234 6252916736 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2025-08-02 01:26:25,561 basehttp 17234 6252916736 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2025-08-02 01:26:25,561 basehttp 17234 6185611264 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+ERROR 2025-08-02 01:37:46,903 log 19333 8321664320 Internal Server Error: /password-reset-request/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/thulanimoyo/BIDR_Backend/authentication_service/user/views.py", line 72, in post
+    reset_link = f"{settings.FRONTEND_URL}/reset-password/{uid}/{token}/"
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/conf/__init__.py", line 91, in __getattr__
+    val = getattr(_wrapped, name)
+AttributeError: 'Settings' object has no attribute 'FRONTEND_URL'
+WARNING 2025-08-02 01:37:46,990 log 19333 8321664320 Bad Request: /password-reset-request/
+WARNING 2025-08-02 01:37:47,075 log 19333 8321664320 Bad Request: /password-reset/
+WARNING 2025-08-02 01:37:47,326 log 19333 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 01:37:47,326 log 19333 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 01:37:47,410 log 19333 8321664320 Bad Request: /login/
+WARNING 2025-08-02 01:37:47,577 log 19333 8321664320 Bad Request: /login/
+WARNING 2025-08-02 01:37:47,743 log 19333 8321664320 Bad Request: /login/
+WARNING 2025-08-02 01:37:48,345 log 19333 8321664320 Unauthorized: /logout/
+WARNING 2025-08-02 01:37:48,431 log 19333 8321664320 Bad Request: /logout/
+WARNING 2025-08-02 01:37:48,599 log 19333 8321664320 Unauthorized: /profile/
+WARNING 2025-08-02 01:38:37,682 log 19577 8321664320 Bad Request: /verify-otp/
+WARNING 2025-08-02 01:38:37,765 log 19577 8321664320 Bad Request: /verify-otp/
+WARNING 2025-08-02 01:38:37,931 log 19577 8321664320 Not Found: /resend-otp/
+WARNING 2025-08-02 01:38:57,235 log 19763 8321664320 Bad Request: /password-reset-request/
+WARNING 2025-08-02 01:38:57,318 log 19763 8321664320 Bad Request: /password-reset/
+WARNING 2025-08-02 01:38:57,565 log 19763 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 01:38:57,565 log 19763 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 01:38:57,649 log 19763 8321664320 Bad Request: /login/
+WARNING 2025-08-02 01:38:57,814 log 19763 8321664320 Bad Request: /login/
+WARNING 2025-08-02 01:38:57,978 log 19763 8321664320 Bad Request: /login/
+WARNING 2025-08-02 01:38:58,258 log 19763 8321664320 Unauthorized: /logout/
+WARNING 2025-08-02 01:38:58,342 log 19763 8321664320 Bad Request: /logout/
+WARNING 2025-08-02 01:38:58,510 log 19763 8321664320 Unauthorized: /profile/
+WARNING 2025-08-02 01:39:00,089 log 19763 8321664320 Bad Request: /verify-otp/
+WARNING 2025-08-02 01:39:00,175 log 19763 8321664320 Bad Request: /verify-otp/
+WARNING 2025-08-02 01:39:00,346 log 19763 8321664320 Not Found: /resend-otp/
+WARNING 2025-08-02 01:43:35,668 log 20538 8321664320 Bad Request: /logout/
+WARNING 2025-08-02 01:46:12,639 log 21281 8321664320 Bad Request: /password-reset-request/
+WARNING 2025-08-02 01:46:12,733 log 21281 8321664320 Bad Request: /password-reset/
+WARNING 2025-08-02 01:46:13,003 log 21281 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 01:46:13,005 log 21281 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 01:46:13,095 log 21281 8321664320 Bad Request: /login/
+WARNING 2025-08-02 01:46:13,272 log 21281 8321664320 Bad Request: /login/
+WARNING 2025-08-02 01:46:13,449 log 21281 8321664320 Bad Request: /login/
+WARNING 2025-08-02 01:46:13,749 log 21281 8321664320 Unauthorized: /logout/
+WARNING 2025-08-02 01:46:14,018 log 21281 8321664320 Unauthorized: /profile/
+WARNING 2025-08-02 01:46:15,712 log 21281 8321664320 Bad Request: /verify-otp/
+WARNING 2025-08-02 01:46:15,805 log 21281 8321664320 Bad Request: /verify-otp/
+WARNING 2025-08-02 01:46:15,987 log 21281 8321664320 Not Found: /resend-otp/
+INFO 2025-08-02 01:51:32,326 autoreload 22217 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 01:51:40,507 basehttp 22217 6171766784 "GET /health/ HTTP/1.1" 200 90
+INFO 2025-08-02 01:52:12,960 autoreload 22217 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/serializers.py changed, reloading.
+INFO 2025-08-02 01:52:13,341 autoreload 22395 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 01:52:18,707 autoreload 22395 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/views.py changed, reloading.
+INFO 2025-08-02 01:52:18,940 autoreload 22413 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 01:52:33,627 autoreload 22413 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/views.py changed, reloading.
+INFO 2025-08-02 01:52:33,947 autoreload 22461 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 01:52:41,386 autoreload 22461 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/urls.py changed, reloading.
+INFO 2025-08-02 01:52:42,377 autoreload 22502 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 01:52:54,368 autoreload 22630 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 01:53:01,719 basehttp 22502 6134755328 "GET /health/ HTTP/1.1" 200 90
+INFO 2025-08-02 01:53:09,126 basehttp 22502 6134755328 "POST /role-selection/ HTTP/1.1" 200 76
+WARNING 2025-08-02 01:53:16,888 log 22502 6134755328 Bad Request: /register/
+WARNING 2025-08-02 01:53:16,888 basehttp 22502 6134755328 "POST /register/ HTTP/1.1" 400 68
+INFO 2025-08-02 01:53:26,797 basehttp 22502 6134755328 "POST /register/ HTTP/1.1" 201 183
+INFO 2025-08-02 01:53:32,169 basehttp 22502 6134755328 "POST /verify-otp/ HTTP/1.1" 200 39
+ERROR 2025-08-02 01:53:38,856 log 22502 6134755328 Internal Server Error: /login/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such table: token_blacklist_outstandingtoken
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/thulanimoyo/BIDR_Backend/authentication_service/user/views.py", line 38, in post
+    refresh = RefreshToken.for_user(user)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework_simplejwt/tokens.py", line 344, in for_user
+    OutstandingToken.objects.create(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/base.py", line 1071, in _save_table
+    results = self._do_insert(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/base.py", line 1112, in _do_insert
+    return manager._insert(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/query.py", line 1847, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such table: token_blacklist_outstandingtoken
+ERROR 2025-08-02 01:53:38,857 basehttp 22502 6134755328 "POST /login/ HTTP/1.1" 500 192266
+INFO 2025-08-02 01:53:51,584 basehttp 22502 6134755328 "POST /login/ HTTP/1.1" 200 838
+INFO 2025-08-02 01:53:58,444 basehttp 22502 6134755328 "GET /profile/ HTTP/1.1" 200 300
+INFO 2025-08-02 01:54:00,408 basehttp 22502 6134755328 "GET /admin/user/appuser/ HTTP/1.1" 200 20231
+INFO 2025-08-02 01:54:00,430 basehttp 22502 6134755328 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 01:54:08,602 basehttp 22502 6134755328 "POST /logout/ HTTP/1.1" 200 31
+ERROR 2025-08-02 01:54:15,262 log 22502 6134755328 Internal Server Error: /resend-otp/
+ERROR 2025-08-02 01:54:15,263 basehttp 22502 6134755328 "POST /resend-otp/ HTTP/1.1" 500 30
+INFO 2025-08-02 01:54:22,023 basehttp 22502 6134755328 "GET /health/ready/ HTTP/1.1" 200 67
+WARNING 2025-08-02 01:54:28,313 log 22502 6134755328 Unauthorized: /profile/
+WARNING 2025-08-02 01:54:28,314 basehttp 22502 6134755328 "GET /profile/ HTTP/1.1" 401 58
+INFO 2025-08-02 01:56:28,586 basehttp 22502 6134755328 "GET /admin/token_blacklist/blacklistedtoken/ HTTP/1.1" 200 14914
+INFO 2025-08-02 01:56:28,600 basehttp 22502 6134755328 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 02:06:23,855 autoreload 22502 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:06:24,312 autoreload 25425 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:06:39,986 autoreload 25425 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:06:40,326 autoreload 25484 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:07:01,201 autoreload 25484 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:07:01,540 autoreload 25547 8321664320 Watching for file changes with StatReloader
+WARNING 2025-08-02 02:07:57,219 log 25834 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 02:07:57,220 log 25834 8321664320 Bad Request: /role-selection/
+INFO 2025-08-02 02:08:35,525 autoreload 25547 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:08:35,930 autoreload 25990 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:08:47,506 autoreload 25990 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/managers.py changed, reloading.
+INFO 2025-08-02 02:08:47,955 autoreload 26026 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:08:53,410 autoreload 26026 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/managers.py changed, reloading.
+INFO 2025-08-02 02:08:53,639 autoreload 26051 8321664320 Watching for file changes with StatReloader
+WARNING 2025-08-02 02:09:00,245 log 26071 8321664320 Bad Request: /password-reset-request/
+WARNING 2025-08-02 02:09:00,339 log 26071 8321664320 Bad Request: /password-reset/
+WARNING 2025-08-02 02:09:00,429 log 26071 8321664320 Bad Request: /password-reset/
+WARNING 2025-08-02 02:09:00,429 log 26071 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 02:09:00,431 log 26071 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 02:09:00,522 log 26071 8321664320 Bad Request: /login/
+WARNING 2025-08-02 02:09:00,701 log 26071 8321664320 Bad Request: /login/
+WARNING 2025-08-02 02:09:00,879 log 26071 8321664320 Bad Request: /login/
+WARNING 2025-08-02 02:09:01,168 log 26071 8321664320 Unauthorized: /logout/
+WARNING 2025-08-02 02:09:01,447 log 26071 8321664320 Unauthorized: /profile/
+INFO 2025-08-02 02:09:26,817 autoreload 26051 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/security/utils.py changed, reloading.
+INFO 2025-08-02 02:09:27,163 autoreload 26196 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:09:38,689 autoreload 26196 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:09:39,024 autoreload 26241 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:09:56,640 basehttp 26241 6127202304 "GET /admin/user/appuser/ HTTP/1.1" 200 20231
+INFO 2025-08-02 02:09:56,661 basehttp 26241 6127202304 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+WARNING 2025-08-02 02:09:58,575 log 26302 8321664320 Bad Request: /password-reset-request/
+WARNING 2025-08-02 02:09:58,667 log 26302 8321664320 Bad Request: /password-reset/
+WARNING 2025-08-02 02:09:58,935 log 26302 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 02:09:58,938 log 26302 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 02:09:59,030 log 26302 8321664320 Bad Request: /login/
+WARNING 2025-08-02 02:09:59,207 log 26302 8321664320 Bad Request: /login/
+WARNING 2025-08-02 02:09:59,383 log 26302 8321664320 Bad Request: /login/
+WARNING 2025-08-02 02:09:59,658 log 26302 8321664320 Unauthorized: /logout/
+WARNING 2025-08-02 02:09:59,941 log 26302 8321664320 Unauthorized: /profile/
+INFO 2025-08-02 02:10:00,725 basehttp 26241 6127202304 "GET /admin/user/appuser/ HTTP/1.1" 200 20231
+INFO 2025-08-02 02:10:00,736 basehttp 26241 6127202304 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+WARNING 2025-08-02 02:11:17,671 log 26707 8321664320 Bad Request: /password-reset-request/
+WARNING 2025-08-02 02:11:17,767 log 26707 8321664320 Bad Request: /password-reset/
+WARNING 2025-08-02 02:11:18,040 log 26707 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 02:11:18,041 log 26707 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 02:11:18,131 log 26707 8321664320 Bad Request: /login/
+WARNING 2025-08-02 02:11:18,307 log 26707 8321664320 Bad Request: /login/
+WARNING 2025-08-02 02:11:18,482 log 26707 8321664320 Bad Request: /login/
+WARNING 2025-08-02 02:11:18,799 log 26707 8321664320 Unauthorized: /logout/
+WARNING 2025-08-02 02:11:19,072 log 26707 8321664320 Unauthorized: /profile/
+INFO 2025-08-02 02:16:53,825 autoreload 26241 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:16:54,179 autoreload 27704 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:17:04,598 autoreload 27704 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:17:04,877 autoreload 27740 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:17:17,300 autoreload 27740 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:17:17,604 autoreload 27778 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:18:10,601 autoreload 27778 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:18:10,912 autoreload 27918 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:18:48,816 autoreload 28036 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:18:51,069 autoreload 28036 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:18:51,266 autoreload 28042 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:18:51,766 autoreload 27918 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:18:51,989 autoreload 28043 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:25:49,094 autoreload 28043 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:25:49,191 autoreload 28042 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:25:49,457 autoreload 29270 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:25:49,457 autoreload 29271 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:25:56,379 autoreload 29271 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:25:56,381 autoreload 29270 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py changed, reloading.
+INFO 2025-08-02 02:25:56,622 autoreload 29307 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:25:56,622 autoreload 29306 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:26:12,199 autoreload 29306 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/admin.py changed, reloading.
+INFO 2025-08-02 02:26:12,202 autoreload 29307 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/admin.py changed, reloading.
+INFO 2025-08-02 02:26:12,555 autoreload 29401 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:26:12,555 autoreload 29402 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:26:21,004 autoreload 29402 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/admin.py changed, reloading.
+INFO 2025-08-02 02:26:21,036 autoreload 29401 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/admin.py changed, reloading.
+INFO 2025-08-02 02:26:21,257 autoreload 29441 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:26:21,266 autoreload 29442 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:26:28,681 autoreload 29441 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/admin.py changed, reloading.
+INFO 2025-08-02 02:26:28,687 autoreload 29442 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/admin.py changed, reloading.
+INFO 2025-08-02 02:26:28,924 autoreload 29468 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:26:28,924 autoreload 29467 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:26:38,306 autoreload 29467 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/admin.py changed, reloading.
+INFO 2025-08-02 02:26:38,416 autoreload 29468 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/user/admin.py changed, reloading.
+INFO 2025-08-02 02:26:38,600 autoreload 29508 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 02:26:38,692 autoreload 29509 8321664320 Watching for file changes with StatReloader
+WARNING 2025-08-02 02:26:54,457 log 29641 8321664320 Bad Request: /password-reset-request/
+WARNING 2025-08-02 02:26:54,550 log 29641 8321664320 Bad Request: /password-reset/
+WARNING 2025-08-02 02:26:54,811 log 29641 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 02:26:54,812 log 29641 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 02:26:54,899 log 29641 8321664320 Bad Request: /login/
+WARNING 2025-08-02 02:26:55,071 log 29641 8321664320 Bad Request: /login/
+WARNING 2025-08-02 02:26:55,243 log 29641 8321664320 Bad Request: /login/
+WARNING 2025-08-02 02:26:55,513 log 29641 8321664320 Unauthorized: /logout/
+WARNING 2025-08-02 02:26:55,777 log 29641 8321664320 Unauthorized: /profile/
+INFO 2025-08-02 02:34:48,578 basehttp 29509 6193426432 "GET /admin/user/appuser/ HTTP/1.1" 200 20527
+INFO 2025-08-02 02:34:48,593 basehttp 29509 6193426432 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 02:34:50,509 basehttp 29509 6193426432 "GET /admin/user/address/ HTTP/1.1" 200 14960
+INFO 2025-08-02 02:34:50,523 basehttp 29509 6193426432 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 02:43:30,189 basehttp 29509 6193426432 "GET /admin/user/address/ HTTP/1.1" 200 14960
+INFO 2025-08-02 02:43:30,208 basehttp 29509 6193426432 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 02:43:34,773 basehttp 29509 6193426432 "GET /admin/user_sessions/sessionactivity/ HTTP/1.1" 200 14363
+INFO 2025-08-02 02:43:34,784 basehttp 29509 6193426432 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 02:43:37,756 basehttp 29509 6193426432 "GET /admin/user_sessions/sessionactivity/ HTTP/1.1" 200 14363
+INFO 2025-08-02 02:43:37,771 basehttp 29509 6193426432 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 02:43:44,938 basehttp 29509 6193426432 "GET /admin/user_sessions/sessionsecurityevent/ HTTP/1.1" 200 15377
+INFO 2025-08-02 02:43:44,958 basehttp 29509 6193426432 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 02:43:46,011 basehttp 29509 6193426432 "GET /admin/user_sessions/trusteddevice/ HTTP/1.1" 200 15428
+INFO 2025-08-02 02:43:46,029 basehttp 29509 6193426432 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 02:43:48,455 basehttp 29509 6193426432 "GET /admin/user_sessions/usersession/ HTTP/1.1" 200 16074
+INFO 2025-08-02 02:43:48,466 basehttp 29509 6193426432 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 02:47:12,710 basehttp 29509 6193426432 "GET /admin/permissions/userrole/ HTTP/1.1" 200 17301
+INFO 2025-08-02 02:47:12,725 basehttp 29509 6193426432 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+WARNING 2025-08-02 03:05:10,930 log 29509 6193426432 Not Found: /api/v1/categories/categories/
+WARNING 2025-08-02 03:05:10,931 basehttp 29509 6193426432 "GET /api/v1/categories/categories/ HTTP/1.1" 404 5580
+INFO 2025-08-02 10:18:32,384 autoreload 74275 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 10:18:36,144 basehttp 74275 6161330176 "GET /admin/permissions/userrole/ HTTP/1.1" 200 20466
+INFO 2025-08-02 10:18:36,162 basehttp 74275 6161330176 "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,169 basehttp 74275 6194982912 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,171 basehttp 74275 6178156544 "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,173 basehttp 74275 6211809280 "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,174 basehttp 74275 6194982912 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,176 basehttp 74275 6178156544 "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,179 basehttp 74275 6228635648 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,179 basehttp 74275 6211809280 "GET /static/admin/js/core.js HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,180 basehttp 74275 6194982912 "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,181 basehttp 74275 6245462016 "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,183 basehttp 74275 6178156544 "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,183 basehttp 74275 6228635648 "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,186 basehttp 74275 6211809280 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,187 basehttp 74275 6161330176 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 10:18:36,187 basehttp 74275 6245462016 "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,194 basehttp 74275 6245462016 "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,197 basehttp 74275 6245462016 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,199 basehttp 74275 6245462016 "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,211 basehttp 74275 6245462016 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,212 basehttp 74275 6161330176 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+INFO 2025-08-02 10:18:36,213 basehttp 74275 6211809280 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+INFO 2025-08-02 10:21:00,990 basehttp 74275 6161330176 "GET /admin/permissions/userrole/ HTTP/1.1" 200 20466
+INFO 2025-08-02 10:21:01,004 basehttp 74275 6161330176 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 10:22:50,567 autoreload 74275 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/urls.py changed, reloading.
+INFO 2025-08-02 10:22:51,013 autoreload 75010 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 10:22:57,438 autoreload 75010 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/seller/views.py changed, reloading.
+INFO 2025-08-02 10:22:57,764 autoreload 75034 8321664320 Watching for file changes with StatReloader
+ERROR 2025-08-02 10:26:39,019 log 75999 8321664320 Internal Server Error: /api/seller/business-registration/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/contextlib.py", line 79, in inner
+    return func(*args, **kwds)
+  File "/Users/thulanimoyo/BIDR_Backend/authentication_service/seller/views.py", line 249, in post
+    if address_serializer.is_valid():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 223, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 442, in run_validation
+    value = self.to_internal_value(data)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 495, in to_internal_value
+    for field in fields:
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 378, in _writable_fields
+    for field in self.fields.values():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1103, in get_fields
+    field_class, field_kwargs = self.build_field(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1249, in build_field
+    return self.build_unknown_field(field_name, model_class)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1367, in build_unknown_field
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: Field name `location` is not valid for model `SellersAddressDetails` in `seller.serializers.SellerAddressSerializer`.
+INFO 2025-08-02 10:27:02,244 autoreload 75034 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/seller/serializers.py changed, reloading.
+INFO 2025-08-02 10:27:02,601 autoreload 76124 8321664320 Watching for file changes with StatReloader
+WARNING 2025-08-02 10:28:36,547 log 76502 8321664320 Forbidden: /api/seller/business-registration/
+WARNING 2025-08-02 10:28:36,636 log 76502 8321664320 Unauthorized: /api/seller/business-registration/
+WARNING 2025-08-02 10:28:36,810 log 76502 8321664320 Forbidden: /api/seller/document-upload/
+WARNING 2025-08-02 10:28:36,983 log 76502 8321664320 Not Found: /api/seller/document-upload/
+WARNING 2025-08-02 10:28:37,077 log 76502 8321664320 Unauthorized: /api/seller/profiles/
+WARNING 2025-08-02 10:28:37,361 log 76502 8321664320 Bad Request: /api/seller/register/
+WARNING 2025-08-02 10:28:37,450 log 76502 8321664320 Bad Request: /api/seller/register/
+WARNING 2025-08-02 10:28:51,148 log 76632 8321664320 Forbidden: /api/seller/business-registration/
+WARNING 2025-08-02 10:28:51,237 log 76632 8321664320 Unauthorized: /api/seller/business-registration/
+WARNING 2025-08-02 10:28:51,411 log 76632 8321664320 Forbidden: /api/seller/document-upload/
+WARNING 2025-08-02 10:28:51,591 log 76632 8321664320 Not Found: /api/seller/document-upload/
+WARNING 2025-08-02 10:28:51,689 log 76632 8321664320 Unauthorized: /api/seller/profiles/
+WARNING 2025-08-02 10:28:51,973 log 76632 8321664320 Bad Request: /api/seller/register/
+WARNING 2025-08-02 10:28:52,063 log 76632 8321664320 Bad Request: /api/seller/register/
+WARNING 2025-08-02 10:28:53,027 log 76632 8321664320 Bad Request: /password-reset-request/
+WARNING 2025-08-02 10:28:53,116 log 76632 8321664320 Bad Request: /password-reset/
+WARNING 2025-08-02 10:28:53,377 log 76632 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 10:28:53,378 log 76632 8321664320 Bad Request: /role-selection/
+WARNING 2025-08-02 10:28:53,466 log 76632 8321664320 Bad Request: /login/
+WARNING 2025-08-02 10:28:53,640 log 76632 8321664320 Bad Request: /login/
+WARNING 2025-08-02 10:28:53,813 log 76632 8321664320 Bad Request: /login/
+WARNING 2025-08-02 10:28:54,084 log 76632 8321664320 Unauthorized: /logout/
+WARNING 2025-08-02 10:28:54,374 log 76632 8321664320 Unauthorized: /profile/
+INFO 2025-08-02 10:43:01,859 autoreload 79095 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 10:43:15,688 basehttp 79095 6132330496 "GET /health/ HTTP/1.1" 200 90
+INFO 2025-08-02 10:43:45,587 basehttp 79095 6132330496 "POST /api/seller/register/ HTTP/1.1" 201 117
+WARNING 2025-08-02 10:44:03,878 log 79095 6132330496 Bad Request: /login/
+WARNING 2025-08-02 10:44:03,878 basehttp 79095 6132330496 "POST /login/ HTTP/1.1" 400 55
+INFO 2025-08-02 10:44:26,745 basehttp 79095 6132330496 "POST /login/ HTTP/1.1" 200 986
+WARNING 2025-08-02 10:44:47,738 log 79095 6132330496 Bad Request: /api/seller/business-registration/
+WARNING 2025-08-02 10:44:47,738 basehttp 79095 6132330496 "POST /api/seller/business-registration/ HTTP/1.1" 400 75
+INFO 2025-08-02 10:45:14,410 basehttp 79095 6132330496 "POST /api/seller/business-registration/ HTTP/1.1" 201 58
+INFO 2025-08-02 10:45:20,994 basehttp 79095 6132330496 "GET /api/seller/profiles/ HTTP/1.1" 200 52
+INFO 2025-08-02 10:45:36,089 basehttp 79095 6132330496 "GET /api/seller/profiles/ HTTP/1.1" 200 769
+INFO 2025-08-02 10:45:43,914 basehttp 79095 6132330496 "POST /api/seller/document-upload/ HTTP/1.1" 200 45
+INFO 2025-08-02 10:45:51,436 basehttp 79095 6132330496 "GET /api/seller/profiles/059c4b5b-cd8e-471b-8a74-7e8ba42c10f1/performance_metrics/ HTTP/1.1" 200 151
+INFO 2025-08-02 10:46:11,230 basehttp 79095 6132330496 "POST /login/ HTTP/1.1" 200 973
+WARNING 2025-08-02 10:46:24,984 log 79095 6132330496 Unauthorized: /api/seller/admin/document-vetting/
+WARNING 2025-08-02 10:46:24,984 basehttp 79095 6132330496 "GET /api/seller/admin/document-vetting/ HTTP/1.1" 401 172
+INFO 2025-08-02 10:46:34,126 basehttp 79095 6132330496 "POST /login/ HTTP/1.1" 200 973
+INFO 2025-08-02 10:46:45,684 basehttp 79095 6132330496 "GET /api/seller/admin/document-vetting/ HTTP/1.1" 200 505
+INFO 2025-08-02 10:46:55,039 basehttp 79095 6132330496 "POST /api/seller/profiles/059c4b5b-cd8e-471b-8a74-7e8ba42c10f1/approve_seller/ HTTP/1.1" 200 41
+INFO 2025-08-02 10:48:01,079 basehttp 79095 6132330496 "GET /admin/permissions/userrole/ HTTP/1.1" 200 20466
+INFO 2025-08-02 10:48:01,094 basehttp 79095 6132330496 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 10:48:03,561 basehttp 79095 6132330496 "GET /admin/permissions/userrole/ HTTP/1.1" 200 20466
+INFO 2025-08-02 10:48:03,571 basehttp 79095 6132330496 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 10:48:44,768 autoreload 76124 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/urls.py changed, reloading.
+INFO 2025-08-02 10:48:45,215 autoreload 79095 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/urls.py changed, reloading.
+INFO 2025-08-02 10:48:45,254 autoreload 80991 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 10:48:45,494 autoreload 80994 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 10:49:20,591 autoreload 80991 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/urls.py changed, reloading.
+INFO 2025-08-02 10:49:21,062 autoreload 80994 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/urls.py changed, reloading.
+INFO 2025-08-02 10:49:21,073 autoreload 81111 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 10:49:21,320 autoreload 81112 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 10:50:31,410 autoreload 81402 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-02 10:50:42,313 basehttp 81112 6164819968 "HEAD /swagger/ HTTP/1.1" 200 0
+INFO 2025-08-02 10:53:00,233 basehttp 81112 6164819968 "GET /admin/permissions/userrole/ HTTP/1.1" 200 20466
+INFO 2025-08-02 10:53:00,266 basehttp 81112 6164819968 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-02 10:53:10,043 basehttp 81112 6164819968 "GET /swagger/ HTTP/1.1" 200 2471
+INFO 2025-08-02 10:53:10,097 basehttp 81112 6164819968 "GET /static/drf-yasg/style.css HTTP/1.1" 200 1047
+INFO 2025-08-02 10:53:10,099 basehttp 81112 13220622336 "GET /static/drf-yasg/insQ.min.js HTTP/1.1" 200 2093
+INFO 2025-08-02 10:53:10,100 basehttp 81112 6164819968 "GET /static/drf-yasg/swagger-ui-init.js HTTP/1.1" 200 15480
+INFO 2025-08-02 10:53:10,104 basehttp 81112 13237448704 "GET /static/drf-yasg/immutable.min.js HTTP/1.1" 200 56904
+INFO 2025-08-02 10:53:10,105 basehttp 81112 13170143232 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui.css HTTP/1.1" 200 145206
+INFO 2025-08-02 10:53:10,107 basehttp 81112 13203795968 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-standalone-preset.js HTTP/1.1" 200 322863
+INFO 2025-08-02 10:53:10,109 basehttp 81112 13186969600 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-bundle.js HTTP/1.1" 200 1046583
+INFO 2025-08-02 10:53:10,245 basehttp 81112 13203795968 "GET /static/drf-yasg/swagger-ui-dist/favicon-32x32.png HTTP/1.1" 200 628
+ERROR 2025-08-02 10:53:10,304 log 81112 13186969600 Internal Server Error: /swagger/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/views.py", line 112, in get
+    schema = generator.get_schema(request, self.public)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 276, in get_schema
+    paths, prefix = self.get_paths(endpoints, components, request, public)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 482, in get_paths
+    operation = self.get_operation(view, path, prefix, method, components, request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 524, in get_operation
+    operation = view_inspector.get_operation(operation_keys)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 45, in get_operation
+    responses = self.get_responses()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 180, in get_responses
+    response_serializers = self.get_response_serializers()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 235, in get_response_serializers
+    responses = self.get_default_responses()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 211, in get_default_responses
+    default_schema = self.serializer_to_schema(default_schema) or ''
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 438, in serializer_to_schema
+    return self.probe_inspectors(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 49, in get_schema
+    return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 228, in probe_field_inspectors
+    return self.probe_inspectors(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 140, in field_to_swagger_object
+    actual_schema = definitions.setdefault(ref_name, make_schema_definition)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/openapi.py", line 685, in setdefault
+    ret = maker()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 109, in make_schema_definition
+    for property_name, child in serializer.fields.items():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1103, in get_fields
+    field_class, field_kwargs = self.build_field(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1249, in build_field
+    return self.build_unknown_field(field_name, model_class)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1367, in build_unknown_field
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: Field name `timezone` is not valid for model `AppUser` in `user.serializers.ComprehensiveUserProfileSerializer`.
+ERROR 2025-08-02 10:53:10,306 basehttp 81112 13186969600 "GET /swagger/?format=openapi HTTP/1.1" 500 234560
+ERROR 2025-08-02 10:54:33,943 log 81112 6164819968 Internal Server Error: /swagger/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/views.py", line 112, in get
+    schema = generator.get_schema(request, self.public)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 276, in get_schema
+    paths, prefix = self.get_paths(endpoints, components, request, public)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 482, in get_paths
+    operation = self.get_operation(view, path, prefix, method, components, request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 524, in get_operation
+    operation = view_inspector.get_operation(operation_keys)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 45, in get_operation
+    responses = self.get_responses()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 180, in get_responses
+    response_serializers = self.get_response_serializers()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 235, in get_response_serializers
+    responses = self.get_default_responses()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 211, in get_default_responses
+    default_schema = self.serializer_to_schema(default_schema) or ''
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 438, in serializer_to_schema
+    return self.probe_inspectors(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 49, in get_schema
+    return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 228, in probe_field_inspectors
+    return self.probe_inspectors(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 140, in field_to_swagger_object
+    actual_schema = definitions.setdefault(ref_name, make_schema_definition)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/openapi.py", line 685, in setdefault
+    ret = maker()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 109, in make_schema_definition
+    for property_name, child in serializer.fields.items():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1103, in get_fields
+    field_class, field_kwargs = self.build_field(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1249, in build_field
+    return self.build_unknown_field(field_name, model_class)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1367, in build_unknown_field
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: Field name `timezone` is not valid for model `AppUser` in `user.serializers.ComprehensiveUserProfileSerializer`.
+ERROR 2025-08-02 10:54:33,945 basehttp 81112 6164819968 "GET /swagger/ HTTP/1.1" 500 234039
+ERROR 2025-08-02 10:54:37,646 log 81112 6164819968 Internal Server Error: /swagger/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/views.py", line 112, in get
+    schema = generator.get_schema(request, self.public)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 276, in get_schema
+    paths, prefix = self.get_paths(endpoints, components, request, public)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 482, in get_paths
+    operation = self.get_operation(view, path, prefix, method, components, request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 524, in get_operation
+    operation = view_inspector.get_operation(operation_keys)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 45, in get_operation
+    responses = self.get_responses()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 180, in get_responses
+    response_serializers = self.get_response_serializers()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 235, in get_response_serializers
+    responses = self.get_default_responses()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 211, in get_default_responses
+    default_schema = self.serializer_to_schema(default_schema) or ''
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 438, in serializer_to_schema
+    return self.probe_inspectors(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 49, in get_schema
+    return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 228, in probe_field_inspectors
+    return self.probe_inspectors(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 140, in field_to_swagger_object
+    actual_schema = definitions.setdefault(ref_name, make_schema_definition)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/openapi.py", line 685, in setdefault
+    ret = maker()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 109, in make_schema_definition
+    for property_name, child in serializer.fields.items():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1103, in get_fields
+    field_class, field_kwargs = self.build_field(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1249, in build_field
+    return self.build_unknown_field(field_name, model_class)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1367, in build_unknown_field
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: Field name `timezone` is not valid for model `AppUser` in `user.serializers.ComprehensiveUserProfileSerializer`.
+ERROR 2025-08-02 10:54:37,647 basehttp 81112 6164819968 "GET /swagger/ HTTP/1.1" 500 234039
+WARNING 2025-08-02 14:07:43,756 log 81112 6164819968 Not Found: /api/v1/categories/categories/
+WARNING 2025-08-02 14:07:43,759 basehttp 81112 6164819968 "GET /api/v1/categories/categories/ HTTP/1.1" 404 6225
+INFO 2025-08-03 06:27:57,589 autoreload 35501 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-03 06:28:12,637 basehttp 35501 6196523008 "GET /swagger/ HTTP/1.1" 200 2234
+INFO 2025-08-03 06:28:12,675 basehttp 35501 6196523008 "GET /static/drf-yasg/style.css HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:12,678 basehttp 35501 6213349376 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui.css HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:12,680 basehttp 35501 6247002112 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-standalone-preset.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:12,680 basehttp 35501 6230175744 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-bundle.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:12,681 basehttp 35501 6263828480 "GET /static/drf-yasg/insQ.min.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:12,681 basehttp 35501 6196523008 "GET /static/drf-yasg/swagger-ui-init.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:12,684 basehttp 35501 6280654848 "GET /static/drf-yasg/immutable.min.js HTTP/1.1" 304 0
+ERROR 2025-08-03 06:28:12,960 log 35501 6280654848 Internal Server Error: /swagger/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/views.py", line 112, in get
+    schema = generator.get_schema(request, self.public)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 276, in get_schema
+    paths, prefix = self.get_paths(endpoints, components, request, public)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 482, in get_paths
+    operation = self.get_operation(view, path, prefix, method, components, request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 524, in get_operation
+    operation = view_inspector.get_operation(operation_keys)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 45, in get_operation
+    responses = self.get_responses()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 180, in get_responses
+    response_serializers = self.get_response_serializers()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 235, in get_response_serializers
+    responses = self.get_default_responses()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 211, in get_default_responses
+    default_schema = self.serializer_to_schema(default_schema) or ''
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 438, in serializer_to_schema
+    return self.probe_inspectors(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 49, in get_schema
+    return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 228, in probe_field_inspectors
+    return self.probe_inspectors(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 140, in field_to_swagger_object
+    actual_schema = definitions.setdefault(ref_name, make_schema_definition)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/openapi.py", line 685, in setdefault
+    ret = maker()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 109, in make_schema_definition
+    for property_name, child in serializer.fields.items():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1103, in get_fields
+    field_class, field_kwargs = self.build_field(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1249, in build_field
+    return self.build_unknown_field(field_name, model_class)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1367, in build_unknown_field
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: Field name `timezone` is not valid for model `AppUser` in `user.serializers.ComprehensiveUserProfileSerializer`.
+ERROR 2025-08-03 06:28:12,963 basehttp 35501 6280654848 "GET /swagger/?format=openapi HTTP/1.1" 500 233719
+INFO 2025-08-03 06:28:17,331 basehttp 35501 6196523008 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-03 06:28:17,347 basehttp 35501 6196523008 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4155
+INFO 2025-08-03 06:28:17,360 basehttp 35501 6196523008 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:17,365 basehttp 35501 6213349376 "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:17,367 basehttp 35501 6196523008 "GET /static/admin/css/login.css HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:17,368 basehttp 35501 6230175744 "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:17,368 basehttp 35501 6247002112 "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:17,369 basehttp 35501 6263828480 "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:17,370 basehttp 35501 6280654848 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:21,077 basehttp 35501 6196523008 "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2025-08-03 06:28:21,092 basehttp 35501 6196523008 "GET /admin/ HTTP/1.1" 200 17171
+INFO 2025-08-03 06:28:21,120 basehttp 35501 6196523008 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:21,121 basehttp 35501 6230175744 "GET /static/admin/css/dashboard.css HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:21,121 basehttp 35501 6213349376 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:21,122 basehttp 35501 6247002112 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,040 basehttp 35501 6196523008 "GET /admin/user/appuser/ HTTP/1.1" 200 28113
+INFO 2025-08-03 06:28:35,052 basehttp 35501 6196523008 "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,055 basehttp 35501 6213349376 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,057 basehttp 35501 6230175744 "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,058 basehttp 35501 6247002112 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,059 basehttp 35501 6263828480 "GET /static/admin/js/core.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,060 basehttp 35501 6213349376 "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,062 basehttp 35501 6280654848 "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,062 basehttp 35501 6230175744 "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,062 basehttp 35501 6247002112 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,066 basehttp 35501 6247002112 "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,068 basehttp 35501 6196523008 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-03 06:28:35,072 basehttp 35501 6196523008 "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,110 basehttp 35501 6247002112 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+INFO 2025-08-03 06:28:35,110 basehttp 35501 6196523008 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 304 0
+INFO 2025-08-03 06:29:19,562 basehttp 35501 6196523008 "GET /admin/seller/companyinfo/ HTTP/1.1" 200 17215
+INFO 2025-08-03 06:29:19,577 basehttp 35501 6196523008 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+ERROR 2025-08-03 06:32:43,888 exception 35501 6196523008 Invalid HTTP_HOST header: '414e91375642.ngrok-free.app'. You may need to add '414e91375642.ngrok-free.app' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '414e91375642.ngrok-free.app'. You may need to add '414e91375642.ngrok-free.app' to ALLOWED_HOSTS.
+WARNING 2025-08-03 06:32:43,945 log 35501 6196523008 Bad Request: /
+WARNING 2025-08-03 06:32:43,946 basehttp 35501 6196523008 "GET / HTTP/1.1" 400 73676
+INFO 2025-08-03 07:32:28,615 basehttp 35501 6196523008 "OPTIONS /role-selection/ HTTP/1.1" 200 0
+INFO 2025-08-03 07:32:30,670 basehttp 35501 6196523008 "OPTIONS /role-selection/ HTTP/1.1" 200 0
+ERROR 2025-08-03 07:33:13,244 exception 35501 6213349376 Invalid HTTP_HOST header: '414e91375642.ngrok-free.app'. You may need to add '414e91375642.ngrok-free.app' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '414e91375642.ngrok-free.app'. You may need to add '414e91375642.ngrok-free.app' to ALLOWED_HOSTS.
+WARNING 2025-08-03 07:33:13,272 log 35501 6213349376 Bad Request: /role-selection/
+WARNING 2025-08-03 07:33:13,272 basehttp 35501 6213349376 "GET /role-selection/ HTTP/1.1" 400 75927
+ERROR 2025-08-03 07:33:15,272 exception 35501 6213349376 Invalid HTTP_HOST header: '414e91375642.ngrok-free.app'. You may need to add '414e91375642.ngrok-free.app' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '414e91375642.ngrok-free.app'. You may need to add '414e91375642.ngrok-free.app' to ALLOWED_HOSTS.
+WARNING 2025-08-03 07:33:15,296 log 35501 6213349376 Bad Request: /favicon.ico
+WARNING 2025-08-03 07:33:15,296 basehttp 35501 6213349376 "GET /favicon.ico HTTP/1.1" 400 75478
+INFO 2025-08-03 07:46:08,315 autoreload 35501 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/settings.py changed, reloading.
+INFO 2025-08-03 07:46:09,393 autoreload 43514 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-03 07:56:44,022 basehttp 43514 6123188224 "OPTIONS /role-selection/ HTTP/1.1" 200 0
+ERROR 2025-08-03 07:56:54,360 exception 43514 6140014592 Invalid HTTP_HOST header: '414e91375642.ngrok-free.app'. You may need to add '414e91375642.ngrok-free.app' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '414e91375642.ngrok-free.app'. You may need to add '414e91375642.ngrok-free.app' to ALLOWED_HOSTS.
+WARNING 2025-08-03 07:56:54,402 log 43514 6140014592 Bad Request: /role-selection/
+WARNING 2025-08-03 07:56:54,402 basehttp 43514 6140014592 "GET /role-selection/ HTTP/1.1" 400 75783
+ERROR 2025-08-03 07:56:56,349 exception 43514 6140014592 Invalid HTTP_HOST header: '414e91375642.ngrok-free.app'. You may need to add '414e91375642.ngrok-free.app' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '414e91375642.ngrok-free.app'. You may need to add '414e91375642.ngrok-free.app' to ALLOWED_HOSTS.
+WARNING 2025-08-03 07:56:56,372 log 43514 6140014592 Bad Request: /favicon.ico
+WARNING 2025-08-03 07:56:56,373 basehttp 43514 6140014592 "GET /favicon.ico HTTP/1.1" 400 75478
+INFO 2025-08-03 08:00:24,426 autoreload 43514 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/settings.py changed, reloading.
+INFO 2025-08-03 08:00:24,906 autoreload 45083 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-03 08:02:27,442 autoreload 45083 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/settings.py changed, reloading.
+INFO 2025-08-03 08:02:27,796 autoreload 45306 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-03 08:02:34,126 autoreload 45306 8321664320 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/settings.py changed, reloading.
+INFO 2025-08-03 08:02:34,542 autoreload 45322 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-03 08:03:25,378 basehttp 45322 6198210560 "OPTIONS /role-selection/ HTTP/1.1" 200 0
+WARNING 2025-08-03 08:03:33,222 log 45322 6215036928 Method Not Allowed: /role-selection/
+WARNING 2025-08-03 08:03:33,222 basehttp 45322 6215036928 "GET /role-selection/ HTTP/1.1" 405 40
+WARNING 2025-08-03 08:03:33,674 log 45322 6215036928 Not Found: /favicon.ico
+WARNING 2025-08-03 08:03:33,674 basehttp 45322 6215036928 "GET /favicon.ico HTTP/1.1" 404 6184
+INFO 2025-08-03 08:04:22,792 basehttp 45322 6231863296 "GET /admin/seller/companyinfo/ HTTP/1.1" 200 17215
+WARNING 2025-08-03 08:04:29,213 log 45322 6231863296 Method Not Allowed: /role-selection/
+WARNING 2025-08-03 08:04:29,214 basehttp 45322 6231863296 "GET /role-selection/ HTTP/1.1" 405 40
+WARNING 2025-08-03 08:05:16,966 log 45322 6198210560 Bad Request: /role-selection/
+WARNING 2025-08-03 08:05:16,967 basehttp 45322 6198210560 "POST /role-selection/ HTTP/1.1" 400 36
+INFO 2025-08-03 08:05:45,807 basehttp 45322 6198210560 "POST /role-selection/ HTTP/1.1" 200 76
+INFO 2025-08-03 08:06:55,160 basehttp 45322 6215036928 code 400, message Bad request version ('lÕÃvÙÚ\x13z\x9aj«\x86u\x8dÛ\x13ä\x9eQÐ\x00*ÊÊ\x13\x02\x13\x03\x13\x01À,À+Ì©À0À/Ì¨À')
+ERROR 2025-08-03 08:06:55,161 basehttp 45322 6215036928 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-08-03 08:06:55,166 basehttp 45322 6215036928 code 400, message Bad request version ('\x0e+\x81\x07*¥DZÛàÙ\x18\x05é\x92FÍu\x91\x9e+\x00,ZZ\x13\x02\x13\x03\x13\x01À,À+Ì©À0À/Ì¨À')
+ERROR 2025-08-03 08:06:55,166 basehttp 45322 6215036928 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-08-03 08:06:55,167 basehttp 45322 6215036928 code 400, message Bad request version ('Ý\x00\x00\x14À')
+ERROR 2025-08-03 08:06:55,167 basehttp 45322 6215036928 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-08-03 08:12:14,958 basehttp 45322 6215036928 "OPTIONS /role-selection/ HTTP/1.1" 200 0
+WARNING 2025-08-03 08:12:19,614 log 45322 6231863296 Method Not Allowed: /role-selection/
+WARNING 2025-08-03 08:12:19,615 basehttp 45322 6231863296 "GET /role-selection/ HTTP/1.1" 405 40
+WARNING 2025-08-03 08:14:05,757 log 45322 6215036928 Unauthorized: /role-selection/
+WARNING 2025-08-03 08:14:05,759 basehttp 45322 6215036928 "POST /role-selection/ HTTP/1.1" 401 107
+WARNING 2025-08-03 08:14:26,112 log 45322 6215036928 Unauthorized: /role-selection/
+WARNING 2025-08-03 08:14:26,114 basehttp 45322 6215036928 "POST /role-selection/ HTTP/1.1" 401 107
+INFO 2025-08-03 08:14:46,292 basehttp 45322 6215036928 "POST /role-selection/ HTTP/1.1" 200 76
+INFO 2025-08-03 08:58:07,141 basehttp 45322 6215036928 "OPTIONS /register/ HTTP/1.1" 200 0
+WARNING 2025-08-03 08:58:34,892 log 45322 6231863296 Method Not Allowed: /register/
+WARNING 2025-08-03 08:58:34,893 basehttp 45322 6231863296 "GET /register/ HTTP/1.1" 405 40
+WARNING 2025-08-03 08:59:10,431 log 45322 6248689664 Method Not Allowed: /register/
+WARNING 2025-08-03 08:59:10,433 basehttp 45322 6248689664 "GET /register/ HTTP/1.1" 405 40
+INFO 2025-08-03 09:03:51,897 basehttp 45322 6215036928 "OPTIONS /register/ HTTP/1.1" 200 0
+WARNING 2025-08-03 09:08:39,878 log 45322 6215036928 Method Not Allowed: /register/
+WARNING 2025-08-03 09:08:39,880 basehttp 45322 6215036928 "GET /register/ HTTP/1.1" 405 40
+INFO 2025-08-03 09:12:56,038 basehttp 45322 6215036928 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-03 09:13:20,140 autoreload 53374 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-03 09:14:30,839 basehttp 53374 6203043840 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-03 09:15:26,454 basehttp 53374 6219870208 "GET /admin/user/appuser/ HTTP/1.1" 200 28113
+INFO 2025-08-03 09:15:26,518 basehttp 53374 6219870208 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-03 11:16:17,169 autoreload 77962 8321664320 Watching for file changes with StatReloader
+INFO 2025-08-03 13:07:26,631 basehttp 77962 6125301760 "GET /admin/user/appuser/ HTTP/1.1" 200 28113
+INFO 2025-08-03 13:07:26,720 basehttp 77962 6125301760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-03 14:07:48,582 basehttp 77962 6125301760 "GET /admin/user/appuser/ HTTP/1.1" 200 28113
+INFO 2025-08-03 14:07:48,618 basehttp 77962 6125301760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-03 14:07:50,218 basehttp 77962 6125301760 "GET /admin/user/appuser/ HTTP/1.1" 200 28113
+INFO 2025-08-03 14:07:50,233 basehttp 77962 6125301760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-03 14:07:50,827 basehttp 77962 6125301760 "GET /admin/user/appuser/ HTTP/1.1" 200 28113
+INFO 2025-08-03 14:07:50,861 basehttp 77962 6125301760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-03 23:38:18,906 autoreload 23894 8464516416 Watching for file changes with StatReloader
+INFO 2025-08-03 23:39:13,656 basehttp 23894 6164230144 "OPTIONS /register/ HTTP/1.1" 200 0
+WARNING 2025-08-03 23:43:04,819 log 23894 6164230144 Method Not Allowed: /register/
+WARNING 2025-08-03 23:43:04,822 basehttp 23894 6164230144 "GET /register/ HTTP/1.1" 405 40
+WARNING 2025-08-03 23:43:08,453 log 23894 6164230144 Bad Request: /register/
+WARNING 2025-08-03 23:43:08,454 basehttp 23894 6164230144 "POST /register/ HTTP/1.1" 400 201
+WARNING 2025-08-03 23:43:44,304 log 23894 6164230144 Bad Request: /register/
+WARNING 2025-08-03 23:43:44,304 basehttp 23894 6164230144 "POST /register/ HTTP/1.1" 400 155
+WARNING 2025-08-03 23:44:27,394 log 23894 6164230144 Bad Request: /register/
+WARNING 2025-08-03 23:44:27,395 basehttp 23894 6164230144 "POST /register/ HTTP/1.1" 400 45
+ERROR 2025-08-03 23:44:34,747 log 23894 6164230144 Internal Server Error: /register/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/thulanimoyo/BIDR_Backend/authentication_service/user/views.py", line 178, in post
+    user = serializer.save()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 208, in save
+    self.instance = self.create(validated_data)
+  File "/Users/thulanimoyo/BIDR_Backend/authentication_service/user/serializers.py", line 97, in create
+    user.set_password(password)
+  File "/Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py", line 199, in set_password
+    raise ValueError(f"Password validation failed: {', '.join(validation_result['errors'])}")
+ValueError: Password validation failed: Password must contain at least one uppercase letter, Password must contain at least one special character
+ERROR 2025-08-03 23:44:34,752 basehttp 23894 6164230144 "POST /register/ HTTP/1.1" 500 111550
+ERROR 2025-08-03 23:44:54,349 log 23894 6164230144 Internal Server Error: /register/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/thulanimoyo/BIDR_Backend/authentication_service/user/views.py", line 178, in post
+    user = serializer.save()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 208, in save
+    self.instance = self.create(validated_data)
+  File "/Users/thulanimoyo/BIDR_Backend/authentication_service/user/serializers.py", line 97, in create
+    user.set_password(password)
+  File "/Users/thulanimoyo/BIDR_Backend/authentication_service/user/models.py", line 199, in set_password
+    raise ValueError(f"Password validation failed: {', '.join(validation_result['errors'])}")
+ValueError: Password validation failed: Password must contain at least one special character
+ERROR 2025-08-03 23:44:54,355 basehttp 23894 6164230144 "POST /register/ HTTP/1.1" 500 111155
+WARNING 2025-08-03 23:45:09,828 log 23894 6164230144 Bad Request: /register/
+WARNING 2025-08-03 23:45:09,828 basehttp 23894 6164230144 "POST /register/ HTTP/1.1" 400 46
+INFO 2025-08-03 23:45:27,512 basehttp 23894 6164230144 "POST /register/ HTTP/1.1" 201 176
+INFO 2025-08-03 23:48:41,557 basehttp 23894 13170143232 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-03 23:49:57,259 basehttp 23894 13170143232 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-03 23:51:49,332 basehttp 23894 13170143232 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-03 23:57:51,373 basehttp 23894 13170143232 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-03 23:57:58,085 basehttp 23894 13170143232 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-03 23:59:54,843 autoreload 23894 8464516416 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/settings.py changed, reloading.
+INFO 2025-08-03 23:59:55,320 autoreload 27286 8464516416 Watching for file changes with StatReloader
+INFO 2025-08-04 00:00:49,271 autoreload 27423 8464516416 Watching for file changes with StatReloader
+INFO 2025-08-04 00:01:41,072 basehttp 27423 6170865664 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-04 00:02:31,469 basehttp 27423 6170865664 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-04 00:04:07,099 basehttp 27423 6187692032 "POST /register/ HTTP/1.1" 201 177
+INFO 2025-08-04 00:04:48,212 basehttp 27423 6170865664 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-04 00:10:46,053 basehttp 27423 6170865664 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-04 00:12:02,109 autoreload 27423 8464516416 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/settings.py changed, reloading.
+INFO 2025-08-04 00:12:02,493 autoreload 29134 8464516416 Watching for file changes with StatReloader
+INFO 2025-08-04 00:18:17,717 basehttp 29134 6190575616 "OPTIONS /register/ HTTP/1.1" 200 0
+WARNING 2025-08-04 00:19:14,572 log 29134 6190575616 Method Not Allowed: /register/
+WARNING 2025-08-04 00:19:14,572 basehttp 29134 6190575616 "GET /register/ HTTP/1.1" 405 40
+INFO 2025-08-04 00:19:46,328 basehttp 29134 6190575616 "POST /register/ HTTP/1.1" 201 174
+INFO 2025-08-04 00:24:41,044 autoreload 29134 8464516416 /Users/thulanimoyo/BIDR_Backend/authentication_service/authentication_service/settings.py changed, reloading.
+INFO 2025-08-04 00:24:41,451 autoreload 31524 8464516416 Watching for file changes with StatReloader
+INFO 2025-08-04 00:25:13,241 basehttp 31524 6125350912 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-04 00:25:14,755 basehttp 31524 6125350912 "POST /register/ HTTP/1.1" 201 175
+INFO 2025-08-04 00:28:24,457 basehttp 31524 6125350912 "GET /admin/ HTTP/1.1" 200 17171
+INFO 2025-08-04 00:28:24,472 basehttp 31524 6125350912 "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:24,476 basehttp 31524 6125350912 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:24,477 basehttp 31524 6142177280 "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:24,480 basehttp 31524 6159003648 "GET /static/admin/css/dashboard.css HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:24,481 basehttp 31524 6341865472 "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:24,481 basehttp 31524 6325039104 "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:24,483 basehttp 31524 6358691840 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:24,486 basehttp 31524 6341865472 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:24,486 basehttp 31524 6159003648 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:24,487 basehttp 31524 6358691840 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+WARNING 2025-08-04 00:28:24,516 log 31524 6358691840 Not Found: /favicon.ico
+WARNING 2025-08-04 00:28:24,516 basehttp 31524 6358691840 "GET /favicon.ico HTTP/1.1" 404 6171
+INFO 2025-08-04 00:28:29,903 basehttp 31524 6125350912 "GET /admin/otp/otp/ HTTP/1.1" 200 25737
+INFO 2025-08-04 00:28:29,915 basehttp 31524 6125350912 "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:29,917 basehttp 31524 6159003648 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:29,917 basehttp 31524 6325039104 "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:29,919 basehttp 31524 6125350912 "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:29,922 basehttp 31524 6159003648 "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:29,925 basehttp 31524 6358691840 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:29,927 basehttp 31524 6341865472 "GET /static/admin/js/core.js HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:29,930 basehttp 31524 6325039104 "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:29,932 basehttp 31524 6125350912 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:29,932 basehttp 31524 6159003648 "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2025-08-04 00:28:29,935 basehttp 31524 6142177280 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-04 00:28:29,938 basehttp 31524 6142177280 "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+INFO 2025-08-04 06:47:22,304 autoreload 40426 8464516416 Watching for file changes with StatReloader
+INFO 2025-08-04 15:58:17,974 autoreload 66161 8464516416 Watching for file changes with StatReloader
+INFO 2025-08-04 16:00:08,747 basehttp 66161 6161051648 "GET /admin/ HTTP/1.1" 200 17171
+INFO 2025-08-04 16:00:08,759 basehttp 66161 6177878016 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:08,760 basehttp 66161 6211530752 "GET /static/admin/css/dashboard.css HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:08,760 basehttp 66161 6161051648 "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:08,760 basehttp 66161 6194704384 "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:08,761 basehttp 66161 6177878016 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:08,761 basehttp 66161 6228357120 "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:08,761 basehttp 66161 6245183488 "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:08,772 basehttp 66161 6245183488 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:08,772 basehttp 66161 6177878016 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:08,773 basehttp 66161 6228357120 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+WARNING 2025-08-04 16:00:08,811 log 66161 6228357120 Not Found: /favicon.ico
+WARNING 2025-08-04 16:00:08,812 basehttp 66161 6228357120 "GET /favicon.ico HTTP/1.1" 404 6171
+INFO 2025-08-04 16:00:16,710 basehttp 66161 6161051648 "GET /admin/user/appuser/ HTTP/1.1" 200 32192
+INFO 2025-08-04 16:00:16,718 basehttp 66161 6177878016 "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:16,719 basehttp 66161 6194704384 "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:16,720 basehttp 66161 6211530752 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:16,721 basehttp 66161 6228357120 "GET /static/admin/js/core.js HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:16,721 basehttp 66161 6194704384 "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:16,721 basehttp 66161 6177878016 "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:16,722 basehttp 66161 6245183488 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:16,724 basehttp 66161 6211530752 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:16,727 basehttp 66161 6177878016 "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:16,727 basehttp 66161 6245183488 "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:16,729 basehttp 66161 6161051648 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-04 16:00:16,729 basehttp 66161 6245183488 "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:16,742 basehttp 66161 6245183488 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+INFO 2025-08-04 16:00:16,742 basehttp 66161 6161051648 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 304 0
+ERROR 2025-08-04 16:16:41,485 log 66161 6161051648 Internal Server Error: /admin/user/appuser/add/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 837, in get_form
+    return modelform_factory(self.model, **defaults)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/forms/models.py", line 652, in modelform_factory
+    return type(form)(class_name, (form,), form_class_attrs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/forms/models.py", line 332, in __new__
+    raise FieldError(message)
+django.core.exceptions.FieldError: Unknown field(s) (fullname) specified for AppUser
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 716, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/sites.py", line 240, in inner
+    return view(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/debug.py", line 143, in sensitive_post_parameters_wrapper
+    return view(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/auth/admin.py", line 121, in add_view
+    return self._add_view(request, form_url, extra_context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/auth/admin.py", line 149, in _add_view
+    return super().add_view(request, form_url, extra_context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1947, in add_view
+    return self.changeform_view(request, None, form_url, extra_context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1806, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1841, in _changeform_view
+    ModelForm = self.get_form(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/auth/admin.py", line 98, in get_form
+    return super().get_form(request, obj, **defaults)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 839, in get_form
+    raise FieldError(
+django.core.exceptions.FieldError: Unknown field(s) (fullname) specified for AppUser. Check fields/fieldsets/exclude attributes of class AppUserAdmin.
+ERROR 2025-08-04 16:16:41,509 basehttp 66161 6161051648 "GET /admin/user/appuser/add/ HTTP/1.1" 500 189543
+INFO 2025-08-04 16:16:44,490 basehttp 66161 6161051648 "GET /admin/user/appuser/ HTTP/1.1" 200 32192
+INFO 2025-08-04 16:20:33,856 basehttp 66161 6161051648 "GET /admin/otp/otp/ HTTP/1.1" 200 25737
+INFO 2025-08-04 16:20:33,875 basehttp 66161 6161051648 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-04 16:26:54,534 basehttp 66161 6161051648 "GET /admin/user/address/ HTTP/1.1" 200 18125
+INFO 2025-08-04 16:26:54,548 basehttp 66161 6161051648 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-04 16:27:17,452 basehttp 66161 6161051648 "GET /admin/seller/companyinfo/ HTTP/1.1" 200 17215
+INFO 2025-08-04 16:27:17,464 basehttp 66161 6161051648 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-04 16:32:18,819 basehttp 66161 6161051648 "GET /admin/user/appuser/ HTTP/1.1" 200 32192
+INFO 2025-08-04 16:32:18,833 basehttp 66161 6161051648 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-07 06:55:11,616 autoreload 8614 8752169344 Watching for file changes with StatReloader
+INFO 2025-08-07 06:55:28,782 basehttp 8614 6196506624 "GET /admin HTTP/1.1" 301 0
+INFO 2025-08-07 06:55:28,852 basehttp 8614 6213332992 "GET /admin/ HTTP/1.1" 200 17171
+INFO 2025-08-07 06:55:28,887 basehttp 8614 6280638464 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2025-08-07 06:55:28,888 basehttp 8614 6230159360 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2025-08-07 06:55:28,888 basehttp 8614 6196506624 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+INFO 2025-08-07 06:55:28,889 basehttp 8614 6246985728 "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+INFO 2025-08-07 06:55:28,889 basehttp 8614 6213332992 "GET /static/admin/css/base.css HTTP/1.1" 200 21544
+INFO 2025-08-07 06:55:28,889 basehttp 8614 6263812096 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+INFO 2025-08-07 06:55:28,889 basehttp 8614 6280638464 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-08-07 06:55:28,893 basehttp 8614 6280638464 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2025-08-07 06:55:28,893 basehttp 8614 6263812096 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+INFO 2025-08-07 06:55:28,893 basehttp 8614 6213332992 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+WARNING 2025-08-07 06:55:28,976 log 8614 6213332992 Not Found: /favicon.ico
+WARNING 2025-08-07 06:55:28,976 basehttp 8614 6213332992 "GET /favicon.ico HTTP/1.1" 404 6171
+INFO 2025-08-07 06:55:46,442 basehttp 8614 6196506624 "GET /admin/user_sessions/usersession/ HTTP/1.1" 200 19239
+INFO 2025-08-07 06:55:46,456 basehttp 8614 6246985728 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2025-08-07 06:55:46,456 basehttp 8614 6196506624 "GET /static/admin/css/changelists.css HTTP/1.1" 200 6811
+INFO 2025-08-07 06:55:46,457 basehttp 8614 6263812096 "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+INFO 2025-08-07 06:55:46,460 basehttp 8614 6280638464 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9042
+INFO 2025-08-07 06:55:46,460 basehttp 8614 6213332992 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-07 06:55:46,460 basehttp 8614 6196506624 "GET /static/admin/js/actions.js HTTP/1.1" 200 8067
+INFO 2025-08-07 06:55:46,462 basehttp 8614 6246985728 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2025-08-07 06:55:46,462 basehttp 8614 6263812096 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2025-08-07 06:55:46,464 basehttp 8614 6213332992 "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+INFO 2025-08-07 06:55:46,466 basehttp 8614 6230159360 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2025-08-07 06:55:46,470 basehttp 8614 6280638464 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2025-08-07 06:55:46,474 basehttp 8614 6230159360 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2025-08-07 06:55:46,489 basehttp 8614 6230159360 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2025-08-07 06:55:47,948 basehttp 8614 6230159360 "GET /admin/user_sessions/usersession/add/ HTTP/1.1" 200 36979
+INFO 2025-08-07 06:55:47,958 basehttp 8614 6213332992 "GET /static/admin/js/calendar.js HTTP/1.1" 200 9141
+INFO 2025-08-07 06:55:47,959 basehttp 8614 6230159360 "GET /static/admin/css/forms.css HTTP/1.1" 200 9090
+INFO 2025-08-07 06:55:47,959 basehttp 8614 6246985728 "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 586
+INFO 2025-08-07 06:55:47,961 basehttp 8614 6263812096 "GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 200 19319
+INFO 2025-08-07 06:55:47,962 basehttp 8614 6280638464 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-07 06:55:47,962 basehttp 8614 6246985728 "GET /static/admin/css/widgets.css HTTP/1.1" 200 11800
+INFO 2025-08-07 06:55:47,964 basehttp 8614 6280638464 "GET /static/admin/js/change_form.js HTTP/1.1" 200 606
+INFO 2025-08-07 06:55:47,988 basehttp 8614 6280638464 "GET /static/admin/img/icon-calendar.svg HTTP/1.1" 200 1086
+INFO 2025-08-07 06:55:47,989 basehttp 8614 6246985728 "GET /static/admin/img/icon-clock.svg HTTP/1.1" 200 677
