@@ -4,7 +4,10 @@ import json
 from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 from django.utils import timezone
-from admin_profile.models import AdminActivityLog
+
+from import_helper import setup_imports
+setup_imports()
+from admin.models import AdminActivityLog
 
 logger = logging.getLogger(__name__)
 

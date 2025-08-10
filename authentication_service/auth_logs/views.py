@@ -4,205 +4,463 @@ BIDR Authentication Logging Views
 This module contains views for logging and analyzing authentication activities
 in the BIDR platform.
 """
-from django.db.models import Count, Q, Avg, Max, Min
-from django.utils import timezone
-from django.http import HttpResponse
-from datetime import datetime, timedelta
-from rest_framework import status, viewsets, permissions
-from rest_framework.decorators import api_view, permission_classes, action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter
 import csv
 import json
-from io import StringIO
+from datetime import timedelta
 
-from .models import AuthenticationLog, SecurityEvent, LoginSession, AuditTrail
+from django.db.models import Count, Q, Avg
+from django.utils import timezone
+from django.http import HttpResponse
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+
+from .models import AuthenticationLog, SecurityEvent, LoginSession, AuditTrail, SuspiciousActivity
 from .serializers import (
     AuthenticationLogSerializer, AuthenticationLogCreateSerializer,
     SecurityEventSerializer, SecurityEventDetailSerializer,
     LoginSessionSerializer, AuditTrailSerializer,
-    AuthenticationAnalyticsSerializer, UserActivitySummarySerializer,
-    SecurityDashboardSerializer, LogFilterSerializer, BulkLogCreateSerializer,
-    ExportRequestSerializer
-)
-from .utils import (
-    detect_suspicious_activity, get_device_info, get_location_info,
-    calculate_risk_score, generate_security_recommendations
+    SuspiciousActivitySerializer, SuspiciousActivityDetailSerializer,
+    AuthenticationAnalyticsSerializer,
+    SecurityDashboardSerializer, BulkLogCreateSerializer, ExportRequestSerializer
 )
 
-@api_view(["POST"])
-def log_action(request):
-    try:
-        cec_client_id = request.data.get('cec_client_id')
-        employee_id = request.data.get('employee_id')
-        employee_name = request.data.get('employee_name')
-        action = request.data.get('action')
-        details = request.data.get('details')
-        policy_or_reference = request.data.get('policy_or_reference')
-        device_id = request.data.get('device_id')
-        ip_address = request.META.get('REMOTE_ADDR', '')
-        is_payment = request.data.get('is_payment', False)
-        payload = request.data.get('payload')
-        response_text = request.data.get('response')
-        status_code = request.data.get('status_code')
-        latitude = request.data.get('latitude')
-        longitude = request.data.get('longitude')
-        app_name = request.data.get('app_name')
-        app_version = request.data.get('app_version')
 
-        log = AppLog(
-            cec_client_id=cec_client_id,
-            employee_id=employee_id,
-            employee_name=employee_name,
-            action=action,
-            app_name=app_name,
-            app_version=app_version,
-            details=details,
-            latitude=latitude,
-            longitude=longitude,
-            policy_or_reference=policy_or_reference,
-            device_id=device_id,
-            ip_address=ip_address,
-            is_payment=is_payment,
-            payload=payload,
-            response=response_text,
-            status_code=status_code,
-            timestamp=now()
-        )
-        log.save()
+class AuthenticationLogViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for authentication logs.
+    
+    Provides CRUD operations for authentication logs with appropriate filtering
+    and permission controls.
+    """
+    queryset = AuthenticationLog.objects.all().order_by('-timestamp')
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['user_email', 'ip_address', 'country', 'device_id']
+    filterset_fields = ['action', 'status', 'user_type', 'country']
+    ordering_fields = ['timestamp', 'user_email', 'response_code']
+    ordering = ['-timestamp']
+    
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return AuthenticationLogCreateSerializer
+        return AuthenticationLogSerializer
+    
+    def get_permissions(self):
+        if self.action in ['create', 'list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+    
+    @action(detail=False, methods=['post'])
+    def bulk_create(self, request):
+        """Create multiple authentication logs at once."""
+        serializer = BulkLogCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            logs_data = serializer.validated_data['logs']
+            logs = [AuthenticationLog(**log_data) for log_data in logs_data]
+            AuthenticationLog.objects.bulk_create(logs)
+            return Response({"message": f"Successfully created {len(logs)} logs"}, 
+                           status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['post'])
+    def export(self, request):
+        """Export authentication logs in various formats."""
+        serializer = ExportRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        data = serializer.validated_data
+        export_format = data.get('format', 'csv')
+        max_records = data.get('max_records', 10000)
+        
+        # Apply filters if provided
+        queryset = self.filter_queryset(self.get_queryset())[:max_records]
+        
+        if export_format == 'csv':
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="auth_logs.csv"'
+            
+            writer = csv.writer(response)
+            # Write header
+            writer.writerow(['log_id', 'user_email', 'action', 'status', 'timestamp', 
+                            'ip_address', 'country', 'device_type'])
+            
+            # Write data
+            for log in queryset:
+                writer.writerow([
+                    log.log_id, log.user_email, log.action, log.status, 
+                    log.timestamp, log.ip_address, log.country, log.device_type
+                ])
+            return response
+            
+        elif export_format == 'json':
+            serializer = AuthenticationLogSerializer(queryset, many=True)
+            response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
+            response['Content-Disposition'] = 'attachment; filename="auth_logs.json"'
+            return response
+            
+        return Response({"error": "Unsupported export format"}, 
+                       status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['get'])
+    def analytics(self, request):
+        """Get analytics data for authentication logs."""
+        # Get time range from query params or use last 30 days
+        days = int(request.query_params.get('days', 30))
+        start_date = timezone.now() - timedelta(days=days)
+        
+        # Base queryset
+        queryset = AuthenticationLog.objects.filter(timestamp__gte=start_date)
+        
+        # Basic counts
+        total_logs = queryset.count()
+        successful_logins = queryset.filter(action='login_success').count()
+        failed_logins = queryset.filter(action='login_failed').count()
+        registrations = queryset.filter(action__in=[
+            'registration_attempt', 'registration_success', 'registration_failed'
+        ]).count()
+        password_resets = queryset.filter(action__in=[
+            'password_reset_request', 'password_reset_success', 'password_reset_failed'
+        ]).count()
+        
+        # Unique counts
+        unique_users = queryset.values('user_email').distinct().count()
+        unique_ips = queryset.values('ip_address').distinct().count()
+        
+        # Security events count
+        security_events = SecurityEvent.objects.filter(detected_at__gte=start_date).count()
+        
+        # Time series data - daily stats
+        daily_stats = list(queryset.values('timestamp__date')
+                          .annotate(date=Count('timestamp__date'))
+                          .annotate(
+                              total=Count('log_id'),
+                              successful=Count('log_id', filter=Q(status='success')),
+                              failed=Count('log_id', filter=Q(status='failed'))
+                          )
+                          .order_by('timestamp__date'))
+        
+        # Top stats
+        top_actions = list(queryset.values('action')
+                          .annotate(count=Count('action'))
+                          .order_by('-count')[:10])
+        
+        top_user_types = list(queryset.values('user_type')
+                             .annotate(count=Count('user_type'))
+                             .order_by('-count')[:5])
+        
+        top_countries = list(queryset.values('country')
+                            .annotate(count=Count('country'))
+                            .order_by('-count')[:10])
+        
+        top_devices = list(queryset.values('device_type')
+                          .annotate(count=Count('device_type'))
+                          .order_by('-count')[:5])
+        
+        # Prepare response data
+        analytics_data = {
+            'total_logs': total_logs,
+            'successful_logins': successful_logins,
+            'failed_logins': failed_logins,
+            'registrations': registrations,
+            'password_resets': password_resets,
+            'security_events': security_events,
+            'unique_users': unique_users,
+            'unique_ips': unique_ips,
+            'daily_stats': daily_stats,
+            'top_actions': top_actions,
+            'top_user_types': top_user_types,
+            'top_countries': top_countries,
+            'top_devices': top_devices,
+        }
+        
+        serializer = AuthenticationAnalyticsSerializer(analytics_data)
+        return Response(serializer.data)
 
-        return Response({"success": True, "message": "Log saved successfully"}, status=status.HTTP_201_CREATED)
-    except Exception as e:
-        return Response({"success": False, "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@api_view(["POST"])
-def normalize_app_logs(request):
-    client_id = request.data.get('client_id')
-    start_date = request.data.get('start_date')
-    end_date = request.data.get('end_date')
+class SecurityEventViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for security events.
+    
+    Provides CRUD operations for security events with appropriate filtering
+    and permission controls.
+    """
+    queryset = SecurityEvent.objects.all().order_by('-detected_at')
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['user_email', 'title', 'description']
+    filterset_fields = ['event_type', 'severity', 'status']
+    ordering_fields = ['detected_at', 'risk_score', 'severity']
+    ordering = ['-detected_at']
+    
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return SecurityEventDetailSerializer
+        return SecurityEventSerializer
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+    
+    @action(detail=True, methods=['post'])
+    def resolve(self, request, pk=None):
+        """Mark a security event as resolved."""
+        event = self.get_object()
+        notes = request.data.get('notes', '')
+        
+        event.mark_resolved(resolved_by=request.user.email, notes=notes)
+        
+        serializer = self.get_serializer(event)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def dashboard(self, request):
+        """Get security dashboard data."""
+        # Get time range from query params or use last 30 days
+        days = int(request.query_params.get('days', 30))
+        start_date = timezone.now() - timedelta(days=days)
+        today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # Security events stats
+        active_security_events = SecurityEvent.objects.exclude(status='resolved').count()
+        high_risk_events = SecurityEvent.objects.filter(
+            severity__in=['high', 'critical']
+        ).exclude(status='resolved').count()
+        
+        # Authentication logs stats
+        failed_login_attempts_today = AuthenticationLog.objects.filter(
+            action='login_failed',
+            timestamp__gte=today_start
+        ).count()
+        
+        suspicious_activities_today = SuspiciousActivity.objects.filter(
+            detected_at__gte=today_start
+        ).count()
+        
+        # Login success rate
+        login_attempts = AuthenticationLog.objects.filter(
+            action__in=['login_attempt', 'login_success', 'login_failed'],
+            timestamp__gte=start_date
+        ).count()
+        
+        successful_logins = AuthenticationLog.objects.filter(
+            action='login_success',
+            timestamp__gte=start_date
+        ).count()
+        
+        login_success_rate = (successful_logins / login_attempts * 100) if login_attempts > 0 else 0
+        
+        # Response time
+        avg_response_time = AuthenticationLog.objects.filter(
+            timestamp__gte=start_date,
+            response_time_ms__isnull=False
+        ).aggregate(avg=Avg('response_time_ms'))['avg'] or 0
+        
+        # Unique users today
+        unique_users_today = AuthenticationLog.objects.filter(
+            timestamp__gte=today_start
+        ).values('user_email').distinct().count()
+        
+        # Recent critical events
+        recent_critical_events = SecurityEvent.objects.filter(
+            severity__in=['high', 'critical']
+        ).order_by('-detected_at')[:5]
+        
+        # Geographic distribution
+        geo_distribution = list(AuthenticationLog.objects.filter(
+            timestamp__gte=start_date,
+            country__isnull=False
+        ).values('country').annotate(count=Count('country')).order_by('-count')[:10])
+        
+        # Device stats
+        device_stats = list(AuthenticationLog.objects.filter(
+            timestamp__gte=start_date,
+            device_type__isnull=False
+        ).values('device_type').annotate(count=Count('device_type')).order_by('-count')[:5])
+        
+        # Browser stats
+        browser_stats = list(AuthenticationLog.objects.filter(
+            timestamp__gte=start_date,
+            browser__isnull=False
+        ).values('browser').annotate(count=Count('browser')).order_by('-count')[:5])
+        
+        # Prepare response data
+        dashboard_data = {
+            'active_security_events': active_security_events,
+            'high_risk_events': high_risk_events,
+            'failed_login_attempts_today': failed_login_attempts_today,
+            'suspicious_activities_today': suspicious_activities_today,
+            'login_success_rate': login_success_rate,
+            'average_response_time': avg_response_time,
+            'unique_users_today': unique_users_today,
+            'recent_critical_events': recent_critical_events,
+            'geographic_distribution': geo_distribution,
+            'device_stats': device_stats,
+            'browser_stats': browser_stats,
+        }
+        
+        serializer = SecurityDashboardSerializer(dashboard_data)
+        return Response(serializer.data)
 
-    try:
-        logs = AppLog.objects.filter(
-            cec_client_id=client_id,
-            timestamp__date__range=[start_date, end_date]
-        ).values(
-            'employee_id', 'employee_name', 'action', 'timestamp'
-        )
 
-        df = pd.DataFrame(logs)
-        if df.empty:
-            return Response({'message': "No logs found for the given date range"}, status=status.HTTP_200_OK)
-
-        df['timestamp'] = pd.to_datetime(df['timestamp']).dt.date
-        daily_summary = df.groupby(['timestamp', 'employee_name', 'action']).size().reset_index(name='count')
-        total_actions_per_day = daily_summary.groupby(['timestamp', 'employee_name'])['count'].sum().reset_index(
-            name='total_actions')
-        daily_summary = daily_summary.merge(total_actions_per_day, on=['timestamp', 'employee_name'])
-        daily_summary['percentage'] = (daily_summary['count'] / daily_summary['total_actions']) * 100
-
-        daily_summary_list = daily_summary.to_dict(orient='records')
-
+class LoginSessionViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for login sessions.
+    
+    Provides CRUD operations for login sessions with appropriate filtering
+    and permission controls.
+    """
+    queryset = LoginSession.objects.all().order_by('-login_timestamp')
+    serializer_class = LoginSessionSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['user_email', 'session_id', 'ip_address', 'device_id']
+    filterset_fields = ['is_active', 'user_email']
+    ordering_fields = ['login_timestamp', 'last_activity']
+    ordering = ['-login_timestamp']
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+    
+    @action(detail=True, methods=['post'])
+    def terminate(self, request, pk=None):
+        """Terminate a login session."""
+        session = self.get_object()
+        session.terminate_session()
+        
+        serializer = self.get_serializer(session)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def active(self, request):
+        """Get all active login sessions."""
+        queryset = self.filter_queryset(self.get_queryset().filter(is_active=True))
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'])
+    def terminate_all(self, request):
+        """Terminate all active sessions for a user."""
+        user_email = request.data.get('user_email')
+        if not user_email:
+            return Response(
+                {"error": "user_email is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        sessions = LoginSession.objects.filter(user_email=user_email, is_active=True)
+        count = sessions.count()
+        
+        for session in sessions:
+            session.terminate_session()
+        
         return Response({
-            'message': "Logs normalized successfully",
-            'data': daily_summary_list,
-            'success': True
-        }, status=status.HTTP_200_OK)
-
-    except Exception as e:
-        return Response({"error": str(e), "success": False}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            "message": f"Terminated {count} active sessions for {user_email}"
+        })
 
 
-def get_branch_name(employee_id):
-    return ""
+class AuditTrailViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint for audit trail.
+    
+    Provides read-only operations for audit trail with appropriate filtering
+    and permission controls.
+    """
+    queryset = AuditTrail.objects.all().order_by('-timestamp')
+    serializer_class = AuditTrailSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['admin_email', 'target_user_email', 'description']
+    filterset_fields = ['action', 'admin_email', 'target_user_email']
+    ordering_fields = ['timestamp', 'admin_email', 'action']
+    ordering = ['-timestamp']
+    permission_classes = [IsAdminUser]
 
 
-@api_view(["POST"])
-def get_most_active_app_users_and_branches(request):
-    client_id = request.data.get('client_id')
-    start_date = request.data.get('start_date')
-    end_date = request.data.get('end_date')
-
-    try:
-        logs = AppLog.objects.filter(
-            cec_client_id=client_id,
-            timestamp__date__range=[start_date, end_date]
-        ).values(
-            'employee_id', 'employee_name', 'action', 'timestamp'
-        )
-
-        df = pd.DataFrame(logs)
-        if df.empty:
-            return Response({'message': "No logs found for the given date range"}, status=status.HTTP_200_OK)
-
-
-        user_activity = df.groupby('employee_name').size().reset_index(name='count').sort_values(by='count',
-                                                                                                 ascending=False)
-        most_active_users = user_activity.head(10).to_dict(orient='records')
-
-
-        branch_activity = df.groupby('employee_id').size().reset_index(name='count').sort_values(by='count',
-                                                                                                 ascending=False)
-        branch_activity['branch_name'] = branch_activity['employee_id'].apply(
-            lambda x: get_branch_name(x))
-        most_active_branches = branch_activity.groupby('branch_name')['count'].sum().reset_index().sort_values(
-            by='count', ascending=False).head(10).to_dict(orient='records')
-
-        return Response({
-            'message': "Most active users and branches retrieved successfully",
-            'most_active_users': most_active_users,
-            'most_active_branches': most_active_branches,
-            'success': True
-        }, status=status.HTTP_200_OK)
-
-    except Exception as e:
-        return Response({"error": str(e), "success": False}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-def check_suspicious_activity(employee_id, latitude=None, longitude=None):
-    suspicious_activities = []
-
-    # Get today's logs for the employee
-    today_start = datetime.combine(datetime.today(), datetime.min.time())
-    today_end = datetime.combine(datetime.today(), datetime.max.time())
-    today_logs = AppLog.objects.filter(employee_id=employee_id, timestamp__range=(today_start, today_end))
-
-    # Check if the employee logged in with more than 5 devices on the same day
-    device_count = today_logs.values('device_id').distinct().count()
-    if device_count > 5:
-        suspicious_activities.append("Logged in with more than 3 devices on the same day.")
-
-    # Check if the latitude and longitude distance is more than 20km in the last 10 minutes
-    if latitude and longitude:
-        ten_minutes_ago = timezone.now() - timedelta(minutes=10)
-        recent_logs = today_logs.filter(timestamp__gte=ten_minutes_ago)
-        for log in recent_logs:
-            if log.latitude and log.longitude:
-                distance = services.haversine(float(log.latitude), float(log.longitude), float(latitude), float(longitude))
-                if distance > 10:
-                    suspicious_activities.append("Logged in from a location more than 10km away in the last 10 minutes.")
-                    break
-
-    # Check if the user tried to log in with a different password more than 3 times without successful login
-    failed_login_attempts = today_logs.filter(action='login_failed').count()
-    if failed_login_attempts > 3:
-        suspicious_activities.append("More than 10 failed login attempts with different passwords.")
-
-    # Check if the last login was 1000km away from the current login location
-    last_login_log = today_logs.filter(action='login_success').last()
-    if last_login_log and last_login_log.latitude and last_login_log.longitude:
-        distance = services.haversine(float(last_login_log.latitude), float(last_login_log.longitude), float(latitude), float(longitude))
-        if distance > 1000:
-            suspicious_activities.append("Last login was more than 1000km away from the current login location.")
-
-    # Log suspicious activities
-    if suspicious_activities:
-        new_activity = SuspiciousActivity.objects.create(
-            cec_client_id=today_logs.first().cec_client_id,
-            employee_id=employee_id,
-            description="\n".join(suspicious_activities)
-        )
-        new_activity.logs.set(today_logs)
-        new_activity.save()
-
-    return suspicious_activities
+class SuspiciousActivityViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for suspicious activities.
+    
+    Provides CRUD operations for suspicious activities with appropriate filtering
+    and permission controls.
+    """
+    queryset = SuspiciousActivity.objects.all().order_by('-detected_at')
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['user_email', 'description', 'source_ip']
+    filterset_fields = ['activity_type', 'severity', 'status', 'country']
+    ordering_fields = ['detected_at', 'severity']
+    ordering = ['-detected_at']
+    
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return SuspiciousActivityDetailSerializer
+        return SuspiciousActivitySerializer
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+    
+    @action(detail=True, methods=['post'])
+    def resolve(self, request, pk=None):
+        """Mark a suspicious activity as resolved."""
+        activity = self.get_object()
+        notes = request.data.get('notes', '')
+        
+        activity.mark_resolved(resolved_by=request.user.email, notes=notes)
+        
+        serializer = self.get_serializer(activity)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'])
+    def mark_false_positive(self, request, pk=None):
+        """Mark a suspicious activity as a false positive."""
+        activity = self.get_object()
+        notes = request.data.get('notes', '')
+        
+        activity.status = 'false_positive'
+        activity.resolved_at = timezone.now()
+        activity.resolved_by = request.user.email
+        if notes:
+            activity.resolution_notes = notes
+        activity.save()
+        
+        serializer = self.get_serializer(activity)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def by_user(self, request):
+        """Get suspicious activities for a specific user."""
+        user_email = request.query_params.get('user_email')
+        if not user_email:
+            return Response(
+                {"error": "user_email query parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        queryset = self.filter_queryset(self.get_queryset().filter(user_email=user_email))
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

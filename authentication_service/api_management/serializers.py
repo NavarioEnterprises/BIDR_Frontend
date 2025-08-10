@@ -4,10 +4,8 @@ BIDR API Management Serializers
 Serializers for API key management and monitoring.
 """
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from .models import APIKey, APIScope, APIRequest, RateLimitBucket, APIKeyUsageQuota
 
-User = get_user_model()
+from .models import APIKey, APIScope, APIRequest, RateLimitBucket, APIKeyUsageQuota
 
 
 class APIScopeSerializer(serializers.ModelSerializer):

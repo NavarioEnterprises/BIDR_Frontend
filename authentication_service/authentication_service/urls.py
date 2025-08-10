@@ -45,8 +45,7 @@ urlpatterns = [
     path("password-reset/", views.PasswordResetView.as_view(), name="password-reset"),
 
     # OTP endpoints
-    path("verify-otp/", views.OTPVerificationView.as_view(), name="verify-otp"),
-    path("resend-otp/", views.ResendOTPView.as_view(), name="resend-otp"),
+    path('api/otp/', include('otp.urls')),
 
     # Seller business registration
     # path("seller/business-registration/", views.SellerBusinessRegistrationView.as_view(),

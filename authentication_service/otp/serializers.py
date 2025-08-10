@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from django.contrib.auth import authenticate
-from django.contrib.auth.password_validation import validate_password
 
+from import_helper import setup_imports
+setup_imports()
 from user.models import AppUser
 from .models import OTP
 

@@ -49,12 +49,14 @@ INSTALLED_APPS = [
     'user',
     'otp',
     'seller',
-    # 'buyer',   # May have dependencies on seller
+    'buyer',   # May have dependencies on seller
     'permissions',
-    # 'auth_logs',
+    'auth_logs',
     'user_sessions',
     'api_management',
     'analytics',
+    'security',
+    #'user_sessions',
 
 ]
 
@@ -68,7 +70,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # Custom middleware can be added here
+    # Custom middleware
+    'security.middleware.SecurityMiddleware',  # Our custom security middleware
 ]
 
 ROOT_URLCONF = 'authentication_service.urls'

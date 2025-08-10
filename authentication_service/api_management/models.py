@@ -7,13 +7,12 @@ and API access control for the BIDR platform.
 import uuid
 import secrets
 import hashlib
-from datetime import timedelta
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 
-User = get_user_model()
+from import_helper import setup_imports
+setup_imports()
+from user.models import AppUser
 
 
 class APIKeyStatus(models.TextChoices):
@@ -94,7 +93,7 @@ class APIKey(models.Model):
     
     # Ownership
     user = models.ForeignKey(
-        User,
+        AppUser,
         on_delete=models.CASCADE,
         related_name='api_keys',
         help_text="User who owns this API key"

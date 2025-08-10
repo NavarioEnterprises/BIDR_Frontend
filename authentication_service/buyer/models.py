@@ -2,13 +2,15 @@ import uuid
 
 from django.db import models
 
-from user.models import MetadataModel, User
+from import_helper import setup_imports
+setup_imports()
+from user.models import MetadataModel, AppUser
 
 
 class Buyer(MetadataModel):
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
     is_active = models.BooleanField(default=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='buyers_profile')
+    user = models.OneToOneField(AppUser, on_delete=models.CASCADE, related_name='buyers_profile')
 
     def __str__(self):
         return f"Buyer Profile for {self.user.email}"
@@ -22,7 +24,7 @@ class Buyer(MetadataModel):
 class BuyersAddressDetails(MetadataModel):
     uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(
-        User,
+        AppUser,
         on_delete=models.CASCADE,
         related_name='address_details',
         help_text="The user or account this address belongs to."

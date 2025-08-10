@@ -3,9 +3,8 @@ BIDR Analytics Views
 
 API endpoints for analytics and reporting.
 """
-from django.db.models import Count, Avg, Sum, Max, Min, Q
+from django.db.models import Count
 from django.utils import timezone
-from datetime import datetime, timedelta
 from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response

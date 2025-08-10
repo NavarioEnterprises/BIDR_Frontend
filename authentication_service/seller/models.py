@@ -6,6 +6,8 @@ from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator
 
+from import_helper import setup_imports
+setup_imports()
 from user.models import MetadataModel, AppUser
 from security.utils import security_utils
 

@@ -5,13 +5,14 @@ This module contains models for tracking and analyzing authentication
 metrics, user behavior, and system performance.
 """
 import uuid
+
 from datetime import timedelta
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth import get_user_model
-from django.db.models import Avg, Count, Sum, Max, Min
 
-User = get_user_model()
+from import_helper import setup_imports
+setup_imports()
+from user.models import AppUser
 
 
 class MetricType(models.TextChoices):
@@ -125,7 +126,7 @@ class UserBehaviorAnalytics(models.Model):
     
     # User Context
     user = models.ForeignKey(
-        User,
+        AppUser,
         on_delete=models.CASCADE,
         related_name='behavior_analytics',
         help_text="User this analytics record belongs to"
@@ -516,26 +517,29 @@ class AuthenticationTrend(models.Model):
             self.is_increasing = False
 
 
+class ReportType(models.TextChoices):
+    """Types of analytics reports"""
+    DAILY_SUMMARY = 'daily_summary', 'Daily Summary'
+    WEEKLY_SUMMARY = 'weekly_summary', 'Weekly Summary'
+    MONTHLY_SUMMARY = 'monthly_summary', 'Monthly Summary'
+    SECURITY_REPORT = 'security_report', 'Security Report'
+    PERFORMANCE_REPORT = 'performance_report', 'Performance Report'
+    USER_BEHAVIOR = 'user_behavior', 'User Behavior Report'
+    CUSTOM = 'custom', 'Custom Report'
+
+
+class ReportStatus(models.TextChoices):
+    """Status options for analytics reports"""
+    GENERATING = 'generating', 'Generating'
+    COMPLETED = 'completed', 'Completed'
+    FAILED = 'failed', 'Failed'
+    SCHEDULED = 'scheduled', 'Scheduled'
+
+
 class AnalyticsReport(models.Model):
     """
     Store generated analytics reports
     """
-    REPORT_TYPES = [
-        ('daily_summary', 'Daily Summary'),
-        ('weekly_summary', 'Weekly Summary'),
-        ('monthly_summary', 'Monthly Summary'),
-        ('security_report', 'Security Report'),
-        ('performance_report', 'Performance Report'),
-        ('user_behavior', 'User Behavior Report'),
-        ('custom', 'Custom Report'),
-    ]
-    
-    REPORT_STATUS = [
-        ('generating', 'Generating'),
-        ('completed', 'Completed'),
-        ('failed', 'Failed'),
-        ('scheduled', 'Scheduled'),
-    ]
     
     id = models.BigAutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -552,7 +556,7 @@ class AnalyticsReport(models.Model):
     )
     report_type = models.CharField(
         max_length=50,
-        choices=REPORT_TYPES,
+        choices=ReportType.choices,
         help_text="Type of report"
     )
     
@@ -587,12 +591,12 @@ class AnalyticsReport(models.Model):
     # Generation Info
     status = models.CharField(
         max_length=20,
-        choices=REPORT_STATUS,
-        default='scheduled',
+        choices=ReportStatus.choices,
+        default=ReportStatus.SCHEDULED,
         help_text="Current status of the report"
     )
     generated_by = models.ForeignKey(
-        User,
+        AppUser,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -658,7 +662,7 @@ class AnalyticsReport(models.Model):
 
     def mark_completed(self, generation_time=None):
         """Mark the report as completed"""
-        self.status = 'completed'
+        self.status = ReportStatus.COMPLETED
         self.generated_at = timezone.now()
         if generation_time:
             self.generation_time = generation_time
@@ -666,6 +670,6 @@ class AnalyticsReport(models.Model):
 
     def mark_failed(self, error_message):
         """Mark the report as failed"""
-        self.status = 'failed'
+        self.status = ReportStatus.FAILED
         self.error_message = error_message
         self.save(update_fields=['status', 'error_message'])

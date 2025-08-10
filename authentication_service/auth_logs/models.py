@@ -4,13 +4,11 @@ BIDR Authentication Logging Models
 This module contains models for logging all authentication-related activities
 in the BIDR platform including logins, registrations, password resets, etc.
 """
-from django.db import models
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.core.validators import RegexValidator
-from django.utils import timezone
 from datetime import timedelta
-import json
+
+from django.db import models
+from django.utils import timezone
+
 
 
 class AuthenticationLog(models.Model):
@@ -333,6 +331,103 @@ class LoginSession(models.Model):
     def is_expired(self):
         """Check if session has expired (24 hours of inactivity)."""
         return timezone.now() - self.last_activity > timedelta(hours=24)
+
+
+class SuspiciousActivity(models.Model):
+    """
+    Records suspicious activities detected in the system that may indicate
+    security threats or unauthorized access attempts.
+    """
+    
+    ACTIVITY_TYPE_CHOICES = [
+        ('unusual_login', 'Unusual Login Pattern'),
+        ('multiple_failed_attempts', 'Multiple Failed Login Attempts'),
+        ('impossible_travel', 'Impossible Travel Detection'),
+        ('unusual_device', 'Unusual Device Access'),
+        ('unusual_time', 'Unusual Access Time'),
+        ('unusual_location', 'Unusual Geographic Location'),
+        ('brute_force', 'Brute Force Attack'),
+        ('api_abuse', 'API Abuse'),
+        ('data_scraping', 'Data Scraping Attempt'),
+        ('session_hijacking', 'Session Hijacking Attempt'),
+        ('privilege_escalation', 'Privilege Escalation Attempt'),
+        ('unauthorized_access', 'Unauthorized Access Attempt'),
+        ('other', 'Other Suspicious Activity'),
+    ]
+    
+    SEVERITY_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+        ('critical', 'Critical'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('new', 'New'),
+        ('investigating', 'Under Investigation'),
+        ('resolved', 'Resolved'),
+        ('false_positive', 'False Positive'),
+        ('ignored', 'Ignored'),
+    ]
+    
+    id = models.BigAutoField(primary_key=True)
+    user_email = models.EmailField(null=True, blank=True, db_index=True, help_text="Email of the affected user")
+    user_id = models.IntegerField(null=True, blank=True, db_index=True, help_text="ID of the affected user")
+    
+    activity_type = models.CharField(max_length=50, choices=ACTIVITY_TYPE_CHOICES)
+    severity = models.CharField(max_length=20, choices=SEVERITY_CHOICES, default='medium')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+    
+    description = models.TextField(help_text="Detailed description of the suspicious activity")
+    source_ip = models.GenericIPAddressField(null=True, blank=True, help_text="Source IP address")
+    
+    # Location data
+    country = models.CharField(max_length=100, null=True, blank=True)
+    region = models.CharField(max_length=100, null=True, blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    
+    # Device information
+    device_info = models.JSONField(default=dict, blank=True, help_text="Device information")
+    
+    # Additional data
+    details = models.JSONField(default=dict, blank=True, help_text="Additional details about the activity")
+    
+    # Related logs
+    related_auth_logs = models.ManyToManyField(AuthenticationLog, blank=True, related_name='suspicious_activities')
+    
+    # Timestamps
+    detected_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    
+    # Resolution information
+    resolved_by = models.EmailField(null=True, blank=True, help_text="Email of the admin who resolved this")
+    resolution_notes = models.TextField(null=True, blank=True)
+    
+    class Meta:
+        db_table = "bidr_suspicious_activities"
+        ordering = ['-detected_at']
+        indexes = [
+            models.Index(fields=['user_email', 'detected_at']),
+            models.Index(fields=['activity_type', 'status']),
+            models.Index(fields=['severity', 'status']),
+            models.Index(fields=['source_ip', 'detected_at']),
+        ]
+        verbose_name = "Suspicious Activity"
+        verbose_name_plural = "Suspicious Activities"
+    
+    def __str__(self):
+        return f"{self.get_activity_type_display()} - {self.detected_at}"
+    
+    def mark_resolved(self, resolved_by, notes=None):
+        """Mark this suspicious activity as resolved."""
+        self.status = 'resolved'
+        self.resolved_at = timezone.now()
+        self.resolved_by = resolved_by
+        if notes:
+            self.resolution_notes = notes
+        self.save()
 
 
 class AuditTrail(models.Model):

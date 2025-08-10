@@ -1,3 +1,11 @@
+import hashlib
+import random
+import string
+
+from django.conf import settings
+from django.utils import timezone
+
+
 class OTPGenerator:
     """
     Utility class for generating and validating OTPs

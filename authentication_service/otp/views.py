@@ -1,6 +1,3 @@
-import random
-import string
-
 from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,9 +5,12 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 
+from import_helper import setup_imports
+setup_imports()
 from user.models import AppUser
 from .models import OTP
 from .serializers import OTPVerificationSerializer
+from .utils import OTPGenerator
 
 
 class OTPVerificationView(APIView):
@@ -57,8 +57,8 @@ class ResendOTPView(APIView):
                 verified_at=timezone.now()
             )
 
-            # Generate new OTP
-            otp_code = "".join(random.choices(string.digits, k=6))
+            # Generate new OTP using the OTPGenerator utility
+            otp_code = OTPGenerator.generate_otp()
             OTP.objects.create(user=user, otp=otp_code)
 
             # Send OTP via email

@@ -17,10 +17,9 @@ from .models import (
     UserPermission, UserPermissionManager
 )
 from .serializers import (
-    PermissionSerializer, UserRoleTypeSerializer, RolePermissionSerializer,
+    PermissionSerializer, UserRoleTypeSerializer, BulkAssignPermissionsSerializer,
     UserRoleSerializer, UserPermissionSerializer, UserPermissionSummarySerializer,
-    AssignRoleSerializer, AssignPermissionSerializer, BulkAssignRolesSerializer,
-    BulkAssignPermissionsSerializer
+    AssignRoleSerializer, AssignPermissionSerializer, BulkAssignRolesSerializer
 )
 
 

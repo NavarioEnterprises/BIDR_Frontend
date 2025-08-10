@@ -8,3 +8,6 @@ pytz~=2024.2
 Pillow~=11.0.0
 python-decouple~=3.8
 django-extensions~=3.2.3
+
+django-mptt~=0.17.0
+django-filter~=25.1

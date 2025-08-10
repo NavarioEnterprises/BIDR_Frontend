@@ -1,7 +1,9 @@
-import uuid
 from django.db import models
 from django.utils import timezone
-from accounts.models import MetadataModel, AppUser
+
+from import_helper import setup_imports
+setup_imports()
+from user.models import MetadataModel, AppUser
 
 
 class SecurityPolicy(MetadataModel):

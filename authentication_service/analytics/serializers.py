@@ -4,13 +4,11 @@ BIDR Analytics Serializers
 Serializers for analytics and reporting endpoints.
 """
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+
 from .models import (
     AuthenticationMetric, UserBehaviorAnalytics, SystemPerformanceMetric,
     AuthenticationTrend, AnalyticsReport
 )
-
-User = get_user_model()
 
 
 class AuthenticationMetricSerializer(serializers.ModelSerializer):

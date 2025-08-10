@@ -2,6 +2,7 @@
 Serializers for the roles and permissions system.
 """
 from rest_framework import serializers
+
 from .models import Permission, UserRoleType, RolePermission, UserRole, UserPermission, UserPermissionManager
 
 

@@ -2,9 +2,8 @@
 Serializers for BIDR Authentication Logging System
 """
 from rest_framework import serializers
-from django.utils import timezone
-from datetime import timedelta
-from .models import AuthenticationLog, SecurityEvent, LoginSession, AuditTrail
+
+from .models import AuthenticationLog, SecurityEvent, LoginSession, AuditTrail, SuspiciousActivity
 
 
 class AuthenticationLogSerializer(serializers.ModelSerializer):
@@ -235,6 +234,40 @@ class BulkLogCreateSerializer(serializers.Serializer):
         if len(value) > 1000:
             raise serializers.ValidationError("Cannot create more than 1000 logs at once")
         return value
+
+
+class SuspiciousActivitySerializer(serializers.ModelSerializer):
+    """Serializer for suspicious activities."""
+    
+    activity_type_display = serializers.CharField(source='get_activity_type_display', read_only=True)
+    severity_display = serializers.CharField(source='get_severity_display', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    related_auth_logs_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = SuspiciousActivity
+        fields = [
+            'id', 'user_email', 'user_id', 'activity_type', 'activity_type_display',
+            'severity', 'severity_display', 'status', 'status_display',
+            'description', 'source_ip', 'country', 'region', 'city',
+            'latitude', 'longitude', 'device_info', 'details',
+            'detected_at', 'resolved_at', 'resolved_by', 'resolution_notes',
+            'related_auth_logs_count'
+        ]
+        read_only_fields = ['id', 'detected_at', 'resolved_at']
+    
+    def get_related_auth_logs_count(self, obj):
+        """Get count of related authentication logs."""
+        return obj.related_auth_logs.count()
+
+
+class SuspiciousActivityDetailSerializer(SuspiciousActivitySerializer):
+    """Detailed serializer for suspicious activities including related logs."""
+    
+    related_auth_logs = AuthenticationLogSerializer(many=True, read_only=True)
+    
+    class Meta(SuspiciousActivitySerializer.Meta):
+        fields = SuspiciousActivitySerializer.Meta.fields + ['related_auth_logs']
 
 
 class ExportRequestSerializer(serializers.Serializer):

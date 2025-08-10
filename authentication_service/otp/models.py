@@ -4,94 +4,14 @@ import uuid
 from django.db import models
 from django.utils.timezone import now
 
-from user.models import AppUser
+from import_helper import setup_imports
+setup_imports()
+from user.models import AppUser, MetadataModel
 
 
 def default_expires_at():
     """Return a datetime 5 minutes from now."""
     return now() + timedelta(minutes=5)
-
-
-class MetadataModel(models.Model):
-    is_visible = models.BooleanField(default=True)
-    is_hidden = models.BooleanField(default=False)
-    is_deleted = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
-    restored_at = models.DateTimeField(null=True, blank=True)
-    last_updated_by = models.ForeignKey(
-        AppUser,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="%(class)s_updated_by",
-        help_text="User who last updated this record."
-    )
-
-    class Meta:
-        abstract = True
-        ordering = ['-created_at']
-        get_latest_by = 'created_at'
-
-    def soft_delete(self):
-        """
-        Mark the instance as deleted without removing it from the database.
-        """
-        self.is_deleted = True
-        self.deleted_at = now()
-        self.save(update_fields=['is_deleted', 'deleted_at'])
-
-    def restore(self):
-        """
-        Restore a soft-deleted instance by unmarking it as deleted.
-        """
-        self.is_deleted = False
-        self.deleted_at = None
-        self.restored_at = now()
-        self.save(update_fields=['is_deleted', 'deleted_at', 'restored_at'])
-
-    def toggle_visibility(self):
-        """
-        Toggle the visibility of the instance.
-        """
-        self.is_visible = not self.is_visible
-        self.save(update_fields=['is_visible'])
-
-    def hide(self):
-        """
-        Mark the instance as hidden.
-        """
-        self.is_hidden = True
-        self.save(update_fields=['is_hidden'])
-
-    def unhide(self):
-        """
-        Unmark the instance as hidden.
-        """
-        self.is_hidden = False
-        self.save(update_fields=['is_hidden'])
-
-    def save(self, *args, **kwargs):
-        """
-        Override save to log last_updated_by if provided.
-        """
-        user = kwargs.pop('user', None)
-        if user:
-            self.last_updated_by = user
-        super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        """
-        Override delete to prevent signature mismatch with the base method.
-        """
-        if kwargs.pop('soft', True):
-            self.soft_delete()
-        else:
-            super().delete(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.__class__.__name__} - ID {self.pk} (Visible: {self.is_visible}, Deleted: {self.is_deleted})"
 
 
 class OTP(MetadataModel):
