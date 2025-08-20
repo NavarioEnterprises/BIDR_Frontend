@@ -143,6 +143,10 @@ class AnalyticsReportViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Filter reports to user's own or admin access"""
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return AnalyticsReport.objects.none()
+        
         if self.request.user.is_staff:
             return AnalyticsReport.objects.all()
         return AnalyticsReport.objects.filter(generated_by=self.request.user)

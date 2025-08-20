@@ -320,7 +320,7 @@ class SellersAddressDetails(MetadataModel):
     )
     platform_workflow_email_address = models.EmailField(
         max_length=255, null=False, blank=False,
-        help_text="Email address for platform workflow notifications."
+        help_text="Email address for platform workflow notifications_service."
     )
     is_primary = models.BooleanField(
         default=False, help_text="Indicates if this is the primary business address."

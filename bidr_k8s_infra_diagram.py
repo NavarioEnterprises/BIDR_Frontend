@@ -64,11 +64,15 @@ with Diagram(
             acr = ContainerRegistries("BIDRcontainerregistry (ACR, West US)")
 
         # Workloads (Containerized Services)
-        with Cluster("Containerized Services"):
-            api_service = ContainerInstances("BIDR-api-service (Deployment)")
-            web_service = ContainerInstances("BIDR-web-service (Deployment)")
-            worker_service = ContainerInstances("BIDR-worker-service (Deployment)")
-            proxy_service = ContainerInstances("BIDR-proxy-service (Deployment)")
+        with Cluster("BIDR Microservices (8 Services)"):
+            auth_service = ContainerInstances("auth-service (2 replicas)")
+            chat_service = ContainerInstances("chat-service (2 replicas)")
+            payment_service = ContainerInstances("payment-service (3 replicas)")
+            resolution_service = ContainerInstances("resolution-service (2 replicas)")
+            product_service = ContainerInstances("product-service (2 replicas)")
+            notifications_service = ContainerInstances("notifications-service (2 replicas)")
+            transactions_service = ContainerInstances("transactions-service (2 replicas)")
+            reviews_service = ContainerInstances("reviews-service (2 replicas)")
 
             # Kubernetes ingress controller
             ingress_controller = Resource("nginx-ingress-controller (K8s)")
@@ -116,7 +120,7 @@ with Diagram(
         lb_k8s >> vnet_aks
 
         pip_edge >> vnet_edge
-        vnet_edge >> proxy_service
+        # vnet_edge >> proxy_service  # Removed since proxy_service not defined
 
         pip_mgmt >> vnet_mgmt
         vnet_mgmt >> bastion
@@ -126,37 +130,35 @@ with Diagram(
         aks_cluster >> [node_pool_system, node_pool_workload]
 
         # Container registry
-        acr >> [api_service, web_service, worker_service, proxy_service]
+        acr >> [auth_service, chat_service, payment_service, resolution_service, product_service, notifications_service, transactions_service, reviews_service]
 
         # Ingress and load balancing
         lb_k8s >> ingress_controller
-        ingress_controller >> [api_service, web_service]
+        ingress_controller >> [auth_service, chat_service, payment_service, resolution_service, product_service, notifications_service, transactions_service, reviews_service]
         cert_manager >> ingress_controller
 
-        # Service connections
-        api_service >> psql_flexible
-        api_service >> redis_cache
-        web_service >> api_service
-        worker_service >> [psql_flexible, redis_cache]
+        # Service connections to database
+        [auth_service, chat_service, payment_service, resolution_service, product_service, notifications_service, transactions_service, reviews_service] >> psql_flexible
+        [auth_service, chat_service, payment_service, resolution_service, product_service, notifications_service, transactions_service, reviews_service] >> redis_cache
 
         # Storage connections
-        [api_service, worker_service] >> storage_persistent
+        [auth_service, chat_service, payment_service, resolution_service, product_service, notifications_service, transactions_service, reviews_service] >> storage_persistent
         storage_persistent >> [pv_data, pv_logs]
         storage_backup >> storage_persistent
 
         # Security connections
         key_vault >> secret_store
-        secret_store >> [api_service, web_service, worker_service]
+        secret_store >> [auth_service, chat_service, payment_service, resolution_service, product_service, notifications_service, transactions_service, reviews_service]
 
         # Monitoring connections
         aks_cluster >> [ai_k8s, prometheus]
-        [api_service, web_service, worker_service] >> ai_workloads
+        [auth_service, chat_service, payment_service, resolution_service, product_service, notifications_service, transactions_service, reviews_service] >> ai_workloads
         prometheus >> grafana
         ai_k8s >> failure_anomalies_k8s
 
         # CI/CD connections
         devops >> acr
         devops >> aks_cluster
-        devops - [api_service, web_service, worker_service, psql_flexible]
+        devops - [auth_service, chat_service, payment_service, resolution_service, psql_flexible]
 
 print("Containerized Kubernetes infrastructure diagram generated for BIDR resources.")

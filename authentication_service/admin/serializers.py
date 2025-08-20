@@ -107,7 +107,7 @@ class AdminActivityLogCreateSerializer(serializers.ModelSerializer):
 
 
 class AdminNotificationCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating admin notifications"""
+    """Serializer for creating admin notifications_service"""
 
     class Meta:
         model = AdminNotification

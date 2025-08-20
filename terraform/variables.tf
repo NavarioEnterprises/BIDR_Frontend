@@ -100,3 +100,60 @@ variable "email_host_password" {
   default     = ""
   sensitive   = true
 }
+
+# PostgreSQL Configuration
+variable "postgresql_version" {
+  description = "Version of PostgreSQL to use"
+  type        = string
+  default     = "15"
+}
+
+variable "postgresql_sku" {
+  description = "SKU for PostgreSQL Flexible Server"
+  type        = string
+  default     = "B_Standard_B1ms"
+}
+
+variable "postgresql_storage_mb" {
+  description = "Storage size in MB for PostgreSQL"
+  type        = number
+  default     = 32768
+}
+
+variable "database_names" {
+  description = "List of database names to create"
+  type        = list(string)
+  default     = [
+    "auth_db",
+    "chat_db",
+    "payment_db",
+    "resolution_db",
+    "product_db",
+    "notifications_db",
+    "transactions_db",
+    "reviews_db"
+  ]
+}
+
+# Redis Configuration
+variable "redis_capacity" {
+  description = "Capacity of Redis Cache"
+  type        = number
+  default     = 2
+}
+
+variable "redis_family" {
+  description = "Family of Redis Cache"
+  type        = string
+  default     = "C"
+}
+
+variable "redis_sku" {
+  description = "SKU for Redis Cache"
+  type        = string
+  default     = "Standard"
+  validation {
+    condition     = contains(["Basic", "Standard", "Premium"], var.redis_sku)
+    error_message = "Redis SKU must be Basic, Standard, or Premium."
+  }
+}

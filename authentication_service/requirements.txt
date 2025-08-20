@@ -9,4 +9,5 @@ django-filter>=23.5
 drf-yasg>=1.21.7
 gunicorn>=21.2.0
 whitenoise>=6.6.0
-rest_framework_simplejwt
+djangorestframework-simplejwt>=5.0.0
+django-prometheus>=2.3.1

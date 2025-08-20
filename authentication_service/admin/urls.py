@@ -7,7 +7,7 @@ from .views import AdminProfileViewSet, AdminActivityLogViewSet, AdminNotificati
 router = DefaultRouter()
 router.register(r'profile', AdminProfileViewSet, basename='admin-profile')
 router.register(r'activity-logs', AdminActivityLogViewSet, basename='admin-activity-log')
-router.register(r'notifications', AdminNotificationViewSet, basename='admin-notification')
+router.register(r'notifications_service', AdminNotificationViewSet, basename='admin-notification')
 
 urlpatterns = [
     path('', include(router.urls)),

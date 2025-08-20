@@ -211,7 +211,7 @@ class ComprehensiveUserProfileSerializer(serializers.ModelSerializer):
             'bio', 'website', 'linkedin_profile',
             
             # Preferences
-            'preferred_language', 'timezone', 'currency_preference',
+            'preferred_language', 'user_timezone', 'currency_preference',
             
             # Notification preferences
             'email_notifications', 'sms_notifications', 'push_notifications', 'marketing_emails',
@@ -272,7 +272,7 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
             'first_name', 'middle_name', 'last_name', 'alternative_phone', 'alternative_email',
             'date_of_birth', 'gender', 'nationality', 'occupation', 'company_name',
             'profile_picture', 'bio', 'website', 'linkedin_profile', 'preferred_language',
-            'timezone', 'currency_preference', 'email_notifications', 'sms_notifications',
+            'user_timezone', 'currency_preference', 'email_notifications', 'sms_notifications',
             'push_notifications', 'marketing_emails', 'profile_visibility', 'show_email', 'show_phone'
         ]
     
@@ -309,7 +309,7 @@ class UserPreferencesSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppUser
         fields = [
-            'preferred_language', 'timezone', 'currency_preference',
+            'preferred_language', 'user_timezone', 'currency_preference',
             'email_notifications', 'sms_notifications', 'push_notifications',
             'marketing_emails', 'profile_visibility', 'show_email', 'show_phone'
         ]

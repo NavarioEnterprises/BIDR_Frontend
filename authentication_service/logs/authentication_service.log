@@ -1113,3 +1113,235 @@ INFO 2025-08-07 06:55:47,962 basehttp 8614 6246985728 "GET /static/admin/css/wid
 INFO 2025-08-07 06:55:47,964 basehttp 8614 6280638464 "GET /static/admin/js/change_form.js HTTP/1.1" 200 606
 INFO 2025-08-07 06:55:47,988 basehttp 8614 6280638464 "GET /static/admin/img/icon-calendar.svg HTTP/1.1" 200 1086
 INFO 2025-08-07 06:55:47,989 basehttp 8614 6246985728 "GET /static/admin/img/icon-clock.svg HTTP/1.1" 200 677
+INFO 2025-08-15 13:30:15,724 autoreload 21946 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-15 13:32:33,170 autoreload 23563 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-15 13:35:53,593 autoreload 25990 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-15 13:43:37,520 autoreload 31775 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 05:45:27,616 basehttp 31775 6171242496 "OPTIONS /register/ HTTP/1.1" 200 0
+INFO 2025-08-16 05:45:29,370 basehttp 31775 6171242496 "POST /register/ HTTP/1.1" 201 175
+INFO 2025-08-16 05:45:55,634 basehttp 31775 6171242496 "OPTIONS /verify-otp/ HTTP/1.1" 200 0
+WARNING 2025-08-16 05:45:55,655 log 31775 6171242496 Not Found: /verify-otp/
+WARNING 2025-08-16 05:45:55,655 basehttp 31775 6171242496 "POST /verify-otp/ HTTP/1.1" 404 6161
+INFO 2025-08-16 05:46:38,278 basehttp 31775 13035925504 "GET / HTTP/1.1" 200 2226
+INFO 2025-08-16 05:46:38,300 basehttp 31775 13035925504 "GET /static/drf-yasg/style.css HTTP/1.1" 200 1047
+INFO 2025-08-16 05:46:38,301 basehttp 31775 13103230976 "GET /static/drf-yasg/insQ.min.js HTTP/1.1" 200 2093
+INFO 2025-08-16 05:46:38,303 basehttp 31775 13035925504 "GET /static/drf-yasg/swagger-ui-init.js HTTP/1.1" 200 15480
+INFO 2025-08-16 05:46:38,305 basehttp 31775 13120057344 "GET /static/drf-yasg/immutable.min.js HTTP/1.1" 200 56904
+INFO 2025-08-16 05:46:38,306 basehttp 31775 13052751872 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui.css HTTP/1.1" 200 145206
+INFO 2025-08-16 05:46:38,313 basehttp 31775 13086404608 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-standalone-preset.js HTTP/1.1" 200 322863
+INFO 2025-08-16 05:46:38,315 basehttp 31775 13069578240 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-bundle.js HTTP/1.1" 200 1046583
+INFO 2025-08-16 05:46:38,390 basehttp 31775 13086404608 "GET /static/drf-yasg/swagger-ui-dist/favicon-32x32.png HTTP/1.1" 200 628
+ERROR 2025-08-16 05:46:38,583 log 31775 13069578240 Internal Server Error: /
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/views.py", line 112, in get
+    schema = generator.get_schema(request, self.public)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 276, in get_schema
+    paths, prefix = self.get_paths(endpoints, components, request, public)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 482, in get_paths
+    operation = self.get_operation(view, path, prefix, method, components, request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/generators.py", line 524, in get_operation
+    operation = view_inspector.get_operation(operation_keys)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 45, in get_operation
+    responses = self.get_responses()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 180, in get_responses
+    response_serializers = self.get_response_serializers()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 235, in get_response_serializers
+    responses = self.get_default_responses()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/view.py", line 211, in get_default_responses
+    default_schema = self.serializer_to_schema(default_schema) or ''
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 438, in serializer_to_schema
+    return self.probe_inspectors(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 49, in get_schema
+    return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 228, in probe_field_inspectors
+    return self.probe_inspectors(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 140, in field_to_swagger_object
+    actual_schema = definitions.setdefault(ref_name, make_schema_definition)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/openapi.py", line 685, in setdefault
+    ret = maker()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/drf_yasg/inspectors/field.py", line 109, in make_schema_definition
+    for property_name, child in serializer.fields.items():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1103, in get_fields
+    field_class, field_kwargs = self.build_field(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1249, in build_field
+    return self.build_unknown_field(field_name, model_class)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 1367, in build_unknown_field
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: Field name `timezone` is not valid for model `AppUser` in `user.serializers.ComprehensiveUserProfileSerializer`.
+ERROR 2025-08-16 05:46:38,585 basehttp 31775 13069578240 "GET /?format=openapi HTTP/1.1" 500 235646
+WARNING 2025-08-16 05:46:49,187 log 31775 13069578240 Not Found: /api/otp/
+WARNING 2025-08-16 05:46:49,188 basehttp 31775 13069578240 "GET /api/otp/ HTTP/1.1" 404 6405
+WARNING 2025-08-16 05:46:49,204 log 31775 13069578240 Not Found: /favicon.ico
+WARNING 2025-08-16 05:46:49,204 basehttp 31775 13069578240 "GET /favicon.ico HTTP/1.1" 404 6160
+INFO 2025-08-16 05:50:37,860 basehttp 31775 6171242496 "POST /register/ HTTP/1.1" 201 182
+INFO 2025-08-16 05:51:43,098 basehttp 31775 6171242496 "OPTIONS /api/otp/verify/ HTTP/1.1" 200 0
+INFO 2025-08-16 05:51:43,113 basehttp 31775 6171242496 "POST /api/otp/verify/ HTTP/1.1" 200 39
+INFO 2025-08-16 06:03:25,784 autoreload 31775 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/user/serializers.py changed, reloading.
+INFO 2025-08-16 06:03:26,781 autoreload 72511 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 06:03:39,416 autoreload 72511 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/user/serializers.py changed, reloading.
+INFO 2025-08-16 06:03:39,763 autoreload 72605 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 06:03:51,352 autoreload 72605 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/user/serializers.py changed, reloading.
+INFO 2025-08-16 06:03:51,697 autoreload 72692 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 06:06:41,813 autoreload 72692 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/user_sessions/views.py changed, reloading.
+INFO 2025-08-16 06:06:42,228 autoreload 73853 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 06:07:03,031 autoreload 73853 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/user_sessions/views.py changed, reloading.
+INFO 2025-08-16 06:07:03,359 autoreload 74004 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 06:07:26,294 autoreload 74004 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/user_sessions/views.py changed, reloading.
+INFO 2025-08-16 06:07:26,647 autoreload 74171 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 06:07:53,660 autoreload 74171 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/user_sessions/views.py changed, reloading.
+INFO 2025-08-16 06:07:54,012 autoreload 74356 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 06:08:16,928 autoreload 74356 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/api_management/views.py changed, reloading.
+INFO 2025-08-16 06:08:17,284 autoreload 74530 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 06:08:39,151 autoreload 74530 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/api_management/views.py changed, reloading.
+INFO 2025-08-16 06:08:39,495 autoreload 74688 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 06:09:00,284 autoreload 74688 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/api_management/views.py changed, reloading.
+INFO 2025-08-16 06:09:00,612 autoreload 74820 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 06:09:21,465 autoreload 74820 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/analytics/views.py changed, reloading.
+INFO 2025-08-16 06:09:21,747 autoreload 74994 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 06:09:43,556 autoreload 74994 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/views.py changed, reloading.
+INFO 2025-08-16 06:09:43,788 autoreload 75142 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 06:11:13,602 autoreload 75142 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/authentication_service/urls.py changed, reloading.
+INFO 2025-08-16 06:11:13,942 autoreload 75929 8726496704 Watching for file changes with StatReloader
+WARNING 2025-08-16 06:33:56,083 log 75929 6203273216 Not Found: /api/otp/
+WARNING 2025-08-16 06:33:56,083 basehttp 75929 6203273216 "GET /api/otp/ HTTP/1.1" 404 6679
+INFO 2025-08-16 06:34:00,551 basehttp 75929 6203273216 "GET / HTTP/1.1" 200 2226
+INFO 2025-08-16 06:34:00,718 basehttp 75929 6203273216 "GET /?format=openapi HTTP/1.1" 200 131648
+ERROR 2025-08-16 10:53:57,450 log 75929 6203273216 Internal Server Error: /api/seller/register/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/views.py", line 265, in post
+    api_request = APIRequest.objects.create(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/query.py", line 677, in create
+    obj = self.model(**kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/base.py", line 567, in __init__
+    raise TypeError(
+TypeError: APIRequest() got unexpected keyword arguments: 'user', 'request_data'
+ERROR 2025-08-16 10:53:57,469 basehttp 75929 6203273216 "POST /api/seller/register/ HTTP/1.1" 500 23227
+INFO 2025-08-16 11:12:57,074 autoreload 75929 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/views.py changed, reloading.
+INFO 2025-08-16 11:12:58,014 autoreload 55043 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 11:13:28,294 autoreload 55043 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/views.py changed, reloading.
+INFO 2025-08-16 11:13:28,655 autoreload 55245 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 11:13:41,292 autoreload 55245 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/views.py changed, reloading.
+INFO 2025-08-16 11:13:41,633 autoreload 55341 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 11:13:59,393 autoreload 55341 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/views.py changed, reloading.
+INFO 2025-08-16 11:13:59,757 autoreload 55476 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 11:14:23,711 autoreload 55476 8726496704 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/views.py changed, reloading.
+INFO 2025-08-16 11:14:24,122 autoreload 55640 8726496704 Watching for file changes with StatReloader
+WARNING 2025-08-16 11:14:45,861 log 55640 6198358016 Bad Request: /api/seller/register/
+WARNING 2025-08-16 11:14:45,862 basehttp 55640 6198358016 "POST /api/seller/register/ HTTP/1.1" 400 130
+ERROR 2025-08-16 11:14:56,224 log 55640 6198358016 Internal Server Error: /api/seller/register/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/views.py", line 222, in post
+    user = serializer.save()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/rest_framework/serializers.py", line 208, in save
+    self.instance = self.create(validated_data)
+  File "/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/serializers.py", line 36, in create
+    user = AppUser.objects.create_user(
+  File "/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/user/managers.py", line 28, in create_user
+    user.set_password(password)
+  File "/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/user/models.py", line 199, in set_password
+    raise ValueError(f"Password validation failed: {', '.join(validation_result['errors'])}")
+ValueError: Password validation failed: Password must contain at least one uppercase letter, Password must contain at least one special character
+ERROR 2025-08-16 11:14:56,225 basehttp 55640 6198358016 "POST /api/seller/register/ HTTP/1.1" 500 117761
+INFO 2025-08-16 11:15:06,070 basehttp 55640 6198358016 "POST /api/seller/register/ HTTP/1.1" 201 117
+INFO 2025-08-16 11:15:55,814 basehttp 55640 6198358016 "POST /api/otp/verify/ HTTP/1.1" 200 39
+INFO 2025-08-16 11:16:01,068 basehttp 55640 6198358016 "POST /login/ HTTP/1.1" 200 976
+INFO 2025-08-16 11:16:09,401 basehttp 55640 6198358016 "POST /logout/ HTTP/1.1" 200 31
+INFO 2025-08-16 11:22:32,030 autoreload 59311 8726496704 Watching for file changes with StatReloader
+INFO 2025-08-16 11:36:18,411 basehttp 59311 6163017728 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-08-16 11:36:18,600 basehttp 59311 6163017728 "POST /login/ HTTP/1.1" 200 975
+INFO 2025-08-16 11:39:14,055 basehttp 59311 6163017728 "POST /login/ HTTP/1.1" 200 975
+INFO 2025-08-16 11:40:08,489 basehttp 59311 6163017728 "POST /login/ HTTP/1.1" 200 975
+INFO 2025-08-16 11:40:27,954 basehttp 59311 6163017728 "POST /login/ HTTP/1.1" 200 975
+INFO 2025-08-16 12:50:29,284 basehttp 59311 6163017728 "OPTIONS /profile/ HTTP/1.1" 200 0
+WARNING 2025-08-16 12:50:29,323 log 59311 6163017728 Unauthorized: /profile/
+WARNING 2025-08-16 12:50:29,324 basehttp 59311 6163017728 "PATCH /profile/ HTTP/1.1" 401 172
+INFO 2025-08-16 12:50:50,265 basehttp 59311 6163017728 "OPTIONS /logout/ HTTP/1.1" 200 0
+WARNING 2025-08-16 12:50:50,274 log 59311 6163017728 Unauthorized: /logout/
+WARNING 2025-08-16 12:50:50,274 basehttp 59311 6163017728 "POST /logout/ HTTP/1.1" 401 172
+INFO 2025-08-16 12:51:18,137 basehttp 59311 6163017728 "POST /login/ HTTP/1.1" 200 975
+INFO 2025-08-16 12:51:28,878 basehttp 59311 6163017728 "PATCH /profile/ HTTP/1.1" 200 686
+INFO 2025-08-16 18:58:48,872 basehttp 59311 6163017728 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-08-16 18:58:49,289 basehttp 59311 6163017728 "POST /login/ HTTP/1.1" 200 976
+INFO 2025-08-18 06:08:42,723 basehttp 59311 6163017728 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-08-18 06:08:42,950 basehttp 59311 6163017728 "POST /login/ HTTP/1.1" 200 976
+WARNING 2025-08-18 06:44:47,183 log 59311 6163017728 Not Found: /files/normalize_collection_data/
+WARNING 2025-08-18 06:44:47,186 basehttp 59311 6163017728 "POST /files/normalize_collection_data/ HTTP/1.1" 404 6498
+INFO 2025-08-18 16:11:40,896 autoreload 82003 8272397760 Watching for file changes with StatReloader
+INFO 2025-08-18 16:19:13,732 basehttp 82003 6125039616 "OPTIONS /login/ HTTP/1.1" 200 0
+WARNING 2025-08-18 16:19:13,888 log 82003 6125039616 Bad Request: /login/
+WARNING 2025-08-18 16:19:13,888 basehttp 82003 6125039616 "POST /login/ HTTP/1.1" 400 44
+WARNING 2025-08-18 16:19:36,743 log 82003 6125039616 Bad Request: /login/
+WARNING 2025-08-18 16:19:36,744 basehttp 82003 6125039616 "POST /login/ HTTP/1.1" 400 44
+INFO 2025-08-18 16:19:53,410 basehttp 82003 6125039616 "POST /login/ HTTP/1.1" 200 976
+INFO 2025-08-20 05:54:30,967 autoreload 3372 8651146688 Watching for file changes with StatReloader
+INFO 2025-08-20 05:58:52,419 autoreload 4736 8651146688 Watching for file changes with StatReloader
+INFO 2025-08-20 05:59:19,243 basehttp 4736 6123794432 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-08-20 05:59:19,423 basehttp 4736 6123794432 "POST /login/ HTTP/1.1" 200 976
+INFO 2025-08-20 06:19:43,326 basehttp 4736 6123794432 "GET / HTTP/1.1" 200 2226
+INFO 2025-08-20 06:19:43,368 basehttp 4736 6123794432 "GET /static/drf-yasg/style.css HTTP/1.1" 200 1047
+INFO 2025-08-20 06:19:43,369 basehttp 4736 13455405056 "GET /static/drf-yasg/insQ.min.js HTTP/1.1" 200 2093
+INFO 2025-08-20 06:19:43,370 basehttp 4736 13472231424 "GET /static/drf-yasg/immutable.min.js HTTP/1.1" 200 56904
+INFO 2025-08-20 06:19:43,371 basehttp 4736 6123794432 "GET /static/drf-yasg/swagger-ui-init.js HTTP/1.1" 200 15480
+INFO 2025-08-20 06:19:43,374 basehttp 4736 6140620800 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui.css HTTP/1.1" 200 145206
+INFO 2025-08-20 06:19:43,376 basehttp 4736 13438578688 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-standalone-preset.js HTTP/1.1" 200 322863
+INFO 2025-08-20 06:19:43,377 basehttp 4736 6157447168 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-bundle.js HTTP/1.1" 200 1046583
+INFO 2025-08-20 06:19:43,546 basehttp 4736 13438578688 "GET /static/drf-yasg/swagger-ui-dist/favicon-32x32.png HTTP/1.1" 200 628
+INFO 2025-08-20 06:19:43,556 basehttp 4736 6157447168 "GET /?format=openapi HTTP/1.1" 200 131648

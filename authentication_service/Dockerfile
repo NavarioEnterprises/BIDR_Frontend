@@ -40,14 +40,14 @@ RUN python manage.py collectstatic --noinput || echo "Static files collection sk
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8067/health/ || exit 1
+    CMD curl -f http://localhost:8000/health/ || exit 1
 
 # Expose port
-EXPOSE 8067
+EXPOSE 8000
 
 # Run gunicorn with better production settings
 CMD ["gunicorn", \
-     "--bind", "0.0.0.0:8067", \
+     "--bind", "0.0.0.0:8000", \
      "--workers", "3", \
      "--worker-class", "sync", \
      "--worker-connections", "1000", \

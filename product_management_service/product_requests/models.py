@@ -1544,7 +1544,7 @@ class RequestMessage(models.Model):
 
 class RequestWatchlist(models.Model):
     """
-    Users can watch product requests to get notifications.
+    Users can watch product requests to get notifications_service.
     """
     request = models.ForeignKey(
         ProductRequest,

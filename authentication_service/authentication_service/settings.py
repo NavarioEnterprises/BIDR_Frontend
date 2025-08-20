@@ -21,6 +21,14 @@ ALLOWED_HOSTS.append('414e91375642.ngrok-free.app')
 ALLOWED_HOSTS.append('192.168.68.104')
 ALLOWED_HOSTS.append('10.0.2.2')
 ALLOWED_HOSTS.append('0.0.0.0')
+
+# Allow all Kubernetes pod network IPs (10.244.x.x range)
+ALLOWED_HOSTS.append('*')  # Allow all hosts for Kubernetes deployment
+
+# Alternative: Add specific pod network ranges if needed
+# import ipaddress
+# ALLOWED_HOSTS.extend([str(ip) for ip in ipaddress.IPv4Network('10.244.0.0/16')])
+
 print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
 
 # Add ngrok domains dynamically
@@ -44,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'drf_yasg',
+    'django_prometheus',
 
     # Local apps
     'user',
@@ -61,6 +70,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -70,8 +80,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # Custom middleware
-    'security.middleware.SecurityMiddleware',  # Our custom security middleware
+    # Custom middleware - temporarily disabled due to async compatibility issues
+    # 'security.middleware.SecurityMiddleware',  # Our custom security middleware
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ROOT_URLCONF = 'authentication_service.urls'
@@ -294,8 +305,12 @@ LOGGING = {
 # Create logs directory if it doesn't exist
 os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
 
-# Security settings
-if not DEBUG:
+# Security settings - explicitly disable SSL redirect for development
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+print(f"SECURE_SSL_REDIRECT value: {SECURE_SSL_REDIRECT}")
+print(f"DEBUG value: {DEBUG}")
+
+if not DEBUG and SECURE_SSL_REDIRECT:
     SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True

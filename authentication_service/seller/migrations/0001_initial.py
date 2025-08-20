@@ -253,7 +253,7 @@ class Migration(migrations.Migration):
                 ('contact_person_name', models.CharField(help_text='Name of the contact person at this address.', max_length=100)),
                 ('contact_person_telephone', models.CharField(help_text='Telephone number of the contact person.', max_length=20)),
                 ('contact_person_email_address', models.EmailField(help_text='Email address of the contact person.', max_length=255)),
-                ('platform_workflow_email_address', models.EmailField(help_text='Email address for platform workflow notifications.', max_length=255)),
+                ('platform_workflow_email_address', models.EmailField(help_text='Email address for platform workflow notifications_service.', max_length=255)),
                 ('is_primary', models.BooleanField(default=False, help_text='Indicates if this is the primary business address.')),
                 ('is_billing_address', models.BooleanField(default=False, help_text='Indicates if this address is used for billing purposes.')),
                 ('is_shipping_address', models.BooleanField(default=False, help_text='Indicates if this address is used for shipping purposes.')),

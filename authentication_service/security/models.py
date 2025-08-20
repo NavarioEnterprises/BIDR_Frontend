@@ -214,7 +214,7 @@ class APIKey(MetadataModel):
     name = models.CharField(max_length=100)
     key_prefix = models.CharField(max_length=10, editable=False)
     key_hash = models.CharField(max_length=255, editable=False)
-    user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='api_keys')
+    user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='security_api_keys')
     permissions = models.JSONField(null=True, blank=True)
     expires_at = models.DateTimeField(null=True, blank=True)
     last_used = models.DateTimeField(null=True, blank=True)

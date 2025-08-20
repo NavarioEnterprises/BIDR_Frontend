@@ -11,3 +11,4 @@ django-extensions~=3.2.3
 
 django-mptt~=0.17.0
 django-filter~=25.1
+django-prometheus~=2.3.1

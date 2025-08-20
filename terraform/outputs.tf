@@ -82,3 +82,77 @@ output "acr_login_command" {
   description = "Command to login to Azure Container Registry"
   value       = "az acr login --name ${azurerm_container_registry.bidr.name}"
 }
+
+# PostgreSQL Outputs
+output "postgresql_server_name" {
+  description = "Name of the PostgreSQL server"
+  value       = azurerm_postgresql_flexible_server.bidr.name
+}
+
+output "postgresql_fqdn" {
+  description = "FQDN of the PostgreSQL server"
+  value       = azurerm_postgresql_flexible_server.bidr.fqdn
+}
+
+output "postgresql_connection_string" {
+  description = "Connection string template for PostgreSQL (password needs to be retrieved from Key Vault)"
+  value       = "postgresql://${var.database_user}:@${azurerm_postgresql_flexible_server.bidr.fqdn}:5432/"
+  sensitive   = true
+}
+
+# Redis Outputs
+output "redis_hostname" {
+  description = "Hostname of the Redis cache"
+  value       = azurerm_redis_cache.bidr.hostname
+}
+
+output "redis_ssl_port" {
+  description = "SSL port of the Redis cache"
+  value       = azurerm_redis_cache.bidr.ssl_port
+}
+
+output "redis_primary_access_key" {
+  description = "Primary access key for Redis cache"
+  value       = azurerm_redis_cache.bidr.primary_access_key
+  sensitive   = true
+}
+
+# Storage Account Outputs
+output "storage_account_name" {
+  description = "Name of the storage account"
+  value       = azurerm_storage_account.bidr.name
+}
+
+output "storage_account_primary_blob_endpoint" {
+  description = "Primary blob endpoint of the storage account"
+  value       = azurerm_storage_account.bidr.primary_blob_endpoint
+}
+
+# Application Insights
+output "application_insights_instrumentation_key" {
+  description = "Instrumentation key for Application Insights"
+  value       = azurerm_application_insights.bidr.instrumentation_key
+  sensitive   = true
+}
+
+output "application_insights_connection_string" {
+  description = "Connection string for Application Insights"
+  value       = azurerm_application_insights.bidr.connection_string
+  sensitive   = true
+}
+
+# VNet and Subnet Outputs
+output "vnet_name" {
+  description = "Name of the virtual network"
+  value       = azurerm_virtual_network.bidr.name
+}
+
+output "aks_subnet_id" {
+  description = "ID of the AKS subnet"
+  value       = azurerm_subnet.aks.id
+}
+
+output "database_subnet_id" {
+  description = "ID of the database subnet"
+  value       = azurerm_subnet.database.id
+}

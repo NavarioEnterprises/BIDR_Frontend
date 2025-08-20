@@ -39,6 +39,10 @@ class UserSessionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Filter sessions to current user only"""
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return UserSession.objects.none()
+        
         return UserSession.objects.filter(user=self.request.user)
 
     def get_serializer_class(self):
@@ -174,6 +178,10 @@ class TrustedDeviceViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Filter devices to current user only"""
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return TrustedDevice.objects.none()
+        
         return TrustedDevice.objects.filter(user=self.request.user)
 
     @action(detail=False, methods=['post'])
@@ -238,6 +246,10 @@ class SessionSecurityEventViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Filter events to current user's sessions only"""
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return SessionSecurityEvent.objects.none()
+        
         user_sessions = UserSession.objects.filter(user=self.request.user)
         return SessionSecurityEvent.objects.filter(session__in=user_sessions)
 
@@ -295,6 +307,10 @@ class SessionActivityViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Filter activities to current user's sessions only"""
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return SessionActivity.objects.none()
+        
         user_sessions = UserSession.objects.filter(user=self.request.user)
         return SessionActivity.objects.filter(session__in=user_sessions)
 

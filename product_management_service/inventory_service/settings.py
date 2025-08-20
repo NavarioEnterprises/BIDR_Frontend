@@ -372,3 +372,6 @@ PRODUCT_LOGGING_SETTINGS = {
     ],
     'BULK_OPERATION_BATCH_SIZE': int(os.getenv('BULK_OPERATION_BATCH_SIZE', '1000')),
 }
+
+# Allow all hosts for Kubernetes deployment
+ALLOWED_HOSTS.append('*')

@@ -105,7 +105,7 @@ database_user = "bidruser"
 ### Optional Variables
 
 ```hcl
-# Email Configuration (for notifications)
+# Email Configuration (for notifications_service)
 email_host_user     = "your-email@example.com"
 email_host_password = "your-app-password"
 

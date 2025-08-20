@@ -32,6 +32,10 @@ class APIKeyViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Filter API keys to current user or admin access"""
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return APIKey.objects.none()
+        
         if self.request.user.is_staff:
             return APIKey.objects.all()
         return APIKey.objects.filter(user=self.request.user)
@@ -140,6 +144,10 @@ class APIRequestViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Allow users to view their own requests or all if admin"""
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return APIRequest.objects.none()
+        
         if self.request.user.is_staff:
             return APIRequest.objects.all()
         user_keys = APIKey.objects.filter(user=self.request.user)
@@ -172,6 +180,10 @@ class APIKeyUsageQuotaViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Allow users to view their own quotas or all if admin"""
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return APIKeyUsageQuota.objects.none()
+        
         if self.request.user.is_staff:
             return APIKeyUsageQuota.objects.all()
         user_keys = APIKey.objects.filter(user=self.request.user)

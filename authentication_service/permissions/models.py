@@ -30,7 +30,7 @@ class Permission(models.Model):
         ('buyer_management', 'Buyer Management'),
         ('payment_processing', 'Payment Processing'),
         ('document_verification', 'Document Verification'),
-        ('notifications', 'Notifications'),
+        ('notifications_service', 'Notifications'),
         ('reporting', 'Reporting'),
         ('analytics', 'Analytics'),
         ('system_configuration', 'System Configuration'),

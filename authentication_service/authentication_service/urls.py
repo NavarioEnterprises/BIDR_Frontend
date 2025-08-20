@@ -3,6 +3,7 @@ from django.contrib import admin
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from django_prometheus.exports import ExportToDjangoView
 
 from . import views
 
@@ -28,6 +29,7 @@ urlpatterns = [
     path('health/', views.health_check, name='health'),
     path('health/ready/', views.readiness_check, name='readiness'),
     path('health/live/', views.liveness_check, name='liveness'),
+    
     # Role selection endpoint
     path("role-selection/", views.RoleSelectionView.as_view(), name="role-selection"),
 
@@ -46,6 +48,10 @@ urlpatterns = [
 
     # OTP endpoints
     path('api/otp/', include('otp.urls')),
+    
+    # Legacy OTP endpoints for backward compatibility
+    path('verify-otp/', views.OTPVerificationView.as_view(), name='verify-otp-legacy'),
+    path('resend-otp/', views.ResendOTPView.as_view(), name='resend-otp-legacy'),
 
     # Seller business registration
     # path("seller/business-registration/", views.SellerBusinessRegistrationView.as_view(),
@@ -90,6 +96,11 @@ urlpatterns = [
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    
+    # Metrics endpoint for Prometheus
+    path('metrics', ExportToDjangoView, name='prometheus-django-metrics'),
+    
+    # Default root path for swagger UI (this must be last)
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui-root'),
 ]
 
