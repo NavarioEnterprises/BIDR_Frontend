@@ -25,7 +25,7 @@ class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
   ChewieController? _chewieController;
   bool _isInitialized = false;
   bool _isPlaying = false;
-  bool _showControls = true;
+  bool _showControls = false;
   bool _isBuffering = false;
   bool _hasError = false;
   String _errorMessage = '';
@@ -472,7 +472,7 @@ class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
                     ),
                   ),
 
-                // Bottom Controls
+                // Bottom Controls - Simplified
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -481,7 +481,7 @@ class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
                     opacity: _showControls ? 1.0 : 0.0,
                     duration: Duration(milliseconds: 300),
                     child: Container(
-                      padding: EdgeInsets.all(16),
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(12),
@@ -492,7 +492,7 @@ class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withOpacity(0.8),
+                            Colors.black.withOpacity(0.7),
                           ],
                         ),
                       ),
@@ -504,18 +504,18 @@ class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
                             children: [
                               Text(
                                 _formatDuration(_currentPosition),
-                                style: TextStyle(color: Colors.white, fontSize: 12),
+                                style: TextStyle(color: Colors.white, fontSize: 10),
                               ),
                               SizedBox(width: 8),
                               Expanded(
                                 child: SliderTheme(
                                   data: SliderTheme.of(context).copyWith(
                                     activeTrackColor: Colors.orange,
-                                    inactiveTrackColor: Colors.grey,
+                                    inactiveTrackColor: Colors.grey.withOpacity(0.5),
                                     thumbColor: Colors.orange,
                                     overlayColor: Colors.orange.withOpacity(0.3),
-                                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6),
-                                    trackHeight: 3,
+                                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 4),
+                                    trackHeight: 2,
                                   ),
                                   child: Slider(
                                     value: _totalDuration.inMilliseconds > 0
@@ -531,101 +531,17 @@ class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
                               SizedBox(width: 8),
                               Text(
                                 _formatDuration(_totalDuration),
-                                style: TextStyle(color: Colors.white, fontSize: 12),
+                                style: TextStyle(color: Colors.white, fontSize: 10),
                               ),
-                            ],
-                          ),
-
-                          SizedBox(height: 12),
-
-                          // Control Buttons Row
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              // Rewind 10s
-                              _buildControlButton(
-                                icon: Icons.replay_10,
-                                onTap: () {
-                                  final newPosition = _currentPosition - Duration(seconds: 10);
-                                  _seekTo(newPosition < Duration.zero ? Duration.zero : newPosition);
-                                },
-                              ),
-
-                              // Play/Pause
-                              _buildControlButton(
-                                icon: _isPlaying ? Icons.pause : Icons.play_arrow,
-                                onTap: _togglePlayPause,
-                                isLarge: true,
-                              ),
-
-                              // Forward 10s
-                              _buildControlButton(
-                                icon: Icons.forward_10,
-                                onTap: () {
-                                  final newPosition = _currentPosition + Duration(seconds: 10);
-                                  _seekTo(newPosition > _totalDuration ? _totalDuration : newPosition);
-                                },
-                              ),
-                            ],
-                          ),
-
-                          SizedBox(height: 8),
-
-                          // Additional Controls Row
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              // Volume Control
-                              Row(
-                                children: [
-                                  Icon(
-                                    _volume == 0 ? Icons.volume_off : Icons.volume_up,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
-                                  SizedBox(width: 4),
-                                  Container(
-                                    width: 60,
-                                    child: SliderTheme(
-                                      data: SliderTheme.of(context).copyWith(
-                                        activeTrackColor: Colors.orange,
-                                        inactiveTrackColor: Colors.grey,
-                                        thumbColor: Colors.orange,
-                                        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 4),
-                                        trackHeight: 2,
-                                      ),
-                                      child: Slider(
-                                        value: _volume,
-                                        max: 1.0,
-                                        onChanged: _changeVolume,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              // Speed Control
+                              SizedBox(width: 8),
+                              // Fullscreen button
                               GestureDetector(
-                                onTap: () => _showSpeedDialog(),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.orange),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    '${_playbackSpeed}x',
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
-                                  ),
+                                onTap: _showFullscreenDialog,
+                                child: Icon(
+                                  Icons.fullscreen,
+                                  color: Colors.white,
+                                  size: 20,
                                 ),
-                              ),
-
-                              // Fullscreen
-                              _buildControlButton(
-                                icon: Icons.fullscreen,
-                                onTap: () {
-                                  _chewieController?.enterFullScreen();
-                                },
                               ),
                             ],
                           ),
@@ -666,28 +582,122 @@ class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
     );
   }
 
-  void _showSpeedDialog() {
+  void _showFullscreenDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Playback Speed'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0].map((speed) {
-            return ListTile(
-              title: Text('${speed}x'),
-              leading: Radio<double>(
-                value: speed,
-                groupValue: _playbackSpeed,
-                onChanged: (value) {
-                  _changePlaybackSpeed(value!);
-                  Navigator.pop(context);
-                },
-                activeColor: Colors.orange,
+      barrierColor: Colors.black,
+      barrierDismissible: true,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return Dialog(
+            backgroundColor: Colors.black,
+            insetPadding: EdgeInsets.zero,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: [
+                  // Video Player
+                  Center(
+                    child: AspectRatio(
+                      aspectRatio: _videoPlayerController?.value.aspectRatio ?? 16/9,
+                      child: VideoPlayer(_videoPlayerController!),
+                    ),
+                  ),
+                  
+                  // Close button
+                  Positioned(
+                    top: 40,
+                    right: 20,
+                    child: IconButton(
+                      icon: Icon(Icons.close, color: Colors.white, size: 30),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                  
+                  // Play/Pause overlay
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        setDialogState(() {
+                          if (_videoPlayerController!.value.isPlaying) {
+                            _videoPlayerController!.pause();
+                          } else {
+                            _videoPlayerController!.play();
+                          }
+                        });
+                        // Also update main widget state
+                        setState(() {
+                          _isPlaying = _videoPlayerController!.value.isPlaying;
+                        });
+                      },
+                      child: AnimatedBuilder(
+                        animation: _videoPlayerController!,
+                        builder: (context, child) {
+                          return Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              _videoPlayerController!.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                              color: Colors.white,
+                              size: 50,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  
+                  // Bottom controls
+                  Positioned(
+                    bottom: 20,
+                    left: 20,
+                    right: 20,
+                    child: Column(
+                      children: [
+                        // Progress bar
+                        VideoProgressIndicator(
+                          _videoPlayerController!,
+                          allowScrubbing: true,
+                          colors: VideoProgressColors(
+                            playedColor: Colors.orange,
+                            bufferedColor: Colors.grey,
+                            backgroundColor: Colors.grey.withOpacity(0.3),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        AnimatedBuilder(
+                          animation: _videoPlayerController!,
+                          builder: (context, child) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  _formatDuration(_videoPlayerController!.value.position),
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                Text(
+                                  _formatDuration(_videoPlayerController!.value.duration),
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            );
-          }).toList(),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

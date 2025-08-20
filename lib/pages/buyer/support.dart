@@ -126,7 +126,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                 opacity: value,
                 child: Transform.translate(
                   offset: Offset(0, 20 * (1 - value)),
-                  child: BuyerDashboardHeader(headerName: '',totalAlert: GlobalVariables.alertList.length,),
+                  child: BuyerDashboardHeader(headerName: 'Support',totalAlert: GlobalVariables.alertList.length,),
                 ),
               );
             },
@@ -136,8 +136,8 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
               child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.only(left: 32, right: 32, top: 24),
-                    constraints: BoxConstraints(maxWidth: 1400,maxHeight: 500),
+                    padding: const EdgeInsets.only(left: 68, right: 68, top: 24),
+                    constraints: BoxConstraints(maxWidth: 1600,maxHeight: 500),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -929,10 +929,10 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> {
   @override
   Widget build(BuildContext context) {
     return  Container(
-      height: 50,
+      height: 60,
       width: MediaQuery.of(context).size.width,
       color: Constants.ctaColorLight,
-      padding: EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 8),
+      padding: EdgeInsets.only(left: 68, right: 68, top: 8, bottom: 8),
       child: Row(
         children: [
           Text(
@@ -987,7 +987,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> {
               ),
               child: Icon(
                 HugeIcons.strokeRoundedNotification01,
-                size: 22,
+                size: 18,
                 color: Colors.white,
               ),
             ),

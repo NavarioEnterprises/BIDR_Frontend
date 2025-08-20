@@ -76,14 +76,14 @@ class _FAQScreenState extends State<FAQScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
+        backgroundColor: Constants.ctaColorLight,
+        foregroundColor: Constants.ftaColorLight,
+        elevation: 1,
         title: Text(
           'Frequently Asked Questions',
           style: GoogleFonts.manrope(
-            color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -95,94 +95,104 @@ class _FAQScreenState extends State<FAQScreen> {
       body: Column(
         children: [
           // Category Filter
-          Container(
-            height: 50,
-            color: Colors.white,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _categories.length,
-              itemBuilder: (context, index) {
-                final category = _categories[index];
-                final isSelected = category == _selectedCategory;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(
-                      category,
-                      style: GoogleFonts.manrope(
-                        color: isSelected ? Colors.white : Colors.black,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          Padding(
+            padding: const EdgeInsets.only(left: 64, right: 64,top: 16),
+            child: Container(
+              height: 50,
+              width: MediaQuery.of(context).size.width,
+              constraints: BoxConstraints(maxWidth: 1600),
+              color: Colors.white,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: _categories.length,
+                itemBuilder: (context, index) {
+                  final category = _categories[index];
+                  final isSelected = category == _selectedCategory;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(
+                        category,
+                        style: GoogleFonts.manrope(
+                          color: isSelected ? Colors.white : Colors.black,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        ),
                       ),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedCategory = category;
+                        });
+                      },
+                      selectedColor: Constants.ctaColorLight,
+                      checkmarkColor: Colors.white,
+                      backgroundColor: Colors.grey[200],
                     ),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedCategory = category;
-                      });
-                    },
-                    selectedColor: Constants.ctaColorLight,
-                    checkmarkColor: Colors.white,
-                    backgroundColor: Colors.grey[200],
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
           // FAQ Items
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _filteredFAQItems.length,
-              itemBuilder: (context, index) {
-                final faq = _filteredFAQItems[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: ExpansionTile(
-                    tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    childrenPadding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                    backgroundColor: Colors.white,
-                    collapsedBackgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    collapsedShape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    title: Text(
-                      faq.question,
-                      style: GoogleFonts.manrope(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+            child: Container(
+              padding: const EdgeInsets.only(left: 64, right: 64),
+              width: MediaQuery.of(context).size.width,
+              constraints: BoxConstraints(maxWidth: 1600),
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: _filteredFAQItems.length,
+                itemBuilder: (context, index) {
+                  final faq = _filteredFAQItems[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: ExpansionTile(
+                      tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      childrenPadding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                      backgroundColor: Colors.white,
+                      collapsedBackgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: Colors.grey[300]!),
                       ),
-                    ),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        faq.category,
+                      collapsedShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: Colors.grey[300]!),
+                      ),
+                      title: Text(
+                        faq.question,
                         style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          color: Constants.ctaColorLight,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
                         ),
                       ),
-                    ),
-                    children: [
-                      Text(
-                        faq.answer,
-                        style: GoogleFonts.manrope(
-                          fontSize: 14,
-                          height: 1.5,
-                          color: Colors.black54,
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          faq.category,
+                          style: GoogleFonts.manrope(
+                            fontSize: 12,
+                            color: Constants.ctaColorLight,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ],
-                  ),
-                );
-              },
+                      children: [
+                        Text(
+                          faq.answer,
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            height: 1.5,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ],

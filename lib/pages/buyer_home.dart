@@ -1,5 +1,6 @@
 
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:bidr/pages/seller/seller_home_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -188,7 +189,7 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                   child: Column(
                     children: [
                       Container(
-                        constraints: BoxConstraints(maxWidth: 1400),
+                        constraints: BoxConstraints(maxWidth: 1600),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -198,7 +199,7 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                             ScaleTransition(
                               scale: _scaleAnimation,
                               child: Padding(
-                                padding: const EdgeInsets.only(left: 32, right: 32),
+                                padding: const EdgeInsets.only(left: 64, right: 64),
                                 child: Center(
                                     child: _buildAnimatedBannerSection("lib/assets/images/competitive.png")
                                 ),
@@ -208,13 +209,15 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                             SizedBox(height: 24),
 
                             // Animated Category Section
-                            SlideTransition(
-                              position: _slideAnimation,
-                              child: FadeTransition(
-                                opacity: _categoryAnimation,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 32, right: 32),
-                                  child: Center(child: _buildCategoryItems()),
+                            Center(
+                              child: SlideTransition(
+                                position: _slideAnimation,
+                                child: FadeTransition(
+                                  opacity: _categoryAnimation,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 64, right: 64),
+                                    child: Center(child: _buildCategoryItems()),
+                                  ),
                                 ),
                               ),
                             ),
@@ -237,11 +240,20 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                               child: Center(
                                 key: ValueKey(selectedIndex),
                                 child: selectedIndex == 0
-                                    ? VehicleDetailsQuoteForm()
+                                    ? Padding(
+                                      padding: const EdgeInsets.only(left: 64,right: 64),
+                                      child: VehicleDetailsQuoteForm(),
+                                    )
                                     : selectedIndex == 1
-                                    ? ProductQuoteForm()
+                                    ? Padding(
+                                       padding: const EdgeInsets.only(left: 64,right: 64),
+                                      child: ProductQuoteForm(),
+                                    )
                                     : selectedIndex == 2
-                                    ? TireProductQuoteForm()
+                                    ? Padding(
+                                      padding: const EdgeInsets.only(left: 64,right: 64),
+                                      child: TireProductQuoteForm(),
+                                    )
                                     : SizedBox.shrink(),
                               ),
                             ),
@@ -271,9 +283,9 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                       FadeTransition(
                         opacity: _fadeAnimation,
                         child: Container(
-                          constraints: BoxConstraints(maxWidth: 1400),
+                          constraints: BoxConstraints(maxWidth: 1600),
                           child: Padding(
-                            padding: const EdgeInsets.only(left: 32, right: 32),
+                            padding: const EdgeInsets.only(left: 64, right: 64),
                             child: Center(
                                 child: _buildAnimatedBannerSection("lib/assets/images/mask_group.png")
                             ),
@@ -380,7 +392,7 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
           ),
           Center(
             child: Container(
-              constraints: BoxConstraints(maxWidth: 1400),
+              constraints: BoxConstraints(maxWidth: 1600),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -421,94 +433,98 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
               child: Column(
                 children: [
                   Expanded(
-                    child: CustomCard(
-                      elevation: 2,
-                      color: Constants.dtaColorLight,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.35,
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Constants.dtaColorLight,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style: GoogleFonts.manrope(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Constants.ftaColorLight,
-                              ),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.35,
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Constants.dtaColorLight,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 2,
+                            spreadRadius: 1,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: GoogleFonts.manrope(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Constants.ftaColorLight,
                             ),
-                            SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    description,
-                                    textAlign: TextAlign.justify,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 8,
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Constants.ftaColorLight.withOpacity(0.65),
-                                    ),
+                          ),
+                          SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  description,
+                                  textAlign: TextAlign.justify,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 8,
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    color: Constants.ftaColorLight.withOpacity(0.65),
                                   ),
                                 ),
-                              ],
-                            ),
-                            SizedBox(height: 16),
-                            if (title == "About Us") ...[
-                              Expanded(
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: CustomVideoPlayerWidget(
-                                        videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
-                                        autoPlay: false,
-                                        looping: true,
-                                        placeholder: 'Loading awesome video...',
-                                      ),
-                                    ),
-                                    SizedBox(width: 16),
-                                    Expanded(
-                                      child: CustomVideoPlayerWidget(
-                                        videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
-                                        autoPlay: false,
-                                        looping: true,
-                                        placeholder: 'Loading awesome video...',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
+                              ),
                             ],
-                            if (title == "How It Works") ...[
-                              Expanded(
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: CustomVideoPlayerWidget(
-                                        videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
-                                        autoPlay: false,
-                                        looping: true,
-                                        placeholder: 'Loading awesome video...',
-                                      ),
+                          ),
+                          SizedBox(height: 16),
+                          if (title == "About Us") ...[
+                            Expanded(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: CustomVideoPlayerWidget(
+                                      videoUrl: 'https://videocdn.cdnpk.net/videos/83f87a00-c832-4e39-811f-df9ddde83898/horizontal/previews/clear/large.mp4?token=exp=1755697238~hmac=5202134e7d9eb8da3a24a10b5798bab437686787321e18dc3b710fc8aa4b6199',
+                                      autoPlay: false,
+                                      looping: true,
+                                      placeholder: 'Loading awesome video...',
                                     ),
-                                  ],
-                                ),
-                              )
-                            ]
+                                  ),
+                                  SizedBox(width: 16),
+                                  Expanded(
+                                    child: CustomVideoPlayerWidget(
+                                      videoUrl: 'https://videocdn.cdnpk.net/videos/1023b72a-f207-5513-9046-9e86aff44a23/horizontal/previews/clear/large.mp4?token=exp=1755697314~hmac=f8602bae3e1a7957fdf7bb67f723a230d3802e4d3542b8518e0d673fc34175d3',
+                                      autoPlay: false,
+                                      looping: true,
+                                      placeholder: 'Loading awesome video...',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
                           ],
-                        ),
+                          if (title == "How It Works") ...[
+                            Expanded(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: CustomVideoPlayerWidget(
+                                      videoUrl: 'https://videocdn.cdnpk.net/videos/45d47465-c3a1-54ef-aa83-466722d851ad/horizontal/previews/clear/large.mp4?token=exp=1755697358~hmac=426a8baec13e32ba767cbd9a89368f19f1af446166d941db9ac11d5662dc61f1',
+                                      autoPlay: false,
+                                      looping: true,
+                                      placeholder: 'Loading awesome video...',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ]
+                        ],
                       ),
                     ),
                   ),
@@ -516,7 +532,7 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                   AnimatedContainer(
                     duration: Duration(milliseconds: 300),
                     padding: EdgeInsets.only(left: 12,right: 12),
-                    height: 55,
+                    height: 65,
                     width: MediaQuery.of(context).size.width * 0.35,
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -612,7 +628,7 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
               height: 400,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
@@ -622,10 +638,10 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(24),
                 child: Image.asset(
                   image,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                   width: MediaQuery.of(context).size.width,
                   height: 400,
                 ),
@@ -693,42 +709,35 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
             },
           ),
           SizedBox(height: 24),
-          SizedBox(
-            width: MediaQuery.of(context).size.width,
-            child: GridView.builder(
-              itemCount: categories.length,
-              shrinkWrap: true,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 24,
-                crossAxisSpacing: 24,
-                childAspectRatio: 1.6,
-              ),
-              itemBuilder: (context, index) {
-                var category = categories[index];
-                return TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  duration: Duration(milliseconds: 800 + (index * 200)),
-                  builder: (context, value, child) {
-                    return Transform.translate(
-                      offset: Offset(0, 50 * (1 - value)),
-                      child: Opacity(
-                        opacity: value,
-                        child: Container(
-                          child: _categoryCard(
-                            category["icon"]!,
-                            category["name"]!,
-                            index,
-                            selectedIndex,
-                                () => _onCategoryTap(index),
-                          ),
+          Wrap(
+            spacing: 24,
+            runSpacing: 24,
+            alignment: WrapAlignment.center,
+            children: List.generate(categories.length, (index) {
+              var category = categories[index];
+              return TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0.0, end: 1.0),
+                duration: Duration(milliseconds: 800 + (index * 200)),
+                builder: (context, value, child) {
+                  return Transform.translate(
+                    offset: Offset(0, 50 * (1 - value)),
+                    child: Opacity(
+                      opacity: value,
+                      child: Container(
+                        width: (MediaQuery.of(context).size.width - 48 - 48) / 6,
+                        child: _categoryCard(
+                          category["icon"]!,
+                          category["name"]!,
+                          index,
+                          selectedIndex,
+                              () => _onCategoryTap(index),
                         ),
                       ),
-                    );
-                  },
-                );
-              },
-            ),
+                    ),
+                  );
+                },
+              );
+            }),
           ),
           SizedBox(height: 32),
         ],
@@ -853,7 +862,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
 
   // Image picker
   final ImagePicker _imagePicker = ImagePicker();
-  List<File> _selectedImages = [];
+  List<XFile> _selectedImages = [];
+  Map<String, Uint8List> _imageBytes = {};
 
   @override
   void initState() {
@@ -1146,7 +1156,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     );
   }
 
-  Widget _buildImagePreview(File image) {
+  Widget _buildImagePreview(XFile image) {
     return Stack(
       children: [
         Container(
@@ -1158,9 +1168,33 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.file(
-              image,
-              fit: BoxFit.cover,
+            child: FutureBuilder<Uint8List>(
+              future: image.readAsBytes(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Image.memory(
+                    snapshot.data!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[200],
+                        child: Icon(Icons.broken_image, color: Colors.grey[400]),
+                      );
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return Container(
+                    color: Colors.grey[200],
+                    child: Icon(Icons.broken_image, color: Colors.grey[400]),
+                  );
+                }
+                return Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -1193,7 +1227,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       final List<XFile>? images = await _imagePicker.pickMultiImage();
       if (images != null && images.isNotEmpty) {
         setState(() {
-          _selectedImages.addAll(images.map((xFile) => File(xFile.path)).toList());
+          _selectedImages.addAll(images);
         });
       }
     } catch (e) {
@@ -1203,9 +1237,10 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     }
   }
 
-  void _removeImage(File image) {
+  void _removeImage(XFile image) {
     setState(() {
       _selectedImages.remove(image);
+      _imageBytes.remove(image.path);
     });
   }
 
@@ -1617,6 +1652,11 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
   bool _agreeToTerms = false;
   bool _consentToContact = false;
 
+  // Image picker
+  final ImagePicker _imagePicker = ImagePicker();
+  List<XFile> _selectedImages = [];
+  Map<String, Uint8List> _imageBytes = {};
+
   @override
   void initState() {
     super.initState();
@@ -1647,6 +1687,187 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
     _commentsFocus.dispose();
 
     super.dispose();
+  }
+
+  Widget _buildImageUploadSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Upload Documents or Images',
+          style: GoogleFonts.manrope(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[700],
+          ),
+        ),
+        SizedBox(height: 8),
+        GestureDetector(
+          onTap: _pickImages,
+          child: Container(
+            width: double.infinity,
+            height: _selectedImages.isEmpty ? 120 : null,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[300]!, style: BorderStyle.solid),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey[50],
+            ),
+            child: _selectedImages.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.cloud_upload_outlined,
+                          size: 24,
+                          color: Colors.grey[500],
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Upload Documents or Images',
+                          style: GoogleFonts.manrope(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      children: [
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _selectedImages.map((image) => _buildImagePreview(image)).toList(),
+                        ),
+                        SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Constants.ctaColorLight),
+                            borderRadius: BorderRadius.circular(6),
+                            color: Colors.white,
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Add More Images',
+                              style: GoogleFonts.manrope(
+                                color: Constants.ctaColorLight,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+          ),
+        ),
+        if (_selectedImages.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: Text(
+              '${_selectedImages.length} image(s) selected',
+              style: GoogleFonts.manrope(
+                color: Colors.grey[600],
+                fontSize: 12,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildImagePreview(XFile image) {
+    return Stack(
+      children: [
+        Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey[300]!),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: FutureBuilder<Uint8List>(
+              future: image.readAsBytes(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Image.memory(
+                    snapshot.data!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[200],
+                        child: Icon(Icons.broken_image, color: Colors.grey[400]),
+                      );
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return Container(
+                    color: Colors.grey[200],
+                    child: Icon(Icons.broken_image, color: Colors.grey[400]),
+                  );
+                }
+                return Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        Positioned(
+          top: -5,
+          right: -5,
+          child: GestureDetector(
+            onTap: () => _removeImage(image),
+            child: Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.close,
+                size: 12,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _pickImages() async {
+    try {
+      final List<XFile>? images = await _imagePicker.pickMultiImage();
+      if (images != null && images.isNotEmpty) {
+        setState(() {
+          _selectedImages.addAll(images);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking images: $e')),
+      );
+    }
+  }
+
+  void _removeImage(XFile image) {
+    setState(() {
+      _selectedImages.remove(image);
+      _imageBytes.remove(image.path);
+    });
   }
 
   Widget _buildCustomTextField(String hintText, TextEditingController controller, FocusNode focusNode, FocusNode? nextFocusNode, {Widget? suffixIcon}) {
@@ -1914,49 +2135,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
               ],
             ),
             SizedBox(height: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Upload Documents or Images',
-                  style: GoogleFonts.manrope(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                SizedBox(height: 8),
-                Container(
-                  width: double.infinity,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!, style: BorderStyle.solid),
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.grey[50],
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.cloud_upload_outlined,
-                          size: 32,
-                          color: Colors.grey[500],
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Upload Documents or Images',
-                          style: GoogleFonts.manrope(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            _buildImageUploadSection(),
             SizedBox(height: 16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -2130,7 +2309,8 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
 
   // Image picker
   final ImagePicker _imagePicker = ImagePicker();
-  List<File> _selectedImages = [];
+  List<XFile> _selectedImages = [];
+  Map<String, Uint8List> _imageBytes = {};
 
   @override
   void initState() {
@@ -2351,7 +2531,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     );
   }
 
-  Widget _buildImagePreview(File image) {
+  Widget _buildImagePreview(XFile image) {
     return Stack(
       children: [
         Container(
@@ -2363,9 +2543,33 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.file(
-              image,
-              fit: BoxFit.cover,
+            child: FutureBuilder<Uint8List>(
+              future: image.readAsBytes(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Image.memory(
+                    snapshot.data!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[200],
+                        child: Icon(Icons.broken_image, color: Colors.grey[400]),
+                      );
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return Container(
+                    color: Colors.grey[200],
+                    child: Icon(Icons.broken_image, color: Colors.grey[400]),
+                  );
+                }
+                return Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -2398,7 +2602,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
       final List<XFile>? images = await _imagePicker.pickMultiImage();
       if (images != null && images.isNotEmpty) {
         setState(() {
-          _selectedImages.addAll(images.map((xFile) => File(xFile.path)).toList());
+          _selectedImages.addAll(images);
         });
       }
     } catch (e) {
@@ -2408,9 +2612,10 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     }
   }
 
-  void _removeImage(File image) {
+  void _removeImage(XFile image) {
     setState(() {
       _selectedImages.remove(image);
+      _imageBytes.remove(image.path);
     });
   }
 

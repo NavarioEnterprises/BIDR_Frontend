@@ -99,7 +99,7 @@ class MyApp extends StatelessWidget {
         path: '/',
         name: 'home',
         builder: (BuildContext context, GoRouterState state) =>
-            const LoginPage(),
+             BuyerHomePage(),
       ),
       
       // Authentication Routes

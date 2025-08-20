@@ -27,14 +27,15 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
+        backgroundColor: Constants.ctaColorLight,
+        foregroundColor: Constants.ftaColorLight,
+        elevation: 1,
         title: Text(
           'Policies',
           style: GoogleFonts.manrope(
-            color: Colors.black,
+
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -44,9 +45,9 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Constants.ctaColorLight,
+          labelColor: Constants.ftaColorLight,
           unselectedLabelColor: Colors.grey,
-          indicatorColor: Constants.ctaColorLight,
+          indicatorColor: Constants.ftaColorLight,
           isScrollable: true,
           tabs: const [
             Tab(text: 'Terms of Service'),
@@ -56,14 +57,21 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildTermsOfService(),
-          _buildPrivacyPolicy(),
-          _buildReturnPolicy(),
-          _buildSellerAgreement(),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.only(left: 50, right: 50),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          constraints: BoxConstraints(maxWidth: 1600),
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              Expanded(child: _buildTermsOfService()),
+              _buildPrivacyPolicy(),
+              _buildReturnPolicy(),
+              _buildSellerAgreement(),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -404,6 +412,7 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(16),
+            width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),

@@ -31,15 +31,15 @@ class _HeaderSectionState extends State<HeaderSection> {
       padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(360),
-        boxShadow: [
+        borderRadius: BorderRadius.circular(16),
+        /*boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.55),
-            blurRadius: 4,
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 2,
             spreadRadius: 1,
             offset: Offset(0, 2),
           ),
-        ],
+        ],*/
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -163,7 +163,7 @@ class _HeaderSectionState extends State<HeaderSection> {
               children: [
                 TextButton(
                   onPressed: onPressed,
-                  style: TextButton.styleFrom(minimumSize: Size(105, 45)),
+                  style: TextButton.styleFrom(minimumSize: Size(120, 45)),
                   child: Text(
                     text,
                     style: GoogleFonts.manrope(
@@ -173,7 +173,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                     ),
                   ),
                 ),
-                index == Constants.buyerAppBarValue?SizedBox(height: 8,):SizedBox.shrink(),
+                index == Constants.buyerAppBarValue?SizedBox(height: 2,):SizedBox.shrink(),
                 index == Constants.buyerAppBarValue?Padding(
                   padding: const EdgeInsets.only(left: 12,right: 12),
                   child: Container(

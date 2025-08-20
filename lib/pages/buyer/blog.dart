@@ -120,64 +120,67 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 400,
-                    constraints: BoxConstraints(maxWidth: 1400),
-                    child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 5,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        //childAspectRatio: 0.4,
-                      ),
-                      itemCount: blogItems.length,
-                      padding: EdgeInsets.all(24),
-                      physics: NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return TweenAnimationBuilder<double>(
-                          duration: Duration(milliseconds: 800 + (index * 200)),
-                          tween: Tween(begin: 0.0, end: 1.0),
-                          builder: (context, value, child) {
-                            return Opacity(
-                              opacity: value,
-                              child: Transform.translate(
-                                offset: Offset(0, 30 * (1 - value)),
-                                child: Transform.scale(
-                                  scale: 0.8 + (0.2 * value),
-                                  child: BlogCard(
-                                    blogItem: blogItems[index],
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation, secondaryAnimation) => BlogDetailScreen(
-                                            blogItem: blogItems[index],
-                                            relatedItems: blogItems.where((item) => item != blogItems[index]).toList(),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 45, right: 45),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 400,
+                      constraints: BoxConstraints(maxWidth: 1600),
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 5,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          //childAspectRatio: 0.4,
+                        ),
+                        itemCount: blogItems.length,
+                        padding: EdgeInsets.all(24),
+                        physics: NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return TweenAnimationBuilder<double>(
+                            duration: Duration(milliseconds: 800 + (index * 200)),
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            builder: (context, value, child) {
+                              return Opacity(
+                                opacity: value,
+                                child: Transform.translate(
+                                  offset: Offset(0, 30 * (1 - value)),
+                                  child: Transform.scale(
+                                    scale: 0.8 + (0.2 * value),
+                                    child: BlogCard(
+                                      blogItem: blogItems[index],
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation, secondaryAnimation) => BlogDetailScreen(
+                                              blogItem: blogItems[index],
+                                              relatedItems: blogItems.where((item) => item != blogItems[index]).toList(),
+                                            ),
+                                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                              return SlideTransition(
+                                                position: Tween<Offset>(
+                                                  begin: Offset(1.0, 0.0),
+                                                  end: Offset.zero,
+                                                ).animate(CurvedAnimation(
+                                                  parent: animation,
+                                                  curve: Curves.easeInOut,
+                                                )),
+                                                child: child,
+                                              );
+                                            },
+                                            transitionDuration: Duration(milliseconds: 400),
                                           ),
-                                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                            return SlideTransition(
-                                              position: Tween<Offset>(
-                                                begin: Offset(1.0, 0.0),
-                                                end: Offset.zero,
-                                              ).animate(CurvedAnimation(
-                                                parent: animation,
-                                                curve: Curves.easeInOut,
-                                              )),
-                                              child: child,
-                                            );
-                                          },
-                                          transitionDuration: Duration(milliseconds: 400),
-                                        ),
-                                      );
-                                    },
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        );
-                      },
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ),
                   SizedBox(height: 24),
@@ -648,10 +651,10 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                   SizedBox(height: 24),
                   AnimatedContainer(
                     duration: Duration(milliseconds: 300),
-                    height: 50,
+                    height: 60,
                     width: MediaQuery.of(context).size.width,
                     color: Constants.ctaColorLight,
-                    padding: EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 8),
+                    padding: EdgeInsets.only(left: 40, right: 24, top: 8, bottom: 8),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -681,246 +684,250 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                   ),
                   SizedBox(height: 24),
                   Center(
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height + 400,
-                      constraints: BoxConstraints(maxWidth: 1400),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Main Content (Left Side)
-                          Expanded(
-                            flex: 2,
-                            child: SlideTransition(
-                              position: _slideAnimation,
-                              child: Padding(
-                                padding: const EdgeInsets.all(24.0),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 55, right: 55),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height + 400,
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Main Content (Left Side)
+                            Expanded(
+                              flex: 2,
+                              child: SlideTransition(
+                                position: _slideAnimation,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(0.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Hero Image with animation
+                                      AnimatedContainer(
+                                        duration: Duration(milliseconds: 600),
+                                        width: double.infinity,
+                                        height: 300,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          image: DecorationImage(
+                                            image: NetworkImage(widget.blogItem.imageUrl),
+                                            fit: BoxFit.cover,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.1),
+                                              blurRadius: 10,
+                                              offset: Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: 24),
+
+                                      // Title with fade animation
+                                      TweenAnimationBuilder<double>(
+                                        duration: Duration(milliseconds: 800),
+                                        tween: Tween(begin: 0.0, end: 1.0),
+                                        builder: (context, value, child) {
+                                          return Opacity(
+                                            opacity: value,
+                                            child: Transform.translate(
+                                              offset: Offset(0, 20 * (1 - value)),
+                                              child: Text(
+                                                widget.blogItem.title,
+                                                style: GoogleFonts.manrope(
+                                                  fontSize: 32,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Constants.ftaColorLight,
+                                                  height: 1.2,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      SizedBox(height: 16),
+
+                                      // Description with delayed animation
+                                      TweenAnimationBuilder<double>(
+                                        duration: Duration(milliseconds: 1000),
+                                        tween: Tween(begin: 0.0, end: 1.0),
+                                        builder: (context, value, child) {
+                                          return Opacity(
+                                            opacity: value,
+                                            child: Transform.translate(
+                                              offset: Offset(0, 15 * (1 - value)),
+                                              child: Text(
+                                                widget.blogItem.description,
+                                                style: GoogleFonts.manrope(
+                                                  fontSize: 14,
+                                                  color: Colors.black,
+                                                  height: 1.5,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      SizedBox(height: 24),
+
+                                      // Date and Stats with staggered animation
+                                      TweenAnimationBuilder<double>(
+                                        duration: Duration(milliseconds: 1200),
+                                        tween: Tween(begin: 0.0, end: 1.0),
+                                        builder: (context, value, child) {
+                                          return Opacity(
+                                            opacity: value,
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Icon(HugeIcons.strokeRoundedCalendar01, size: 24, color: Constants.ftaColorLight),
+                                                    SizedBox(width: 6),
+                                                    Text(
+                                                      widget.blogItem.date,
+                                                      style: GoogleFonts.manrope(
+                                                        fontSize: 14,
+                                                        color: Constants.ftaColorLight,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 16),
+                                                Row(
+                                                  children: [
+                                                    _buildAnimatedStatItem(CupertinoIcons.heart_fill, widget.blogItem.likes, Colors.red),
+                                                    SizedBox(width: 16),
+                                                    _buildAnimatedStatItem(HugeIcons.strokeRoundedMessage01, widget.blogItem.comments, Colors.orange),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      SizedBox(height: 16),
+                                      Divider(),
+                                      SizedBox(height: 8),
+
+                                      // Content with fade animation
+                                      TweenAnimationBuilder<double>(
+                                        duration: Duration(milliseconds: 1400),
+                                        tween: Tween(begin: 0.0, end: 1.0),
+                                        builder: (context, value, child) {
+                                          return Opacity(
+                                            opacity: value,
+                                            child: Text(
+                                              widget.blogItem.detailContent,
+                                              style: GoogleFonts.manrope(
+                                                fontSize: 14,
+                                                height: 1.6,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      SizedBox(height: 8),
+                                      Divider(),
+                                      SizedBox(height: 16),
+
+                                      Text(
+                                        'Comments (${blogComments.length})',
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      SizedBox(height: 16),
+
+                                      // Comments List with staggered animations
+                                      Expanded(
+                                        child: SingleChildScrollView(
+                                          child: Column(
+                                            children: [
+                                              ...blogComments.asMap().entries.map((entry) {
+                                                int index = entry.key;
+                                                BlogComment comment = entry.value;
+                                                return TweenAnimationBuilder<double>(
+                                                  duration: Duration(milliseconds: 600 + (index * 200)),
+                                                  tween: Tween(begin: 0.0, end: 1.0),
+                                                  builder: (context, value, child) {
+                                                    return Opacity(
+                                                      opacity: value,
+                                                      child: Transform.translate(
+                                                        offset: Offset(30 * (1 - value), 0),
+                                                        child: _buildCommentItem(comment),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              }),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 24,),
+
+                            // Related Articles (Right Side) with slide animation
+                            SlideTransition(
+                              position: Tween<Offset>(
+                                begin: Offset(1, 0),
+                                end: Offset.zero,
+                              ).animate(CurvedAnimation(
+                                parent: _slideController,
+                                curve: Curves.easeOutCubic,
+                              )),
+                              child: Container(
+                                width: 350,
+                                height: MediaQuery.of(context).size.height,
+                                color: Colors.white,
+                                //padding: EdgeInsets.all(24),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Hero Image with animation
-                                    AnimatedContainer(
-                                      duration: Duration(milliseconds: 600),
-                                      width: double.infinity,
-                                      height: 250,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        image: DecorationImage(
-                                          image: NetworkImage(widget.blogItem.imageUrl),
-                                          fit: BoxFit.cover,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(0.1),
-                                            blurRadius: 10,
-                                            offset: Offset(0, 4),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(height: 24),
-
-                                    // Title with fade animation
-                                    TweenAnimationBuilder<double>(
-                                      duration: Duration(milliseconds: 800),
-                                      tween: Tween(begin: 0.0, end: 1.0),
-                                      builder: (context, value, child) {
-                                        return Opacity(
-                                          opacity: value,
-                                          child: Transform.translate(
-                                            offset: Offset(0, 20 * (1 - value)),
-                                            child: Text(
-                                              widget.blogItem.title,
-                                              style: GoogleFonts.manrope(
-                                                fontSize: 32,
-                                                fontWeight: FontWeight.bold,
-                                                color: Constants.ftaColorLight,
-                                                height: 1.2,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    SizedBox(height: 16),
-
-                                    // Description with delayed animation
-                                    TweenAnimationBuilder<double>(
-                                      duration: Duration(milliseconds: 1000),
-                                      tween: Tween(begin: 0.0, end: 1.0),
-                                      builder: (context, value, child) {
-                                        return Opacity(
-                                          opacity: value,
-                                          child: Transform.translate(
-                                            offset: Offset(0, 15 * (1 - value)),
-                                            child: Text(
-                                              widget.blogItem.description,
-                                              style: GoogleFonts.manrope(
-                                                fontSize: 14,
-                                                color: Colors.black,
-                                                height: 1.5,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    SizedBox(height: 24),
-
-                                    // Date and Stats with staggered animation
-                                    TweenAnimationBuilder<double>(
-                                      duration: Duration(milliseconds: 1200),
-                                      tween: Tween(begin: 0.0, end: 1.0),
-                                      builder: (context, value, child) {
-                                        return Opacity(
-                                          opacity: value,
-                                          child: Column(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Icon(HugeIcons.strokeRoundedCalendar01, size: 24, color: Constants.ftaColorLight),
-                                                  SizedBox(width: 6),
-                                                  Text(
-                                                    widget.blogItem.date,
-                                                    style: GoogleFonts.manrope(
-                                                      fontSize: 14,
-                                                      color: Constants.ftaColorLight,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(height: 16),
-                                              Row(
-                                                children: [
-                                                  _buildAnimatedStatItem(CupertinoIcons.heart_fill, widget.blogItem.likes, Colors.red),
-                                                  SizedBox(width: 16),
-                                                  _buildAnimatedStatItem(HugeIcons.strokeRoundedMessage01, widget.blogItem.comments, Colors.orange),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    SizedBox(height: 16),
-                                    Divider(),
-                                    SizedBox(height: 8),
-
-                                    // Content with fade animation
-                                    TweenAnimationBuilder<double>(
-                                      duration: Duration(milliseconds: 1400),
-                                      tween: Tween(begin: 0.0, end: 1.0),
-                                      builder: (context, value, child) {
-                                        return Opacity(
-                                          opacity: value,
-                                          child: Text(
-                                            widget.blogItem.detailContent,
-                                            style: GoogleFonts.manrope(
-                                              fontSize: 14,
-                                              height: 1.6,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    SizedBox(height: 8),
-                                    Divider(),
-                                    SizedBox(height: 16),
-
                                     Text(
-                                      'Comments (${blogComments.length})',
+                                      'Related Articles',
                                       style: GoogleFonts.manrope(
-                                        fontSize: 20,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
                                       ),
                                     ),
-                                    SizedBox(height: 16),
-
-                                    // Comments List with staggered animations
+                                    SizedBox(height: 20),
                                     Expanded(
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          children: [
-                                            ...blogComments.asMap().entries.map((entry) {
-                                              int index = entry.key;
-                                              BlogComment comment = entry.value;
-                                              return TweenAnimationBuilder<double>(
-                                                duration: Duration(milliseconds: 600 + (index * 200)),
-                                                tween: Tween(begin: 0.0, end: 1.0),
-                                                builder: (context, value, child) {
-                                                  return Opacity(
-                                                    opacity: value,
-                                                    child: Transform.translate(
-                                                      offset: Offset(30 * (1 - value), 0),
-                                                      child: _buildCommentItem(comment),
-                                                    ),
-                                                  );
-                                                },
+                                      child: ListView.builder(
+                                        itemCount: widget.relatedItems.length,
+                                        itemBuilder: (context, index) {
+                                          return TweenAnimationBuilder<double>(
+                                            duration: Duration(milliseconds: 800 + (index * 150)),
+                                            tween: Tween(begin: 0.0, end: 1.0),
+                                            builder: (context, value, child) {
+                                              return Opacity(
+                                                opacity: value,
+                                                child: Transform.translate(
+                                                  offset: Offset(20 * (1 - value), 0),
+                                                  child: _buildAnimatedRelatedItem(context, widget.relatedItems[index]),
+                                                ),
                                               );
-                                            }),
-                                          ],
-                                        ),
+                                            },
+                                          );
+                                        },
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),
                             ),
-                          ),
-
-                          // Related Articles (Right Side) with slide animation
-                          SlideTransition(
-                            position: Tween<Offset>(
-                              begin: Offset(1, 0),
-                              end: Offset.zero,
-                            ).animate(CurvedAnimation(
-                              parent: _slideController,
-                              curve: Curves.easeOutCubic,
-                            )),
-                            child: Container(
-                              width: 350,
-                              height: MediaQuery.of(context).size.height,
-                              color: Colors.white,
-                              padding: EdgeInsets.all(24),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Related Articles',
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  SizedBox(height: 20),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      itemCount: widget.relatedItems.length,
-                                      itemBuilder: (context, index) {
-                                        return TweenAnimationBuilder<double>(
-                                          duration: Duration(milliseconds: 800 + (index * 150)),
-                                          tween: Tween(begin: 0.0, end: 1.0),
-                                          builder: (context, value, child) {
-                                            return Opacity(
-                                              opacity: value,
-                                              child: Transform.translate(
-                                                offset: Offset(20 * (1 - value), 0),
-                                                child: _buildAnimatedRelatedItem(context, widget.relatedItems[index]),
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

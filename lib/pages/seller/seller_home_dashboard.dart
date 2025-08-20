@@ -1,4 +1,5 @@
 import 'package:bidr/constants/Constants.dart';
+import 'package:bidr/pages/seller/profile_management.dart';
 import 'package:bidr/pages/seller/rating_and_review.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -81,7 +82,8 @@ class _SellerDashboardState extends State<SellerDashboard>
     Function(String pin)? onPinCompleted,
     Function()? onCancel,
     int pinLength = 4,
-  }) {
+  })
+  {
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -178,10 +180,10 @@ class _SellerDashboardState extends State<SellerDashboard>
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 32, right: 32),
+                  padding: const EdgeInsets.only(left: 64, right: 64),
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    constraints: BoxConstraints(maxWidth: 1400),
+                    constraints: BoxConstraints(maxWidth: 1600),
                     decoration: BoxDecoration(
                       color: Constants.ctaColorLight,
                       borderRadius: BorderRadius.circular(12)
@@ -193,33 +195,43 @@ class _SellerDashboardState extends State<SellerDashboard>
                           setState(() {
                             tabActiveIndex =0;
                           });
-                        },HugeIcons.strokeRoundedBook01, 'My Bookkeeper', tabActiveIndex==0?true:false),
+                        },HugeIcons.strokeRoundedDashboardSquare01, 'My Dashboard', tabActiveIndex==0?true:false),
                         _buildNavItem((){
                           setState(() {
                             tabActiveIndex =1;
                           });
-                        },HugeIcons.strokeRoundedCustomerSupport, 'Support (BIDR)', tabActiveIndex==1?true:false),
+                        },HugeIcons.strokeRoundedBook01, 'My Bookkeeper', tabActiveIndex==1?true:false),
                         _buildNavItem((){
                           setState(() {
                             tabActiveIndex =2;
                           });
-                        },HugeIcons.strokeRoundedUserAdd01, 'Refer a Friend/Business', tabActiveIndex==2?true:false),
+                        },HugeIcons.strokeRoundedCustomerSupport, 'Support (BIDR)', tabActiveIndex==2?true:false),
                         _buildNavItem((){
                           setState(() {
                             tabActiveIndex =3;
                           });
-                        },HugeIcons.strokeRoundedStar, 'Review & Rating Manager', tabActiveIndex==3?true:false),
+                        },HugeIcons.strokeRoundedUserAdd01, 'Refer a Friend/Business', tabActiveIndex==3?true:false),
+                        _buildNavItem((){
+                          setState(() {
+                            tabActiveIndex =4;
+                          });
+                        },HugeIcons.strokeRoundedStar, 'Review & Rating Manager', tabActiveIndex==4?true:false),
+                        _buildNavItem((){
+                          setState(() {
+                            tabActiveIndex =5;
+                          });
+                        },HugeIcons.strokeRoundedProfile, 'Profile Management', tabActiveIndex==5?true:false),
                       ],
                     ),
                   ),
                 ),
                 if(tabActiveIndex==0)...[
                   Padding(
-                    padding: const EdgeInsets.only(left: 32, right: 32),
+                    padding: const EdgeInsets.only(left: 64, right: 64),
                     child: Container(
                       width: MediaQuery.of(context).size.width,
-                      constraints: BoxConstraints(maxWidth: 1400),
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      constraints: BoxConstraints(maxWidth: 1600),
+                      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 12),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -261,20 +273,33 @@ class _SellerDashboardState extends State<SellerDashboard>
                 else if(tabActiveIndex==1)...[
                   Container()
                 ]
-               else if(tabActiveIndex==2)...[
+                else if(tabActiveIndex==2)...[
+                    Container()
+                  ]
+               else if(tabActiveIndex==3)...[
                     Container()
                 ]
-                else if(tabActiveIndex==3)...[
+                else if(tabActiveIndex==4)...[
                   Padding(
-                    padding: const EdgeInsets.only(left: 32, right: 32),
+                    padding: const EdgeInsets.only(left: 64, right: 64),
                     child: Container(
                       width: MediaQuery.of(context).size.width,
-                      constraints: BoxConstraints(maxWidth: 1400),
+                      constraints: BoxConstraints(maxWidth: 1600),
                       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       child: ReviewScreen(),
                     ),
                   ),
-                ]
+                ] else if(tabActiveIndex==5)...[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 64, right: 64),
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              constraints: BoxConstraints(maxWidth: 1600),
+                              //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              child: ProfileManagement(),
+                            ),
+                          ),
+                      ]
                 else...[
                   Container()
                 ],
@@ -1109,7 +1134,7 @@ class _SellerDashboardState extends State<SellerDashboard>
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? Colors.white.withOpacity(0.15) : Colors.transparent,
+          color: isActive ? Colors.white.withOpacity(0.2) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -1126,7 +1151,7 @@ class _SellerDashboardState extends State<SellerDashboard>
               ),
             ),
             isActive?SizedBox(width: 8):SizedBox.shrink(),
-            isActive?Container(height: 8,width: 8,decoration: BoxDecoration(color: Constants.ftaColorLight,shape: BoxShape.circle),):SizedBox.shrink(),
+            isActive?Container(height: 12,width: 12,decoration: BoxDecoration(color: Constants.ftaColorLight,shape: BoxShape.circle),):SizedBox.shrink(),
 
           ],
         ),
