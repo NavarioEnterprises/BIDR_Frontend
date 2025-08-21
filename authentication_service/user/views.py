@@ -354,7 +354,8 @@ class AddressDetailView(generics.RetrieveUpdateDestroyAPIView):
         """Soft delete address"""
         instance = self.get_object()
         instance.soft_delete()
-        
+
+
         return Response({
             'message': 'Address deleted successfully'
         }, status=status.HTTP_200_OK)
