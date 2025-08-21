@@ -1,6 +1,15 @@
 """
 Tests for the user_sessions app
 """
+# Set up Django environment if not already configured
+import os
+import django
+from django.conf import settings
+
+if not settings.configured:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'authentication_service.settings')
+    django.setup()
+
 from datetime import timedelta
 from django.test import TestCase
 from django.urls import reverse

@@ -11,6 +11,15 @@ Tests cover:
 """
 
 import json
+# Set up Django environment if not already configured
+import os
+import django
+from django.conf import settings
+
+if not settings.configured:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chat_service.settings')
+    django.setup()
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils import timezone

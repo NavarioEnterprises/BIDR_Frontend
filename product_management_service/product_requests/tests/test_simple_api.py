@@ -2,6 +2,15 @@
 Simple test cases for Product Request API endpoints.
 """
 from decimal import Decimal
+# Set up Django environment if not already configured
+import os
+import django
+from django.conf import settings
+
+if not settings.configured:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'product_management_service.settings')
+    django.setup()
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from rest_framework import status

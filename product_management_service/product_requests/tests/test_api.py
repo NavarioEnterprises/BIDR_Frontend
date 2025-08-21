@@ -4,6 +4,15 @@ Test cases for Product Request API endpoints.
 import json
 from datetime import date, timedelta
 from decimal import Decimal
+# Set up Django environment if not already configured
+import os
+import django
+from django.conf import settings
+
+if not settings.configured:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'product_management_service.settings')
+    django.setup()
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse

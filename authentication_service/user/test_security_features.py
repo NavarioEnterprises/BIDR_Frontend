@@ -1,6 +1,22 @@
 """
 Tests specifically for encryption and password security features
 """
+# Set up Django environment if not already configured
+import os
+import django
+from django.conf import settings
+
+try:
+    # Check if Django is already setup
+    from django.apps import apps
+    if not apps.ready:
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'authentication_service.settings')
+        django.setup()
+except ImportError:
+    # Django not configured at all
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'authentication_service.settings')
+    django.setup()
+
 from django.test import TestCase
 from django.contrib.auth.hashers import check_password
 from .models import AppUser

@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 """
-Test script to verify that security, logging, and API management components
+Test module to verify that security, logging, and API management components
 are properly integrated across all apps in the authentication_service.
 
-This script:
-1. Makes requests to various endpoints
-2. Verifies that security measures are applied
-3. Checks that activities are properly logged
-4. Confirms that API management is working
-
-Usage:
-    python test_security_integration.py
+These tests:
+1. Make requests to various endpoints
+2. Verify that security measures are applied
+3. Check that activities are properly logged
+4. Confirm that API management is working
 """
 
 import os
@@ -19,6 +16,7 @@ import requests
 import json
 import time
 from datetime import datetime
+import pytest
 
 # Set up Django environment
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'authentication_service.settings')
