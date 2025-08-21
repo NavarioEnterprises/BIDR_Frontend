@@ -360,6 +360,7 @@ class AddressDetailView(generics.RetrieveUpdateDestroyAPIView):
         }, status=status.HTTP_200_OK)
 
 
+
 class AddressSetPrimaryView(APIView):
     """
     Set an address as primary
