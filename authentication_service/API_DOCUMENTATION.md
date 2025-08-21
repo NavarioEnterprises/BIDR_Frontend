@@ -10,6 +10,7 @@ The BIDR Authentication Service provides comprehensive user management with encr
 http://localhost:8000/
 ```
 
+
 ## Authentication
 
 Most endpoints require JWT authentication. Include the token in the Authorization header:
