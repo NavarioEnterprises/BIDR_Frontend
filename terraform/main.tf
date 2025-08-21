@@ -589,13 +589,131 @@ resource "azurerm_redis_cache" "bidr" {
   }
 }
 
-# Public IP for Load Balancer (optional - AKS creates this automatically)
-resource "azurerm_public_ip" "bidr_lb" {
-  name                = "${var.aks_cluster_name}-lb-ip"
-  resource_group_name = azurerm_kubernetes_cluster.bidr.node_resource_group
+# Network Security Group for NGINX Proxy
+resource "azurerm_network_security_group" "nginx_proxy" {
+  name                = "${var.aks_cluster_name}-nginx-nsg"
+  location            = azurerm_resource_group.bidr.location
+  resource_group_name = azurerm_resource_group.bidr.name
+
+  security_rule {
+    name                       = "HTTP"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "HTTPS"
+    priority                   = 1002
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "SSH"
+    priority                   = 1003
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  tags = {
+    Environment = var.environment
+    Project     = "BIDR"
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Public IP for NGINX Proxy VM
+resource "azurerm_public_ip" "nginx_proxy" {
+  name                = "${var.aks_cluster_name}-nginx-ip"
+  resource_group_name = azurerm_resource_group.bidr.name
   location            = azurerm_resource_group.bidr.location
   allocation_method   = "Static"
   sku                 = "Standard"
+
+  tags = {
+    Environment = var.environment
+    Project     = "BIDR"
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Network Interface for NGINX Proxy VM
+resource "azurerm_network_interface" "nginx_proxy" {
+  name                = "${var.aks_cluster_name}-nginx-nic"
+  location            = azurerm_resource_group.bidr.location
+  resource_group_name = azurerm_resource_group.bidr.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.aks.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.nginx_proxy.id
+  }
+
+  tags = {
+    Environment = var.environment
+    Project     = "BIDR"
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Associate Network Security Group to the network interface
+resource "azurerm_network_interface_security_group_association" "nginx_proxy" {
+  network_interface_id      = azurerm_network_interface.nginx_proxy.id
+  network_security_group_id = azurerm_network_security_group.nginx_proxy.id
+}
+
+# NGINX Proxy Virtual Machine
+resource "azurerm_linux_virtual_machine" "nginx_proxy" {
+  name                = "${var.aks_cluster_name}-nginx-proxy"
+  resource_group_name = azurerm_resource_group.bidr.name
+  location            = azurerm_resource_group.bidr.location
+  size                = "Standard_B2s"
+  admin_username      = "azureuser"
+  
+  # Disable password authentication
+  disable_password_authentication = true
+
+  network_interface_ids = [
+    azurerm_network_interface.nginx_proxy.id,
+  ]
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = var.ssh_public_key
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2"
+    version   = "latest"
+  }
+
+  custom_data = base64encode(templatefile("${path.module}/cloud-init.yaml", {
+    aks_cluster_name = var.aks_cluster_name
+  }))
 
   tags = {
     Environment = var.environment
