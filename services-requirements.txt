@@ -28,3 +28,10 @@ django-extensions>=3.2.0
 
 # Monitoring and Metrics
 django-prometheus>=2.3.1
+
+# Development and Testing Dependencies
+flake8>=7.0.0
+safety>=3.0.0
+pytest>=8.0.0
+pytest-django>=4.0.0
+coverage>=7.0.0
