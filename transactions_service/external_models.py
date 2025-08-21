@@ -5,20 +5,25 @@ These are simplified local models to avoid cross-service dependencies.
 
 import uuid
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 
 
-class AppUser(AbstractUser):
+class AppUser(models.Model):
     """Placeholder AppUser model - should sync with actual authentication service"""
     id = models.UUIDField(
         primary_key=True, 
         default=uuid.uuid4, 
         editable=False
     )
+    username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     role = models.CharField(max_length=20, default='BUYER')
     is_verified = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         app_label = 'transactions'  # Use existing app for simplicity
