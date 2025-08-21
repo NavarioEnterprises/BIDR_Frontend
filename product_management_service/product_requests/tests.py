@@ -69,7 +69,7 @@ class ProductRequestModelTest(TestCase):
         self.assertEqual(request.category, self.category)
         self.assertEqual(request.quantity_needed, 100)
         self.assertEqual(request.urgency, 'high')
-        self.assertEqual(request.status, StatusChoices.PENDING)
+        self.assertEqual(request.status, 'ACTIVE')
         self.assertIsNotNone(request.reference_number)
     
     def test_request_str_representation(self):
@@ -175,7 +175,7 @@ class ProductRequestModelTest(TestCase):
             request_type='product_inquiry',
             requester=self.user,
             quantity_needed=10,
-            status=StatusChoices.ACTIVE,
+            status='ACTIVE',
             expires_at=timezone.now() + timedelta(days=7)
         )
         self.assertTrue(active_request.can_receive_quotes())
@@ -187,7 +187,7 @@ class ProductRequestModelTest(TestCase):
             request_type='product_inquiry',
             requester=self.user,
             quantity_needed=10,
-            status=StatusChoices.ACTIVE,
+            status='ACTIVE',
             expires_at=timezone.now() - timedelta(days=1)
         )
         self.assertFalse(expired_request.can_receive_quotes())

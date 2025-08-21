@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="Initial Commit">
-      <change beforePath="$PROJECT_DIR$/authentication_service/otp/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/otp/urls.py" afterDir="false" />
-    </list>
+    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="Initial Commit" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -84,7 +82,7 @@
       <workItem from="1755533413059" duration="2653000" />
       <workItem from="1755669035492" duration="2601000" />
       <workItem from="1755781772169" duration="181000" />
-      <workItem from="1755806689089" duration="1133000" />
+      <workItem from="1755806689089" duration="2585000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <option name="closed" value="true" />
@@ -118,7 +116,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755806781429</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1755807828772</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1755807828772</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

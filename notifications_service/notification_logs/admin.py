@@ -4,27 +4,27 @@ from .models import NotificationLog, SystemLog, ErrorLog, AuditLog, APILog
 
 @admin.register(NotificationLog)
 class NotificationLogAdmin(admin.ModelAdmin):
-    list_display = ['id', 'notification_id', 'event_type', 'status', 'channel', 'created_at']
-    list_filter = ['event_type', 'status', 'channel']
-    search_fields = ['notification_id', 'message']
+    list_display = ['id', 'notification_id', 'channel_type', 'status', 'attempt_number', 'created_at']
+    list_filter = ['channel_type', 'status']
+    search_fields = ['notification_id', 'error_message']
     readonly_fields = ['id', 'created_at']
     ordering = ['-created_at']
 
 
 @admin.register(SystemLog)
 class SystemLogAdmin(admin.ModelAdmin):
-    list_display = ['id', 'service', 'log_level', 'component', 'created_at']
-    list_filter = ['log_level', 'service', 'component']
-    search_fields = ['message', 'service']
+    list_display = ['id', 'component', 'level', 'action', 'created_at']
+    list_filter = ['level', 'component']
+    search_fields = ['message', 'component']
     readonly_fields = ['id', 'created_at']
     ordering = ['-created_at']
 
 
 @admin.register(ErrorLog)
 class ErrorLogAdmin(admin.ModelAdmin):
-    list_display = ['id', 'error_type', 'severity', 'service', 'created_at']
-    list_filter = ['error_type', 'severity', 'service']
-    search_fields = ['error_message', 'service']
+    list_display = ['id', 'error_type', 'component', 'environment', 'created_at']
+    list_filter = ['error_type', 'component', 'environment']
+    search_fields = ['error_message', 'component']
     readonly_fields = ['id', 'created_at']
     ordering = ['-created_at']
 
@@ -40,8 +40,8 @@ class AuditLogAdmin(admin.ModelAdmin):
 
 @admin.register(APILog)
 class APILogAdmin(admin.ModelAdmin):
-    list_display = ['id', 'endpoint', 'method', 'status_code', 'response_time_ms', 'created_at']
-    list_filter = ['method', 'status_code']
+    list_display = ['id', 'endpoint', 'method', 'response_status', 'processing_time_ms', 'created_at']
+    list_filter = ['method', 'response_status']
     search_fields = ['endpoint', 'user_agent']
     readonly_fields = ['id', 'created_at']
     ordering = ['-created_at']

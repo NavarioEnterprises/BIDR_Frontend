@@ -428,13 +428,13 @@ class ProductRequestMessageAPITest(ProductRequestAPITestCase):
     def test_list_messages(self):
         """Test listing messages for a product request."""
         # Create test messages
-        ProductRequestMessage.objects.create(
-            product_request=self.product_request,
+        RequestMessage.objects.create(
+            request=self.product_request,
             sender=self.user1,
             message='Test message 1'
         )
-        ProductRequestMessage.objects.create(
-            product_request=self.product_request,
+        RequestMessage.objects.create(
+            request=self.product_request,
             sender=self.user2,
             message='Test message 2'
         )
@@ -491,9 +491,9 @@ class ProductRequestWatchlistAPITest(ProductRequestAPITestCase):
     def test_list_watchlist(self):
         """Test listing user's watchlist."""
         # Add to watchlist
-        ProductRequestWatchlist.objects.create(
+        RequestWatchlist.objects.create(
             user=self.user2,
-            product_request=self.product_request
+            request=self.product_request
         )
 
         self.authenticate(self.user2)
@@ -505,9 +505,9 @@ class ProductRequestWatchlistAPITest(ProductRequestAPITestCase):
     def test_remove_from_watchlist(self):
         """Test removing a product request from watchlist."""
         # Add to watchlist first
-        watchlist_item = ProductRequestWatchlist.objects.create(
+        watchlist_item = RequestWatchlist.objects.create(
             user=self.user2,
-            product_request=self.product_request
+            request=self.product_request
         )
 
         self.authenticate(self.user2)
@@ -515,7 +515,7 @@ class ProductRequestWatchlistAPITest(ProductRequestAPITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(
-            ProductRequestWatchlist.objects.filter(id=watchlist_item.id).exists()
+            RequestWatchlist.objects.filter(id=watchlist_item.id).exists()
         )
 
 

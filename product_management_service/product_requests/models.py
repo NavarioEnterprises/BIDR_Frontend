@@ -1097,28 +1097,9 @@ class ProductRequest(models.Model):
         """
         # from products.models import ProductSpecificationTemplate
         
-        # If template_id is provided, use that specific template
-        if template_id:
-            try:
-                template = ProductSpecificationTemplate.objects.get(id=template_id)
-            except ProductSpecificationTemplate.DoesNotExist:
-                return False
-        else:
-            # Otherwise try to find a suitable template
-            template = self.get_template_for_category()
-            
-        if not template:
-            return False
-            
-        # Apply the template data
-        if template.example_data:
-            # Merge with existing specifications, template takes precedence
-            self.product_specifications.update(template.example_data)
-            
-        # Increment template usage count
-        template.increment_usage()
-        
-        return True
+        # Template functionality temporarily disabled
+        # TODO: Implement ProductSpecificationTemplate model
+        return False
     
     def sync_vehicle_tyres_rims_data(self):
         """
