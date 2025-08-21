@@ -34,7 +34,9 @@ from .serializers import (
     CompanyInfoSerializer, CompanyContactInfoSerializer, BankingInfoSerializer, BusinessRegistrationSerializer
 )
 
-# Import security utils only (remove problematic imports)
+# Import required models
+from api_management.models import APIRequest, RateLimitBucket
+from auth_logs.models import AuditTrail, SecurityEvent
 from security.utils import SecurityUtils
 
 
@@ -281,10 +283,10 @@ class SellerBusinessRegistrationView(APIView):
         if rate_limit_bucket.is_rate_limited(20):  # Limit for business registration
             # Log the rate limiting event
             SecurityEvent.objects.create(
-                user=user,
-                event_type='BUSINESS_REG_RATE_LIMIT_EXCEEDED',
-                ip_address=ip_address,
-                details=f"Business registration rate limit exceeded for user: {user.email}"
+                user_email=user.email,
+                event_type='api_abuse',
+                title='Business Registration Rate Limit Exceeded',
+                description=f"Business registration rate limit exceeded for user: {user.email}"
             )
             
             # Update API request status
@@ -303,10 +305,10 @@ class SellerBusinessRegistrationView(APIView):
         if user.role != 'seller':
             # Log unauthorized access attempt
             SecurityEvent.objects.create(
-                user=user,
-                event_type='UNAUTHORIZED_BUSINESS_REG_ATTEMPT',
-                ip_address=ip_address,
-                details=f"Non-seller user attempted business registration: {user.email}"
+                user_email=user.email,
+                event_type='privilege_escalation',
+                title='Unauthorized Business Registration Attempt',
+                description=f"Non-seller user attempted business registration: {user.email}"
             )
             
             # Update API request status
@@ -320,10 +322,11 @@ class SellerBusinessRegistrationView(APIView):
 
         # Create audit trail for business registration attempt
         AuditTrail.objects.create(
-            user=user,
-            action='BUSINESS_REGISTRATION_STARTED',
+            admin_email=user.email,
+            action='user_created',
             ip_address=ip_address,
-            details=f"Business registration process started"
+            user_agent=request.META.get('HTTP_USER_AGENT', ''),
+            description=f"Business registration process started"
         )
 
         # Step 1: Company Details
@@ -339,18 +342,19 @@ class SellerBusinessRegistrationView(APIView):
                 
                 # Log successful company details update
                 AuditTrail.objects.create(
-                    user=user,
-                    action='COMPANY_DETAILS_UPDATED',
+                    admin_email=user.email,
+                    action='user_updated',
                     ip_address=ip_address,
-                    details=f"Company details updated for seller: {user.email}"
+                    user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                    description=f"Company details updated for seller: {user.email}"
                 )
             else:
                 # Log validation error
                 SecurityEvent.objects.create(
-                    user=user,
-                    event_type='BUSINESS_REG_VALIDATION_ERROR',
-                    ip_address=ip_address,
-                    details=f"Company details validation error: {company_serializer.errors}"
+                    user_email=user.email,
+                    event_type='data_breach_attempt',
+                    title='Company Details Validation Error',
+                    description=f"Company details validation error: {company_serializer.errors}"
                 )
                 
                 # Update API request status
@@ -372,18 +376,19 @@ class SellerBusinessRegistrationView(APIView):
                 
                 # Log successful address details update
                 AuditTrail.objects.create(
-                    user=user,
-                    action='ADDRESS_DETAILS_UPDATED',
+                    admin_email=user.email,
+                    action='user_updated',
                     ip_address=ip_address,
-                    details=f"Address details updated for seller: {user.email}"
+                    user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                    description=f"Address details updated for seller: {user.email}"
                 )
             else:
                 # Log validation error
                 SecurityEvent.objects.create(
-                    user=user,
-                    event_type='BUSINESS_REG_VALIDATION_ERROR',
-                    ip_address=ip_address,
-                    details=f"Address details validation error: {address_serializer.errors}"
+                    user_email=user.email,
+                    event_type='data_breach_attempt',
+                    title='Address Details Validation Error',
+                    description=f"Address details validation error: {address_serializer.errors}"
                 )
                 
                 # Update API request status
@@ -405,18 +410,19 @@ class SellerBusinessRegistrationView(APIView):
                 
                 # Log successful bank details update
                 AuditTrail.objects.create(
-                    user=user,
-                    action='BANK_DETAILS_UPDATED',
+                    admin_email=user.email,
+                    action='user_updated',
                     ip_address=ip_address,
-                    details=f"Bank details updated for seller: {user.email}"
+                    user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                    description=f"Bank details updated for seller: {user.email}"
                 )
             else:
                 # Log validation error
                 SecurityEvent.objects.create(
-                    user=user,
-                    event_type='BUSINESS_REG_VALIDATION_ERROR',
-                    ip_address=ip_address,
-                    details=f"Bank details validation error: {bank_serializer.errors}"
+                    user_email=user.email,
+                    event_type='data_breach_attempt',
+                    title='Bank Details Validation Error',
+                    description=f"Bank details validation error: {bank_serializer.errors}"
                 )
                 
                 # Update API request status
@@ -427,11 +433,12 @@ class SellerBusinessRegistrationView(APIView):
                 return Response(bank_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         # Log successful business registration
-        SecurityAuditLog.objects.create(
-            user=user,
-            action='BUSINESS_REGISTRATION_COMPLETED',
+        AuditTrail.objects.create(
+            admin_email=user.email,
+            action='user_created',
             ip_address=ip_address,
-            details=f"Business registration completed successfully for seller: {user.email}"
+            user_agent=request.META.get('HTTP_USER_AGENT', ''),
+            description=f"Business registration completed successfully for seller: {user.email}"
         )
         
         # Update API request status
@@ -477,10 +484,10 @@ class SellerDocumentUploadView(APIView):
         if rate_limit_bucket.is_rate_limited(15):  # Limit for document uploads
             # Log the rate limiting event
             SecurityEvent.objects.create(
-                user=user,
-                event_type='DOCUMENT_UPLOAD_RATE_LIMIT_EXCEEDED',
-                ip_address=ip_address,
-                details=f"Document upload rate limit exceeded for user: {user.email}"
+                user_email=user.email,
+                event_type='api_abuse',
+                title='Document Upload Rate Limit Exceeded',
+                description=f"Document upload rate limit exceeded for user: {user.email}"
             )
             
             # Update API request status
@@ -498,10 +505,10 @@ class SellerDocumentUploadView(APIView):
         if user.role != 'seller':
             # Log unauthorized access attempt
             SecurityEvent.objects.create(
-                user=user,
-                event_type='UNAUTHORIZED_DOCUMENT_UPLOAD_ATTEMPT',
-                ip_address=ip_address,
-                details=f"Non-seller user attempted document upload: {user.email}"
+                user_email=user.email,
+                event_type='privilege_escalation',
+                title='Unauthorized Document Upload Attempt',
+                description=f"Non-seller user attempted document upload: {user.email}"
             )
             
             # Update API request status
@@ -519,10 +526,11 @@ class SellerDocumentUploadView(APIView):
             
             # Log document upload attempt
             AuditTrail.objects.create(
-                user=user,
-                action='DOCUMENT_UPLOAD_STARTED',
+                admin_email=user.email,
+                action='user_updated',
                 ip_address=ip_address,
-                details=f"Document upload process started for seller: {user.email}"
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                description=f"Document upload process started for seller: {user.email}"
             )
 
             # Validate document types and sizes
@@ -532,10 +540,10 @@ class SellerDocumentUploadView(APIView):
                 if file.size > 10 * 1024 * 1024:  # 10MB limit
                     # Log security event for oversized file
                     SecurityEvent.objects.create(
-                        user=user,
-                        event_type='OVERSIZED_FILE_UPLOAD_ATTEMPT',
-                        ip_address=ip_address,
-                        details=f"User attempted to upload oversized file: {file.name}, size: {file.size} bytes"
+                        user_email=user.email,
+                        event_type='data_breach_attempt',
+                        title='Oversized File Upload Attempt',
+                        description=f"User attempted to upload oversized file: {file.name}, size: {file.size} bytes"
                     )
                     
                     # Update API request status
@@ -553,10 +561,10 @@ class SellerDocumentUploadView(APIView):
                 if file_ext not in allowed_extensions:
                     # Log security event for disallowed file type
                     SecurityEvent.objects.create(
-                        user=user,
-                        event_type='DISALLOWED_FILE_TYPE_UPLOAD_ATTEMPT',
-                        ip_address=ip_address,
-                        details=f"User attempted to upload disallowed file type: {file.name}, type: {file_ext}"
+                        user_email=user.email,
+                        event_type='data_breach_attempt',
+                        title='Disallowed File Type Upload Attempt',
+                        description=f"User attempted to upload disallowed file type: {file.name}, type: {file_ext}"
                     )
                     
                     # Update API request status
@@ -573,11 +581,12 @@ class SellerDocumentUploadView(APIView):
                 serializer.save()
                 
                 # Log successful document upload
-                SecurityAuditLog.objects.create(
-                    user=user,
-                    action='DOCUMENT_UPLOAD_COMPLETED',
+                AuditTrail.objects.create(
+                    admin_email=user.email,
+                    action='user_updated',
                     ip_address=ip_address,
-                    details=f"Documents uploaded successfully for seller: {user.email}"
+                    user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                    description=f"Documents uploaded successfully for seller: {user.email}"
                 )
                 
                 # Update API request status
@@ -591,10 +600,10 @@ class SellerDocumentUploadView(APIView):
 
             # Log validation error
             SecurityEvent.objects.create(
-                user=user,
-                event_type='DOCUMENT_UPLOAD_VALIDATION_ERROR',
-                ip_address=ip_address,
-                details=f"Document upload validation error: {serializer.errors}"
+                user_email=user.email,
+                event_type='data_breach_attempt',
+                title='Document Upload Validation Error',
+                description=f"Document upload validation error: {serializer.errors}"
             )
             
             # Update API request status
@@ -607,10 +616,10 @@ class SellerDocumentUploadView(APIView):
         except Seller.DoesNotExist:
             # Log error
             SecurityEvent.objects.create(
-                user=user,
-                event_type='SELLER_PROFILE_NOT_FOUND',
-                ip_address=ip_address,
-                details=f"Seller profile not found for user: {user.email}"
+                user_email=user.email,
+                event_type='data_breach_attempt',
+                title='Seller Profile Not Found',
+                description=f"Seller profile not found for user: {user.email}"
             )
             
             # Update API request status
