@@ -1,0 +1,14 @@
+INFO 2025-08-10 02:45:08,075 autoreload 74685 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-10 02:45:52,507 autoreload 74889 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-10 02:46:01,741 basehttp 74889 6124744704 "GET /api/v1/core/health/ HTTP/1.1" 200 111
+INFO 2025-08-10 02:46:08,210 basehttp 74889 6124744704 "GET /api/v1/core/service-info/ HTTP/1.1" 200 429
+INFO 2025-08-10 02:49:20,158 basehttp 74889 6124744704 "GET /api/v1/core/service-info/ HTTP/1.1" 200 429
+WARNING 2025-08-10 02:56:44,834 log 76223 8771748224 Forbidden: /api/v1/core/stats/
+INFO 2025-08-10 02:59:58,455 autoreload 76570 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-10 03:00:08,277 basehttp 74889 6124744704 "GET /api/v1/core/health/ HTTP/1.1" 200 111
+INFO 2025-08-10 03:07:56,679 autoreload 74889 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/resolution_service/notifications/migrations/0001_initial.py changed, reloading.
+INFO 2025-08-10 03:07:57,064 autoreload 77592 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-10 03:18:48,819 autoreload 77592 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/resolution_service/resolution_service/settings.py changed, reloading.
+INFO 2025-08-10 03:18:49,073 autoreload 79275 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-10 03:18:57,403 autoreload 79275 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/resolution_service/resolution_service/settings.py changed, reloading.
+INFO 2025-08-10 03:18:57,605 autoreload 79287 8771748224 Watching for file changes with StatReloader

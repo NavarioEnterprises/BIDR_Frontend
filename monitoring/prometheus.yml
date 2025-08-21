@@ -1,0 +1,76 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files: []
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # BIDR Services
+  - job_name: 'auth-service'
+    static_configs:
+      - targets: ['auth-service:8000']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  - job_name: 'chat-service'
+    static_configs:
+      - targets: ['chat-service:8000']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  - job_name: 'payment-service'
+    static_configs:
+      - targets: ['payment-service:8000']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  - job_name: 'resolution-service'
+    static_configs:
+      - targets: ['resolution-service:8000']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  - job_name: 'product-service'
+    static_configs:
+      - targets: ['product-service:8000']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  - job_name: 'notifications-service'
+    static_configs:
+      - targets: ['notifications-service:8000']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  - job_name: 'transactions-service'
+    static_configs:
+      - targets: ['transactions-service:8000']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  - job_name: 'reviews-service'
+    static_configs:
+      - targets: ['reviews-service:8000']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Infrastructure Exporters
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 60s
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 60s
+
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx-exporter:9113']
+    scrape_interval: 30s

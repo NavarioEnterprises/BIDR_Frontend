@@ -1,0 +1,901 @@
+INFO 2025-08-09 07:26:20,249 autoreload 61817 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 07:29:03,673 autoreload 62204 8771748224 Watching for file changes with StatReloader
+ERROR 2025-08-09 07:29:16,890 exception 62204 6157053952 Invalid HTTP_HOST header: '127.0.0.1:8088'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '127.0.0.1:8088'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+WARNING 2025-08-09 07:29:16,915 log 62204 6157053952 Bad Request: /
+WARNING 2025-08-09 07:29:16,916 basehttp 62204 6157053952 "GET / HTTP/1.1" 400 79737
+ERROR 2025-08-09 07:29:16,964 exception 62204 6173880320 Invalid HTTP_HOST header: '127.0.0.1:8088'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '127.0.0.1:8088'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+WARNING 2025-08-09 07:29:16,976 log 62204 6173880320 Bad Request: /favicon.ico
+WARNING 2025-08-09 07:29:16,976 basehttp 62204 6173880320 "GET /favicon.ico HTTP/1.1" 400 79662
+INFO 2025-08-09 07:29:39,173 autoreload 62204 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/settings.py changed, reloading.
+INFO 2025-08-09 07:29:39,546 autoreload 62269 8771748224 Watching for file changes with StatReloader
+WARNING 2025-08-09 07:36:03,840 log 62269 6136508416 Not Found: /
+WARNING 2025-08-09 07:36:03,840 basehttp 62269 6136508416 "GET / HTTP/1.1" 404 3933
+WARNING 2025-08-09 07:36:03,855 log 62269 6136508416 Not Found: /favicon.ico
+WARNING 2025-08-09 07:36:03,855 basehttp 62269 6136508416 "GET /favicon.ico HTTP/1.1" 404 3984
+INFO 2025-08-09 07:36:08,973 basehttp 62269 6136508416 "GET /admin HTTP/1.1" 301 0
+INFO 2025-08-09 07:36:09,036 basehttp 62269 6153334784 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-09 07:36:09,053 basehttp 62269 6153334784 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4158
+INFO 2025-08-09 07:36:09,072 basehttp 62269 12901707776 "GET /static/admin/css/login.css HTTP/1.1" 200 958
+INFO 2025-08-09 07:36:09,072 basehttp 62269 12935360512 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2025-08-09 07:36:09,072 basehttp 62269 6136508416 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+INFO 2025-08-09 07:36:09,073 basehttp 62269 6170161152 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2025-08-09 07:36:09,073 basehttp 62269 12918534144 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+INFO 2025-08-09 07:36:09,074 basehttp 62269 6153334784 "GET /static/admin/css/base.css HTTP/1.1" 200 21544
+INFO 2025-08-09 07:36:09,075 basehttp 62269 6136508416 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-08-09 07:37:20,940 basehttp 62269 6136508416 "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2025-08-09 07:37:20,952 basehttp 62269 6136508416 "GET /admin/ HTTP/1.1" 200 6720
+INFO 2025-08-09 07:37:20,973 basehttp 62269 6136508416 "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+INFO 2025-08-09 07:37:20,976 basehttp 62269 6136508416 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2025-08-09 07:37:20,976 basehttp 62269 6153334784 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+INFO 2025-08-09 07:38:20,382 autoreload 62269 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/core/admin.py changed, reloading.
+INFO 2025-08-09 07:38:20,801 autoreload 62922 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 07:38:56,624 autoreload 62922 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/categories/admin.py changed, reloading.
+INFO 2025-08-09 07:38:58,199 autoreload 62971 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 07:39:38,287 autoreload 62971 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/products/admin.py changed, reloading.
+INFO 2025-08-09 07:39:40,182 autoreload 63025 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 07:40:16,153 autoreload 63025 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 07:40:17,549 autoreload 63069 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 07:41:07,059 autoreload 63069 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/admin.py changed, reloading.
+INFO 2025-08-09 07:41:08,585 autoreload 63130 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 07:41:18,815 autoreload 63130 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/ratings/admin.py changed, reloading.
+INFO 2025-08-09 07:41:20,648 autoreload 63149 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 07:41:28,995 autoreload 63149 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/transactions/admin.py changed, reloading.
+INFO 2025-08-09 07:41:30,111 autoreload 63166 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 07:41:39,467 autoreload 63166 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_logs/admin.py changed, reloading.
+INFO 2025-08-09 07:41:41,033 autoreload 63185 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 07:52:45,477 basehttp 63185 6200094720 "GET /admin/ HTTP/1.1" 200 18798
+ERROR 2025-08-09 07:52:55,465 log 63185 6200094720 Internal Server Error: /admin/products/product/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: products_product.product_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 716, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/sites.py", line 240, in inner
+    return view(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 2126, in changelist_view
+    "selection_note": _("0 of %(cnt)s selected") % {"cnt": len(cl.result_list)},
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: products_product.product_id
+ERROR 2025-08-09 07:52:55,480 basehttp 63185 6200094720 "GET /admin/products/product/ HTTP/1.1" 500 218504
+INFO 2025-08-09 07:54:00,187 autoreload 63185 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/categories/migrations/0001_initial.py changed, reloading.
+INFO 2025-08-09 07:54:02,224 autoreload 64429 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 10:19:16,136 autoreload 75616 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 10:19:21,099 basehttp 75616 6155857920 "GET /admin/products/product/ HTTP/1.1" 302 0
+INFO 2025-08-09 10:19:21,113 basehttp 75616 6155857920 "GET /admin/login/?next=/admin/products/product/ HTTP/1.1" 200 4192
+INFO 2025-08-09 10:19:21,751 basehttp 75616 6155857920 "GET /admin/login/?next=/admin/products/product/ HTTP/1.1" 200 4192
+INFO 2025-08-09 10:19:29,461 basehttp 75616 6155857920 "POST /admin/login/?next=/admin/products/product/ HTTP/1.1" 200 4358
+INFO 2025-08-09 10:19:32,288 basehttp 75616 6155857920 "POST /admin/login/?next=/admin/products/product/ HTTP/1.1" 200 4358
+INFO 2025-08-09 10:19:53,477 basehttp 75616 6155857920 "POST /admin/login/?next=/admin/products/product/ HTTP/1.1" 302 0
+INFO 2025-08-09 10:19:53,497 basehttp 75616 6155857920 "GET /admin/products/product/ HTTP/1.1" 200 20047
+INFO 2025-08-09 10:19:53,510 basehttp 75616 6155857920 "GET /static/admin/css/changelists.css HTTP/1.1" 200 6811
+INFO 2025-08-09 10:19:53,514 basehttp 75616 13052751872 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2025-08-09 10:19:53,514 basehttp 75616 13069578240 "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+INFO 2025-08-09 10:19:53,514 basehttp 75616 13086404608 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9042
+INFO 2025-08-09 10:19:53,515 basehttp 75616 6172684288 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:19:53,516 basehttp 75616 13035925504 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2025-08-09 10:19:53,521 basehttp 75616 13069578240 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2025-08-09 10:19:53,522 basehttp 75616 13052751872 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2025-08-09 10:19:53,522 basehttp 75616 6172684288 "GET /static/admin/js/actions.js HTTP/1.1" 200 8067
+INFO 2025-08-09 10:19:53,524 basehttp 75616 6155857920 "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+INFO 2025-08-09 10:19:53,527 basehttp 75616 13052751872 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2025-08-09 10:19:53,529 basehttp 75616 13086404608 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2025-08-09 10:19:53,537 basehttp 75616 13052751872 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+INFO 2025-08-09 10:19:53,537 basehttp 75616 13086404608 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2025-08-09 10:20:01,737 basehttp 75616 13086404608 "GET /admin/products/product/ HTTP/1.1" 200 20047
+INFO 2025-08-09 10:20:01,750 basehttp 75616 13086404608 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:20:05,070 basehttp 75616 13086404608 "GET /admin/categories/category/ HTTP/1.1" 200 19363
+INFO 2025-08-09 10:20:05,092 basehttp 75616 13086404608 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:20:06,505 basehttp 75616 13086404608 "GET /admin/categories/category/add/ HTTP/1.1" 200 29117
+INFO 2025-08-09 10:20:06,518 basehttp 75616 6155857920 "GET /static/admin/js/collapse.js HTTP/1.1" 200 1803
+INFO 2025-08-09 10:20:06,518 basehttp 75616 6172684288 "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 586
+INFO 2025-08-09 10:20:06,518 basehttp 75616 13086404608 "GET /static/admin/css/forms.css HTTP/1.1" 200 9090
+INFO 2025-08-09 10:20:06,522 basehttp 75616 13052751872 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:20:06,523 basehttp 75616 13086404608 "GET /static/admin/css/widgets.css HTTP/1.1" 200 11800
+INFO 2025-08-09 10:20:06,524 basehttp 75616 13086404608 "GET /static/admin/js/change_form.js HTTP/1.1" 200 606
+INFO 2025-08-09 10:25:26,763 basehttp 75616 6155857920 "POST /admin/categories/category/add/ HTTP/1.1" 302 0
+INFO 2025-08-09 10:25:26,776 basehttp 75616 6155857920 "GET /admin/categories/category/ HTTP/1.1" 200 22817
+INFO 2025-08-09 10:25:26,791 basehttp 75616 6172684288 "GET /static/admin/img/icon-no.svg HTTP/1.1" 200 560
+INFO 2025-08-09 10:25:26,793 basehttp 75616 13035925504 "GET /static/admin/img/icon-yes.svg HTTP/1.1" 200 436
+INFO 2025-08-09 10:25:26,794 basehttp 75616 6155857920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:25:30,080 basehttp 75616 6155857920 "GET /admin/categories/category/3b6b0f2e-8516-4748-b3c4-e54ffbf57555/change/ HTTP/1.1" 200 29631
+INFO 2025-08-09 10:25:30,097 basehttp 75616 6155857920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:25:30,104 basehttp 75616 6155857920 "GET /static/admin/img/tooltag-arrowright.svg HTTP/1.1" 200 280
+INFO 2025-08-09 10:25:34,848 basehttp 75616 6155857920 "POST /admin/categories/category/3b6b0f2e-8516-4748-b3c4-e54ffbf57555/change/ HTTP/1.1" 302 0
+INFO 2025-08-09 10:25:34,857 basehttp 75616 6155857920 "GET /admin/categories/category/ HTTP/1.1" 200 22819
+INFO 2025-08-09 10:25:34,871 basehttp 75616 6155857920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:25:38,375 basehttp 75616 6155857920 "GET /admin/categories/category/add/ HTTP/1.1" 200 29198
+INFO 2025-08-09 10:25:38,394 basehttp 75616 6155857920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:26:12,222 basehttp 75616 6155857920 "POST /admin/categories/category/add/ HTTP/1.1" 302 0
+INFO 2025-08-09 10:26:12,241 basehttp 75616 6155857920 "GET /admin/categories/category/ HTTP/1.1" 200 23683
+INFO 2025-08-09 10:26:12,252 basehttp 75616 6155857920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:26:42,562 basehttp 75616 6155857920 "GET /admin/categories/category/add/ HTTP/1.1" 200 29287
+INFO 2025-08-09 10:26:42,577 basehttp 75616 6155857920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:27:01,246 basehttp 75616 6155857920 "POST /admin/categories/category/add/ HTTP/1.1" 302 0
+INFO 2025-08-09 10:27:01,265 basehttp 75616 6155857920 "GET /admin/categories/category/ HTTP/1.1" 200 24533
+INFO 2025-08-09 10:27:01,275 basehttp 75616 6155857920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:27:13,208 basehttp 75616 6155857920 "GET /admin/product_requests/productrequest/ HTTP/1.1" 200 20522
+INFO 2025-08-09 10:27:13,225 basehttp 75616 6155857920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:27:14,991 basehttp 75616 6155857920 "GET /admin/product_requests/productrequest/add/ HTTP/1.1" 200 49063
+INFO 2025-08-09 10:27:15,008 basehttp 75616 6155857920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:27:15,012 basehttp 75616 13035925504 "GET /static/admin/img/icon-unknown.svg HTTP/1.1" 200 655
+INFO 2025-08-09 10:27:15,013 basehttp 75616 6155857920 "GET /static/admin/js/inlines.js HTTP/1.1" 200 15526
+INFO 2025-08-09 10:27:15,030 basehttp 75616 6155857920 "GET /static/admin/img/inline-delete.svg HTTP/1.1" 200 560
+INFO 2025-08-09 10:27:40,435 basehttp 75616 6155857920 "GET /admin/product_requests/productrequest/ HTTP/1.1" 200 20522
+INFO 2025-08-09 10:27:44,241 basehttp 75616 6155857920 "GET /admin/products/product/ HTTP/1.1" 200 20560
+INFO 2025-08-09 10:27:44,255 basehttp 75616 6155857920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+ERROR 2025-08-09 10:27:46,585 log 75616 6155857920 Internal Server Error: /admin/products/product/add/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/forms/forms.py", line 174, in __getitem__
+    field = self.fields[name]
+KeyError: 'slug'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 716, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/sites.py", line 240, in inner
+    return view(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1947, in add_view
+    return self.changeform_view(request, None, form_url, extra_context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1806, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1887, in _changeform_view
+    admin_form = helpers.AdminForm(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/helpers.py", line 49, in __init__
+    self.prepopulated_fields = [
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/helpers.py", line 50, in <listcomp>
+    {"field": form[field_name], "dependencies": [form[f] for f in dependencies]}
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/forms/forms.py", line 176, in __getitem__
+    raise KeyError(
+KeyError: "Key 'slug' not found in 'ProductForm'. Choices are: barcode, base_price, category, compare_price, condition, cost_price, currency, description, dimensions_height, dimensions_length, dimensions_width, images, is_digital, is_featured, low_stock_threshold, meta_description, meta_title, name, primary_image, quantity_available, quantity_reserved, requires_shipping, seller, seller_location, short_description, sku, specifications, status, track_inventory, weight."
+ERROR 2025-08-09 10:27:46,586 basehttp 75616 6155857920 "GET /admin/products/product/add/ HTTP/1.1" 500 153810
+INFO 2025-08-09 10:28:51,578 autoreload 75616 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/products/admin.py changed, reloading.
+INFO 2025-08-09 10:28:51,881 autoreload 76471 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 10:44:33,161 autoreload 78016 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 10:44:43,660 basehttp 78016 6155972608 "GET /admin/products/product/add/ HTTP/1.1" 200 59490
+INFO 2025-08-09 10:44:43,680 basehttp 78016 6155972608 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:44:43,689 basehttp 78016 6155972608 "GET /static/admin/img/icon-deletelink.svg HTTP/1.1" 200 392
+INFO 2025-08-09 10:44:58,188 basehttp 78016 6155972608 "GET /admin/product_requests/productrequest/ HTTP/1.1" 200 20522
+INFO 2025-08-09 10:44:58,202 basehttp 78016 6155972608 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:45:00,766 basehttp 78016 6155972608 "GET /admin/product_requests/productrequest/add/ HTTP/1.1" 200 49063
+INFO 2025-08-09 10:45:00,784 basehttp 78016 6155972608 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:53:49,597 basehttp 78016 6155972608 "GET /admin/product_requests/requestimage/ HTTP/1.1" 200 18117
+INFO 2025-08-09 10:53:49,616 basehttp 78016 6155972608 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:53:51,609 basehttp 78016 6155972608 "GET /admin/product_requests/requestimage/add/ HTTP/1.1" 200 20979
+INFO 2025-08-09 10:53:51,625 basehttp 78016 6155972608 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:54:06,131 basehttp 78016 6155972608 "GET /admin/product_requests/productrequest/ HTTP/1.1" 200 20522
+INFO 2025-08-09 10:54:06,147 basehttp 78016 6155972608 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 10:54:07,775 basehttp 78016 6155972608 "GET /admin/product_requests/productrequest/add/ HTTP/1.1" 200 49063
+INFO 2025-08-09 10:54:07,784 basehttp 78016 6155972608 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 11:11:12,654 autoreload 78016 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:11:13,090 autoreload 79989 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:11:22,678 autoreload 79989 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:11:23,051 autoreload 80010 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:11:49,282 autoreload 80010 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:11:49,645 autoreload 80051 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:12:56,416 autoreload 80051 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:12:56,812 autoreload 80241 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:13:13,630 autoreload 80241 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:13:13,996 autoreload 80275 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:13:22,507 autoreload 80275 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:13:22,875 autoreload 80290 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:13:30,357 autoreload 80290 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:13:30,653 autoreload 80306 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:13:38,136 autoreload 80306 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:13:38,422 autoreload 80323 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:13:50,033 autoreload 80323 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:13:50,411 autoreload 80343 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:14:28,390 basehttp 80343 6163214336 "GET /admin/product_requests/productrequest/add/ HTTP/1.1" 200 52037
+INFO 2025-08-09 11:14:28,411 basehttp 80343 6163214336 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 11:14:29,128 basehttp 80343 6163214336 "GET /admin/product_requests/productrequest/add/ HTTP/1.1" 200 52037
+INFO 2025-08-09 11:14:29,141 basehttp 80343 6163214336 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 11:18:30,399 autoreload 80343 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:18:30,817 autoreload 80813 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:18:41,451 autoreload 80813 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:18:41,805 autoreload 80833 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:19:11,150 autoreload 80833 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:19:11,511 autoreload 80871 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:19:34,592 autoreload 80871 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:19:34,877 autoreload 80998 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:19:54,816 autoreload 80998 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:19:55,175 autoreload 81029 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:20:02,675 autoreload 81029 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:20:02,951 autoreload 81041 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:20:12,514 autoreload 81041 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:20:12,815 autoreload 81060 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:20:21,347 autoreload 81060 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:20:21,659 autoreload 81075 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:20:34,339 autoreload 81075 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:20:34,697 autoreload 81094 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:24:20,531 autoreload 81094 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:24:20,956 autoreload 81480 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:24:45,056 autoreload 81480 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:24:45,423 autoreload 81514 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:25:11,656 autoreload 81514 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:25:12,031 autoreload 81546 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:26:04,194 autoreload 81546 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:26:04,592 autoreload 81716 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:26:23,522 autoreload 81716 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:26:23,886 autoreload 81744 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:26:33,460 autoreload 81744 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:26:34,103 autoreload 81762 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:26:43,983 autoreload 81762 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:26:44,251 autoreload 81782 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:26:53,703 autoreload 81782 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:26:53,975 autoreload 81803 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:27:04,573 autoreload 81803 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 11:27:04,839 autoreload 81815 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:33:17,157 basehttp 81815 6157152256 "GET /admin/product_requests/productrequest/add/ HTTP/1.1" 200 57981
+INFO 2025-08-09 11:33:17,179 basehttp 81815 6157152256 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 11:33:22,856 basehttp 81815 6157152256 "GET /admin/product_requests/consumerelectronics/ HTTP/1.1" 200 24094
+INFO 2025-08-09 11:33:22,866 basehttp 81815 6157152256 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 11:33:24,547 basehttp 81815 6157152256 "GET /admin/product_requests/consumerelectronics/add/ HTTP/1.1" 200 40498
+INFO 2025-08-09 11:33:24,559 basehttp 81815 6157152256 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 11:41:53,228 autoreload 81815 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/urls.py changed, reloading.
+INFO 2025-08-09 11:41:53,633 autoreload 83167 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:43:26,456 autoreload 83440 8771748224 Watching for file changes with StatReloader
+WARNING 2025-08-09 11:43:38,196 log 83440 6159642624 Not Found: /product-requests/requests/
+WARNING 2025-08-09 11:43:38,196 basehttp 83440 6159642624 "GET /product-requests/requests/ HTTP/1.1" 404 4029
+INFO 2025-08-09 11:43:51,316 autoreload 83167 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/urls.py changed, reloading.
+INFO 2025-08-09 11:43:51,480 autoreload 83440 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/urls.py changed, reloading.
+INFO 2025-08-09 11:43:51,735 autoreload 83570 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:43:51,745 autoreload 83571 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:44:01,012 autoreload 83677 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:44:12,886 basehttp 83571 6199717888 "GET /product-requests/requests/ HTTP/1.1" 200 8073
+INFO 2025-08-09 11:44:18,550 basehttp 83571 6199717888 "GET /product-requests/requests/categories/ HTTP/1.1" 200 169
+INFO 2025-08-09 11:44:23,116 basehttp 83571 6199717888 "GET /product-requests/requests/urgent_requests/ HTTP/1.1" 200 2936
+INFO 2025-08-09 11:44:28,814 basehttp 83571 6199717888 "GET /product-requests/requests/ HTTP/1.1" 200 8073
+INFO 2025-08-09 11:45:41,536 basehttp 83571 6199717888 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-09 11:45:41,551 basehttp 83571 6199717888 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4158
+INFO 2025-08-09 11:45:41,561 basehttp 83571 6216544256 "GET /product-requests/requests/ HTTP/1.1" 200 8073
+INFO 2025-08-09 11:45:41,564 basehttp 83571 6233370624 "GET /product-requests/requests/categories/ HTTP/1.1" 200 169
+INFO 2025-08-09 11:45:41,570 basehttp 83571 6250196992 "GET /product-requests/requests/urgent_requests/ HTTP/1.1" 200 2936
+INFO 2025-08-09 11:45:41,579 basehttp 83571 6267023360 "GET /product-requests/requests/?category=ELECTRONICS HTTP/1.1" 200 3742
+INFO 2025-08-09 11:45:41,588 basehttp 83571 6216544256 "GET /product-requests/requests/?category=VEHICLE_SPARES HTTP/1.1" 200 2235
+INFO 2025-08-09 11:45:41,596 basehttp 83571 6233370624 "GET /product-requests/requests/?category=TYRES_RIMS HTTP/1.1" 200 2197
+INFO 2025-08-09 11:45:41,602 basehttp 83571 6250196992 "GET /product-requests/consumer-electronics/ HTTP/1.1" 200 4845
+INFO 2025-08-09 11:45:41,607 basehttp 83571 6267023360 "GET /product-requests/vehicle-spares/ HTTP/1.1" 200 2532
+INFO 2025-08-09 11:45:41,612 basehttp 83571 6216544256 "GET /product-requests/tyres-rims/ HTTP/1.1" 200 1834
+INFO 2025-08-09 11:45:41,621 basehttp 83571 6233370624 "GET /product-requests/requests/ HTTP/1.1" 200 8073
+WARNING 2025-08-09 11:45:41,624 log 83571 6250196992 Unauthorized: /product-requests/requests/
+WARNING 2025-08-09 11:45:41,624 basehttp 83571 6250196992 "POST /product-requests/requests/ HTTP/1.1" 401 145
+INFO 2025-08-09 11:45:41,633 basehttp 83571 6267023360 "GET /product-requests/requests/ HTTP/1.1" 200 8073
+WARNING 2025-08-09 11:45:41,636 log 83571 6216544256 Unauthorized: /product-requests/requests/
+WARNING 2025-08-09 11:45:41,636 basehttp 83571 6216544256 "POST /product-requests/requests/ HTTP/1.1" 401 145
+INFO 2025-08-09 11:45:41,645 basehttp 83571 6233370624 "GET /product-requests/requests/ HTTP/1.1" 200 8073
+WARNING 2025-08-09 11:45:41,647 log 83571 6250196992 Unauthorized: /product-requests/requests/
+WARNING 2025-08-09 11:45:41,647 basehttp 83571 6250196992 "POST /product-requests/requests/ HTTP/1.1" 401 145
+INFO 2025-08-09 11:45:41,651 basehttp 83571 6267023360 "GET /product-requests/requests/categories/ HTTP/1.1" 200 169
+INFO 2025-08-09 11:48:23,709 basehttp 83570 6171570176 "GET /admin/product_requests/consumerelectronics/add/ HTTP/1.1" 200 40498
+INFO 2025-08-09 11:48:23,718 basehttp 83570 6171570176 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 11:48:32,562 basehttp 83570 6171570176 "GET /admin/product_requests/productrequest/ HTTP/1.1" 200 36670
+INFO 2025-08-09 11:48:32,573 basehttp 83570 6171570176 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 11:48:32,584 basehttp 83570 6171570176 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+INFO 2025-08-09 11:53:06,199 basehttp 83570 6171570176 "GET /admin/product_requests/requestmessage/ HTTP/1.1" 200 21372
+INFO 2025-08-09 11:53:06,211 basehttp 83570 6171570176 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 11:53:07,774 basehttp 83570 6171570176 "GET /admin/product_requests/requestmessage/add/ HTTP/1.1" 200 27993
+INFO 2025-08-09 11:53:07,783 basehttp 83570 6171570176 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 11:53:18,884 basehttp 83570 6171570176 "GET /admin/product_requests/requesttemplate/ HTTP/1.1" 200 20129
+INFO 2025-08-09 11:53:18,940 basehttp 83570 6171570176 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 11:53:20,332 basehttp 83570 6171570176 "GET /admin/product_requests/requesttemplate/add/ HTTP/1.1" 200 25255
+INFO 2025-08-09 11:53:20,343 basehttp 83570 6171570176 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 11:54:43,816 autoreload 83570 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/settings.py changed, reloading.
+INFO 2025-08-09 11:54:43,960 autoreload 83571 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/settings.py changed, reloading.
+INFO 2025-08-09 11:54:44,140 autoreload 84959 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:54:44,161 autoreload 84960 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:55:14,563 autoreload 84960 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/settings.py changed, reloading.
+INFO 2025-08-09 11:55:14,576 autoreload 84959 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/settings.py changed, reloading.
+INFO 2025-08-09 11:55:14,798 autoreload 85059 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:55:14,798 autoreload 85060 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:55:35,157 autoreload 85059 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:55:35,162 autoreload 85060 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:55:35,478 autoreload 85140 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:55:35,478 autoreload 85141 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:55:46,721 autoreload 85140 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:55:46,724 autoreload 85141 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-09 11:55:47,024 autoreload 85165 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:55:47,024 autoreload 85166 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:56:05,371 autoreload 85165 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/transactions/models.py changed, reloading.
+INFO 2025-08-09 11:56:05,380 autoreload 85166 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/transactions/models.py changed, reloading.
+INFO 2025-08-09 11:56:05,586 autoreload 85237 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:56:05,597 autoreload 85238 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:56:13,810 autoreload 85237 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/transactions/models.py changed, reloading.
+INFO 2025-08-09 11:56:13,871 autoreload 85238 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/transactions/models.py changed, reloading.
+INFO 2025-08-09 11:56:14,028 autoreload 85258 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 11:56:14,096 autoreload 85259 8771748224 Watching for file changes with StatReloader
+WARNING 2025-08-09 12:34:59,971 log 90970 8771748224 Unauthorized: /api/v1/requests/
+WARNING 2025-08-09 12:35:18,370 log 91055 8771748224 Unauthorized: /api/v1/requests/
+INFO 2025-08-09 13:31:32,203 autoreload 96798 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:31:37,407 basehttp 96798 6195556352 "GET /admin/product_requests/requesttemplate/add/ HTTP/1.1" 200 22467
+INFO 2025-08-09 13:31:37,434 basehttp 96798 6195556352 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:35:13,870 basehttp 96798 6195556352 "GET /admin/product_requests/productrequest/ HTTP/1.1" 200 43439
+INFO 2025-08-09 13:35:13,883 basehttp 96798 6195556352 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:35:49,259 basehttp 96798 6195556352 "GET /admin/product_requests/requestspecification/ HTTP/1.1" 200 16259
+INFO 2025-08-09 13:35:49,271 basehttp 96798 6195556352 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:35:51,544 basehttp 96798 6195556352 "GET /admin/product_requests/requestspecification/add/ HTTP/1.1" 200 21978
+INFO 2025-08-09 13:35:51,552 basehttp 96798 6195556352 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:40:04,885 basehttp 96798 6195556352 "GET /admin/analytics/searchanalytics/ HTTP/1.1" 200 16335
+INFO 2025-08-09 13:40:04,896 basehttp 96798 6195556352 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:40:06,277 basehttp 96798 6195556352 "GET /admin/analytics/searchanalytics/add/ HTTP/1.1" 200 23670
+INFO 2025-08-09 13:40:06,293 basehttp 96798 6212382720 "GET /static/admin/js/calendar.js HTTP/1.1" 200 9141
+INFO 2025-08-09 13:40:06,293 basehttp 96798 6195556352 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:40:06,294 basehttp 96798 6229209088 "GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 200 19319
+INFO 2025-08-09 13:40:06,308 basehttp 96798 6229209088 "GET /static/admin/img/icon-calendar.svg HTTP/1.1" 200 1086
+INFO 2025-08-09 13:40:17,712 basehttp 96798 6229209088 "GET /admin/analytics/salesanalytics/ HTTP/1.1" 200 16282
+INFO 2025-08-09 13:40:17,722 basehttp 96798 6229209088 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:40:19,308 basehttp 96798 6229209088 "GET /admin/analytics/salesanalytics/add/ HTTP/1.1" 200 26200
+INFO 2025-08-09 13:40:19,316 basehttp 96798 6229209088 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:42:32,144 autoreload 96798 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/models.py changed, reloading.
+INFO 2025-08-09 13:42:32,607 autoreload 97835 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:42:50,424 autoreload 97835 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/models.py changed, reloading.
+INFO 2025-08-09 13:42:50,820 autoreload 97868 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:43:00,376 autoreload 97868 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/models.py changed, reloading.
+INFO 2025-08-09 13:43:00,745 autoreload 97899 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:43:09,250 autoreload 97899 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/models.py changed, reloading.
+INFO 2025-08-09 13:43:09,600 autoreload 97937 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:43:18,135 autoreload 97937 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/admin.py changed, reloading.
+INFO 2025-08-09 13:43:18,414 autoreload 97955 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:43:51,841 autoreload 97955 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/admin.py changed, reloading.
+INFO 2025-08-09 13:43:52,224 autoreload 98018 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:44:00,708 autoreload 98018 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/admin.py changed, reloading.
+INFO 2025-08-09 13:44:01,077 autoreload 98035 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:44:08,572 autoreload 98035 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/admin.py changed, reloading.
+INFO 2025-08-09 13:44:08,931 autoreload 98056 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:45:45,888 autoreload 98056 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/urls.py changed, reloading.
+INFO 2025-08-09 13:45:46,300 autoreload 98204 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:47:00,355 autoreload 98648 8771748224 Watching for file changes with StatReloader
+WARNING 2025-08-09 13:47:10,630 log 98648 6156873728 Unauthorized: /analytics/api/v1/dashboard/overview/
+WARNING 2025-08-09 13:47:10,630 basehttp 98648 6156873728 "GET /analytics/api/v1/dashboard/overview/ HTTP/1.1" 401 297
+INFO 2025-08-09 13:48:06,512 autoreload 98204 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/models.py changed, reloading.
+INFO 2025-08-09 13:48:06,832 autoreload 98648 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/models.py changed, reloading.
+INFO 2025-08-09 13:48:06,928 autoreload 98878 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:48:07,117 autoreload 98879 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:49:12,612 autoreload 99096 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:49:19,607 basehttp 99096 6157578240 "GET /admin/analytics/salesanalytics/add/ HTTP/1.1" 200 26566
+INFO 2025-08-09 13:49:19,633 basehttp 99096 6157578240 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+ERROR 2025-08-09 13:49:26,411 log 99096 6157578240 Internal Server Error: /admin/analytics/productrequestanalytics/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 716, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/sites.py", line 240, in inner
+    return view(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/options.py", line 2126, in changelist_view
+    "selection_note": _("0 of %(cnt)s selected") % {"cnt": len(cl.result_list)},
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/query.py", line 382, in __len__
+    self._fetch_all()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1549, in execute_sql
+    sql, params = self.as_sql()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 736, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 279, in get_select
+    related_klass_infos = self.get_related_selections(select, select_mask)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1235, in get_related_selections
+    next_klass_infos = self.get_related_selections(
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1200, in get_related_selections
+    raise FieldError(
+django.core.exceptions.FieldError: Non-relational field given in select_related: 'category'. Choices are: buyer_id, vehicle_tyres_rims, vehicle_spares, consumer_electronics
+ERROR 2025-08-09 13:49:26,413 basehttp 99096 6157578240 "GET /admin/analytics/productrequestanalytics/ HTTP/1.1" 500 183404
+INFO 2025-08-09 13:49:48,241 autoreload 99096 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/admin.py changed, reloading.
+INFO 2025-08-09 13:49:48,636 autoreload 99168 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:50:23,308 basehttp 99168 6124105728 "GET /admin/analytics/salesanalytics/add/ HTTP/1.1" 200 26566
+INFO 2025-08-09 13:50:25,524 basehttp 99168 6124105728 "GET /admin/analytics/searchanalytics/ HTTP/1.1" 200 46339
+INFO 2025-08-09 13:50:25,535 basehttp 99168 6124105728 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:50:36,406 basehttp 99168 6124105728 "GET /admin/analytics/userbehavioranalytics/ HTTP/1.1" 200 24407
+INFO 2025-08-09 13:50:36,413 basehttp 99168 6124105728 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:50:42,012 basehttp 99168 6124105728 "GET /admin/analytics/analyticsreport/ HTTP/1.1" 200 18642
+INFO 2025-08-09 13:50:42,024 basehttp 99168 6124105728 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:50:44,034 basehttp 99168 6124105728 "GET /admin/analytics/categoryanalytics/ HTTP/1.1" 200 41769
+INFO 2025-08-09 13:50:44,043 basehttp 99168 6124105728 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:50:47,125 basehttp 99168 6124105728 "GET /admin/analytics/inventoryanalytics/ HTTP/1.1" 200 24210
+INFO 2025-08-09 13:50:47,134 basehttp 99168 6124105728 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:50:48,953 basehttp 99168 6124105728 "GET /admin/analytics/productrequestanalytics/ HTTP/1.1" 200 79147
+INFO 2025-08-09 13:50:48,963 basehttp 99168 6124105728 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:50:54,368 basehttp 99168 6124105728 "GET /admin/analytics/salesanalytics/ HTTP/1.1" 200 24252
+INFO 2025-08-09 13:50:54,377 basehttp 99168 6124105728 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:50:55,652 basehttp 99168 6124105728 "GET /admin/analytics/searchanalytics/ HTTP/1.1" 200 46339
+INFO 2025-08-09 13:50:55,662 basehttp 99168 6124105728 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:50:56,513 basehttp 99168 6124105728 "GET /admin/analytics/userbehavioranalytics/ HTTP/1.1" 200 24407
+INFO 2025-08-09 13:50:56,526 basehttp 99168 6124105728 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:50:57,867 basehttp 99168 6124105728 "GET /admin/analytics/analyticsreport/ HTTP/1.1" 200 18642
+INFO 2025-08-09 13:50:57,876 basehttp 99168 6124105728 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+ERROR 2025-08-09 13:51:00,128 log 99168 6124105728 Internal Server Error: /admin/analytics/analyticsreport/add/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/options.py", line 681, in get_field
+    return self.fields_map[field_name]
+KeyError: 'date_range_days_display'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/utils.py", line 289, in lookup_field
+    f = _get_non_gfk_field(opts, name)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/utils.py", line 322, in _get_non_gfk_field
+    field = opts.get_field(name)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/db/models/options.py", line 683, in get_field
+    raise FieldDoesNotExist(
+django.core.exceptions.FieldDoesNotExist: AnalyticsReport has no field named 'date_range_days_display'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/defaulttags.py", line 242, in render
+    nodelist.append(node.render_annotated(context))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/defaulttags.py", line 242, in render
+    nodelist.append(node.render_annotated(context))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/defaulttags.py", line 242, in render
+    nodelist.append(node.render_annotated(context))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/defaulttags.py", line 326, in render
+    return nodelist.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/defaulttags.py", line 326, in render
+    return nodelist.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 1059, in render
+    output = self.filter_expression.resolve(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 710, in resolve
+    obj = self.var.resolve(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 842, in resolve
+    value = self._resolve_lookup(context)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/template/base.py", line 909, in _resolve_lookup
+    current = current()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/helpers.py", line 270, in contents
+    f, attr, value = lookup_field(field, obj, model_admin)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/django/contrib/admin/utils.py", line 298, in lookup_field
+    value = attr(obj)
+  File "/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/admin.py", line 367, in date_range_days_display
+    return f"{obj.date_range_days} days"
+  File "/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/models.py", line 651, in date_range_days
+    return (self.end_date - self.start_date).days + 1
+TypeError: unsupported operand type(s) for -: 'NoneType' and 'NoneType'
+ERROR 2025-08-09 13:51:00,135 basehttp 99168 6124105728 "GET /admin/analytics/analyticsreport/add/ HTTP/1.1" 500 675803
+INFO 2025-08-09 13:52:16,638 autoreload 99168 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/models.py changed, reloading.
+INFO 2025-08-09 13:52:17,060 autoreload 99508 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:52:38,119 basehttp 99508 6129561600 "GET /admin/analytics/analyticsreport/add/ HTTP/1.1" 200 28995
+INFO 2025-08-09 13:52:38,131 basehttp 99508 6129561600 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:52:40,766 basehttp 99508 6129561600 "GET /admin/analytics/analyticsreport/ HTTP/1.1" 200 18642
+INFO 2025-08-09 13:52:40,774 basehttp 99508 6129561600 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:52:42,951 basehttp 99508 6129561600 "GET /admin/analytics/analyticsreport/add/ HTTP/1.1" 200 28995
+INFO 2025-08-09 13:52:42,960 basehttp 99508 6129561600 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 13:54:21,249 autoreload 99508 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/views.py changed, reloading.
+INFO 2025-08-09 13:54:21,681 autoreload 99698 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:54:29,191 autoreload 99698 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/views.py changed, reloading.
+INFO 2025-08-09 13:54:29,555 autoreload 99712 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:54:55,773 autoreload 99712 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/views.py changed, reloading.
+INFO 2025-08-09 13:54:56,135 autoreload 99757 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 13:55:06,759 autoreload 99757 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/views.py changed, reloading.
+INFO 2025-08-09 13:55:07,109 autoreload 99779 8771748224 Watching for file changes with StatReloader
+WARNING 2025-08-09 13:57:59,060 log 205 8771748224 Not Found: /product-requests/api/v1/requests/
+WARNING 2025-08-09 14:01:02,773 log 656 8771748224 Unauthorized: /analytics/api/v1/product-request-analytics/
+WARNING 2025-08-09 14:01:02,775 log 656 8771748224 Unauthorized: /analytics/api/v1/category-analytics/
+WARNING 2025-08-09 14:01:02,776 log 656 8771748224 Unauthorized: /analytics/api/v1/dashboard/overview/
+WARNING 2025-08-09 14:01:02,779 log 656 8771748224 Unauthorized: /analytics/api/v1/reports/
+ERROR 2025-08-09 14:01:03,137 log 656 8771748224 Internal Server Error: /analytics/api/v1/category-analytics/
+ERROR 2025-08-09 14:01:03,539 log 656 8771748224 Internal Server Error: /analytics/api/v1/dashboard/overview/
+ERROR 2025-08-09 14:01:03,816 log 656 8771748224 Internal Server Error: /analytics/api/v1/dashboard/trends/
+ERROR 2025-08-09 14:01:04,090 log 656 8771748224 Internal Server Error: /analytics/api/v1/product-request-analytics/
+WARNING 2025-08-09 14:01:06,629 log 656 8771748224 Not Found: /product-requests/api/v1/requests/
+INFO 2025-08-09 15:32:49,675 basehttp 99779 6201831424 "GET /admin/analytics/analyticsreport/add/ HTTP/1.1" 200 28995
+INFO 2025-08-09 15:32:49,693 basehttp 99779 6201831424 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 15:32:54,594 basehttp 99779 6201831424 "GET /admin/analytics/userbehavioranalytics/ HTTP/1.1" 200 24407
+INFO 2025-08-09 15:32:54,613 basehttp 99779 6201831424 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:32:41,969 basehttp 99779 6201831424 "GET /admin/analytics/userbehavioranalytics/ HTTP/1.1" 200 24407
+INFO 2025-08-09 22:32:41,992 basehttp 99779 6201831424 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:34:06,176 autoreload 99779 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/settings.py changed, reloading.
+INFO 2025-08-09 22:34:07,509 autoreload 40923 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 22:34:30,385 autoreload 40923 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/app_logs/middleware.py changed, reloading.
+INFO 2025-08-09 22:34:30,874 autoreload 40999 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 22:34:42,065 basehttp 40999 6138408960 "GET /admin/analytics/userbehavioranalytics/ HTTP/1.1" 200 26579
+INFO 2025-08-09 22:34:42,087 basehttp 40999 6138408960 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:34:46,735 autoreload 40999 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/app_logs/middleware.py changed, reloading.
+INFO 2025-08-09 22:34:47,189 autoreload 41062 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 22:35:08,647 basehttp 41062 6130970624 "GET /admin/app_logs/apirequestlog/ HTTP/1.1" 200 20098
+INFO 2025-08-09 22:35:08,661 basehttp 41062 6130970624 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+ERROR 2025-08-09 22:35:48,138 log 41450 8771748224 Internal Server Error: /categories/categories/
+WARNING 2025-08-09 22:35:48,265 log 41450 8771748224 Not Found: /analytics/product-request-analytics/
+WARNING 2025-08-09 22:35:48,575 log 41450 8771748224 Not Found: /nonexistent-endpoint/
+WARNING 2025-08-09 22:35:48,715 log 41450 8771748224 Bad Request: /product-requests/requests/
+INFO 2025-08-09 22:36:09,246 basehttp 41062 6130970624 "GET /admin/app_logs/apirequestlog/ HTTP/1.1" 200 25962
+INFO 2025-08-09 22:36:09,259 basehttp 41062 6130970624 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:36:16,533 basehttp 41062 6130970624 "GET /admin/categories/categoryspecification/ HTTP/1.1" 200 19549
+INFO 2025-08-09 22:36:16,542 basehttp 41062 6130970624 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:36:18,498 basehttp 41062 6130970624 "GET /admin/categories/categoryspecification/add/ HTTP/1.1" 200 24472
+INFO 2025-08-09 22:36:18,508 basehttp 41062 6130970624 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:36:36,228 basehttp 41062 6130970624 "GET /admin/categories/categoryattribute/ HTTP/1.1" 200 20135
+INFO 2025-08-09 22:36:36,237 basehttp 41062 6130970624 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:36:37,938 basehttp 41062 6130970624 "GET /admin/categories/categoryattribute/add/ HTTP/1.1" 200 32352
+INFO 2025-08-09 22:36:37,949 basehttp 41062 6130970624 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:37:16,558 basehttp 41062 6130970624 "GET /admin/product_requests/requestwatchlist/ HTTP/1.1" 200 20224
+INFO 2025-08-09 22:37:16,567 basehttp 41062 6130970624 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:37:18,517 basehttp 41062 6130970624 "GET /admin/product_requests/requestwatchlist/add/ HTTP/1.1" 200 26561
+INFO 2025-08-09 22:37:18,526 basehttp 41062 6130970624 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:37:36,161 basehttp 41062 6130970624 "GET /admin/token_blacklist/blacklistedtoken/ HTTP/1.1" 200 17707
+INFO 2025-08-09 22:37:36,172 basehttp 41062 6130970624 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:37:38,803 basehttp 41062 6130970624 "GET /admin/token_blacklist/blacklistedtoken/add/ HTTP/1.1" 200 18934
+INFO 2025-08-09 22:37:38,815 basehttp 41062 6130970624 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:39:01,084 autoreload 41062 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/settings.py changed, reloading.
+INFO 2025-08-09 22:39:01,656 autoreload 42224 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 22:40:49,138 autoreload 42224 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/app_logs/apps.py changed, reloading.
+INFO 2025-08-09 22:40:49,567 autoreload 42428 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 22:41:13,781 autoreload 42428 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/core/apps.py changed, reloading.
+INFO 2025-08-09 22:41:14,210 autoreload 42470 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 22:41:25,886 autoreload 42470 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/categories/apps.py changed, reloading.
+INFO 2025-08-09 22:41:26,317 autoreload 42490 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 22:41:36,887 autoreload 42490 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/apps.py changed, reloading.
+INFO 2025-08-09 22:41:37,613 autoreload 42509 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 22:41:55,503 autoreload 42509 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/apps.py changed, reloading.
+INFO 2025-08-09 22:41:55,884 autoreload 42538 8771748224 Watching for file changes with StatReloader
+WARNING 2025-08-09 22:48:53,068 log 43193 8771748224 Unauthorized: /product-requests/requests/
+WARNING 2025-08-09 22:48:53,311 log 43193 8771748224 Not Found: /api/token/blacklist/
+WARNING 2025-08-09 22:48:53,415 log 43193 8771748224 Not Found: /api/token/
+WARNING 2025-08-09 22:48:53,519 log 43193 8771748224 Not Found: /api/token/refresh/
+ERROR 2025-08-09 22:48:56,260 log 43193 8771748224 Internal Server Error: /api/v1/categories/categories/
+ERROR 2025-08-09 22:48:56,370 log 43193 8771748224 Internal Server Error: /api/v1/categories/categories/
+ERROR 2025-08-09 22:48:56,480 log 43193 8771748224 Internal Server Error: /api/v1/categories/categories/
+WARNING 2025-08-09 22:48:56,587 log 43193 8771748224 Unauthorized: /api/v1/categories/categories/
+ERROR 2025-08-09 22:48:56,807 log 43193 8771748224 Internal Server Error: /api/v1/categories/categories/
+ERROR 2025-08-09 22:48:56,918 log 43193 8771748224 Internal Server Error: /api/v1/categories/categories/227d1889-d9a0-41ea-95c8-4552789f7cd5/
+ERROR 2025-08-09 22:48:57,031 log 43193 8771748224 Internal Server Error: /api/v1/categories/categories/d4f0578d-7a25-425e-a872-da47c5f66d30/
+WARNING 2025-08-09 22:48:57,685 log 43193 8771748224 Unauthorized: /api/v1/categories/attributes/
+INFO 2025-08-09 22:50:17,641 basehttp 42538 6204043264 "GET /admin/token_blacklist/blacklistedtoken/add/ HTTP/1.1" 200 18998
+INFO 2025-08-09 22:50:17,664 basehttp 42538 6204043264 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:50:19,940 basehttp 42538 6204043264 "GET /admin/app_logs/apirequestlog/ HTTP/1.1" 200 26034
+INFO 2025-08-09 22:50:19,950 basehttp 42538 6204043264 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:50:22,271 basehttp 42538 6204043264 "GET /admin/app_logs/applicationlog/ HTTP/1.1" 200 20218
+INFO 2025-08-09 22:50:22,285 basehttp 42538 6204043264 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:50:23,532 basehttp 42538 6204043264 "GET /admin/app_logs/categorylog/ HTTP/1.1" 200 18970
+INFO 2025-08-09 22:50:23,544 basehttp 42538 6204043264 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:50:24,706 basehttp 42538 6204043264 "GET /admin/app_logs/errorlog/ HTTP/1.1" 200 19432
+INFO 2025-08-09 22:50:24,717 basehttp 42538 6204043264 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:50:25,412 basehttp 42538 6204043264 "GET /admin/app_logs/performancelog/ HTTP/1.1" 200 20017
+INFO 2025-08-09 22:50:25,423 basehttp 42538 6204043264 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:50:27,644 basehttp 42538 6204043264 "GET /admin/app_logs/productrequestlog/ HTTP/1.1" 200 19365
+INFO 2025-08-09 22:50:27,655 basehttp 42538 6204043264 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 22:51:39,646 autoreload 42538 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/app_logs/middleware.py changed, reloading.
+INFO 2025-08-09 22:51:40,106 autoreload 43443 8771748224 Watching for file changes with StatReloader
+ERROR 2025-08-09 22:54:34,140 log 43760 8771748224 Internal Server Error: /categories/categories/
+INFO 2025-08-09 23:03:02,446 autoreload 43443 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/admin.py changed, reloading.
+INFO 2025-08-09 23:03:02,856 autoreload 44886 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:11:52,695 autoreload 44886 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/settings.py changed, reloading.
+INFO 2025-08-09 23:11:53,122 autoreload 45874 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:12:52,615 autoreload 45874 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/quotes/admin.py changed, reloading.
+INFO 2025-08-09 23:12:53,062 autoreload 46006 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:13:42,223 autoreload 46006 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/quotes/migrations/0001_initial.py changed, reloading.
+INFO 2025-08-09 23:13:42,579 autoreload 46363 8771748224 Watching for file changes with StatReloader
+WARNING 2025-08-09 23:14:25,516 log 46564 8771748224 Unauthorized: /api/v1/requests/
+INFO 2025-08-09 23:24:10,998 basehttp 46363 6134362112 "GET /admin/app_logs/productrequestlog/ HTTP/1.1" 200 21151
+INFO 2025-08-09 23:24:11,016 basehttp 46363 6134362112 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 23:39:53,773 autoreload 46363 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/urls.py changed, reloading.
+INFO 2025-08-09 23:39:54,434 autoreload 49334 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:40:03,131 autoreload 49334 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/inventory_service/urls.py changed, reloading.
+INFO 2025-08-09 23:40:04,248 autoreload 49412 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:40:10,195 autoreload 49412 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/analytics/urls.py changed, reloading.
+INFO 2025-08-09 23:40:11,509 autoreload 49468 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:40:18,744 autoreload 49548 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:40:27,909 basehttp 49548 13052751872 "GET /swagger/ HTTP/1.1" 200 1673
+WARNING 2025-08-09 23:40:35,613 log 49548 13052751872 Unauthorized: /api/v1/categories/
+WARNING 2025-08-09 23:40:35,614 basehttp 49548 13052751872 "GET /api/v1/categories/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:40:35,629 log 49548 13052751872 Unauthorized: /api/v1/requests/
+WARNING 2025-08-09 23:40:35,629 basehttp 49548 13052751872 "GET /api/v1/requests/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:40:35,645 log 49548 13052751872 Unauthorized: /api/v1/quotes/
+WARNING 2025-08-09 23:40:35,645 basehttp 49548 13052751872 "GET /api/v1/quotes/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:40:35,658 log 49548 13052751872 Unauthorized: /api/v1/transactions/
+WARNING 2025-08-09 23:40:35,658 basehttp 49548 13052751872 "GET /api/v1/transactions/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:40:35,671 log 49548 13052751872 Unauthorized: /api/v1/ratings/
+WARNING 2025-08-09 23:40:35,671 basehttp 49548 13052751872 "GET /api/v1/ratings/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:40:35,684 log 49548 13052751872 Unauthorized: /api/v1/analytics/
+WARNING 2025-08-09 23:40:35,684 basehttp 49548 13052751872 "GET /api/v1/analytics/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:40:52,886 log 49548 13052751872 Not Found: /api/token/
+WARNING 2025-08-09 23:40:52,889 basehttp 49548 13052751872 "POST /api/token/ HTTP/1.1" 404 5105
+INFO 2025-08-09 23:41:26,276 autoreload 49468 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/urls.py changed, reloading.
+INFO 2025-08-09 23:41:26,751 autoreload 49958 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:41:26,802 autoreload 49548 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/urls.py changed, reloading.
+INFO 2025-08-09 23:41:27,215 autoreload 49959 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:41:34,346 autoreload 49958 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/inventory_service/urls.py changed, reloading.
+INFO 2025-08-09 23:41:34,651 autoreload 49976 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:41:34,725 autoreload 49959 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/inventory_service/urls.py changed, reloading.
+INFO 2025-08-09 23:41:35,018 autoreload 49977 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:41:42,254 basehttp 49977 6199980032 "POST /api/token/ HTTP/1.1" 200 491
+INFO 2025-08-09 23:41:50,610 basehttp 49977 6199980032 "GET /api/v1/categories/ HTTP/1.1" 200 135
+INFO 2025-08-09 23:41:50,623 basehttp 49977 6199980032 "GET /api/v1/requests/ HTTP/1.1" 200 457
+INFO 2025-08-09 23:41:50,635 basehttp 49977 6199980032 "GET /api/v1/quotes/ HTTP/1.1" 200 346
+INFO 2025-08-09 23:41:58,102 basehttp 49977 6199980032 "GET /api/v1/transactions/ HTTP/1.1" 200 2
+INFO 2025-08-09 23:41:58,115 basehttp 49977 6199980032 "GET /api/v1/ratings/ HTTP/1.1" 200 2
+INFO 2025-08-09 23:41:58,132 basehttp 49977 6199980032 "GET /api/v1/analytics/ HTTP/1.1" 200 569
+INFO 2025-08-09 23:45:49,124 autoreload 49977 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/urls.py changed, reloading.
+INFO 2025-08-09 23:45:49,595 autoreload 50617 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:45:49,683 autoreload 49976 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/urls.py changed, reloading.
+INFO 2025-08-09 23:45:50,035 autoreload 50618 8771748224 Watching for file changes with StatReloader
+ERROR 2025-08-09 23:46:19,833 log 50617 6135230464 Internal Server Error: /swagger.json
+ERROR 2025-08-09 23:46:19,833 basehttp 50617 6135230464 "GET /swagger.json HTTP/1.1" 500 96
+INFO 2025-08-09 23:46:27,850 basehttp 50617 6135230464 "GET / HTTP/1.1" 200 1682
+WARNING 2025-08-09 23:46:34,307 log 50617 6135230464 Unauthorized: /api/v1/categories/
+WARNING 2025-08-09 23:46:34,307 basehttp 50617 6135230464 "GET /api/v1/categories/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:46:39,835 log 50617 6135230464 Unauthorized: /api/v1/product-requests/
+WARNING 2025-08-09 23:46:39,835 basehttp 50617 6135230464 "GET /api/v1/product-requests/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:46:45,761 log 50617 6135230464 Unauthorized: /api/v1/quotes/
+WARNING 2025-08-09 23:46:45,761 basehttp 50617 6135230464 "GET /api/v1/quotes/ HTTP/1.1" 401 145
+INFO 2025-08-09 23:50:47,807 basehttp 50618 6168309760 "GET /admin/app_logs/productrequestlog/ HTTP/1.1" 200 21151
+INFO 2025-08-09 23:50:47,828 basehttp 50618 6168309760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-09 23:51:05,668 basehttp 50618 6168309760 "GET / HTTP/1.1" 200 1682
+INFO 2025-08-09 23:51:05,719 basehttp 50618 13220622336 "GET /static/drf-yasg/insQ.min.js HTTP/1.1" 200 2093
+INFO 2025-08-09 23:51:05,720 basehttp 50618 6168309760 "GET /static/drf-yasg/style.css HTTP/1.1" 200 1047
+INFO 2025-08-09 23:51:05,725 basehttp 50618 13237448704 "GET /static/drf-yasg/immutable.min.js HTTP/1.1" 200 56904
+INFO 2025-08-09 23:51:05,727 basehttp 50618 13220622336 "GET /static/drf-yasg/swagger-ui-init.js HTTP/1.1" 200 15480
+INFO 2025-08-09 23:51:05,729 basehttp 50618 13170143232 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui.css HTTP/1.1" 200 145206
+INFO 2025-08-09 23:51:05,734 basehttp 50618 13203795968 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-standalone-preset.js HTTP/1.1" 200 322863
+INFO 2025-08-09 23:51:05,743 basehttp 50618 13186969600 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-bundle.js HTTP/1.1" 200 1046583
+INFO 2025-08-09 23:51:05,845 basehttp 50618 13203795968 "GET /static/drf-yasg/swagger-ui-dist/favicon-32x32.png HTTP/1.1" 200 628
+ERROR 2025-08-09 23:51:05,963 log 50618 13186969600 Internal Server Error: /
+ERROR 2025-08-09 23:51:05,963 basehttp 50618 13186969600 "GET /?format=openapi HTTP/1.1" 500 96
+WARNING 2025-08-09 23:51:13,869 log 50618 6168309760 Not Found: /api/v1/
+WARNING 2025-08-09 23:51:13,869 basehttp 50618 6168309760 "GET /api/v1/ HTTP/1.1" 404 4267
+WARNING 2025-08-09 23:51:13,885 log 50618 6168309760 Not Found: /favicon.ico
+WARNING 2025-08-09 23:51:13,885 basehttp 50618 6168309760 "GET /favicon.ico HTTP/1.1" 404 3828
+WARNING 2025-08-09 23:51:47,929 log 50618 6168309760 Not Found: /api/v1/inventory/
+WARNING 2025-08-09 23:51:47,929 basehttp 50618 6168309760 "GET /api/v1/inventory/ HTTP/1.1" 404 4297
+WARNING 2025-08-09 23:52:08,224 log 50618 6168309760 Not Found: /api/v1/api/v1/product-requests
+WARNING 2025-08-09 23:52:08,224 basehttp 50618 6168309760 "GET /api/v1/api/v1/product-requests HTTP/1.1" 404 4336
+INFO 2025-08-09 23:53:35,511 autoreload 50618 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/settings.py changed, reloading.
+INFO 2025-08-09 23:53:35,780 autoreload 50617 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_management_service/settings.py changed, reloading.
+INFO 2025-08-09 23:53:36,030 autoreload 51565 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:53:36,073 autoreload 51566 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:54:05,427 basehttp 51566 6134116352 "GET /api/v1/categories/ HTTP/1.1" 200 155
+ERROR 2025-08-09 23:54:11,273 log 51566 6134116352 Internal Server Error: /api/v1/categories/categories/
+ERROR 2025-08-09 23:54:11,273 basehttp 51566 6134116352 "GET /api/v1/categories/categories/ HTTP/1.1" 500 96
+INFO 2025-08-09 23:54:27,230 autoreload 51565 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/categories/models.py changed, reloading.
+INFO 2025-08-09 23:54:27,335 autoreload 51566 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/categories/models.py changed, reloading.
+INFO 2025-08-09 23:54:27,652 autoreload 51879 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:54:27,652 autoreload 51878 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-09 23:55:35,547 basehttp 51879 6125154304 "GET / HTTP/1.1" 200 1682
+INFO 2025-08-09 23:55:35,550 basehttp 51879 6141980672 "GET /swagger/ HTTP/1.1" 200 1682
+INFO 2025-08-09 23:55:35,553 basehttp 51879 6125154304 "GET /redoc/ HTTP/1.1" 200 952
+ERROR 2025-08-09 23:55:35,641 log 51879 6158807040 Internal Server Error: /swagger.json
+ERROR 2025-08-09 23:55:35,641 basehttp 51879 6158807040 "GET /swagger.json HTTP/1.1" 500 96
+INFO 2025-08-09 23:55:35,646 basehttp 51879 6125154304 "GET /api/v1/categories/ HTTP/1.1" 200 155
+INFO 2025-08-09 23:55:35,662 basehttp 51879 6141980672 "GET /api/v1/categories/categories/ HTTP/1.1" 200 2476
+WARNING 2025-08-09 23:55:35,666 log 51879 13035925504 Unauthorized: /api/v1/categories/categories/
+WARNING 2025-08-09 23:55:35,667 basehttp 51879 13035925504 "POST /api/v1/categories/categories/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,671 log 51879 6158807040 Unauthorized: /api/v1/categories/categories/
+WARNING 2025-08-09 23:55:35,671 basehttp 51879 6158807040 "POST /api/v1/categories/categories/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,676 log 51879 6125154304 Unauthorized: /api/v1/categories/attributes/
+WARNING 2025-08-09 23:55:35,676 basehttp 51879 6125154304 "GET /api/v1/categories/attributes/ HTTP/1.1" 401 145
+INFO 2025-08-09 23:55:35,681 basehttp 51879 6141980672 "GET /api/v1/product-requests/ HTTP/1.1" 200 469
+INFO 2025-08-09 23:55:35,694 basehttp 51879 6158807040 "GET /api/v1/product-requests/requests/ HTTP/1.1" 200 14167
+WARNING 2025-08-09 23:55:35,699 log 51879 13035925504 Unauthorized: /api/v1/product-requests/requests/
+WARNING 2025-08-09 23:55:35,699 basehttp 51879 13035925504 "POST /api/v1/product-requests/requests/ HTTP/1.1" 401 145
+INFO 2025-08-09 23:55:35,707 basehttp 51879 13052751872 "GET /api/v1/product-requests/consumer-electronics/ HTTP/1.1" 200 6976
+INFO 2025-08-09 23:55:35,714 basehttp 51879 6125154304 "GET /api/v1/product-requests/vehicle-spares/ HTTP/1.1" 200 4557
+INFO 2025-08-09 23:55:35,721 basehttp 51879 6141980672 "GET /api/v1/product-requests/tyres-rims/ HTTP/1.1" 200 3352
+WARNING 2025-08-09 23:55:35,725 log 51879 6158807040 Unauthorized: /api/v1/product-requests/messages/
+WARNING 2025-08-09 23:55:35,725 basehttp 51879 6158807040 "GET /api/v1/product-requests/messages/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,729 log 51879 13035925504 Unauthorized: /api/v1/product-requests/watchlist/
+WARNING 2025-08-09 23:55:35,729 basehttp 51879 13035925504 "GET /api/v1/product-requests/watchlist/ HTTP/1.1" 401 145
+INFO 2025-08-09 23:55:35,734 basehttp 51879 6125154304 "GET /api/v1/quotes/ HTTP/1.1" 200 396
+WARNING 2025-08-09 23:55:35,738 log 51879 6141980672 Unauthorized: /api/v1/quotes/quotes/
+WARNING 2025-08-09 23:55:35,738 basehttp 51879 6141980672 "GET /api/v1/quotes/quotes/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,742 log 51879 6158807040 Unauthorized: /api/v1/quotes/quote-items/
+WARNING 2025-08-09 23:55:35,742 basehttp 51879 6158807040 "GET /api/v1/quotes/quote-items/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,746 log 51879 13035925504 Unauthorized: /api/v1/quotes/quote-attachments/
+WARNING 2025-08-09 23:55:35,746 basehttp 51879 13035925504 "GET /api/v1/quotes/quote-attachments/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,750 log 51879 13052751872 Unauthorized: /api/v1/quotes/quote-messages/
+WARNING 2025-08-09 23:55:35,751 basehttp 51879 13052751872 "GET /api/v1/quotes/quote-messages/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,755 log 51879 6125154304 Unauthorized: /api/v1/quotes/quote-comparisons/
+WARNING 2025-08-09 23:55:35,755 basehttp 51879 6125154304 "GET /api/v1/quotes/quote-comparisons/ HTTP/1.1" 401 145
+INFO 2025-08-09 23:55:35,759 basehttp 51879 6141980672 "GET /api/v1/transactions/ HTTP/1.1" 200 2
+INFO 2025-08-09 23:55:35,762 basehttp 51879 6158807040 "GET /api/v1/ratings/ HTTP/1.1" 200 2
+INFO 2025-08-09 23:55:35,774 basehttp 51879 13035925504 "GET /api/v1/analytics/ HTTP/1.1" 200 569
+WARNING 2025-08-09 23:55:35,778 log 51879 6125154304 Unauthorized: /api/v1/analytics/product-request-analytics/
+WARNING 2025-08-09 23:55:35,779 basehttp 51879 6125154304 "GET /api/v1/analytics/product-request-analytics/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,785 log 51879 6141980672 Unauthorized: /api/v1/analytics/category-analytics/
+WARNING 2025-08-09 23:55:35,785 basehttp 51879 6141980672 "GET /api/v1/analytics/category-analytics/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,789 log 51879 6158807040 Unauthorized: /api/v1/analytics/user-behavior-analytics/
+WARNING 2025-08-09 23:55:35,789 basehttp 51879 6158807040 "GET /api/v1/analytics/user-behavior-analytics/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,792 log 51879 13035925504 Unauthorized: /api/v1/analytics/search-analytics/
+WARNING 2025-08-09 23:55:35,792 basehttp 51879 13035925504 "GET /api/v1/analytics/search-analytics/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,797 log 51879 13052751872 Unauthorized: /api/v1/analytics/sales-analytics/
+WARNING 2025-08-09 23:55:35,797 basehttp 51879 13052751872 "GET /api/v1/analytics/sales-analytics/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,801 log 51879 6125154304 Unauthorized: /api/v1/analytics/inventory-analytics/
+WARNING 2025-08-09 23:55:35,802 basehttp 51879 6125154304 "GET /api/v1/analytics/inventory-analytics/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,805 log 51879 6141980672 Unauthorized: /api/v1/analytics/reports/
+WARNING 2025-08-09 23:55:35,806 basehttp 51879 6141980672 "GET /api/v1/analytics/reports/ HTTP/1.1" 401 145
+WARNING 2025-08-09 23:55:35,818 log 51879 6158807040 Not Found: /api/v1/analytics/dashboard/
+WARNING 2025-08-09 23:55:35,818 basehttp 51879 6158807040 "GET /api/v1/analytics/dashboard/ HTTP/1.1" 404 19492
+WARNING 2025-08-09 23:55:35,922 log 51879 13035925504 Unauthorized: /api/token/
+WARNING 2025-08-09 23:55:35,922 basehttp 51879 13035925504 "POST /api/token/ HTTP/1.1" 401 188
+INFO 2025-08-10 01:34:28,417 basehttp 51879 6125154304 "GET / HTTP/1.1" 200 1682
+WARNING 2025-08-10 01:37:41,106 log 51879 6125154304 Not Found: /api/v1/core/profiles/
+WARNING 2025-08-10 01:37:41,107 basehttp 51879 6125154304 "GET /api/v1/core/profiles/ HTTP/1.1" 404 4309
+INFO 2025-08-10 01:37:48,500 basehttp 51879 6125154304 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-10 03:07:56,418 autoreload 51878 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-10 03:07:56,716 autoreload 51879 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service/product_requests/models.py changed, reloading.
+INFO 2025-08-10 03:07:57,414 autoreload 77591 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-10 03:07:57,435 autoreload 77595 8771748224 Watching for file changes with StatReloader
