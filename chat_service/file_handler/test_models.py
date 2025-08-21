@@ -26,7 +26,8 @@ from chat_messaging.models import Message
 from chat_conversations.models import Conversation
 from .models import (
     FileUpload, FileShare, FileVersion, FileBackup,
-    FileProcessingJob, FileThumbnail
+    FileProcessingJob, FileThumbnail, FileScan,
+    FileCleanupTask, FileCompressionJob, FileAccessLog
 )
 
 

@@ -4,6 +4,7 @@ Serializers for chat_messaging app API endpoints.
 
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.utils import timezone
 from chat_core.serializers import UserSerializer
 from .models import (
     Message, MessageAttachment, MessageReaction, MessageReadReceipt,

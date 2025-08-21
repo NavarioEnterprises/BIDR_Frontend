@@ -18,6 +18,7 @@ import requests
 import json
 import hashlib
 import asyncio
+import uuid
 from typing import Dict, List, Optional, Tuple
 from django.conf import settings
 from django.core.cache import cache
@@ -374,4 +375,212 @@ class TranslationService:
                 # Update usage count
                 db_cached.usage_count += 1
                 db_cached.last_used = timezone.now()
-                db_cached.save(update_fields=['usage_count', 'last_used'])\n                \n                result = {\n                    'translated_text': db_cached.translated_text,\n                    'detected_source_language': db_cached.source_language,\n                    'confidence': float(db_cached.confidence_score) if db_cached.confidence_score else 1.0,\n                    'provider': db_cached.translation_service,\n                    'from_cache': True\n                }\n                \n                # Cache in Django cache for faster access\n                cache.set(cache_key, result, self.cache_ttl)\n                return result\n            \n        except Exception as e:\n            logger.warning(f\"Cache retrieval error: {str(e)}\")\n        \n        return None\n    \n    def _cache_translation(self, text: str, source_lang: str, target_lang: str, result: Dict):\n        \"\"\"Cache translation result.\"\"\"\n        try:\n            # Cache in Django cache\n            cache_key = self._get_cache_key(text, source_lang, target_lang)\n            cache.set(cache_key, result, self.cache_ttl)\n            \n            # Cache in database\n            TranslationCache.objects.update_or_create(\n                source_text=text,\n                source_language=source_lang,\n                target_language=target_lang,\n                defaults={\n                    'translated_text': result['translated_text'],\n                    'translation_service': result['provider'],\n                    'confidence_score': result.get('confidence', 1.0),\n                    'usage_count': 1,\n                    'last_used': timezone.now()\n                }\n            )\n            \n        except Exception as e:\n            logger.warning(f\"Cache storage error: {str(e)}\")\n    \n    async def translate_text(self, text: str, target_language: str, source_language: str = None, user_preferences: Dict = None) -> Dict:\n        \"\"\"Translate text with caching and fallback.\"\"\"\n        if not text or not target_language:\n            raise ValueError(\"Text and target language are required\")\n        \n        # Detect source language if not provided\n        if not source_language:\n            try:\n                detection_result = await self.detect_language(text)\n                source_language = detection_result['language']\n            except:\n                source_language = 'auto'\n        \n        # Skip translation if source and target are the same\n        if source_language == target_language:\n            return {\n                'translated_text': text,\n                'detected_source_language': source_language,\n                'confidence': 1.0,\n                'provider': 'none',\n                'from_cache': False\n            }\n        \n        # Check cache first\n        cached_result = self._get_cached_translation(text, source_language, target_language)\n        if cached_result:\n            return cached_result\n        \n        # Get preferred provider order\n        provider_order = self._get_provider_order(user_preferences)\n        \n        # Try providers in order\n        last_error = None\n        for provider_name in provider_order:\n            if provider_name not in self.providers:\n                continue\n            \n            provider = self.providers[provider_name]\n            try:\n                result = await provider.translate(text, target_language, source_language)\n                result['from_cache'] = False\n                \n                # Cache successful translation\n                self._cache_translation(text, source_language, target_language, result)\n                \n                logger.info(f\"Translation successful using {provider_name}\")\n                return result\n                \n            except Exception as e:\n                logger.warning(f\"Translation failed with {provider_name}: {str(e)}\")\n                last_error = e\n                continue\n        \n        # All providers failed\n        if last_error:\n            raise last_error\n        else:\n            raise RuntimeError(\"No translation providers available\")\n    \n    async def detect_language(self, text: str) -> Dict:\n        \"\"\"Detect language of text.\"\"\"\n        if not text:\n            raise ValueError(\"Text is required for language detection\")\n        \n        # Try providers in order\n        for provider_name in [self.default_provider] + self.fallback_providers:\n            if provider_name not in self.providers:\n                continue\n            \n            provider = self.providers[provider_name]\n            try:\n                result = await provider.detect_language(text)\n                return result\n            except Exception as e:\n                logger.warning(f\"Language detection failed with {provider_name}: {str(e)}\")\n                continue\n        \n        # Fallback to English if detection fails\n        return {'language': 'en', 'confidence': 0.1}\n    \n    async def batch_translate(self, texts: List[str], target_language: str, source_language: str = None) -> List[Dict]:\n        \"\"\"Translate multiple texts efficiently.\"\"\"\n        results = []\n        \n        # Process in batches to avoid API limits\n        batch_size = 10\n        for i in range(0, len(texts), batch_size):\n            batch = texts[i:i + batch_size]\n            batch_results = await asyncio.gather(\n                *[self.translate_text(text, target_language, source_language) for text in batch],\n                return_exceptions=True\n            )\n            \n            for result in batch_results:\n                if isinstance(result, Exception):\n                    results.append({\n                        'error': str(result),\n                        'translated_text': '',\n                        'provider': 'error'\n                    })\n                else:\n                    results.append(result)\n        \n        return results\n    \n    def _get_provider_order(self, user_preferences: Dict = None) -> List[str]:\n        \"\"\"Get provider preference order.\"\"\"\n        if user_preferences and user_preferences.get('preferred_provider'):\n            preferred = user_preferences['preferred_provider']\n            if preferred in self.providers:\n                order = [preferred]\n                order.extend([p for p in [self.default_provider] + self.fallback_providers if p != preferred and p in self.providers])\n                return order\n        \n        # Default order\n        return [p for p in [self.default_provider] + self.fallback_providers if p in self.providers]\n    \n    def get_supported_languages(self) -> Dict[str, str]:\n        \"\"\"Get list of supported languages.\"\"\"\n        # Common languages supported by most providers\n        return {\n            'en': 'English',\n            'es': 'Spanish',\n            'fr': 'French',\n            'de': 'German',\n            'it': 'Italian',\n            'pt': 'Portuguese',\n            'ru': 'Russian',\n            'zh': 'Chinese (Simplified)',\n            'zh-tw': 'Chinese (Traditional)',\n            'ja': 'Japanese',\n            'ko': 'Korean',\n            'ar': 'Arabic',\n            'hi': 'Hindi',\n            'th': 'Thai',\n            'vi': 'Vietnamese',\n            'pl': 'Polish',\n            'nl': 'Dutch',\n            'sv': 'Swedish',\n            'da': 'Danish',\n            'no': 'Norwegian',\n            'fi': 'Finnish',\n            'tr': 'Turkish',\n            'he': 'Hebrew',\n        }\n    \n    def get_provider_status(self) -> Dict[str, bool]:\n        \"\"\"Get status of all providers.\"\"\"\n        status = {}\n        for name, provider in self.providers.items():\n            try:\n                status[name] = provider.is_available()\n            except:\n                status[name] = False\n        return status\n\n\n# Global translation service instance\n_translation_service = None\n\ndef get_translation_service() -> TranslationService:\n    \"\"\"Get the global translation service instance.\"\"\"\n    global _translation_service\n    if _translation_service is None:\n        _translation_service = TranslationService()\n    return _translation_service
+                db_cached.save(update_fields=['usage_count', 'last_used'])
+                
+                result = {
+                    'translated_text': db_cached.translated_text,
+                    'detected_source_language': db_cached.source_language,
+                    'confidence': float(db_cached.confidence_score) if db_cached.confidence_score else 1.0,
+                    'provider': db_cached.translation_service,
+                    'from_cache': True
+                }
+                
+                # Cache in Django cache for faster access
+                cache.set(cache_key, result, self.cache_ttl)
+                return result
+            
+        except Exception as e:
+            logger.warning(f"Cache retrieval error: {str(e)}")
+        
+        return None
+    
+    def _cache_translation(self, text: str, source_lang: str, target_lang: str, result: Dict):
+        """Cache translation result."""
+        try:
+            # Cache in Django cache
+            cache_key = self._get_cache_key(text, source_lang, target_lang)
+            cache.set(cache_key, result, self.cache_ttl)
+            
+            # Cache in database
+            TranslationCache.objects.update_or_create(
+                source_text=text,
+                source_language=source_lang,
+                target_language=target_lang,
+                defaults={
+                    'translated_text': result['translated_text'],
+                    'translation_service': result['provider'],
+                    'confidence_score': result.get('confidence', 1.0),
+                    'usage_count': 1,
+                    'last_used': timezone.now()
+                }
+            )
+            
+        except Exception as e:
+            logger.warning(f"Cache storage error: {str(e)}")
+    
+    async def translate_text(self, text: str, target_language: str, source_language: str = None, user_preferences: Dict = None) -> Dict:
+        """Translate text with caching and fallback."""
+        if not text or not target_language:
+            raise ValueError("Text and target language are required")
+        
+        # Detect source language if not provided
+        if not source_language:
+            try:
+                detection_result = await self.detect_language(text)
+                source_language = detection_result['language']
+            except:
+                source_language = 'auto'
+        
+        # Skip translation if source and target are the same
+        if source_language == target_language:
+            return {
+                'translated_text': text,
+                'detected_source_language': source_language,
+                'confidence': 1.0,
+                'provider': 'none',
+                'from_cache': False
+            }
+        
+        # Check cache first
+        cached_result = self._get_cached_translation(text, source_language, target_language)
+        if cached_result:
+            return cached_result
+        
+        # Get preferred provider order
+        provider_order = self._get_provider_order(user_preferences)
+        
+        # Try providers in order
+        last_error = None
+        for provider_name in provider_order:
+            if provider_name not in self.providers:
+                continue
+            
+            provider = self.providers[provider_name]
+            try:
+                result = await provider.translate(text, target_language, source_language)
+                result['from_cache'] = False
+                
+                # Cache successful translation
+                self._cache_translation(text, source_language, target_language, result)
+                
+                logger.info(f"Translation successful using {provider_name}")
+                return result
+                
+            except Exception as e:
+                logger.warning(f"Translation failed with {provider_name}: {str(e)}")
+                last_error = e
+                continue
+        
+        # All providers failed
+        if last_error:
+            raise last_error
+        else:
+            raise RuntimeError("No translation providers available")
+    
+    async def detect_language(self, text: str) -> Dict:
+        """Detect language of text."""
+        if not text:
+            raise ValueError("Text is required for language detection")
+        
+        # Try providers in order
+        for provider_name in [self.default_provider] + self.fallback_providers:
+            if provider_name not in self.providers:
+                continue
+            
+            provider = self.providers[provider_name]
+            try:
+                result = await provider.detect_language(text)
+                return result
+            except Exception as e:
+                logger.warning(f"Language detection failed with {provider_name}: {str(e)}")
+                continue
+        
+        # Fallback to English if detection fails
+        return {'language': 'en', 'confidence': 0.1}
+    
+    async def batch_translate(self, texts: List[str], target_language: str, source_language: str = None) -> List[Dict]:
+        """Translate multiple texts efficiently."""
+        results = []
+        
+        # Process in batches to avoid API limits
+        batch_size = 10
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i + batch_size]
+            batch_results = await asyncio.gather(
+                *[self.translate_text(text, target_language, source_language) for text in batch],
+                return_exceptions=True
+            )
+            
+            for result in batch_results:
+                if isinstance(result, Exception):
+                    results.append({
+                        'error': str(result),
+                        'translated_text': '',
+                        'provider': 'error'
+                    })
+                else:
+                    results.append(result)
+        
+        return results
+    
+    def _get_provider_order(self, user_preferences: Dict = None) -> List[str]:
+        """Get provider preference order."""
+        if user_preferences and user_preferences.get('preferred_provider'):
+            preferred = user_preferences['preferred_provider']
+            if preferred in self.providers:
+                order = [preferred]
+                order.extend([p for p in [self.default_provider] + self.fallback_providers if p != preferred and p in self.providers])
+                return order
+        
+        # Default order
+        return [p for p in [self.default_provider] + self.fallback_providers if p in self.providers]
+    
+    def get_supported_languages(self) -> Dict[str, str]:
+        """Get list of supported languages."""
+        # Common languages supported by most providers
+        return {
+            'en': 'English',
+            'es': 'Spanish',
+            'fr': 'French',
+            'de': 'German',
+            'it': 'Italian',
+            'pt': 'Portuguese',
+            'ru': 'Russian',
+            'zh': 'Chinese (Simplified)',
+            'zh-tw': 'Chinese (Traditional)',
+            'ja': 'Japanese',
+            'ko': 'Korean',
+            'ar': 'Arabic',
+            'hi': 'Hindi',
+            'th': 'Thai',
+            'vi': 'Vietnamese',
+            'pl': 'Polish',
+            'nl': 'Dutch',
+            'sv': 'Swedish',
+            'da': 'Danish',
+            'no': 'Norwegian',
+            'fi': 'Finnish',
+            'tr': 'Turkish',
+            'he': 'Hebrew',
+        }
+    
+    def get_provider_status(self) -> Dict[str, bool]:
+        """Get status of all providers."""
+        status = {}
+        for name, provider in self.providers.items():
+            try:
+                status[name] = provider.is_available()
+            except:
+                status[name] = False
+        return status
+
+
+# Global translation service instance
+_translation_service = None
+
+def get_translation_service() -> TranslationService:
+    """Get the global translation service instance."""
+    global _translation_service
+    if _translation_service is None:
+        _translation_service = TranslationService()
+    return _translation_service

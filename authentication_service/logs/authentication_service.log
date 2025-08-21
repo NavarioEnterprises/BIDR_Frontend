@@ -1379,3 +1379,11 @@ WARNING 2025-08-21 21:00:55,608 log 95970 6131658752 Unauthorized: /addresses/
 WARNING 2025-08-21 21:00:55,609 basehttp 95970 6131658752 "GET /addresses/ HTTP/1.1" 401 58
 WARNING 2025-08-21 21:00:55,642 log 95970 6131658752 Not Found: /favicon.ico
 WARNING 2025-08-21 21:00:55,643 basehttp 95970 6131658752 "GET /favicon.ico HTTP/1.1" 404 6434
+INFO 2025-08-21 21:14:56,141 autoreload 95970 8651146688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/views.py changed, reloading.
+INFO 2025-08-21 21:14:56,672 autoreload 16214 8651146688 Watching for file changes with StatReloader
+INFO 2025-08-21 21:15:46,177 autoreload 16214 8651146688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/views.py changed, reloading.
+INFO 2025-08-21 21:15:46,600 autoreload 16713 8651146688 Watching for file changes with StatReloader
+INFO 2025-08-21 21:16:39,420 autoreload 16713 8651146688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/views.py changed, reloading.
+INFO 2025-08-21 21:16:39,887 autoreload 17008 8651146688 Watching for file changes with StatReloader
+INFO 2025-08-21 21:17:42,032 autoreload 17008 8651146688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/seller/views.py changed, reloading.
+INFO 2025-08-21 21:17:42,479 autoreload 17300 8651146688 Watching for file changes with StatReloader

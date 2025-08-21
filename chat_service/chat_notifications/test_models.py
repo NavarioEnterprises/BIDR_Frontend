@@ -28,7 +28,10 @@ from .models import (
     Notification,
     NotificationPreference,
     NotificationDevice,
-    NotificationBatch
+    NotificationBatch,
+    UserNotificationPreference,
+    NotificationDelivery,
+    BulkNotification
 )
 
 
