@@ -337,8 +337,10 @@ class _ProfileManagementState extends State<ProfileManagement>
 
   Widget _buildMenuItem(String title, IconData icon, {bool isDestructive = false}) {
     final bool isSelected = selectedTab == title;
-    final Color textColor = isDestructive ? Colors.red[300]! :
-    isSelected ? Colors.white : Colors.grey[400]!;
+    final bool isSignOutSelected = title == "Sign Out";
+    final bool isDeleteSelected = title == "Delete Account";
+    final Color textColor = isSignOutSelected ? Colors.red.shade700 :isDeleteSelected?Constants.ctaColorLight:
+    isSelected ? Colors.white : Colors.blueAccent.withOpacity(0.5);
     final Color backgroundColor = isSelected ? Colors.white.withOpacity(0.1) : Colors.transparent;
 
     return TweenAnimationBuilder<double>(
@@ -355,6 +357,7 @@ class _ProfileManagementState extends State<ProfileManagement>
             scale: 1 + (value * 0.02),
             child: ListTile(
               leading: Icon(icon, color: textColor, size: 20),
+
               title: Text(
                 title,
                 style: GoogleFonts.manrope(
@@ -956,25 +959,41 @@ class _ProfileManagementState extends State<ProfileManagement>
       width: MediaQuery.of(context).size.height * 0.5,
       margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(36),
+        border: Border.all(color: Constants.ftaColorLight),
       ),
-      child: CheckboxListTile(
-        title: Text(
-          category,
-          style: GoogleFonts.manrope(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          checkboxTheme: CheckboxThemeData(
+            shape: const CircleBorder(),
+            fillColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return Constants.ctaColorLight;
+              }
+              return null;
+            }),
           ),
         ),
-        value: value,
-        onChanged: (bool? newValue) {
-          setState(() {
-            categories[category] = newValue ?? false;
-          });
-        },
-        controlAffinity: ListTileControlAffinity.trailing,
+        child: CheckboxListTile(
+          title: Text(
+            category,
+            style: GoogleFonts.manrope(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          value: value,
+          onChanged: (bool? newValue) {
+            setState(() {
+              categories[category] = newValue ?? false;
+            });
+          },
+          controlAffinity: ListTileControlAffinity.trailing,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
       ),
     );
   }
@@ -989,9 +1008,8 @@ class _ProfileManagementState extends State<ProfileManagement>
           offset: Offset((1 - animation) * 30, 0),
           child: Opacity(
             opacity: animation,
-            child: _buildCheckboxField(label, value, onChanged),
-          ),
-        );
+            child: _buildCheckboxField(label, value,onChanged),
+        ));
       },
     );
   }
@@ -1000,24 +1018,42 @@ class _ProfileManagementState extends State<ProfileManagement>
     return Container(
       width: MediaQuery.of(context).size.height * 0.5,
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(36),
+        border: Border.all(color: Constants.ftaColorLight),
       ),
-      child: CheckboxListTile(
-        title: Text(
-          label,
-          style: GoogleFonts.manrope(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          checkboxTheme: CheckboxThemeData(
+            shape: const CircleBorder(),
+            fillColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return Constants.ctaColorLight;
+              }
+              return null;
+            }),
           ),
         ),
-        value: value,
-        onChanged: onChanged,
-        controlAffinity: ListTileControlAffinity.trailing,
+        child: CheckboxListTile(
+          title: Text(
+            label,
+            style: GoogleFonts.manrope(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          value: value,
+          onChanged: onChanged,
+          controlAffinity: ListTileControlAffinity.trailing,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
       ),
     );
   }
+
+
 
   Widget _buildAnimatedDropdownField(String label, String hint, int index) {
     return TweenAnimationBuilder<double>(

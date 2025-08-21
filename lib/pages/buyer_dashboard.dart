@@ -32,11 +32,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         SizedBox(height: 24),
         Padding(
-          padding: const EdgeInsets.only(left: 32, right: 32),
+          padding: const EdgeInsets.only(left: 68, right: 68),
           child: Center(
             child: Container(
               width: double.infinity,
-              constraints: BoxConstraints(maxWidth: 1400),
+              constraints: BoxConstraints(maxWidth: 1600),
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
                 color: Constants.ftaColorLight,
@@ -83,7 +83,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 32, right: 32),
+                    padding: const EdgeInsets.only(left: 0, right: 0),
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       height: 600,

@@ -145,10 +145,10 @@ class _BuyerLandingPageState extends State<BuyerLandingPage>
           ),
           SizedBox(height: 24),
           Container(
-            height: 50,
+            height: 60,
             width: MediaQuery.of(context).size.width,
             color: Constants.ctaColorLight,
-            padding: EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 8),
+            padding: EdgeInsets.only(left: 50, right: 50, top: 8, bottom: 8),
             child: Row(
               children: [
                 TextButton(
@@ -217,11 +217,11 @@ class _BuyerLandingPageState extends State<BuyerLandingPage>
 
   Widget _buildHeroSection() {
     return Padding(
-      padding: const EdgeInsets.only(left: 24, right: 24),
+      padding: const EdgeInsets.only(left: 68, right: 68),
       child: Container(
         width: double.infinity,
         height: 400,
-        constraints: BoxConstraints(maxWidth: 1400),
+        constraints: BoxConstraints(maxWidth: 1600),
         padding: EdgeInsets.all(24),
         child: Row(
           children: [
@@ -298,10 +298,10 @@ class _BuyerLandingPageState extends State<BuyerLandingPage>
 
   Widget _buildContentSection() {
     return Padding(
-      padding: const EdgeInsets.only(left: 24, right: 24),
+      padding: const EdgeInsets.only(left: 68, right: 68),
       child: Container(
         width: double.infinity,
-        constraints: BoxConstraints(maxWidth: 1400),
+        constraints: BoxConstraints(maxWidth: 1600),
         padding: EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Colors.white,

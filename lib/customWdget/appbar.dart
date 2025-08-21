@@ -43,7 +43,7 @@ class _HeaderSectionState extends State<HeaderSection> {
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Image.asset(
             "lib/assets/images/bidr_logo1.png",
@@ -51,103 +51,103 @@ class _HeaderSectionState extends State<HeaderSection> {
             height: 50,
             width: 80,
           ),
-          Expanded(
-            child: Row(
-              children: [
-                Wrap(
-                  runSpacing: 16,
-                  children: [
-                    _navButton('Home',0,()=>setState(() {
-                      Constants.buyerAppBarValue =0;
-                      appBarValueNotifier.value++;
-                      buyerHomeValueNotifier.value++;
-                    })),
-                    _navButton('Support',1,()=>setState(() {
-                      Constants.buyerAppBarValue =1;
-                      appBarValueNotifier.value++;
-                      buyerHomeValueNotifier.value++;
-                    })),
-                    _navButton('FAQs',2,()=>setState(() {
-                      Constants.buyerAppBarValue =2;
-                      appBarValueNotifier.value++;
-                      buyerHomeValueNotifier.value++;
-                    })),
-                    _navButton('Policies',3,()=>setState(() {
-                      Constants.buyerAppBarValue =3;
-                      appBarValueNotifier.value++;
-                      buyerHomeValueNotifier.value++;
-                    })),
-                    _navButton('Blogs',4,()=>setState(() {
-                      Constants.buyerAppBarValue =4;
-                      appBarValueNotifier.value++;
-                      buyerHomeValueNotifier.value++;
-                    })),
-                    _navButton('Contact Us',5,()=>setState(() {
-                      Constants.buyerAppBarValue =5;
-                      appBarValueNotifier.value++;
-                      buyerHomeValueNotifier.value++;
-                    })),
 
-                  ],
+          Wrap(
+            runSpacing: 16,
+            children: [
+              _navButton('Home',0,()=>setState(() {
+                Constants.buyerAppBarValue =0;
+                appBarValueNotifier.value++;
+                buyerHomeValueNotifier.value++;
+              })),
+              _navButton('Support',1,()=>setState(() {
+                Constants.buyerAppBarValue =1;
+                appBarValueNotifier.value++;
+                buyerHomeValueNotifier.value++;
+              })),
+              _navButton('FAQs',2,()=>setState(() {
+                Constants.buyerAppBarValue =2;
+                appBarValueNotifier.value++;
+                buyerHomeValueNotifier.value++;
+              })),
+              _navButton('Policies',3,()=>setState(() {
+                Constants.buyerAppBarValue =3;
+                appBarValueNotifier.value++;
+                buyerHomeValueNotifier.value++;
+              })),
+              _navButton('Blogs',4,()=>setState(() {
+                Constants.buyerAppBarValue =4;
+                appBarValueNotifier.value++;
+                buyerHomeValueNotifier.value++;
+              })),
+              _navButton('Contact Us',5,()=>setState(() {
+                Constants.buyerAppBarValue =5;
+                appBarValueNotifier.value++;
+                buyerHomeValueNotifier.value++;
+              })),
+
+            ],
+          ),
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed: ()=>setState(() {
+                  Constants.buyerAppBarValue =7;
+                  appBarValueNotifier.value++;
+                  sellerHomeValueNotifier.value++;
+                }),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: Constants.ftaColorLight,width: 1.4),
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
                 ),
-              ],
-            ),
-          ),
+                child: Text(
+                  'Seller Dashboard',
+                  style: GoogleFonts.manrope(color: Constants.ftaColorLight),
+                ),
+              ),
+              SizedBox(width:12),
+              ElevatedButton(
+                onPressed: ()=>setState(() {
+                  Constants.buyerAppBarValue =6;
+                  appBarValueNotifier.value++;
+                  buyerHomeValueNotifier.value++;
+                }),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: Constants.ftaColorLight,width: 1.4),
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
+                child: Text(
+                  'Buyer Dashboard',
+                  style: GoogleFonts.manrope(color: Constants.ftaColorLight),
+                ),
+              ),
+              SizedBox(width:12),
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
+                child: Text(
+                  'Login',
+                  style: GoogleFonts.manrope(color: Colors.white),
+                ),
+              ),
+            ],
+          )
 
-          ElevatedButton(
-            onPressed: ()=>setState(() {
-              Constants.buyerAppBarValue =7;
-              appBarValueNotifier.value++;
-              sellerHomeValueNotifier.value++;
-            }),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              side: BorderSide(color: Constants.ftaColorLight,width: 1.4),
-              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
-            ),
-            child: Text(
-              'Seller Dashboard',
-              style: GoogleFonts.manrope(color: Constants.ftaColorLight),
-            ),
-          ),
-          SizedBox(width:12),
-          ElevatedButton(
-            onPressed: ()=>setState(() {
-              Constants.buyerAppBarValue =6;
-              appBarValueNotifier.value++;
-              buyerHomeValueNotifier.value++;
-            }),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              side: BorderSide(color: Constants.ftaColorLight,width: 1.4),
-              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
-            ),
-            child: Text(
-              'Buyer Dashboard',
-              style: GoogleFonts.manrope(color: Constants.ftaColorLight),
-            ),
-          ),
-          SizedBox(width:12),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Constants.ctaColorLight,
-              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
-            ),
-            child: Text(
-              'Login',
-              style: GoogleFonts.manrope(color: Colors.white),
-            ),
-          ),
+
         ],
       ),
     );
@@ -155,34 +155,38 @@ class _HeaderSectionState extends State<HeaderSection> {
 
   Widget _navButton(String text,int index, VoidCallback onPressed) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12),
+      padding: EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         children: [
           IntrinsicWidth(
-            child: Column(
-              children: [
-                TextButton(
-                  onPressed: onPressed,
-                  style: TextButton.styleFrom(minimumSize: Size(120, 45)),
-                  child: Text(
-                    text,
-                    style: GoogleFonts.manrope(
-                      color:index == Constants.buyerAppBarValue?Constants.ftaColorLight: Colors.black45,
-                      fontSize: 14,
-                      fontWeight: index == Constants.buyerAppBarValue?FontWeight.bold:FontWeight.w300,
+            child: Container(
+              constraints: BoxConstraints(minWidth: 60),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: onPressed,
+                   // style: TextButton.styleFrom(),
+                    child: Text(
+                      text,
+                      style: GoogleFonts.manrope(
+                        color:index == Constants.buyerAppBarValue?Constants.ftaColorLight: Colors.black45,
+                        fontSize: 13,
+                        fontWeight: index == Constants.buyerAppBarValue?FontWeight.bold:FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-                index == Constants.buyerAppBarValue?SizedBox(height: 2,):SizedBox.shrink(),
-                index == Constants.buyerAppBarValue?Padding(
-                  padding: const EdgeInsets.only(left: 12,right: 12),
-                  child: Container(
-                    height: 2,
-                    color: Constants.ctaColorLight,
-                  ),
-                ):SizedBox.shrink(),
+                  index == Constants.buyerAppBarValue?SizedBox(height: 2,):SizedBox.shrink(),
+                  index == Constants.buyerAppBarValue?Padding(
+                    padding: const EdgeInsets.only(left: 12,right: 12),
+                    child: Container(
+                      height: 2,
+                      color: Constants.ctaColorLight,
+                    ),
+                  ):SizedBox.shrink(),
 
-              ],
+                ],
+              ),
             ),
           ),
         ],

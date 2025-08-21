@@ -14,7 +14,7 @@ import '../customWdget/appbar.dart';
 import '../customWdget/customCard.dart';
 import '../customWdget/custom_input2.dart';
 import '../notifier/my_notifier.dart';
-import 'auto_spares_request.dart';
+import 'buyer_dashboard.dart';
 import 'buyer/blog.dart';
 import 'buyer/contact_form.dart';
 import 'buyer/join_as_business.dart';
@@ -22,6 +22,7 @@ import 'buyer/join_as_buyer.dart';
 import 'buyer/support.dart';
 import 'buyer/video.dart';
 import 'faq_screen.dart';
+import 'notification.dart';
 import 'policies_screen.dart';
 
 class BuyerHomePage extends StatefulWidget {
@@ -155,9 +156,9 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
   }
 
   final List<Map<String, String>> categories = [
-    {"icon": "lib/assets/images/spares1.png", "name": "Vehicle Spares"},
-    {"icon": "lib/assets/images/rims.png", "name": "Vehicle Tyres and Rims"},
-    {"icon": "lib/assets/images/consumer.png", "name": "Consumer Electronics"},
+    {"icon": "lib/assets/images/spares1.png", "name": "Vehicle\nSpares"},
+    {"icon": "lib/assets/images/rims.png", "name": "Vehicle Tyres\nand Rims"},
+    {"icon": "lib/assets/images/consumer.png", "name": "Consumer \nElectronics"},
   ];
 
   @override
@@ -359,6 +360,7 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
             Constants.buyerAppBarValue==5?Expanded(child: ContactFormScreen()):
             Constants.buyerAppBarValue==6?Expanded(child: DashboardScreen()):
             Constants.buyerAppBarValue==7?Expanded(child: SellerDashboard()):
+            Constants.buyerAppBarValue==8?Expanded(child: NotificationPage(notifications: notifications)):
             Container()
           ],
         ),
@@ -439,6 +441,7 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                       decoration: BoxDecoration(
                         color: Constants.dtaColorLight,
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Constants.ctaColorLight),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.grey.withOpacity(0.1),
@@ -710,7 +713,7 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
           ),
           SizedBox(height: 24),
           Wrap(
-            spacing: 24,
+            spacing: 16,
             runSpacing: 24,
             alignment: WrapAlignment.center,
             children: List.generate(categories.length, (index) {
@@ -724,7 +727,7 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                     child: Opacity(
                       opacity: value,
                       child: Container(
-                        width: (MediaQuery.of(context).size.width - 48 - 48) / 6,
+                        width: (MediaQuery.of(context).size.width - 48 - 48) / 6.8,
                         child: _categoryCard(
                           category["icon"]!,
                           category["name"]!,
@@ -739,7 +742,7 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
               );
             }),
           ),
-          SizedBox(height: 32),
+          SizedBox(height: 24),
         ],
       ),
     );
@@ -751,7 +754,8 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
       int index,
       int selectedIndex,
       VoidCallback onPressed,
-      ) {
+      )
+  {
     final bool isSelected = index == selectedIndex;
 
     return AnimatedContainer(
@@ -804,7 +808,7 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                 style: GoogleFonts.manrope(
                   color: isSelected
                       ? Constants.ftaColorLight
-                      : Constants.ftaColorLight.withOpacity(0.7),
+                      : Constants.ftaColorLight.withOpacity(0.85),
                   fontSize: isSelected ? 24 : 20,
                   fontWeight: FontWeight.bold,
                 ),

@@ -11,6 +11,7 @@ import 'dart:io';
 import '../../constants/Constants.dart';
 import '../../customWdget/customCard.dart';
 import '../../customWdget/custom_input2.dart';
+import '../otp_screen.dart';
 import 'complete_business_registration.dart';
 
 class BusinessSignUpPage extends StatefulWidget {
@@ -310,24 +311,29 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     String errorMessage = '';
 
     switch (currentStep) {
-      case 0:
-        errorMessage =
-            'Please fill in Company Name, Trading Name, and Registration Number';
+      case 0: // User Information
+        errorMessage = 'Please fill in all personal information fields';
         break;
-      case 1:
-        errorMessage = 'Please fill in Street Address, City, and Postal Code';
+      case 1: // OTP Verification
+        errorMessage = 'Please verify your email address';
         break;
-      case 2:
+      case 2: // Company Details
+        errorMessage = 'Please fill in Company Name, Trading Name, and Registration Number';
+        break;
+      case 3: // Company Address
+        errorMessage = 'Please fill in all address and contact information';
+        break;
+      case 4: // Company Bank Account
         errorMessage = 'Please fill in Bank Name and Account Number';
         break;
-      case 3:
+      case 5: // Product Categories
         errorMessage = 'Please select at least one product category';
         break;
-      case 4:
-        errorMessage = 'Please enter a Trading Display Name';
+      case 6: // Display On Platform
+        errorMessage = 'Please select display name option or enter Trading Name';
         break;
-      case 5:
-        errorMessage = 'Please grant approval';
+      case 7: // Authorization For Company
+        errorMessage = 'Please grant approval for company authorization';
         break;
       default:
         errorMessage = 'Please complete all required fields';
@@ -338,26 +344,33 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
 
   bool _validateCurrentStep() {
     switch (currentStep) {
-      case 0:
+      case 0: // User Information
+        return _firstNameController.text.isNotEmpty &&
+            _lastNameController.text.isNotEmpty &&
+            _userEmailController.text.isNotEmpty &&
+            _userPhoneController.text.isNotEmpty;
+      case 1: // OTP Verification
+        return true; // OTP validation will be handled separately
+      case 2: // Company Details
         return _companyNameController.text.isNotEmpty &&
             _tradingNameController.text.isNotEmpty &&
             _registrationNumberController.text.isNotEmpty;
-      case 1:
+      case 3: // Company Address
         return _postalAddressController.text.isNotEmpty &&
             _physicalAddressController.text.isNotEmpty &&
             _contactPersonNameController.text.isNotEmpty &&
             _contactPersonTelephoneController.text.isNotEmpty &&
             _contactPersonEmailController.text.isNotEmpty &&
             _platformWorkflowEmailController.text.isNotEmpty;
-      case 2:
+      case 4: // Company Bank Account
         return _bankNameController.text.isNotEmpty &&
             _accountNumberController.text.isNotEmpty;
-      case 3:
+      case 5: // Product Categories
         return selectedCategories.isNotEmpty;
-      case 4:
-        return _tradingNameController.text.isNotEmpty;
-      case 5:
-        return true;
+      case 6: // Display On Platform
+        return _isRegisteredNameSelected || _tradingNameController.text.isNotEmpty;
+      case 7: // Authorization For Company
+        return isApproval;
       default:
         return true;
     }
@@ -615,355 +628,348 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Constants.gtaColorLight,
       body: Padding(
         padding: EdgeInsets.all(0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-
-                child: Row(
-                  children: [
-                    // Left Side - Stepper
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        width: 350,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(0),
-                            bottomLeft: Radius.circular(0),
-                          ),
-                          color: const Color(0xFF1B365D),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                left: 24,
-                                top: 32,
-                                right: 24,
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      'Seller Sign Up',
-                                      textAlign: TextAlign.center,
-                                      style: GoogleFonts.manrope(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Expanded(
-                              child: SingleChildScrollView(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24.0,
-                                  vertical: 24.0,
-                                ),
-                                child: Column(
-                                  children: steps.asMap().entries.map((entry) {
-                                    int index = entry.key;
-                                    return _buildStepItem(index);
-                                  }).toList(),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // Right Side - Form
-                    Expanded(
-                      flex: 5,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        padding: const EdgeInsets.all(32),
-                        constraints: BoxConstraints(
-                          maxWidth: 850,
-                          maxHeight: 1200,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(12),
-                            bottomRight: Radius.circular(12),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // Header
-                            currentStep == steps.length - 1 && isApproval
-                                ? SizedBox.shrink()
-                                : SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
-                                    child: Row(
-                                      children: [
-                                        currentStep > 0
-                                            ? IconButton(
-                                                onPressed: currentStep > 0
-                                                    ? _previousStep
-                                                    : null,
-                                                style: IconButton.styleFrom(
-                                                  backgroundColor:
-                                                      Constants.ftaColorLight,
-                                                  foregroundColor:
-                                                      Constants.ctaColorLight,
-                                                  elevation: 5,
-                                                  shadowColor: Colors.black54,
-                                                ),
-                                                icon: Icon(
-                                                  CupertinoIcons.back,
-                                                  color: Colors.white,
-                                                ),
-                                              )
-                                            : SizedBox.shrink(),
-                                        currentStep > 0
-                                            ? const SizedBox(width: 20)
-                                            : SizedBox.shrink(),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Application to Register a Business',
-                                              style: GoogleFonts.manrope(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Constants.ftaColorLight,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                            currentStep == steps.length - 1 && isApproval
-                                ? SizedBox.shrink()
-                                : (currentStep > 0
-                                      ? SizedBox.shrink()
-                                      : const SizedBox(height: 16)),
-
-                            // Description
-                            currentStep == steps.length - 1 && isApproval
-                                ? SizedBox.shrink()
-                                : (currentStep > 0
-                                      ? SizedBox.shrink()
-                                      : SizedBox(
-                                          width:
-                                              MediaQuery.of(
-                                                context,
-                                              ).size.width *
-                                              0.4,
-                                          child: Text(
-                                            'This page will allow you to register a business in a few easy steps. Please provide all the required information. Once the application has been received, the information will be vetted and we will inform you of the status thereof. If successful, the business will be added to our database and you will immediately be eligible to receive requests as per the selections in this application.',
-                                            textAlign: TextAlign.justify,
-                                            style: GoogleFonts.manrope(
-                                              fontSize: 16,
-                                              color: Colors.grey.shade500,
-                                              height: 1.5,
-                                            ),
-                                          ),
-                                        )),
-
-                            currentStep == steps.length - 1 && isApproval
-                                ? SizedBox.shrink()
-                                : const SizedBox(height: 24),
-
-                            // Form Content
-                            Expanded(
-                              child: AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 800),
-                                transitionBuilder:
-                                    (
-                                      Widget child,
-                                      Animation<double> animation,
-                                    ) {
-                                      return SlideTransition(
-                                        position:
-                                            Tween<Offset>(
-                                              begin: const Offset(0.1, 0),
-                                              end: Offset.zero,
-                                            ).animate(
-                                              CurvedAnimation(
-                                                parent: animation,
-                                                curve: Curves.easeInOutCubic,
-                                              ),
-                                            ),
-                                        child: FadeTransition(
-                                          opacity: animation,
-                                          child: child,
-                                        ),
-                                      );
-                                    },
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.4,
-                                  child: Center(
-                                    child: PageView(
-                                      controller: pageController,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      children: [
-                                        _buildUserInformationForm(),
-                                        _buildOTPVerificationForm(),
-                                        _buildCompanyDetailsForm(),
-                                        _buildCompanyAddressForm(),
-                                        _buildBankAccountForm(),
-                                        _buildProductCategoriesForm(),
-                                        _buildDisplayOnPlatformForm(),
-                                        currentStep == steps.length - 1 &&
-                                                isApproval
-                                            ? BusinessRegistrationCompleteWidget()
-                                            : _buildAuthorizationForm(),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            // Navigation Button
-                            const SizedBox(height: 24),
-                            currentStep == steps.length - 1 && isApproval
-                                ? Center(
-                                    child: AnimatedContainer(
-                                      duration: const Duration(
-                                        milliseconds: 600,
-                                      ),
-                                      width:
-                                          MediaQuery.of(context).size.width *
-                                          0.4,
-                                      height: 45,
-                                      child: ElevatedButton(
-                                        onPressed: () {},
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              Constants.ctaColorLight,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              30,
-                                            ),
-                                          ),
-                                          elevation: _isLoading ? 0 : 2,
-                                          shadowColor: Constants.ctaColorLight
-                                              .withOpacity(0.3),
-                                        ),
-                                        child: AnimatedSwitcher(
-                                          duration: const Duration(
-                                            milliseconds: 600,
-                                          ),
-                                          child: _isLoading
-                                              ? const SizedBox(
-                                                  key: ValueKey('loading'),
-                                                  width: 20,
-                                                  height: 20,
-                                                  child: CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                    valueColor:
-                                                        AlwaysStoppedAnimation<
-                                                          Color
-                                                        >(Colors.white),
-                                                  ),
-                                                )
-                                              : Text(
-                                                  'Enter BIDR Word',
-                                                  key: ValueKey(
-                                                    'text_${currentStep}',
-                                                  ),
-                                                  style: GoogleFonts.manrope(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Center(
-                                    child: AnimatedContainer(
-                                      duration: const Duration(
-                                        milliseconds: 600,
-                                      ),
-                                      width:
-                                          MediaQuery.of(context).size.width *
-                                          0.4,
-                                      height: 45,
-                                      child: ElevatedButton(
-                                        onPressed: _isLoading
-                                            ? null
-                                            : _nextStep,
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              Constants.ctaColorLight,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              30,
-                                            ),
-                                          ),
-                                          elevation: _isLoading ? 0 : 2,
-                                          shadowColor: Constants.ctaColorLight
-                                              .withOpacity(0.3),
-                                        ),
-                                        child: AnimatedSwitcher(
-                                          duration: const Duration(
-                                            milliseconds: 600,
-                                          ),
-                                          child: _isLoading
-                                              ? const SizedBox(
-                                                  key: ValueKey('loading'),
-                                                  width: 20,
-                                                  height: 20,
-                                                  child: CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                    valueColor:
-                                                        AlwaysStoppedAnimation<
-                                                          Color
-                                                        >(Colors.white),
-                                                  ),
-                                                )
-                                              : Text(
-                                                  currentStep ==
-                                                          steps.length - 1
-                                                      ? 'Submit Application'
-                                                      : 'Next',
-                                                  key: ValueKey(
-                                                    'text_${currentStep}',
-                                                  ),
-                                                  style: GoogleFonts.manrope(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+              border: Border.all(color: Constants.gtaColorLight,width: 20)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'Seller Sign Up',
+                style: GoogleFonts.manrope(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey
                 ),
               ),
-            ),
-          ],
+              SizedBox(height: 16,),
+              Expanded(
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+
+                  child: Row(
+                    children: [
+                      // Left Side - Stepper
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          width: 350,
+                          padding: EdgeInsets.only(top: 0,bottom: 0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(0),
+                              bottomLeft: Radius.circular(0),
+                            ),
+                            color: Constants.ftaColorLight,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24.0,
+                                    vertical: 24.0,
+                                  ),
+                                  child: Column(
+                                    children: steps.asMap().entries.map((entry) {
+                                      int index = entry.key;
+                                      return _buildStepItem(index);
+                                    }).toList(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // Right Side - Form
+                      Expanded(
+                        flex: 5,
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          padding: const EdgeInsets.all(32),
+                          constraints: BoxConstraints(
+                            maxWidth: 850,
+                            maxHeight: 1200,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(0),
+                              bottomRight: Radius.circular(0),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // Header
+                              currentStep == steps.length - 1 && isApproval
+                                  ? SizedBox.shrink()
+                                  : SizedBox(
+                                      width:
+                                          MediaQuery.of(context).size.width * 0.5,
+                                      child: Row(
+                                        children: [
+                                          currentStep > 0
+                                              ? IconButton(
+                                                  onPressed: currentStep > 0
+                                                      ? _previousStep
+                                                      : null,
+                                                  style: IconButton.styleFrom(
+                                                    backgroundColor:
+                                                        Constants.ftaColorLight,
+                                                    foregroundColor:
+                                                        Constants.ctaColorLight,
+                                                    elevation: 5,
+                                                    shadowColor: Colors.black54,
+                                                  ),
+                                                  icon: Icon(
+                                                    CupertinoIcons.back,
+                                                    color: Colors.white,
+                                                  ),
+                                                )
+                                              : SizedBox.shrink(),
+                                          currentStep > 0
+                                              ? const SizedBox(width: 20)
+                                              : SizedBox.shrink(),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'Application to Register a Business',
+                                                style: GoogleFonts.manrope(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Constants.ftaColorLight,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                              currentStep == steps.length - 1 && isApproval
+                                  ? SizedBox.shrink()
+                                  : (currentStep > 0
+                                        ? SizedBox.shrink()
+                                        : const SizedBox(height: 16)),
+
+                              // Description
+                              currentStep == steps.length - 1 && isApproval
+                                  ? SizedBox.shrink()
+                                  : (currentStep > 0
+                                        ? SizedBox.shrink()
+                                        : SizedBox(
+                                            width:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width *
+                                                0.5,
+                                            child: Text(
+                                              'This page will allow you to register a business in a few easy steps. Please provide all the required information. Once the application has been received, the information will be vetted and we will inform you of the status thereof. If successful, the business will be added to our database and you will immediately be eligible to receive requests as per the selections in this application.',
+                                              textAlign: TextAlign.justify,
+                                              style: GoogleFonts.manrope(
+                                                fontSize: 14,
+                                                color: Colors.grey.shade500,
+                                                height: 1.5,
+                                              ),
+                                            ),
+                                          )),
+
+                              currentStep == steps.length - 1 && isApproval
+                                  ? SizedBox.shrink()
+                                  : const SizedBox(height: 24),
+
+                              // Form Content
+                              Expanded(
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 800),
+                                  transitionBuilder:
+                                      (
+                                        Widget child,
+                                        Animation<double> animation,
+                                      ) {
+                                        return SlideTransition(
+                                          position:
+                                              Tween<Offset>(
+                                                begin: const Offset(0.1, 0),
+                                                end: Offset.zero,
+                                              ).animate(
+                                                CurvedAnimation(
+                                                  parent: animation,
+                                                  curve: Curves.easeInOutCubic,
+                                                ),
+                                              ),
+                                          child: FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          ),
+                                        );
+                                      },
+                                  child: SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.5,
+                                    child: Center(
+                                      child: PageView(
+                                        controller: pageController,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        children: [
+                                          _buildUserInformationForm(),
+                                          SellerOTPVerificationScreen(email: _userEmailController.text,),
+                                          _buildCompanyDetailsForm(),
+                                          _buildCompanyAddressForm(),
+                                          _buildBankAccountForm(),
+                                          _buildProductCategoriesForm(),
+                                          _buildDisplayOnPlatformForm(),
+                                          currentStep == steps.length - 1 &&
+                                                  isApproval
+                                              ? BusinessRegistrationCompleteWidget()
+                                              : _buildAuthorizationForm(),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              // Navigation Button
+                              const SizedBox(height: 24),
+                              currentStep == steps.length - 1 && isApproval
+                                  ? Center(
+                                      child: AnimatedContainer(
+                                        duration: const Duration(
+                                          milliseconds: 600,
+                                        ),
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                            0.5,
+                                        height: 50,
+                                        child: ElevatedButton(
+                                          onPressed: () {},
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                Constants.ctaColorLight,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                30,
+                                              ),
+                                            ),
+                                            elevation: _isLoading ? 0 : 2,
+                                            shadowColor: Constants.ctaColorLight
+                                                .withOpacity(0.3),
+                                          ),
+                                          child: AnimatedSwitcher(
+                                            duration: const Duration(
+                                              milliseconds: 600,
+                                            ),
+                                            child: _isLoading
+                                                ? const SizedBox(
+                                                    key: ValueKey('loading'),
+                                                    width: 20,
+                                                    height: 20,
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      valueColor:
+                                                          AlwaysStoppedAnimation<
+                                                            Color
+                                                          >(Colors.white),
+                                                    ),
+                                                  )
+                                                : Text(
+                                                    'Enter BIDR Word',
+                                                    key: ValueKey(
+                                                      'text_${currentStep}',
+                                                    ),
+                                                    style: GoogleFonts.manrope(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Center(
+                                      child: AnimatedContainer(
+                                        duration: const Duration(
+                                          milliseconds: 600,
+                                        ),
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                            0.4,
+                                        height: 45,
+                                        child: ElevatedButton(
+                                          onPressed: _isLoading
+                                              ? null
+                                              : _nextStep,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                Constants.ctaColorLight,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                30,
+                                              ),
+                                            ),
+                                            elevation: _isLoading ? 0 : 2,
+                                            shadowColor: Constants.ctaColorLight
+                                                .withOpacity(0.3),
+                                          ),
+                                          child: AnimatedSwitcher(
+                                            duration: const Duration(
+                                              milliseconds: 600,
+                                            ),
+                                            child: _isLoading
+                                                ? const SizedBox(
+                                                    key: ValueKey('loading'),
+                                                    width: 20,
+                                                    height: 20,
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      valueColor:
+                                                          AlwaysStoppedAnimation<
+                                                            Color
+                                                          >(Colors.white),
+                                                    ),
+                                                  )
+                                                : Text(
+                                                    currentStep ==
+                                                            steps.length - 1
+                                                        ? 'Submit Application'
+                                                        : 'Next',
+                                                    key: ValueKey(
+                                                      'text_${currentStep}',
+                                                    ),
+                                                    style: GoogleFonts.manrope(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -981,14 +987,14 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         children: [
           // Vertical line and circle container
           SizedBox(
-            width: 35,
+            width: 30,
             child: Column(
               children: [
                 // Circle with number or checkmark
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  width: 35,
-                  height: 35,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isCompleted
@@ -1036,7 +1042,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     width: 2,
-                    height: 50,
+                    height: 40,
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
                       color: (isCompleted || index < currentStep)
@@ -1087,7 +1093,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   Widget _buildUserInformationForm() {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(0.0),
         child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1251,7 +1257,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
 
   Widget _buildOTPVerificationForm() {
     return Padding(
-      padding: const EdgeInsets.all(32.0),
+      padding: const EdgeInsets.all(0.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1265,7 +1271,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'We have sent a verification code to \${_userEmailController.text}',
+            'We have sent a verification code to ${_userEmailController.text}',
             style: GoogleFonts.manrope(
               fontSize: 14,
               color: Colors.grey[600],

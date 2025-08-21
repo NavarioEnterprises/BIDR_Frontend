@@ -2,6 +2,7 @@ import 'package:bidr/authentication/auth_api_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 
@@ -271,392 +272,398 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            //const SizedBox(height: 16),
-            Expanded(
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-                child: Row(
+        padding: const EdgeInsets.all(0.0),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+              border: Border.all(color: Constants.gtaColorLight,width: 20)),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Stack(
                   children: [
-                    Expanded(
-                      flex: 2,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(12),
-                          topLeft: Radius.circular(12),
-                        ),
-                        child: Image.asset(
-                          "lib/assets/images/sample.jpg",
-                          fit: BoxFit.cover,
-                          height: MediaQuery.of(context).size.height,
-                        ),
-                      ),
+                    Image.asset(
+                      "lib/assets/images/sample.jpg",
+                      fit: BoxFit.cover,
+                      height: MediaQuery.of(context).size.height,
                     ),
-                    Expanded(
-                      flex: 4,
-                      child: Container(
-                        height: MediaQuery.of(context).size.height,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            bottomRight: Radius.circular(12),
-                            topRight: Radius.circular(12),
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 24),
+                        child: OutlinedButton.icon(
+                            onPressed: (){
+                              context.go('/register');
+                            },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Constants.ctaColorLight,
+                            foregroundColor: Constants.ftaColorLight
+                          ),
+                          icon: Icon(CupertinoIcons.back),
+                          label: Text(
+                          'Back',
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+
                           ),
                         ),
-                        child: SingleChildScrollView(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              left: 0,
-                              right: 0,
-                              bottom: 24,
-                              top: 24,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: Container(
+                  height: MediaQuery.of(context).size.height,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      bottomRight: Radius.circular(0),
+                      topRight: Radius.circular(0),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: 0,
+                        right: 0,
+                        bottom: 24,
+                        top: 24,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Center(
+                            child: Container(
+                              width: 90,
+                              height: 90,
+                              child: Image.asset(
+                                "lib/assets/images/bidr_logo.png",
+                                fit: BoxFit.contain,
+                                width: 90,
+                                height: 90,
+                              ),
                             ),
+                          ),
+                          const SizedBox(height: 24),
+                          Center(
+                            child: Text(
+                              'Sign Up',
+                              style: GoogleFonts.manrope(
+                                fontSize: 24,
+
+                                fontWeight: FontWeight.bold,
+                                color: Constants.ftaColorLight,
+                              ),
+                            ),
+                          ),
+
+                          // Subtitle
+                          Center(
+                            child: Text(
+                              'Create your account to get started in just a few steps',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                color: Colors.black45,
+
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Full Name input
+                          SizedBox(
+                            width:
+                            MediaQuery.of(context).size.width * 0.5,
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
                               children: [
-                                Center(
-                                  child: Container(
-                                    width: 90,
-                                    height: 90,
-                                    child: Image.asset(
-                                      "lib/assets/images/bidr_logo.png",
-                                      fit: BoxFit.contain,
-                                      width: 90,
-                                      height: 90,
+                                Padding(
+                                  padding: EdgeInsets.only(left: 8),
+                                  child: Text(
+                                    'Full Name',
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 14,
+
+                                      fontWeight: FontWeight.w300,
+                                      color: Colors.black,
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 24),
-                                Center(
+                                const SizedBox(height: 8),
+                                CustomInputTransparent4(
+                                  hintText: 'Enter Full Name',
+                                  controller: _fullNameController,
+                                  focusNode: _fullNameFocusNode,
+                                  textInputAction: TextInputAction.next,
+                                  isPasswordField: false,
+                                  onChanged: (value) {},
+                                  onSubmitted: (value) {
+                                    _mobileFocusNode.requestFocus();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Mobile Number input
+                          SizedBox(
+                            width:
+                            MediaQuery.of(context).size.width * 0.5,
+                            child: Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
                                   child: Text(
-                                    'Sign Up',
+                                    'Mobile Number',
                                     style: GoogleFonts.manrope(
-                                      fontSize: 24,
+                                      fontSize: 14,
+
+                                      fontWeight: FontWeight.w300,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                CustomInputTransparent4(
+                                  hintText: 'Enter Mobile Number',
+                                  controller: _mobileController,
+                                  focusNode: _mobileFocusNode,
+                                  textInputAction: TextInputAction.next,
+                                  isPasswordField: false,
+                                  integersOnly: true,
+                                  onChanged: (value) {},
+                                  onSubmitted: (value) {
+                                    _emailFocusNode.requestFocus();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Email input
+                          SizedBox(
+                            width:
+                            MediaQuery.of(context).size.width * 0.5,
+                            child: Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Text(
+                                    'Email',
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 14,
+
+                                      fontWeight: FontWeight.w300,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                CustomInputTransparent4(
+                                  hintText: 'Enter Email',
+                                  controller: _emailController,
+                                  focusNode: _emailFocusNode,
+                                  textInputAction: TextInputAction.next,
+                                  isPasswordField: false,
+                                  onChanged: (value) {},
+                                  onSubmitted: (value) {
+                                    _passwordFocusNode.requestFocus();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Password input
+                          SizedBox(
+                            width:
+                            MediaQuery.of(context).size.width * 0.5,
+                            child: Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Text(
+                                    'Password',
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 14,
+
+                                      fontWeight: FontWeight.w300,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                CustomInputTransparent4(
+                                  hintText: 'Enter Password',
+                                  controller: _passwordController,
+                                  focusNode: _passwordFocusNode,
+                                  textInputAction: TextInputAction.next,
+                                  isPasswordField: true,
+                                  onChanged: (value) {},
+                                  onSubmitted: (value) {
+                                    _confirmPasswordFocusNode
+                                        .requestFocus();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Confirm Password input
+                          SizedBox(
+                            width:
+                            MediaQuery.of(context).size.width * 0.5,
+                            child: Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Text(
+                                    'Confirm Password',
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 14,
+
+                                      fontWeight: FontWeight.w300,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                CustomInputTransparent4(
+                                  hintText: 'Enter Confirm Password',
+                                  controller: _confirmPasswordController,
+                                  focusNode: _confirmPasswordFocusNode,
+                                  textInputAction: TextInputAction.done,
+                                  isPasswordField: true,
+                                  onChanged: (value) {},
+                                  onSubmitted: (value) {
+                                    _handleSignUp();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Sign up button
+                          SizedBox(
+                            width:
+                            MediaQuery.of(context).size.width * 0.5,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: _isLoading
+                                  ? null
+                                  : _handleSignUp,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Constants.ctaColorLight,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: _isLoading
+                                  ? SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor:
+                                  AlwaysStoppedAnimation<Color>(
+                                    Constants.ftaColorLight,
+                                  ),
+                                ),
+                              )
+                                  : Text(
+                                'Sign Up',
+                                style: GoogleFonts.manrope(
+                                  fontSize: 14,
+
+                                  fontWeight: FontWeight.w300,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Sign in link
+                          SizedBox(
+                            width:
+                            MediaQuery.of(context).size.width * 0.5,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Already Have an Account? ',
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 14,
+
+                                    fontWeight: FontWeight.w300,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                OutlinedButton(
+                                  onPressed: () {
+                                    /*Navigator.pushNamed(
+                                                  context,
+                                                  '/login',
+                                                );*/
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LoginPage(),
+                                      ),
+                                    );
+                                    setState(() {});
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    side: BorderSide.none,
+                                    foregroundColor:
+                                    Constants.ftaColorLight,
+                                  ),
+                                  child: Text(
+                                    'Sign in',
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 14,
 
                                       fontWeight: FontWeight.bold,
                                       color: Constants.ftaColorLight,
                                     ),
                                   ),
                                 ),
-
-                                // Subtitle
-                                Center(
-                                  child: Text(
-                                    'Create your account to get started in just a few steps',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 14,
-                                      color: Colors.black45,
-
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-
-                                // Full Name input
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.only(left: 8),
-                                        child: Text(
-                                          'Full Name',
-                                          style: GoogleFonts.manrope(
-                                            fontSize: 14,
-
-                                            fontWeight: FontWeight.w300,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      CustomInputTransparent4(
-                                        hintText: 'Enter Full Name',
-                                        controller: _fullNameController,
-                                        focusNode: _fullNameFocusNode,
-                                        textInputAction: TextInputAction.next,
-                                        isPasswordField: false,
-                                        onChanged: (value) {},
-                                        onSubmitted: (value) {
-                                          _mobileFocusNode.requestFocus();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-
-                                // Mobile Number input
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 8),
-                                        child: Text(
-                                          'Mobile Number',
-                                          style: GoogleFonts.manrope(
-                                            fontSize: 14,
-
-                                            fontWeight: FontWeight.w300,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      CustomInputTransparent4(
-                                        hintText: 'Enter Mobile Number',
-                                        controller: _mobileController,
-                                        focusNode: _mobileFocusNode,
-                                        textInputAction: TextInputAction.next,
-                                        isPasswordField: false,
-                                        integersOnly: true,
-                                        onChanged: (value) {},
-                                        onSubmitted: (value) {
-                                          _emailFocusNode.requestFocus();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-
-                                // Email input
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 8),
-                                        child: Text(
-                                          'Email',
-                                          style: GoogleFonts.manrope(
-                                            fontSize: 14,
-
-                                            fontWeight: FontWeight.w300,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      CustomInputTransparent4(
-                                        hintText: 'Enter Email',
-                                        controller: _emailController,
-                                        focusNode: _emailFocusNode,
-                                        textInputAction: TextInputAction.next,
-                                        isPasswordField: false,
-                                        onChanged: (value) {},
-                                        onSubmitted: (value) {
-                                          _passwordFocusNode.requestFocus();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-
-                                // Password input
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 8),
-                                        child: Text(
-                                          'Password',
-                                          style: GoogleFonts.manrope(
-                                            fontSize: 14,
-
-                                            fontWeight: FontWeight.w300,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      CustomInputTransparent4(
-                                        hintText: 'Enter Password',
-                                        controller: _passwordController,
-                                        focusNode: _passwordFocusNode,
-                                        textInputAction: TextInputAction.next,
-                                        isPasswordField: true,
-                                        onChanged: (value) {},
-                                        onSubmitted: (value) {
-                                          _confirmPasswordFocusNode
-                                              .requestFocus();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-
-                                // Confirm Password input
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 8),
-                                        child: Text(
-                                          'Confirm Password',
-                                          style: GoogleFonts.manrope(
-                                            fontSize: 14,
-
-                                            fontWeight: FontWeight.w300,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      CustomInputTransparent4(
-                                        hintText: 'Enter Confirm Password',
-                                        controller: _confirmPasswordController,
-                                        focusNode: _confirmPasswordFocusNode,
-                                        textInputAction: TextInputAction.done,
-                                        isPasswordField: true,
-                                        onChanged: (value) {},
-                                        onSubmitted: (value) {
-                                          _handleSignUp();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-
-                                // Sign up button
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  height: 45,
-                                  child: ElevatedButton(
-                                    onPressed: _isLoading
-                                        ? null
-                                        : _handleSignUp,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Constants.ctaColorLight,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                      ),
-                                      elevation: 0,
-                                    ),
-                                    child: _isLoading
-                                        ? SizedBox(
-                                            width: 20,
-                                            height: 20,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                    Constants.ftaColorLight,
-                                                  ),
-                                            ),
-                                          )
-                                        : Text(
-                                            'Sign Up',
-                                            style: GoogleFonts.manrope(
-                                              fontSize: 14,
-
-                                              fontWeight: FontWeight.w300,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-
-                                // Sign in link
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Already Have an Account? ',
-                                        style: GoogleFonts.manrope(
-                                          fontSize: 14,
-
-                                          fontWeight: FontWeight.w300,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      OutlinedButton(
-                                        onPressed: () {
-                                          /*Navigator.pushNamed(
-                                                    context,
-                                                    '/login',
-                                                  );*/
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => LoginPage(),
-                                            ),
-                                          );
-                                          setState(() {});
-                                        },
-                                        style: OutlinedButton.styleFrom(
-                                          backgroundColor: Colors.white,
-                                          side: BorderSide.none,
-                                          foregroundColor:
-                                              Constants.ftaColorLight,
-                                        ),
-                                        child: Text(
-                                          'Sign in',
-                                          style: GoogleFonts.manrope(
-                                            fontSize: 14,
-
-                                            fontWeight: FontWeight.bold,
-                                            color: Constants.ftaColorLight,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                // Sign Up title
                               ],
                             ),
                           ),
-                        ),
+
+                          // Sign Up title
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

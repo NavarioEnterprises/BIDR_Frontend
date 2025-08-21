@@ -143,10 +143,10 @@ class _BusinessLandingPageState extends State<BusinessLandingPage>
           ),
           SizedBox(height: 24),
           Container(
-            height: 50,
+            height: 60,
             width: MediaQuery.of(context).size.width,
             color: Constants.ctaColorLight,
-            padding: EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 8),
+            padding: EdgeInsets.only(left: 50, right: 50, top: 8, bottom: 8),
             child: Row(
               children: [
                 TextButton(
@@ -181,12 +181,12 @@ class _BusinessLandingPageState extends State<BusinessLandingPage>
                     child: FadeTransition(
                       opacity: _headerFadeAnimation,
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 24, right: 24),
+                        padding: const EdgeInsets.only(left: 68, right: 68),
                         child: Center(
                           child: Container(
                             height: 400,
-                            constraints: BoxConstraints(maxWidth: 1400),
-                            padding: EdgeInsets.all(24),
+                            constraints: BoxConstraints(maxWidth: 1600),
+
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
@@ -264,7 +264,7 @@ class _BusinessLandingPageState extends State<BusinessLandingPage>
                     child: FadeTransition(
                       opacity: _descriptionFadeAnimation,
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 24, right: 24),
+                        padding: const EdgeInsets.only(left: 0, right: 0),
                         child: Center(
                           child: Container(
                             padding: EdgeInsets.all(24),

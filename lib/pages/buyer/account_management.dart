@@ -324,15 +324,17 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
   Widget _buildMenuItem(String title, IconData icon, {bool isDestructive = false}) {
     final bool isSelected = selectedMenuItem == title;
-    final Color textColor = isDestructive ? Colors.red[300]! :
-    isSelected ? Colors.white : Colors.grey[400]!;
+    final bool isSignOutSelected = title == "Sign Out";
+    final bool isDeleteSelected = title == "Delete Account";
+    final Color textColor = isSignOutSelected ? Colors.red.shade700 :isDeleteSelected?Constants.ctaColorLight:
+    isSelected ? Colors.white : Colors.blueAccent.withOpacity(0.5);
     final Color backgroundColor = isSelected ? Colors.white.withOpacity(0.1) : Colors.transparent;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(360),
       ),
       child: ListTile(
         leading: Icon(icon, color: textColor, size: 20),

@@ -13,7 +13,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 
+import '../../customWdget/appbar.dart';
+import '../../models/alert.dart';
 import '../buyer_home.dart';
+import '../notification.dart';
 import 'enter_pin.dart';
 
 enum LeadStatus { open, closed, unsuccessful, pending, inProgress }
@@ -21,7 +24,7 @@ class SellerDashboard extends StatefulWidget {
   @override
   _SellerDashboardState createState() => _SellerDashboardState();
 }
-
+List<WebNotification> notifications = [];
 class _SellerDashboardState extends State<SellerDashboard>
     with TickerProviderStateMixin {
   int selectedIndex = 0;
@@ -35,9 +38,10 @@ class _SellerDashboardState extends State<SellerDashboard>
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
 
   final List<String> menuItems = [
-    'Leads/Requests',
     'Revenue Tracker',
     'Transaction History',
     'Manage Disputes',
@@ -100,6 +104,18 @@ class _SellerDashboardState extends State<SellerDashboard>
   @override
   void initState() {
     super.initState();
+    _loadSampleNotifications();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutBack,
+    ));
     _fadeController = AnimationController(
       duration: Duration(milliseconds: 300),
       vsync: this,
@@ -128,6 +144,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     _slideController.dispose();
     _priceController.dispose();
     _commentsController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -140,14 +157,15 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   @override
   Widget build(BuildContext context) {
+    final unreadCount = notifications.where((n) => !n.read).length;
     return Column(
       children: [
         // Top Navigation Bar - Dark Blue
         SizedBox(height: 24),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          padding: EdgeInsets.symmetric(horizontal: 66, vertical: 15),
           decoration: BoxDecoration(
-            color: Color(0xFF34495E),
+            color: Constants.ftaColorLight,
           ),
           child: Row(
             children: [
@@ -166,10 +184,47 @@ class _SellerDashboardState extends State<SellerDashboard>
                   color: Constants.ctaColorLight,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.notifications, color: Colors.white, size: 16),
+                child: Row(
+                  children: [
+                    Stack(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.notifications_outlined),
+                          onPressed: _showNotificationDialog,
+                        ),
+                        if (unreadCount > 0)
+                          Positioned(
+                            right: 2,
+                            top: 2,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Text(
+                                unreadCount.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    )
+                  ],
+                )
+
               ),
               SizedBox(width: 15),
-              Icon(Icons.filter_alt, color: Colors.white, size: 20),
+              Icon(HugeIcons.strokeRoundedFilter, color: Colors.white, size: 20),
             ],
           ),
         ),
@@ -235,6 +290,34 @@ class _SellerDashboardState extends State<SellerDashboard>
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Expanded(
+                            child: Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.only(top: 8,bottom: 8),
+                              child: FadeTransition(
+                                opacity: _fadeAnimation,
+                                child: SlideTransition(
+                                  position: _slideAnimation,
+                                  child: buildLeadsRequestsWidget(),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ]
+                else if(tabActiveIndex==1)...[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 64, right: 64),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      constraints: BoxConstraints(maxWidth: 1600),
+                      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 12),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           // Left Sidebar
                           Container(
                             width: 180,
@@ -270,9 +353,6 @@ class _SellerDashboardState extends State<SellerDashboard>
                     ),
                   ),
                 ]
-                else if(tabActiveIndex==1)...[
-                  Container()
-                ]
                 else if(tabActiveIndex==2)...[
                     Container()
                   ]
@@ -300,6 +380,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                             ),
                           ),
                       ]
+
                 else...[
                   Container()
                 ],
@@ -312,6 +393,283 @@ class _SellerDashboardState extends State<SellerDashboard>
       ],
     );
   }
+
+  void _loadSampleNotifications() {
+    setState(() {
+      notifications = [
+        WebNotification(
+          id: 1,
+          title: 'Request Accept',
+          body: 'John Doe has accepted the concern. He help...',
+          description: 'John Doe has accepted the concern. He will help you with your request.',
+          type: 'accept',
+          read: false,
+          createdAt: DateTime.now(),
+        ),
+        WebNotification(
+          id: 2,
+          title: 'Bank Details Update Succesfully',
+          body: 'Lorem ipsum is a placeholder text commonly',
+          description: 'Lorem ipsum is a placeholder text commonly used in the printing industry.',
+          type: 'update',
+          read: false,
+          createdAt: DateTime.now().subtract(const Duration(days: 2)),
+        ),
+        WebNotification(
+          id: 3,
+          title: 'Your Profile Is Update Succesfully',
+          body: 'Lorem ipsum is a placeholder text commonly',
+          description: 'Lorem ipsum is a placeholder text commonly used in the printing industry.',
+          type: 'update',
+          read: true,
+          createdAt: DateTime.now().subtract(const Duration(days: 2)),
+        ),
+        WebNotification(
+          id: 4,
+          title: 'Seller Profile Update Succesfully',
+          body: 'Lorem ipsum is a placeholder text commonly',
+          description: 'Lorem ipsum is a placeholder text commonly used in the printing industry.',
+          type: 'update',
+          read: true,
+          createdAt: DateTime.now().subtract(const Duration(days: 2)),
+        ),
+        WebNotification(
+          id: 5,
+          title: 'New Order Received',
+          body: 'You have received a new order from customer',
+          description: 'You have received a new order from customer. Please check your dashboard.',
+          type: 'order',
+          read: false,
+          createdAt: DateTime.now().subtract(const Duration(days: 3)),
+        ),
+      ];
+    });
+  }
+
+  void _showNotificationDialog() {
+    _animationController.forward();
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.3),
+      builder: (BuildContext context) {
+        return ScaleTransition(
+          scale: _scaleAnimation,
+          child: Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Container(
+              width: 320,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'ALERT',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 20),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildAlertStats(),
+                  const SizedBox(height: 20),
+                  _buildRecentNotifications(),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Constants.buyerAppBarValue =8;
+                        appBarValueNotifier.value++;
+                        sellerHomeValueNotifier.value++;
+                      },
+                      child: Text(
+                        'More Notifications',
+                        style: TextStyle(
+                          color: Constants.ctaColorLight,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    ).then((_) {
+      _animationController.reset();
+    });
+  }
+
+  Widget _buildAlertStats() {
+    return Column(
+      children: [
+        _buildStatItem('Requests Received', '100'),
+        const SizedBox(height: 8),
+        _buildStatItem('Requests Answered', '50'),
+        const SizedBox(height: 8),
+        _buildStatItem('Requests Pending', '50'),
+      ],
+    );
+  }
+
+  Widget _buildStatItem(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Constants.ctaColorLight,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecentNotifications() {
+    final recentNotifications = notifications.take(4).toList();
+    final groupedNotifications = <String, List<WebNotification>>{};
+
+    for (var notification in recentNotifications) {
+      final dayKey = _getDayKey(notification.createdAt);
+      groupedNotifications[dayKey] ??= [];
+      groupedNotifications[dayKey]!.add(notification);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: groupedNotifications.entries.map((entry) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                entry.key,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ...entry.value.map((notification) =>
+                _buildNotificationItem(notification, isCompact: true)
+            ),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  String _getDayKey(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date).inDays;
+
+    if (difference == 0) return 'Today';
+    if (difference == 1) return 'Yesterday';
+    if (difference == 2) return 'Monday';
+    return '${difference} days ago';
+  }
+
+  Widget _buildNotificationItem(WebNotification notification, {bool isCompact = false}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Constants.ctaColorLight.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              _getIconForType(notification.type),
+              color: Constants.ctaColorLight,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  notification.title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: notification.read ? FontWeight.normal : FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  notification.body,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                  maxLines: isCompact ? 1 : 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData _getIconForType(String type) {
+    switch (type) {
+      case 'accept':
+        return Icons.check_circle_outline;
+      case 'update':
+        return Icons.update;
+      case 'order':
+        return Icons.shopping_bag_outlined;
+      default:
+        return Icons.notifications_outlined;
+    }
+  }
+
   Widget buildLeadsRequestsWidget() {
     return Container(
       width: MediaQuery.of(context).size.height,
@@ -1206,26 +1564,25 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   Widget _buildMainContent() {
     switch (selectedIndex) {
+      // This is now the first and default widget
       case 0:
-        return buildLeadsRequestsWidget(); // This is now the first and default widget
-      case 1:
         return Row(
           children: [
             Expanded(child: _buildRevenueTracker()),
           ],
         );
-      case 2:
+      case 1:
         return Row(
           children: [
             Expanded(child: _buildTransactionHistory()),
           ],
         );
-      case 3:
+      case 2:
         return _buildManageDisputes();
-      case 4:
+      case 3:
         return _buildAnalytics();
       default:
-        return buildLeadsRequestsWidget(); // Default to leads/requests
+        return _buildRevenueTracker(); // Default to leads/requests
     }
   }
 
