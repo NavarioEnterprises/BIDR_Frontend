@@ -6,3 +6,4 @@ urlpatterns = [
     path('verify/', OTPVerificationView.as_view(), name='otp-verify'),
     path('resend/', ResendOTPView.as_view(), name='otp-resend'),
 ]
+
