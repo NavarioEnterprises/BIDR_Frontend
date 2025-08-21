@@ -14,9 +14,9 @@ on:
 
 env:
   TF_VERSION: '1.5.0'
-  AKS_CLUSTER_NAME: BIDR-dev-aks-cluster
-  AKS_RESOURCE_GROUP: bidr-dev-k8s
-  NAMESPACE: bidr
+  AKS_CLUSTER_NAME: BIDR-uat-aks-cluster-we
+  AKS_RESOURCE_GROUP: bidr-uat-k8s-we
+  NAMESPACE: bidr-uat
 
 jobs:
   detect-infrastructure-changes:
@@ -119,6 +119,9 @@ jobs:
   kubernetes-deploy:
     needs: detect-infrastructure-changes
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     if: |
       needs.detect-infrastructure-changes.outputs.kubernetes == 'true' &&
       github.ref == 'refs/heads/main' &&
@@ -128,9 +131,11 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Azure Login
-      uses: azure/login@v1
+      uses: azure/login@v2
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     
     - name: Get AKS credentials
       run: |
@@ -148,9 +153,12 @@ jobs:
     
     - name: Apply Kubernetes manifests
       run: |
-        # Apply kustomization if it exists, otherwise apply individual files
-        if [ -f "k8s/kustomization.yaml" ]; then
-          echo "Applying kustomization..."
+        # Apply UAT overlay kustomization
+        if [ -f "k8s/overlays/uat/kustomization.yaml" ]; then
+          echo "Applying UAT overlay kustomization..."
+          kubectl apply -k k8s/overlays/uat/
+        elif [ -f "k8s/kustomization.yaml" ]; then
+          echo "Applying base kustomization..."
           kubectl apply -k k8s/
         else
           echo "Applying individual manifests..."
