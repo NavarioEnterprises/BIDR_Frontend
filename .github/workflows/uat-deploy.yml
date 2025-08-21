@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_RESOURCE_GROUP: bidr-uat-k8s
-  AZURE_CLUSTER_NAME: BIDR-uat-aks-cluster
-  AZURE_CONTAINER_REGISTRY: bidrnparusuatregistry2024
-  AZURE_LOCATION: southafricanorth
+  AZURE_RESOURCE_GROUP: bidr-uat-k8s-we
+  AZURE_CLUSTER_NAME: BIDR-uat-aks-cluster-we
+  AZURE_CONTAINER_REGISTRY: bidruatregwe2024
+  AZURE_LOCATION: westeurope
 
 jobs:
   build-and-test:
