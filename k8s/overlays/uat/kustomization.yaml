@@ -1,0 +1,49 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../
+
+patchesStrategicMerge:
+- configmap-patch.yaml
+
+replicas:
+- name: bidr-auth-deployment
+  count: 1
+- name: bidr-chat-deployment
+  count: 1
+- name: bidr-payment-deployment
+  count: 1
+- name: bidr-resolution-deployment
+  count: 1
+- name: bidr-product-deployment
+  count: 1
+- name: bidr-notifications-deployment
+  count: 1
+- name: bidr-transactions-deployment
+  count: 1
+- name: bidr-reviews-deployment
+  count: 1
+
+images:
+- name: bidruatregwe2024.azurecr.io/bidr-authentication_service
+  newTag: uat-latest
+- name: bidruatregwe2024.azurecr.io/bidr-chat_service
+  newTag: uat-latest
+- name: bidruatregwe2024.azurecr.io/bidr-payment_service
+  newTag: uat-latest
+- name: bidruatregwe2024.azurecr.io/bidr-resolution_service
+  newTag: uat-latest
+- name: bidruatregwe2024.azurecr.io/bidr-product_management_service
+  newTag: uat-latest
+- name: bidruatregwe2024.azurecr.io/bidr-notifications_service
+  newTag: uat-latest
+- name: bidruatregwe2024.azurecr.io/bidr-transactions_service
+  newTag: uat-latest
+- name: bidruatregwe2024.azurecr.io/bidr-reviews_and_ratings
+  newTag: uat-latest
+
+commonLabels:
+  environment: uat
+
+namespace: bidr-uat
