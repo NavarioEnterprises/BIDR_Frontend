@@ -40,7 +40,7 @@ jobs:
           payment-service:
             - 'payment_service/**'
           product-service:
-            - 'inventory_service/**'
+            - 'product_management_service/**'
           notifications-service:
             - 'notifications_service/**'
           transactions-service:
@@ -69,7 +69,7 @@ jobs:
           { name: "auth-service", folder: "authentication_service", changed: "${{ needs.detect-changes.outputs.auth-service }}" },
           { name: "chat-service", folder: "chat_service", changed: "${{ needs.detect-changes.outputs.chat-service }}" },
           { name: "payment-service", folder: "payment_service", changed: "${{ needs.detect-changes.outputs.payment-service }}" },
-          { name: "product-service", folder: "inventory_service", changed: "${{ needs.detect-changes.outputs.product-service }}" },
+          { name: "product-service", folder: "product_management_service", changed: "${{ needs.detect-changes.outputs.product-service }}" },
           { name: "notifications-service", folder: "notifications_service", changed: "${{ needs.detect-changes.outputs.notifications-service }}" },
           { name: "transactions-service", folder: "transactions_service", changed: "${{ needs.detect-changes.outputs.transactions-service }}" },
           { name: "reviews-service", folder: "reviews_service", changed: "${{ needs.detect-changes.outputs.reviews-service }}" },
