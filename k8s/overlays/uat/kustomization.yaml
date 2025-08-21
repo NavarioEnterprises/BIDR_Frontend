@@ -5,6 +5,8 @@ resources:
 - secret.yaml
 - configmap.yaml
 - postgres.yaml
+- namespace-and-serviceaccount.yaml
+- namespace-rbac.yaml
 - auth-service.yaml
 - chat-service.yaml
 - payment-service.yaml
