@@ -180,14 +180,14 @@ jobs:
         kubectl apply -k k8s/overlays/uat/
         
         # Wait for deployments to be ready
-        kubectl rollout status deployment/bidr-auth-deployment -n bidr-uat --timeout=900s
-        kubectl rollout status deployment/bidr-chat-deployment -n bidr-uat --timeout=900s
-        kubectl rollout status deployment/bidr-payment-deployment -n bidr-uat --timeout=900s
-        kubectl rollout status deployment/bidr-resolution-deployment -n bidr-uat --timeout=900s
-        kubectl rollout status deployment/bidr-product-deployment -n bidr-uat --timeout=900s
-        kubectl rollout status deployment/bidr-notifications-deployment -n bidr-uat --timeout=900s
-        kubectl rollout status deployment/bidr-transactions-deployment -n bidr-uat --timeout=900s
-        kubectl rollout status deployment/bidr-reviews-deployment -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/auth-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/chat-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/payment-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/resolution-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/product-management-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/notifications-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/transactions-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/reviews-service -n bidr-uat --timeout=900s
 
     - name: Run deployment validation
       run: |
@@ -229,7 +229,7 @@ jobs:
         
         # Database connectivity checks
         echo "Running database connectivity tests..."
-        kubectl exec deployment/bidr-auth-deployment -n bidr-uat -- python manage.py check --database default || echo "Database check failed"
+        kubectl exec deployment/auth-service -n bidr-uat -- python manage.py check --database default || echo "Database check failed"
       continue-on-error: true
 
   performance-tests:
