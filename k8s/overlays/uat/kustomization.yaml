@@ -2,61 +2,64 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- ../../namespace.yaml
-- ../../namespace-and-serviceaccount.yaml
-- ../../namespace-rbac.yaml
-- ../../secret.yaml
-- ../../configmap.yaml
-- ../../postgres.yaml
-- ../../auth-service.yaml
-- ../../chat-service.yaml
-- ../../payment-service.yaml
-- ../../resolution-service.yaml
-- ../../product-management-service.yaml
-- ../../notifications-service.yaml
-- ../../transactions-service.yaml
-- ../../reviews-service.yaml
-- ../../nginx-proxy.yaml
-- ../../ingress.yaml
-- ../../network-policy.yaml
+- secret.yaml
+- configmap.yaml
+- postgres.yaml
+- auth-service.yaml
+- chat-service.yaml
+- payment-service.yaml
+- resolution-service.yaml
+- product-management-service.yaml
+- notifications-service.yaml
+- transactions-service.yaml
+- reviews-service.yaml
+- nginx-proxy.yaml
 
 patchesStrategicMerge:
 - configmap-patch.yaml
 
 replicas:
-- name: bidr-auth-deployment
+- name: auth-service
   count: 1
-- name: bidr-chat-deployment
+- name: chat-service
   count: 1
-- name: bidr-payment-deployment
+- name: payment-service
   count: 1
-- name: bidr-resolution-deployment
+- name: resolution-service
   count: 1
-- name: bidr-product-deployment
+- name: product-management-service
   count: 1
-- name: bidr-notifications-deployment
+- name: notifications-service
   count: 1
-- name: bidr-transactions-deployment
+- name: transactions-service
   count: 1
-- name: bidr-reviews-deployment
+- name: reviews-service
   count: 1
 
 images:
-- name: bidruatregwe2024.azurecr.io/bidr-authentication_service
+- name: bidrnparusdevregistry2024.azurecr.io/auth-service
+  newName: bidruatregwe2024.azurecr.io/bidr-authentication_service
   newTag: uat-latest
-- name: bidruatregwe2024.azurecr.io/bidr-chat_service
+- name: bidrnparusdevregistry2024.azurecr.io/chat-service
+  newName: bidruatregwe2024.azurecr.io/bidr-chat_service
   newTag: uat-latest
-- name: bidruatregwe2024.azurecr.io/bidr-payment_service
+- name: bidrnparusdevregistry2024.azurecr.io/payment-service
+  newName: bidruatregwe2024.azurecr.io/bidr-payment_service
   newTag: uat-latest
-- name: bidruatregwe2024.azurecr.io/bidr-resolution_service
+- name: bidrnparusdevregistry2024.azurecr.io/resolution-service
+  newName: bidruatregwe2024.azurecr.io/bidr-resolution_service
   newTag: uat-latest
-- name: bidruatregwe2024.azurecr.io/bidr-product_management_service
+- name: bidrnparusdevregistry2024.azurecr.io/product-management-service
+  newName: bidruatregwe2024.azurecr.io/bidr-product_management_service
   newTag: uat-latest
-- name: bidruatregwe2024.azurecr.io/bidr-notifications_service
+- name: bidrnparusdevregistry2024.azurecr.io/notifications-service
+  newName: bidruatregwe2024.azurecr.io/bidr-notifications_service
   newTag: uat-latest
-- name: bidruatregwe2024.azurecr.io/bidr-transactions_service
+- name: bidrnparusdevregistry2024.azurecr.io/transactions-service
+  newName: bidruatregwe2024.azurecr.io/bidr-transactions_service
   newTag: uat-latest
-- name: bidruatregwe2024.azurecr.io/bidr-reviews_and_ratings
+- name: bidrnparusdevregistry2024.azurecr.io/reviews-service
+  newName: bidruatregwe2024.azurecr.io/bidr-reviews_and_ratings
   newTag: uat-latest
 
 commonLabels:

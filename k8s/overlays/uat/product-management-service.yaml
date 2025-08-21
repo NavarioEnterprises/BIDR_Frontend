@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-management-service
+  labels:
+    app: product-management-service
+    service: product-management
+    version: dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: product-management-service
+  template:
+    metadata:
+      labels:
+        app: product-management-service
+        service: product-management
+        version: dev
+    spec:
+      serviceAccountName: bidr-service-account
+      containers:
+      - name: product-management-service
+        image: bidrnparusdevregistry2024.azurecr.io/product-service:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DEBUG
+          value: "True"
+        - name: DJANGO_SETTINGS_MODULE
+          value: "product_management_service.settings"
+        - name: SERVICE_NAME
+          value: "product-management"
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: DJANGO_SECRET_KEY
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: PRODUCT_DATABASE_URL
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: REDIS_URL
+        - name: AUTH_SERVICE_URL
+          value: "http://auth-service:8001"
+        - name: MEDIA_ROOT
+          value: "/app/media"
+        command:
+        - /bin/sh
+        args:
+        - -c
+        - "pip install django-mptt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 5
+        volumeMounts:
+        - name: media-volume
+          mountPath: /app/media
+      volumes:
+      - name: media-volume
+        emptyDir: {}
+      imagePullSecrets:
+      - name: acr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-management-service
+  labels:
+    app: product-management-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: product-management-service
+  ports:
+  - port: 8004
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
