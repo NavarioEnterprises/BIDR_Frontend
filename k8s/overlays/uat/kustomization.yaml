@@ -17,6 +17,7 @@ resources:
 
 patchesStrategicMerge:
 - configmap-patch.yaml
+- nginx-proxy-patch.yaml
 
 replicas:
 - name: auth-service
