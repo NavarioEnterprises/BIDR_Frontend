@@ -22,8 +22,8 @@ RUN apt-get update \
 # Create a non-root user early
 RUN adduser --disabled-password --gecos '' --uid 1000 appuser
 
-# Copy local requirements
-COPY requirements.txt /app/requirements.txt
+# Copy common requirements
+COPY services-requirements.txt /app/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt

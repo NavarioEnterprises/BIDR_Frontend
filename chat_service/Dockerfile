@@ -23,7 +23,7 @@ RUN apt-get update \
 RUN adduser --disabled-password --gecos '' --uid 1000 appuser
 
 # Copy requirements first to leverage Docker cache
-COPY requirements.txt /app/
+COPY services-requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 

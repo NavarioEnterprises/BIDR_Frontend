@@ -12,3 +12,16 @@ django-extensions~=3.2.3
 django-mptt~=0.17.0
 django-filter~=25.1
 django-prometheus~=2.3.1
+
+# Production server dependencies
+gunicorn>=21.2.0
+whitenoise>=6.5.0
+
+# API documentation
+drf-yasg>=1.21.0
+
+# Authentication
+djangorestframework-simplejwt>=5.0.0
+
+# Additional dependencies
+redis>=5.0.0
