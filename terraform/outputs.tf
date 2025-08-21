@@ -51,8 +51,8 @@ output "key_vault_uri" {
 }
 
 output "public_ip_address" {
-  description = "Public IP address for the load balancer"
-  value       = azurerm_public_ip.bidr_lb.ip_address
+  description = "Public IP address for the NGINX proxy"
+  value       = azurerm_public_ip.nginx_proxy.ip_address
 }
 
 output "kube_config" {

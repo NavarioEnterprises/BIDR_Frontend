@@ -157,3 +157,9 @@ variable "redis_sku" {
     error_message = "Redis SKU must be Basic, Standard, or Premium."
   }
 }
+
+variable "ssh_public_key" {
+  description = "SSH public key for accessing the NGINX proxy VM"
+  type        = string
+  default     = ""
+}

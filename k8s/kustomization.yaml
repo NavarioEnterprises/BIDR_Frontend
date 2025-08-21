@@ -12,6 +12,7 @@ resources:
 - init-job.yaml
 - hpa.yaml
 - network-policy.yaml
+- nginx-proxy.yaml
 
 commonLabels:
   app.kubernetes.io/name: bidr
