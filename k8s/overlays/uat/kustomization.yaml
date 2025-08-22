@@ -51,28 +51,28 @@ replicas:
 images:
 - name: bidrnparusdevregistry2024.azurecr.io/auth-service
   newName: bidruatregwe2024.azurecr.io/bidr-authentication_service
-  newTag: 90f4bd034f400792c91ee0b2df8d4927cf9f84b2
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
 - name: bidrnparusdevregistry2024.azurecr.io/chat-service
   newName: bidruatregwe2024.azurecr.io/bidr-chat_service
-  newTag: 90f4bd034f400792c91ee0b2df8d4927cf9f84b2
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
 - name: bidrnparusdevregistry2024.azurecr.io/payment-service
   newName: bidruatregwe2024.azurecr.io/bidr-payment_service
-  newTag: 90f4bd034f400792c91ee0b2df8d4927cf9f84b2
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
 - name: bidrnparusdevregistry2024.azurecr.io/resolution-service
   newName: bidruatregwe2024.azurecr.io/bidr-resolution_service
-  newTag: 90f4bd034f400792c91ee0b2df8d4927cf9f84b2
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
 - name: bidrnparusdevregistry2024.azurecr.io/product-management-service
   newName: bidruatregwe2024.azurecr.io/bidr-product_management_service
-  newTag: 90f4bd034f400792c91ee0b2df8d4927cf9f84b2
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
 - name: bidrnparusdevregistry2024.azurecr.io/notifications-service
   newName: bidruatregwe2024.azurecr.io/bidr-notifications_service
-  newTag: 90f4bd034f400792c91ee0b2df8d4927cf9f84b2
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
 - name: bidrnparusdevregistry2024.azurecr.io/transactions-service
   newName: bidruatregwe2024.azurecr.io/bidr-transactions_service
-  newTag: 90f4bd034f400792c91ee0b2df8d4927cf9f84b2
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
 - name: bidrnparusdevregistry2024.azurecr.io/reviews-service
   newName: bidruatregwe2024.azurecr.io/bidr-reviews_and_ratings
-  newTag: 90f4bd034f400792c91ee0b2df8d4927cf9f84b2
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
 
 labels:
 - includeSelectors: true

@@ -16,7 +16,7 @@ spec:
       restartPolicy: OnFailure
       containers:
       - name: auth-migration
-        image: bidruatregwe2024.azurecr.io/bidr-authentication_service:90f4bd034f400792c91ee0b2df8d4927cf9f84b2
+        image: bidruatregwe2024.azurecr.io/bidr-authentication_service:73628618c39af2a0383dd658a621789cfb1e8fb6
         workingDir: /app/authentication_service
         command: ["python", "manage.py", "migrate", "--noinput"]
         env:
