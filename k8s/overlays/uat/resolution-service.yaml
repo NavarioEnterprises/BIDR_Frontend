@@ -7,7 +7,7 @@ metadata:
     service: resolution
     version: dev
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: resolution-service
@@ -54,11 +54,11 @@ spec:
           value: "http://notifications-service:8005"
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "250m"
+            memory: "128Mi"
+            cpu: "100m"
           limits:
-            memory: "512Mi"
-            cpu: "500m"
+            memory: "256Mi"
+            cpu: "200m"
         livenessProbe:
           httpGet:
             path: /health/

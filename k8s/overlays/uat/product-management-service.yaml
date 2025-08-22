@@ -7,7 +7,7 @@ metadata:
     service: product-management
     version: dev
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: product-management-service
@@ -57,11 +57,11 @@ spec:
         - "pip install django-mptt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "250m"
+            memory: "256Mi"
+            cpu: "100m"
           limits:
             memory: "1Gi"
-            cpu: "500m"
+            cpu: "200m"
         livenessProbe:
           httpGet:
             path: /health/

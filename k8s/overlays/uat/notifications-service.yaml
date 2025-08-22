@@ -7,7 +7,7 @@ metadata:
     service: notifications
     version: dev
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: notifications-service
@@ -72,11 +72,11 @@ spec:
               optional: true
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "250m"
+            memory: "128Mi"
+            cpu: "100m"
           limits:
-            memory: "512Mi"
-            cpu: "500m"
+            memory: "256Mi"
+            cpu: "200m"
         livenessProbe:
           httpGet:
             path: /health/
