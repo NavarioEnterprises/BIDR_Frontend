@@ -40,7 +40,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: bidr-secrets
-              key: NOTIFICATION_DATABASE_URL
+              key: NOTIFICATIONS_DATABASE_URL
         - name: REDIS_URL
           valueFrom:
             secretKeyRef:
