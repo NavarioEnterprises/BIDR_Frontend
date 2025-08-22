@@ -26,7 +26,7 @@ spec:
         - containerPort: 8000
         env:
         - name: DEBUG
-          value: "True"
+          value: "False"
         - name: DJANGO_SETTINGS_MODULE
           value: "product_management_service.settings"
         - name: SERVICE_NAME
@@ -64,17 +64,17 @@ spec:
             cpu: "500m"
         livenessProbe:
           httpGet:
-            path: /
+            path: /health/
             port: 8000
           initialDelaySeconds: 120
           periodSeconds: 30
           failureThreshold: 5
         readinessProbe:
           httpGet:
-            path: /
+            path: /health/
             port: 8000
-          initialDelaySeconds: 60
-          periodSeconds: 10
+          initialDelaySeconds: 120
+          periodSeconds: 15
           failureThreshold: 5
         volumeMounts:
         - name: media-volume
