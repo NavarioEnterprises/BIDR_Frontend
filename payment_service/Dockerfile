@@ -31,6 +31,9 @@ RUN pip install --no-cache-dir --upgrade pip \
 # Copy project
 COPY . /app/
 
+# Set working directory to payment service
+WORKDIR /app/payment_service
+
 # Create necessary directories and set permissions
 RUN mkdir -p /app/staticfiles /app/media /app/logs \
     && chown -R appuser:appuser /app

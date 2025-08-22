@@ -20,9 +20,15 @@ resources:
 - prometheus.yaml
 - grafana.yaml
 
-patchesStrategicMerge:
-- configmap-patch.yaml
-- nginx-proxy-patch.yaml
+patches:
+- path: configmap-patch.yaml
+  target:
+    kind: ConfigMap
+    name: bidr-config
+- path: nginx-proxy-patch.yaml
+  target:
+    kind: ConfigMap
+    name: nginx-proxy-config
 
 replicas:
 - name: auth-service
@@ -45,30 +51,32 @@ replicas:
 images:
 - name: bidrnparusdevregistry2024.azurecr.io/auth-service
   newName: bidruatregwe2024.azurecr.io/bidr-authentication_service
-  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
+  newTag: 4dfee97ff04cfa4abe511ed1982e100d10cde219
 - name: bidrnparusdevregistry2024.azurecr.io/chat-service
   newName: bidruatregwe2024.azurecr.io/bidr-chat_service
-  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
+  newTag: 4dfee97ff04cfa4abe511ed1982e100d10cde219
 - name: bidrnparusdevregistry2024.azurecr.io/payment-service
   newName: bidruatregwe2024.azurecr.io/bidr-payment_service
-  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
+  newTag: 4dfee97ff04cfa4abe511ed1982e100d10cde219
 - name: bidrnparusdevregistry2024.azurecr.io/resolution-service
   newName: bidruatregwe2024.azurecr.io/bidr-resolution_service
-  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
+  newTag: 4dfee97ff04cfa4abe511ed1982e100d10cde219
 - name: bidrnparusdevregistry2024.azurecr.io/product-management-service
   newName: bidruatregwe2024.azurecr.io/bidr-product_management_service
-  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
+  newTag: 4dfee97ff04cfa4abe511ed1982e100d10cde219
 - name: bidrnparusdevregistry2024.azurecr.io/notifications-service
   newName: bidruatregwe2024.azurecr.io/bidr-notifications_service
-  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
+  newTag: 4dfee97ff04cfa4abe511ed1982e100d10cde219
 - name: bidrnparusdevregistry2024.azurecr.io/transactions-service
   newName: bidruatregwe2024.azurecr.io/bidr-transactions_service
-  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
+  newTag: 4dfee97ff04cfa4abe511ed1982e100d10cde219
 - name: bidrnparusdevregistry2024.azurecr.io/reviews-service
   newName: bidruatregwe2024.azurecr.io/bidr-reviews_and_ratings
-  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
+  newTag: 4dfee97ff04cfa4abe511ed1982e100d10cde219
 
-commonLabels:
-  environment: uat
+labels:
+- includeSelectors: true
+  pairs:
+    environment: uat
 
 namespace: bidr-uat

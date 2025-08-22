@@ -31,6 +31,9 @@ RUN pip install --no-cache-dir --upgrade pip \
 # Copy project
 COPY . /app/
 
+# Set working directory to reviews and ratings service
+WORKDIR /app/reviews_and_ratings
+
 # Create necessary directories and set permissions
 RUN mkdir -p /app/staticfiles /app/media /app/logs \
     && chown -R appuser:appuser /app
