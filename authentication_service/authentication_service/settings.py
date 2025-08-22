@@ -106,24 +106,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'authentication_service.wsgi.application'
 
 # Database
+# Use DATABASE_URL from environment if provided, otherwise fall back to SQLite
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': config('DATABASE_ENGINE', default='django.db.backends.sqlite3'),
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
-# Production PostgreSQL configuration (commented out for development)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': config('DATABASE_ENGINE', default='django.db.backends.postgresql'),
-#         'NAME': config('DATABASE_NAME', default='bidr_db'),
-#         'USER': config('DATABASE_USER', default='postgres'),
-#         'PASSWORD': config('DATABASE_PASSWORD', default='postgres'),
-#         'HOST': config('DATABASE_HOST', default='postgres-service'),
-#         'PORT': config('DATABASE_PORT', default='5432'),
-#     }
-# }
+# Alternative manual PostgreSQL configuration
+if not DATABASES['default']['ENGINE']:
+    DATABASES = {
+        'default': {
+            'ENGINE': config('DATABASE_ENGINE', default='django.db.backends.postgresql'),
+            'NAME': config('DATABASE_NAME', default='bidr_db'),
+            'USER': config('DATABASE_USER', default='postgres'),
+            'PASSWORD': config('DATABASE_PASSWORD', default='postgres'),
+            'HOST': config('DATABASE_HOST', default='postgres-service'),
+            'PORT': config('DATABASE_PORT', default='5432'),
+        }
+    }
 
 # Custom User Model
 AUTH_USER_MODEL = 'user.AppUser'

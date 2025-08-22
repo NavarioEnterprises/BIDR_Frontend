@@ -1393,3 +1393,4 @@ INFO 2025-08-21 23:34:02,712 basehttp 39945 6134951936 "GET / HTTP/1.1" 200 2226
 INFO 2025-08-21 23:34:02,949 basehttp 39945 6134951936 "GET /?format=openapi HTTP/1.1" 200 131648
 INFO 2025-08-21 23:45:15,059 autoreload 39945 8651146688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/user/views.py changed, reloading.
 INFO 2025-08-21 23:45:15,609 autoreload 83422 8651146688 Watching for file changes with StatReloader
+INFO 2025-08-22 00:10:43,271 autoreload 83422 8651146688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/authentication_service/settings.py changed, reloading.

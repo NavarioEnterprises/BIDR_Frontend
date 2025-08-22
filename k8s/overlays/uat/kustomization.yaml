@@ -7,6 +7,7 @@ resources:
 - postgres.yaml
 - namespace-and-serviceaccount.yaml
 - namespace-rbac.yaml
+- auth-migration-job.yaml
 - auth-service.yaml
 - chat-service.yaml
 - payment-service.yaml
@@ -16,6 +17,8 @@ resources:
 - transactions-service.yaml
 - reviews-service.yaml
 - nginx-proxy.yaml
+- prometheus.yaml
+- grafana.yaml
 
 patchesStrategicMerge:
 - configmap-patch.yaml
@@ -42,28 +45,28 @@ replicas:
 images:
 - name: bidrnparusdevregistry2024.azurecr.io/auth-service
   newName: bidruatregwe2024.azurecr.io/bidr-authentication_service
-  newTag: uat-latest
+  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
 - name: bidrnparusdevregistry2024.azurecr.io/chat-service
   newName: bidruatregwe2024.azurecr.io/bidr-chat_service
-  newTag: uat-latest
+  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
 - name: bidrnparusdevregistry2024.azurecr.io/payment-service
   newName: bidruatregwe2024.azurecr.io/bidr-payment_service
-  newTag: uat-latest
+  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
 - name: bidrnparusdevregistry2024.azurecr.io/resolution-service
   newName: bidruatregwe2024.azurecr.io/bidr-resolution_service
-  newTag: uat-latest
+  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
 - name: bidrnparusdevregistry2024.azurecr.io/product-management-service
   newName: bidruatregwe2024.azurecr.io/bidr-product_management_service
-  newTag: uat-latest
+  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
 - name: bidrnparusdevregistry2024.azurecr.io/notifications-service
   newName: bidruatregwe2024.azurecr.io/bidr-notifications_service
-  newTag: uat-latest
+  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
 - name: bidrnparusdevregistry2024.azurecr.io/transactions-service
   newName: bidruatregwe2024.azurecr.io/bidr-transactions_service
-  newTag: uat-latest
+  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
 - name: bidrnparusdevregistry2024.azurecr.io/reviews-service
   newName: bidruatregwe2024.azurecr.io/bidr-reviews_and_ratings
-  newTag: uat-latest
+  newTag: d9353b9a60924725b95075b9ccca5fc55fc43226
 
 commonLabels:
   environment: uat

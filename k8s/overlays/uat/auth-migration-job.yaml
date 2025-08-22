@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: auth-migration-job
+  labels:
+    app: auth-migration
+    service: auth
+spec:
+  template:
+    metadata:
+      labels:
+        app: auth-migration
+        service: auth
+    spec:
+      serviceAccountName: bidr-service-account
+      restartPolicy: OnFailure
+      containers:
+      - name: auth-migration
+        image: bidrnparusdevregistry2024.azurecr.io/auth-service:latest
+        command: ["python", "manage.py", "migrate", "--noinput"]
+        env:
+        - name: DEBUG
+          value: "False"
+        - name: DJANGO_SETTINGS_MODULE
+          value: "authentication_service.settings"
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: DJANGO_SECRET_KEY
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: AUTH_DATABASE_URL
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: REDIS_URL
+        - name: EMAIL_HOST_USER
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: EMAIL_HOST_USER
+        - name: EMAIL_HOST_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: EMAIL_HOST_PASSWORD
+      imagePullSecrets:
+      - name: acr-secret
+  backoffLimit: 3

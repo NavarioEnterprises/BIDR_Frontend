@@ -17,6 +17,10 @@ spec:
         app: auth-service
         service: auth
         version: dev
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
     spec:
       serviceAccountName: bidr-service-account
       containers:
