@@ -21,7 +21,7 @@ spec:
       serviceAccountName: bidr-service-account
       containers:
       - name: product-management-service
-        image: bidruatregwe2024.azurecr.io/bidr-product_management_service:5758ebb7d96984b4baeeb3ecdaf760937fb57205
+        image: bidruatregwe2024.azurecr.io/bidr-product_management_service:latest
         ports:
         - containerPort: 8000
         env:
