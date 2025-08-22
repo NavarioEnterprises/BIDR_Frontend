@@ -176,6 +176,7 @@ jobs:
         # Delete specific deployments known to have selector conflicts
         # This prevents the "field is immutable" error when selectors change
         kubectl delete deployment product-management-service -n bidr-uat --ignore-not-found=true
+        kubectl delete deployment reviews-service -n bidr-uat --ignore-not-found=true
         
         # Update image tags in Kubernetes manifests
         for service in authentication_service chat_service payment_service resolution_service product_management_service notifications_service transactions_service reviews_and_ratings; do
