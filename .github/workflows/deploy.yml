@@ -107,8 +107,6 @@ jobs:
           ${{ env.REGISTRY }}/${{ matrix.service.name }}:latest
           ${{ env.REGISTRY }}/${{ matrix.service.name }}:${{ github.sha }}
         platforms: linux/amd64
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
 
     - name: Azure Login
       if: matrix.service.changed == 'true'

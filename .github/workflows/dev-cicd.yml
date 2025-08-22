@@ -83,8 +83,6 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/auth-service:latest
             ${{ env.REGISTRY }}/auth-service:dev-${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Deploy Authentication Service
         uses: azure/k8s-deploy@v1
@@ -123,8 +121,6 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/chat-service:latest
             ${{ env.REGISTRY }}/chat-service:dev-${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Deploy Chat Service
         uses: azure/k8s-deploy@v1
@@ -163,8 +159,6 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/payment-service:latest
             ${{ env.REGISTRY }}/payment-service:dev-${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Deploy Payment Service
         uses: azure/k8s-deploy@v1
@@ -203,8 +197,6 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/product-service:latest
             ${{ env.REGISTRY }}/product-service:dev-${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Deploy Product Service
         uses: azure/k8s-deploy@v1
@@ -243,8 +235,6 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/notifications-service:latest
             ${{ env.REGISTRY }}/notifications-service:dev-${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Deploy Notifications Service
         uses: azure/k8s-deploy@v1
@@ -283,8 +273,6 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/transactions-service:latest
             ${{ env.REGISTRY }}/transactions-service:dev-${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Deploy Transactions Service
         uses: azure/k8s-deploy@v1
@@ -323,8 +311,6 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/reviews-service:latest
             ${{ env.REGISTRY }}/reviews-service:dev-${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Deploy Reviews Service
         uses: azure/k8s-deploy@v1
@@ -363,8 +349,6 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/resolution-service:latest
             ${{ env.REGISTRY }}/resolution-service:dev-${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Deploy Resolution Service
         uses: azure/k8s-deploy@v1
