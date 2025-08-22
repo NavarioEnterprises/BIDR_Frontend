@@ -28,6 +28,9 @@ RUN pip install --no-cache-dir --upgrade pip \
 # Copy project files
 COPY . .
 
+# Set working directory to authentication service
+WORKDIR /app/authentication_service
+
 # Create necessary directories and set permissions
 RUN mkdir -p /app/staticfiles /app/media /app/logs \
     && chown -R appuser:appuser /app

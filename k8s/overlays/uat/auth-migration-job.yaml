@@ -17,6 +17,7 @@ spec:
       containers:
       - name: auth-migration
         image: bidrnparusdevregistry2024.azurecr.io/auth-service:latest
+        workingDir: /app/authentication_service
         command: ["python", "manage.py", "migrate", "--noinput"]
         env:
         - name: DEBUG
