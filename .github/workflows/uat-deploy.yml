@@ -170,6 +170,9 @@ jobs:
 
     - name: Deploy to Kubernetes (UAT)
       run: |
+        # Delete existing migration job if it exists (Jobs are immutable)
+        kubectl delete job auth-migration-job -n bidr-uat --ignore-not-found=true
+        
         # Update image tags in Kubernetes manifests
         for service in authentication_service chat_service payment_service resolution_service product_management_service notifications_service transactions_service reviews_and_ratings; do
           # Update the image tag in the deployment
