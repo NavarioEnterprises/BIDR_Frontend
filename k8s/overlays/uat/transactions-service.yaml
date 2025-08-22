@@ -40,7 +40,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: bidr-secrets
-              key: TRANSACTION_DATABASE_URL
+              key: TRANSACTIONS_DATABASE_URL
         - name: REDIS_URL
           valueFrom:
             secretKeyRef:
