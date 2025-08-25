@@ -1,5 +1,5 @@
-
 import 'package:bidr/pages/buyer_home.dart';
+import 'package:bidr/pages/buyer_dashboard.dart';
 import 'package:bidr/pages/home_router.dart';
 import 'package:bidr/pages/faq_screen.dart';
 import 'package:bidr/pages/policies_screen.dart';
@@ -14,8 +14,8 @@ import 'authentication/registration/business_signup.dart';
 import 'authentication/registration/buyer_signup.dart';
 import 'authentication/splashscreen.dart';
 import 'constants/Constants.dart';
-
-
+import 'models/user.dart';
+import 'dart:convert';
 
 Future<void> main() async {
   //fvp.registerWith();
@@ -30,10 +30,35 @@ Future<void> main() async {
 
   // Setup initial data if logged in
   if (isLoggedIn) {
-    Constants.myUid = (await Sharedprefs.getUserUidSharedPreference()) ?? "";
-    Constants.userId = (await Sharedprefs.getUserIdSharedPreference()) ?? -1;
-    print("sffgfg ${Constants.userId}");
-    Constants.myCell = (await Sharedprefs.getUserCellSharedPreference()) ?? "";
+    // Try to load complete login data first
+    final String? completeLoginData =
+        await Sharedprefs.getCompleteLoginDataSharedPreference();
+
+    if (completeLoginData != null && completeLoginData.isNotEmpty) {
+      try {
+        // Parse the complete login data and set current user
+        final loginResponse = LoginResponse.fromJsonString(completeLoginData);
+        Constants.currentUser = loginResponse.user;
+
+        // Set individual constants from the user model
+        Constants.myUid = loginResponse.user.uid;
+        Constants.userId = loginResponse.user.id;
+        Constants.myCell = loginResponse.user.phoneNumber;
+        Constants.myDisplayname = loginResponse.user.fullName;
+        Constants.myCategoryRole = loginResponse.user.role;
+        Constants.myUsername = loginResponse.user.fullName;
+        Constants.myEmail = loginResponse.user.email;
+      } catch (e) {
+        print('Error parsing stored login data: $e');
+        // Fallback to individual SharedPreferences
+        await _loadIndividualUserData();
+      }
+    } else {
+      // Fallback to individual SharedPreferences
+      await _loadIndividualUserData();
+    }
+
+    // Load business data
     Constants.business_name =
         (await Sharedprefs.getBusinessNameSharedPreference()) ?? "";
     Constants.business_email =
@@ -44,22 +69,25 @@ Future<void> main() async {
         (await Sharedprefs.getBusinessIdSharedPreference()) ?? -1;
     Constants.business_uid =
         (await Sharedprefs.getBusinessUidSharedPreference()) ?? "";
-
-    Constants.myDisplayname =
-        (await Sharedprefs.getUserNameSharedPreference()) ?? '';
-    Constants.myCategoryRole =
-        (await Sharedprefs.getUserRoleSharedPreference()) ?? '';
-    Constants.myUsername = Constants.myDisplayname;
-    Constants.myEmail =
-        (await Sharedprefs.getUserEmailSharedPreference()) ?? '';
   }
 
-  // Determine initial route
-  final initialRoute = isLoggedIn
-      ? '/dashboard'
-      : '/';
+  // Determine initial route based on actual authentication state
+  final bool hasValidUser = Constants.currentUser != null;
+  final initialRoute = hasValidUser ? '/dashboard' : '/';
 
   runApp(MyApp(initialRoute: initialRoute));
+}
+
+Future<void> _loadIndividualUserData() async {
+  Constants.myUid = (await Sharedprefs.getUserUidSharedPreference()) ?? "";
+  Constants.userId = (await Sharedprefs.getUserIdSharedPreference()) ?? -1;
+  Constants.myCell = (await Sharedprefs.getUserCellSharedPreference()) ?? "";
+  Constants.myDisplayname =
+      (await Sharedprefs.getUserNameSharedPreference()) ?? '';
+  Constants.myCategoryRole =
+      (await Sharedprefs.getUserRoleSharedPreference()) ?? '';
+  Constants.myUsername = Constants.myDisplayname;
+  Constants.myEmail = (await Sharedprefs.getUserEmailSharedPreference()) ?? '';
 }
 
 class MyApp extends StatelessWidget {
@@ -70,7 +98,12 @@ class MyApp extends StatelessWidget {
   late final GoRouter _router = GoRouter(
     initialLocation: initialRoute,
     redirect: (BuildContext context, GoRouterState state) async {
-      final isLoggedIn = await Sharedprefs.getUserLoggedInSharedPreference() ?? false;
+      // Check both SharedPreferences and Constants for authentication state
+      final isLoggedIn =
+          await Sharedprefs.getUserLoggedInSharedPreference() ?? false;
+      final hasCurrentUser = Constants.currentUser != null;
+      final isAuthenticated = isLoggedIn && hasCurrentUser;
+
       final publicRoutes = [
         '/',
         '/login',
@@ -78,19 +111,32 @@ class MyApp extends StatelessWidget {
         '/register/buyer',
         '/register/seller',
         '/faq',
-        '/policies'
+        '/policies',
       ];
-      
-      if (!isLoggedIn && !publicRoutes.contains(state.matchedLocation)) {
-        return '/';
+
+      final protectedRoutes = [
+        '/dashboard',
+      ];
+
+      // If not authenticated, redirect to login for protected routes
+      if (!isAuthenticated && (protectedRoutes.contains(state.matchedLocation) || !publicRoutes.contains(state.matchedLocation))) {
+        return '/login';
       }
-      
-      // Allow logged-in users to access FAQ and policies
-      final infoRoutes = ['/faq', '/policies', '/terms', '/privacy', '/help', '/support'];
-      if (isLoggedIn && publicRoutes.contains(state.matchedLocation) && !infoRoutes.contains(state.matchedLocation)) {
+
+      // Allow authenticated users to access FAQ and policies
+      final infoRoutes = [
+        '/faq',
+        '/policies',
+        '/terms',
+        '/privacy',
+        '/help',
+        '/support',
+      ];
+      if (isAuthenticated &&
+          publicRoutes.contains(state.matchedLocation) &&
+          !infoRoutes.contains(state.matchedLocation)) {
         return '/dashboard';
       }
-      
       return null;
     },
     routes: [
@@ -98,10 +144,9 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: '/',
         name: 'home',
-        builder: (BuildContext context, GoRouterState state) =>
-             LoginPage(),
+        builder: (BuildContext context, GoRouterState state) => BuyerHomePage(),
       ),
-      
+
       // Authentication Routes
       GoRoute(
         path: '/login',
@@ -109,7 +154,7 @@ class MyApp extends StatelessWidget {
         builder: (BuildContext context, GoRouterState state) =>
             const LoginPage(),
       ),
-      
+
       // Registration Routes
       GoRoute(
         path: '/register',
@@ -129,7 +174,7 @@ class MyApp extends StatelessWidget {
         builder: (BuildContext context, GoRouterState state) =>
             const BusinessSignUpPage(),
       ),
-      
+
       // Dashboard Route (Role-based home)
       GoRoute(
         path: '/dashboard',
@@ -137,7 +182,7 @@ class MyApp extends StatelessWidget {
         builder: (BuildContext context, GoRouterState state) =>
             const HomeRouter(),
       ),
-      
+
       // Information Routes
       GoRoute(
         path: '/faq',
@@ -151,7 +196,7 @@ class MyApp extends StatelessWidget {
         builder: (BuildContext context, GoRouterState state) =>
             const PoliciesScreen(),
       ),
-      
+
       // Additional Information Routes
       GoRoute(
         path: '/terms',
@@ -183,9 +228,7 @@ class MyApp extends StatelessWidget {
       title: 'BIDR',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
-        textTheme: GoogleFonts.manropeTextTheme(
-          Theme.of(context).textTheme,
-        ),
+        textTheme: GoogleFonts.manropeTextTheme(Theme.of(context).textTheme),
         useMaterial3: true,
       ),
       routerConfig: _router,

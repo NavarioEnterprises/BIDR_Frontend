@@ -24,6 +24,7 @@ class Sharedprefs {
   static String sharedPreferenceBusinessEmailKey = "USEREBUSINESEMAILKEY";
   static String sharedPreferenceBusinessNameKey = "USEREBUSINESSNAMEKEY";
   static String sharedPreferenceBusinessPhoneNumberKey = "USEREBUSINESSPHONENUMBERKEY";
+  static String sharedPreferenceCompleteLoginDataKey = "USERCOMPLETELOGINDATAKEY";
 
   static Future<bool> saveUserLoggedInSharedPreference(
       bool isUserLoggedIn) async {
@@ -131,6 +132,11 @@ class Sharedprefs {
     return await preferences.setString(sharedPreferenceCellKey, userCell);
   }
 
+  static Future<bool> saveCompleteLoginDataSharedPreference(String loginData) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.setString(sharedPreferenceCompleteLoginDataKey, loginData);
+  }
+
   //Get Prefs
   static Future<int?> getBusinessIdSharedPreference() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -226,6 +232,11 @@ class Sharedprefs {
   static Future<String?> getUserPasswordPreference() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.getString(sharedPasswordPrefKey);
+  }
+
+  static Future<String?> getCompleteLoginDataSharedPreference() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.getString(sharedPreferenceCompleteLoginDataKey);
   }
 }
 

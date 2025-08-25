@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../models/user.dart';
 
 class Constants {
   static bool isLoggedIn = false;
@@ -25,11 +26,13 @@ class Constants {
   static int userId = -1;
   static int businessId = -1;
   static int defaultServiceId = 1; //192.168.43.107 172.20.10.2
-  static String bidrBaseUrl = "http://127.0.0.1:8001/"; //#FEEDD5 //Colors.grey[800]
+  static String bidrBaseUrl =
+      "http://108.141.192.60/"; //#FEEDD5 //Colors.grey[800]
   static String myUsername = "";
+  static User? currentUser;
   static Color ctaColorLight = Colors.orange;
   static Color ftaColorLight = const Color(0xFF042C4C);
-  static Color gtaColorLight =  Colors.grey.shade800;
+  static Color gtaColorLight = Colors.grey.shade800;
   static Color dtaColorLight = const Color(0xFFFEEDD5);
   static DateFormat formatter = DateFormat('yyyy-MM-dd');
 }

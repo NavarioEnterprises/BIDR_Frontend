@@ -14,17 +14,23 @@ import 'buyer/share_with_friends.dart';
 import 'buyer/transaction_management.dart';
 import 'group_chat.dart';
 
-class DashboardScreen extends StatefulWidget {
+class BuyerDashboardScreen extends StatefulWidget {
   @override
-  _DashboardScreenState createState() => _DashboardScreenState();
+  _BuyerDashboardScreenState createState() => _BuyerDashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   @override
   void initState() {
     super.initState();
   }
-  int dashboardIndex =0;
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  int dashboardIndex = 0;
   bool isActive = false;
   @override
   Widget build(BuildContext context) {
@@ -46,30 +52,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildNavItem(
-                          (){
-                            dashboardIndex =0;
-                    setState(() {
-
-                    });
-                  },HugeIcons.strokeRoundedDashboardSquare01, "Categories",dashboardIndex==0?true:false),
-                  _buildNavItem((){
-                    dashboardIndex =1;
-                    setState(() {
-
-                    });
-                  },HugeIcons.strokeRoundedShare01, "Refer A Friend/Business", dashboardIndex==1?true:false),
-                  _buildNavItem((){
-                    dashboardIndex =2;
-                    setState(() {
-
-                    });
-                  },HugeIcons.strokeRoundedTransaction, "Transaction Management", dashboardIndex==2?true:false),
-                  _buildNavItem((){
-                    dashboardIndex =3;
-                    setState(() {
-
-                    });
-                  },HugeIcons.strokeRoundedUserAccount, "Account Management", dashboardIndex==3?true:false),
+                    () {
+                      dashboardIndex = 0;
+                      setState(() {});
+                    },
+                    HugeIcons.strokeRoundedDashboardSquare01,
+                    "Categories",
+                    dashboardIndex == 0 ? true : false,
+                  ),
+                  _buildNavItem(
+                    () {
+                      dashboardIndex = 1;
+                      setState(() {});
+                    },
+                    HugeIcons.strokeRoundedShare01,
+                    "Refer A Friend/Business",
+                    dashboardIndex == 1 ? true : false,
+                  ),
+                  _buildNavItem(
+                    () {
+                      dashboardIndex = 2;
+                      setState(() {});
+                    },
+                    HugeIcons.strokeRoundedTransaction,
+                    "Transaction Management",
+                    dashboardIndex == 2 ? true : false,
+                  ),
+                  _buildNavItem(
+                    () {
+                      dashboardIndex = 3;
+                      setState(() {});
+                    },
+                    HugeIcons.strokeRoundedUserAccount,
+                    "Account Management",
+                    dashboardIndex == 3 ? true : false,
+                  ),
                 ],
               ),
             ),
@@ -88,26 +105,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       width: MediaQuery.of(context).size.width,
                       height: 600,
                       constraints: BoxConstraints(maxWidth: 1400),
-                      child: dashboardIndex ==0?
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _buildAllRequestCards(),
-                      ):
-                      dashboardIndex ==1?
-                      Container(
-                          width: MediaQuery.of(context).size.width*0.35,
-                          height: 400,
-                          child: ShareWidget()):
-                      dashboardIndex ==2?
-                      TransactionDashboard():
-                      dashboardIndex ==3?
-                      AccountManagementPage():
-                      Container(),
+                      child: dashboardIndex == 0
+                          ? Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _buildAllRequestCards(),
+                            )
+                          : dashboardIndex == 1
+                          ? Container(
+                              width: MediaQuery.of(context).size.width * 0.35,
+                              height: 400,
+                              child: ShareWidget(),
+                            )
+                          : dashboardIndex == 2
+                          ? TransactionDashboard()
+                          : dashboardIndex == 3
+                          ? AccountManagementPage()
+                          : Container(),
                     ),
                   ),
                 ),
                 SizedBox(height: 24),
-                FooterSection(logo: "lib/assets/images/bidr_logo2.png")
+                FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
               ],
             ),
           ),
@@ -122,46 +140,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
     try {
       // Auto Spares Requests
       if (GlobalVariables.combinedRequest.autoSparesRequest.isNotEmpty) {
-        final autoSpareCards = GlobalVariables.combinedRequest.autoSparesRequest.map((spare) {
-          if (spare.status== "Waiting") {
-            return _buildWaitingRequestCard(spare);
-          } else {
-            return _buildActiveRequestCard(spare);
-          }
-        }).toList();
+        final autoSpareCards = GlobalVariables.combinedRequest.autoSparesRequest
+            .map((spare) {
+              if (spare.status == "Waiting") {
+                return _buildWaitingRequestCard(spare);
+              } else {
+                return _buildActiveRequestCard(spare);
+              }
+            })
+            .toList();
 
         cards.addAll(autoSpareCards);
         if (autoSpareCards.isNotEmpty) cards.add(SizedBox(width: 22));
       }
 
       // Rim Tyre Requests
-      if ( GlobalVariables.combinedRequest.rimTyreRequest.isNotEmpty) {
-        final rimTyreCards = GlobalVariables.combinedRequest.rimTyreRequest.map((tyre) {
-          if (tyre== "Waiting") {
-            return _buildWaitingRequestCard(tyre);
-          } else {
-            return _buildActiveRequestCard(tyre);
-          }
-        }).toList();
+      if (GlobalVariables.combinedRequest.rimTyreRequest.isNotEmpty) {
+        final rimTyreCards = GlobalVariables.combinedRequest.rimTyreRequest.map(
+          (tyre) {
+            if (tyre == "Waiting") {
+              return _buildWaitingRequestCard(tyre);
+            } else {
+              return _buildActiveRequestCard(tyre);
+            }
+          },
+        ).toList();
 
         cards.addAll(rimTyreCards);
         if (rimTyreCards.isNotEmpty) cards.add(SizedBox(width: 22));
       }
 
       // Consumer Electronics Requests
-      if ( GlobalVariables.combinedRequest.consumerElectronicsRequest.isNotEmpty) {
-        final electronicsCards = GlobalVariables.combinedRequest.consumerElectronicsRequest.map((electronics) {
-          if (electronics.status == "Waiting") {
-            return _buildWaitingRequestCard(electronics);
-          } else {
-            return _buildActiveRequestCard(electronics);
-          }
-        }).toList();
+      if (GlobalVariables
+          .combinedRequest
+          .consumerElectronicsRequest
+          .isNotEmpty) {
+        final electronicsCards = GlobalVariables
+            .combinedRequest
+            .consumerElectronicsRequest
+            .map((electronics) {
+              if (electronics.status == "Waiting") {
+                return _buildWaitingRequestCard(electronics);
+              } else {
+                return _buildActiveRequestCard(electronics);
+              }
+            })
+            .toList();
 
         cards.addAll(electronicsCards);
         if (electronicsCards.isNotEmpty) cards.add(SizedBox(width: 22));
       }
-
     } catch (e) {
       print('Error building request cards: $e');
       cards.add(_buildErrorCard("Error loading requests"));
@@ -174,7 +202,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return cards;
   }
-
 
   Widget _buildErrorCard(String message) {
     return Container(
@@ -237,15 +264,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildNavItem(VoidCallback voidCallBack, IconData icon, String title, bool isActive) {
+  Widget _buildNavItem(
+    VoidCallback voidCallBack,
+    IconData icon,
+    String title,
+    bool isActive,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         TextButton.icon(
           onPressed: voidCallBack,
-          icon: Icon(
-            icon, color: Colors.white, size: 22,
-       ),
+          icon: Icon(icon, color: Colors.white, size: 22),
           label: Text(
             title,
             style: GoogleFonts.manrope(
@@ -285,8 +315,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         case "Vehicle Tyres and Rims":
           if (request?.productDetails != null) {
-            final typeOfElectronics = request.productDetails.typeOfElectronics ?? "Electronics";
-            final brandPreference = request.productDetails.brandPreference ?? "Various Brands";
+            final typeOfElectronics =
+                request.productDetails.typeOfElectronics ?? "Electronics";
+            final brandPreference =
+                request.productDetails.brandPreference ?? "Various Brands";
             final modelSeries = request.productDetails.modelSeries;
             return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
           }
@@ -297,8 +329,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             final tyreType = request.productDetails.tyreType ?? "Tyres";
             final tyreWidth = request.productDetails.tyreWidthMm ?? 0;
             final sidewall = request.productDetails.sidewallProfile ?? "";
-            final rimDiameter = request.productDetails.wheelRimDiameterInches ?? "";
-            final brand = request.moreFields?.preferredBrand ?? "Various Brands";
+            final rimDiameter =
+                request.productDetails.wheelRimDiameterInches ?? "";
+            final brand =
+                request.moreFields?.preferredBrand ?? "Various Brands";
             return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
           }
           return "Tyre/Rim Request";
@@ -371,17 +405,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: GoogleFonts.manrope(),
-        ),
+        content: Text(message, style: GoogleFonts.manrope()),
         backgroundColor: Colors.red[600],
         duration: Duration(seconds: 3),
       ),
     );
   }
 
-  Widget _buildWaitingRequestCard(dynamic request,) {
+  Widget _buildWaitingRequestCard(dynamic request) {
     return GestureDetector(
       onTap: () => _navigateToDetailScreen(request),
       child: Container(
@@ -431,8 +462,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       onPressed: () {
                         setState(() {});
                       },
-                      icon: Icon(HugeIcons.strokeRoundedFilter, color: Colors.grey[600], size: 18),
-                    )
+                      icon: Icon(
+                        HugeIcons.strokeRoundedFilter,
+                        color: Colors.grey[600],
+                        size: 18,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -451,7 +486,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // Description label
             Container(
               decoration: BoxDecoration(
-                border: Border(left: BorderSide(color: Colors.orange, width: 3)),
+                border: Border(
+                  left: BorderSide(color: Colors.orange, width: 3),
+                ),
               ),
               padding: EdgeInsets.only(left: 8),
               child: Column(
@@ -493,13 +530,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Center(
                   child: Row(
                     children: [
-                      _buildStatusDot("D", (request?.createdAt?.day ?? 0).toString()),
+                      _buildStatusDot(
+                        "D",
+                        (request?.createdAt?.day ?? 0).toString(),
+                      ),
                       SizedBox(width: 8),
-                      _buildStatusDot("H", (request?.createdAt?.hour ?? 0).toString()),
+                      _buildStatusDot(
+                        "H",
+                        (request?.createdAt?.hour ?? 0).toString(),
+                      ),
                       SizedBox(width: 8),
-                      _buildStatusDot("M", (request?.createdAt?.minute ?? 0).toString()),
+                      _buildStatusDot(
+                        "M",
+                        (request?.createdAt?.minute ?? 0).toString(),
+                      ),
                       SizedBox(width: 8),
-                      _buildStatusDot("S", (request?.createdAt?.second ?? 0).toString()),
+                      _buildStatusDot(
+                        "S",
+                        (request?.createdAt?.second ?? 0).toString(),
+                      ),
                     ],
                   ),
                 ),
@@ -620,8 +669,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       onPressed: () {
                         setState(() {});
                       },
-                      icon: Icon(HugeIcons.strokeRoundedFilter, color: Colors.grey[600], size: 18),
-                    )
+                      icon: Icon(
+                        HugeIcons.strokeRoundedFilter,
+                        color: Colors.grey[600],
+                        size: 18,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -640,7 +693,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // Description label
             Container(
               decoration: BoxDecoration(
-                border: Border(left: BorderSide(color: Colors.orange, width: 3)),
+                border: Border(
+                  left: BorderSide(color: Colors.orange, width: 3),
+                ),
               ),
               padding: EdgeInsets.only(left: 8),
               child: Column(
@@ -658,17 +713,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           fontSize: 14,
                         ),
                       ),
-                   TextButton(
-                onPressed: () => _navigateToDetailScreen(request),
-                child: Text(
-                  "View Details",
-                  style: GoogleFonts.manrope(
-                    color: Color(0xFF2B3A5C),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
+                      TextButton(
+                        onPressed: () => _navigateToDetailScreen(request),
+                        child: Text(
+                          "View Details",
+                          style: GoogleFonts.manrope(
+                            color: Color(0xFF2B3A5C),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: 4),
@@ -696,13 +751,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Row(
               children: [
                 Spacer(),
-                _buildStatusDot("D", _getElapsedTime(request.createdAt, 'days')),
+                _buildStatusDot(
+                  "D",
+                  _getElapsedTime(request.createdAt, 'days'),
+                ),
                 SizedBox(width: 8),
-                _buildStatusDot("H", _getElapsedTime(request.createdAt, 'hours')),
+                _buildStatusDot(
+                  "H",
+                  _getElapsedTime(request.createdAt, 'hours'),
+                ),
                 SizedBox(width: 8),
-                _buildStatusDot("M", _getElapsedTime(request.createdAt, 'minutes')),
+                _buildStatusDot(
+                  "M",
+                  _getElapsedTime(request.createdAt, 'minutes'),
+                ),
                 SizedBox(width: 8),
-                _buildStatusDot("S", _getElapsedTime(request.createdAt, 'seconds')),
+                _buildStatusDot(
+                  "S",
+                  _getElapsedTime(request.createdAt, 'seconds'),
+                ),
                 Spacer(),
               ],
             ),
@@ -710,11 +777,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // Seller bids
             Expanded(
               child: SingleChildScrollView(
-
                 child: Column(
                   children: [
-                    if (request?.sellerOffers != null && request.sellerOffers.isNotEmpty) ...[
-                      ...request.sellerOffers.take(2).map((bid) =>  _buildSellerBid(bid,request)),
+                    if (request?.sellerOffers != null &&
+                        request.sellerOffers.isNotEmpty) ...[
+                      ...request.sellerOffers
+                          .take(2)
+                          .map((bid) => _buildSellerBid(bid, request)),
                       SizedBox(height: 16),
                       // View All Bids button
                       Row(
@@ -802,16 +871,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       margin: EdgeInsets.only(bottom: 12),
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Constants.ftaColorLight),
-          color: Colors.transparent
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Constants.ftaColorLight),
+        color: Colors.transparent,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 16),
           Padding(
-            padding: const EdgeInsets.only(left: 12,right: 12),
+            padding: const EdgeInsets.only(left: 12, right: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -827,7 +896,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
                 TextButton(
-                  onPressed: (){
+                  onPressed: () {
                     _showConfirmationDialog(context, seller);
                   },
                   style: TextButton.styleFrom(
@@ -851,18 +920,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           SizedBox(height: 4),
           Padding(
-            padding: const EdgeInsets.only(left: 12,right: 12),
+            padding: const EdgeInsets.only(left: 12, right: 12),
             child: Text(
               _formatBidDateTime(seller.bidTime),
-              style: GoogleFonts.manrope(
-                color: Colors.grey[600],
-                fontSize: 11,
-              ),
+              style: GoogleFonts.manrope(color: Colors.grey[600], fontSize: 11),
             ),
           ),
           SizedBox(height: 6),
           Padding(
-            padding: const EdgeInsets.only(left: 12,right: 12),
+            padding: const EdgeInsets.only(left: 12, right: 12),
             child: RichText(
               text: TextSpan(
                 text: 'Bid: ',
@@ -874,7 +940,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: <TextSpan>[
                   TextSpan(
                     text: " R${seller.bid?.toInt() ?? 0}",
-                    style:  GoogleFonts.manrope(
+                    style: GoogleFonts.manrope(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -886,7 +952,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           SizedBox(height: 6),
           Padding(
-            padding: const EdgeInsets.only(left: 12,right: 12),
+            padding: const EdgeInsets.only(left: 12, right: 12),
             child: RichText(
               text: TextSpan(
                 text: 'Radius/Distance: ',
@@ -898,7 +964,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: <TextSpan>[
                   TextSpan(
                     text: "${seller.radius}Km",
-                    style:  GoogleFonts.manrope(
+                    style: GoogleFonts.manrope(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -910,7 +976,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           SizedBox(height: 6),
           Padding(
-            padding: const EdgeInsets.only(left: 12,right: 12),
+            padding: const EdgeInsets.only(left: 12, right: 12),
             child: RichText(
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -925,7 +991,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   TextSpan(
                     text: seller.comment,
 
-                    style:  GoogleFonts.manrope(
+                    style: GoogleFonts.manrope(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -943,7 +1009,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
                     color: Constants.ftaColorLight,
-                    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(24),bottomRight: Radius.circular(24)),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(24),
+                      bottomRight: Radius.circular(24),
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
@@ -958,75 +1027,140 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       Spacer(),
                       OutlinedButton.icon(
-                        onPressed: (){
+                        onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => GroupChatScreen(
-                                groupChat: GroupChat(uuid: request.id.toString(), request: ProductRequest(description: _getRequestDescription(request),), messages: [Message(
-                                  sender: User(name: Constants.myDisplayname, role: "Buyer"),
-                                  content: "Hello, I need a quote for a fuel filter for my Toyota Corolla 2015. Please provide availability and details.",
-                                  timestamp: DateTime.now().subtract(Duration(minutes: 10)),
-                                ),
-                                  Message(
-                                    sender: User(name: "Seller 1", role: "Seller"),
-                                    content: "Understood! We have options available that match your vehicle model. Would you like delivery, or pick-up from a nearby location?",
-                                    timestamp: DateTime.now().subtract(Duration(minutes: 4)),
-                                    isReply: true,
+                                groupChat: GroupChat(
+                                  uuid: request.id.toString(),
+                                  request: ProductRequest(
+                                    description: _getRequestDescription(
+                                      request,
+                                    ),
                                   ),
-                                  Message(
-                                    sender: User(name: Constants.myDisplayname, role: "Buyer"),
-                                    content: "I prefer an OEM part, but I'm open to aftermarket options if they meet quality standards.",
-                                    timestamp: DateTime.now().subtract(Duration(minutes: 8)),
-                                  ),
-                                  Message(
-                                      sender: User(name: "Seller 1", role: "Seller"),
-                                      content: "Hi John, are you specifically looking for an OEM fuel filter, or would you consider a high-quality aftermarket option?",
-                                      timestamp: DateTime.now().subtract(Duration(minutes: 9)),
-                                      isReply: true,
-                                      replies: [  Message(
-                                        sender: User(name: "Seller 1", role: "Seller"),
-                                        content: "Do you want OEM or aftermarket?",
-                                        timestamp: DateTime.now(),
-                                        isReply: true,
+                                  messages: [
+                                    Message(
+                                      sender: User(
+                                        name: Constants.myDisplayname,
+                                        role: "Buyer",
                                       ),
+                                      content:
+                                          "Hello, I need a quote for a fuel filter for my Toyota Corolla 2015. Please provide availability and details.",
+                                      timestamp: DateTime.now().subtract(
+                                        Duration(minutes: 10),
+                                      ),
+                                    ),
+                                    Message(
+                                      sender: User(
+                                        name: "Seller 1",
+                                        role: "Seller",
+                                      ),
+                                      content:
+                                          "Understood! We have options available that match your vehicle model. Would you like delivery, or pick-up from a nearby location?",
+                                      timestamp: DateTime.now().subtract(
+                                        Duration(minutes: 4),
+                                      ),
+                                      isReply: true,
+                                    ),
+                                    Message(
+                                      sender: User(
+                                        name: Constants.myDisplayname,
+                                        role: "Buyer",
+                                      ),
+                                      content:
+                                          "I prefer an OEM part, but I'm open to aftermarket options if they meet quality standards.",
+                                      timestamp: DateTime.now().subtract(
+                                        Duration(minutes: 8),
+                                      ),
+                                    ),
+                                    Message(
+                                      sender: User(
+                                        name: "Seller 1",
+                                        role: "Seller",
+                                      ),
+                                      content:
+                                          "Hi John, are you specifically looking for an OEM fuel filter, or would you consider a high-quality aftermarket option?",
+                                      timestamp: DateTime.now().subtract(
+                                        Duration(minutes: 9),
+                                      ),
+                                      isReply: true,
+                                      replies: [
                                         Message(
-                                          sender: User(name: "Seller 2", role: "Seller"),
-                                          content: "We have both options in stock.",
+                                          sender: User(
+                                            name: "Seller 1",
+                                            role: "Seller",
+                                          ),
+                                          content:
+                                              "Do you want OEM or aftermarket?",
                                           timestamp: DateTime.now(),
                                           isReply: true,
-                                        ),]
-                                  ),
-                                  Message(
-                                    sender: User(name: Constants.myDisplayname, role: "Buyer"),
-                                    content: "Just the filter for now, but I'd like to know if installation is an option.",
-                                    timestamp: DateTime.now().subtract(Duration(minutes: 5)),
-                                  ),
-                                  Message(
-                                    sender: User(name: "Seller 2", role: "Seller"),
-                                    content: "Thanks for reaching out! Do you need only the filter, or are you also interested in an installation service?",
-                                    timestamp: DateTime.now().subtract(Duration(minutes: 7)),
-                                    isReply: true,
-                                  ),
-                                  Message(
-                                    sender: User(name: Constants.myDisplayname, role: "Buyer"),
-                                    content: "I only need the filter for now, but I appreciate the suggestion. Please share the details so I can compare my options.",
-                                    timestamp: DateTime.now().subtract(Duration(minutes: 3)),
-                                  ),
+                                        ),
+                                        Message(
+                                          sender: User(
+                                            name: "Seller 2",
+                                            role: "Seller",
+                                          ),
+                                          content:
+                                              "We have both options in stock.",
+                                          timestamp: DateTime.now(),
+                                          isReply: true,
+                                        ),
+                                      ],
+                                    ),
+                                    Message(
+                                      sender: User(
+                                        name: Constants.myDisplayname,
+                                        role: "Buyer",
+                                      ),
+                                      content:
+                                          "Just the filter for now, but I'd like to know if installation is an option.",
+                                      timestamp: DateTime.now().subtract(
+                                        Duration(minutes: 5),
+                                      ),
+                                    ),
+                                    Message(
+                                      sender: User(
+                                        name: "Seller 2",
+                                        role: "Seller",
+                                      ),
+                                      content:
+                                          "Thanks for reaching out! Do you need only the filter, or are you also interested in an installation service?",
+                                      timestamp: DateTime.now().subtract(
+                                        Duration(minutes: 7),
+                                      ),
+                                      isReply: true,
+                                    ),
+                                    Message(
+                                      sender: User(
+                                        name: Constants.myDisplayname,
+                                        role: "Buyer",
+                                      ),
+                                      content:
+                                          "I only need the filter for now, but I appreciate the suggestion. Please share the details so I can compare my options.",
+                                      timestamp: DateTime.now().subtract(
+                                        Duration(minutes: 3),
+                                      ),
+                                    ),
 
-                                  Message(
-                                    sender: User(name: "Seller 2", role: "Seller"),
-                                    content: "We have a compatible filter in stock. Could you confirm if you need any additional parts, like a seal or gasket, to ensure a proper fit?",
-                                    timestamp: DateTime.now().subtract(Duration(minutes: 2)),
-                                    isReply: true,
-                                  ),]),
-
+                                    Message(
+                                      sender: User(
+                                        name: "Seller 2",
+                                        role: "Seller",
+                                      ),
+                                      content:
+                                          "We have a compatible filter in stock. Could you confirm if you need any additional parts, like a seal or gasket, to ensure a proper fit?",
+                                      timestamp: DateTime.now().subtract(
+                                        Duration(minutes: 2),
+                                      ),
+                                      isReply: true,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );
-                          setState(() {
-
-                          });
+                          setState(() {});
                         },
                         icon: Icon(
                           HugeIcons.strokeRoundedBubbleChat,
@@ -1053,7 +1187,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // Confirmation Dialog
-  void _showConfirmationDialog(BuildContext context,Seller seller) {
+  void _showConfirmationDialog(BuildContext context, Seller seller) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1203,7 +1337,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   style: GoogleFonts.manrope(
                     fontSize: 16,
                     color: Colors.black,
-                    fontWeight: FontWeight.bold
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(height: 8),
@@ -1223,9 +1357,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
-                          setState(() {
-
-                          });
+                          setState(() {});
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
@@ -1262,7 +1394,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return Container(
-          width: MediaQuery.of(context).size.width*0.3,
+          width: MediaQuery.of(context).size.width * 0.3,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
@@ -1283,7 +1415,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     style: GoogleFonts.manrope(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color:Constants.ftaColorLight,
+                      color: Constants.ftaColorLight,
                     ),
                   ),
                   IconButton(
@@ -1455,7 +1587,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Constants.ctaColorLight,
-                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(360),
                         ),
@@ -1514,7 +1649,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             borderRadius: BorderRadius.circular(360),
             blurRadius: 1,
             spreadRadius: 1,
-            colors: [Colors.transparent, Constants.ftaColorLight.withOpacity(0.4)],
+            colors: [
+              Colors.transparent,
+              Constants.ftaColorLight.withOpacity(0.4),
+            ],
             glowOpacity: 1,
             duration: Duration(milliseconds: 800),
             thickness: 2,
@@ -1578,25 +1716,33 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
               child: Row(
                 children: [
                   IconButton(
-                      onPressed: (){
-                        Navigator.pop(context);
-                        setState(() {
-                          
-                        });
-                      }, icon: Icon(Icons.arrow_back_ios_new, size: 20,)
+                    onPressed: () {
+                      Navigator.pop(context);
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.arrow_back_ios_new, size: 20),
                   ),
-                  SizedBox(width: 16,),
+                  SizedBox(width: 16),
                   Text(
                     'Request ',
-                    style: GoogleFonts.manrope(color: Colors.white, fontSize: 16),
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
                   ),
                   Text(
                     '2',
-                    style: GoogleFonts.manrope(color: Constants.ftaColorLight, fontSize: 24),
+                    style: GoogleFonts.manrope(
+                      color: Constants.ftaColorLight,
+                      fontSize: 24,
+                    ),
                   ),
                   Text(
                     '\t\t\tInformation',
-                    style: GoogleFonts.manrope(color: Colors.white, fontSize: 16),
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),
@@ -1614,7 +1760,10 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                         decoration: BoxDecoration(
                           color: Constants.dtaColorLight.withOpacity(0.55),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Constants.ctaColorLight, width: 1),
+                          border: Border.all(
+                            color: Constants.ctaColorLight,
+                            width: 1,
+                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1634,10 +1783,17 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                 Row(
                                   children: [
                                     Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
                                       decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.red[300]!),
-                                        borderRadius: BorderRadius.circular(360),
+                                        border: Border.all(
+                                          color: Colors.red[300]!,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          360,
+                                        ),
                                       ),
                                       child: Text(
                                         "Cancel",
@@ -1652,8 +1808,12 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                       onPressed: () {
                                         setState(() {});
                                       },
-                                      icon: Icon(HugeIcons.strokeRoundedFilter, color: Colors.grey[600], size: 18),
-                                    )
+                                      icon: Icon(
+                                        HugeIcons.strokeRoundedFilter,
+                                        color: Colors.grey[600],
+                                        size: 18,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -1672,7 +1832,12 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                             // Description label
                             Container(
                               decoration: BoxDecoration(
-                                border: Border(left: BorderSide(color: Colors.orange, width: 3)),
+                                border: Border(
+                                  left: BorderSide(
+                                    color: Colors.orange,
+                                    width: 3,
+                                  ),
+                                ),
                               ),
                               padding: EdgeInsets.only(left: 8),
                               child: Column(
@@ -1680,8 +1845,10 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Description -",
@@ -1691,7 +1858,7 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                         ),
                                       ),
                                       TextButton(
-                                        onPressed: (){},
+                                        onPressed: () {},
                                         child: Text(
                                           "View Details",
                                           style: GoogleFonts.manrope(
@@ -1705,7 +1872,10 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    _getRequestDescription(widget.request, widget.autoSpare),
+                                    _getRequestDescription(
+                                      widget.request,
+                                      widget.autoSpare,
+                                    ),
                                     style: GoogleFonts.manrope(
                                       fontSize: 14,
                                       color: Colors.black,
@@ -1713,7 +1883,8 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                   ),
                                   SizedBox(height: 8),
                                   Text(
-                                    widget.request.category ?? "Unknown Category",
+                                    widget.request.category ??
+                                        "Unknown Category",
                                     style: GoogleFonts.manrope(
                                       color: Colors.orange[700],
                                       fontSize: 14,
@@ -1728,17 +1899,40 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                             Row(
                               children: [
                                 Spacer(),
-                                _buildStatusDot("D", _getElapsedTime(widget.request.createdAt, 'days')),
+                                _buildStatusDot(
+                                  "D",
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'days',
+                                  ),
+                                ),
                                 SizedBox(width: 8),
-                                _buildStatusDot("H", _getElapsedTime(widget.request.createdAt, 'hours')),
+                                _buildStatusDot(
+                                  "H",
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'hours',
+                                  ),
+                                ),
                                 SizedBox(width: 8),
-                                _buildStatusDot("M", _getElapsedTime(widget.request.createdAt, 'minutes')),
+                                _buildStatusDot(
+                                  "M",
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'minutes',
+                                  ),
+                                ),
                                 SizedBox(width: 8),
-                                _buildStatusDot("S", _getElapsedTime(widget.request.createdAt, 'seconds')),
+                                _buildStatusDot(
+                                  "S",
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'seconds',
+                                  ),
+                                ),
                                 Spacer(),
                               ],
                             ),
-
                           ],
                         ),
                       ),
@@ -1757,13 +1951,38 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                 "Vehicle Details",
                                 Constants.ctaColorLight,
                                 [
-                                  _buildDetailItem("VIN Number", widget.autoSpare.vehicleDetails.vin, showImage: true),
-                                  _buildDetailItem("Manufacturer", widget.autoSpare.vehicleDetails.manufacturer),
-                                  _buildDetailItem("Makes & Models", widget.autoSpare.vehicleDetails.makeModel),
-                                  _buildDetailItem("Year", widget.autoSpare.vehicleDetails.year),
-                                  _buildDetailItem("Type", widget.autoSpare.vehicleDetails.type),
-                                  _buildDetailItem("Vehicle", "${widget.autoSpare.vehicleDetails.makeModel} ${widget.autoSpare.vehicleDetails.year}"),
-                                  _buildDetailItem("New/Used Part", widget.autoSpare.vehicleDetails.condition),
+                                  _buildDetailItem(
+                                    "VIN Number",
+                                    widget.autoSpare.vehicleDetails.vin,
+                                    showImage: true,
+                                  ),
+                                  _buildDetailItem(
+                                    "Manufacturer",
+                                    widget
+                                        .autoSpare
+                                        .vehicleDetails
+                                        .manufacturer,
+                                  ),
+                                  _buildDetailItem(
+                                    "Makes & Models",
+                                    widget.autoSpare.vehicleDetails.makeModel,
+                                  ),
+                                  _buildDetailItem(
+                                    "Year",
+                                    widget.autoSpare.vehicleDetails.year,
+                                  ),
+                                  _buildDetailItem(
+                                    "Type",
+                                    widget.autoSpare.vehicleDetails.type,
+                                  ),
+                                  _buildDetailItem(
+                                    "Vehicle",
+                                    "${widget.autoSpare.vehicleDetails.makeModel} ${widget.autoSpare.vehicleDetails.year}",
+                                  ),
+                                  _buildDetailItem(
+                                    "New/Used Part",
+                                    widget.autoSpare.vehicleDetails.condition,
+                                  ),
                                 ],
                               ),
                             ),
@@ -1774,13 +1993,40 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                 "Part Details",
                                 Colors.orange,
                                 [
-                                  _buildDetailItem("Part Name/Description", widget.autoSpare.partDetails.partName),
-                                  _buildDetailItem("Quantity", widget.autoSpare.partDetails.quantity.toString()),
-                                  _buildDetailItem("Your Location", widget.autoSpare.partDetails.location),
-                                  _buildDetailItem("Max Distance You Want to Travel (km)", widget.autoSpare.partDetails.maxDistanceKm.toString()),
-                                  _buildDetailItem("How soon do you need to buy this product?", widget.autoSpare.partDetails.urgency),
-                                  _buildDetailItem("Description of the Product", widget.autoSpare.partDetails.productDescription),
-                                  _buildDetailItem("Product Images", "", isProductImages: true),
+                                  _buildDetailItem(
+                                    "Part Name/Description",
+                                    widget.autoSpare.partDetails.partName,
+                                  ),
+                                  _buildDetailItem(
+                                    "Quantity",
+                                    widget.autoSpare.partDetails.quantity
+                                        .toString(),
+                                  ),
+                                  _buildDetailItem(
+                                    "Your Location",
+                                    widget.autoSpare.partDetails.location,
+                                  ),
+                                  _buildDetailItem(
+                                    "Max Distance You Want to Travel (km)",
+                                    widget.autoSpare.partDetails.maxDistanceKm
+                                        .toString(),
+                                  ),
+                                  _buildDetailItem(
+                                    "How soon do you need to buy this product?",
+                                    widget.autoSpare.partDetails.urgency,
+                                  ),
+                                  _buildDetailItem(
+                                    "Description of the Product",
+                                    widget
+                                        .autoSpare
+                                        .partDetails
+                                        .productDescription,
+                                  ),
+                                  _buildDetailItem(
+                                    "Product Images",
+                                    "",
+                                    isProductImages: true,
+                                  ),
                                 ],
                               ),
                             ),
@@ -1791,11 +2037,29 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                 "More Details",
                                 Colors.orange,
                                 [
-                                  _buildDetailItem("Part Number", widget.autoSpare.moreFields.partNumber),
-                                  _buildDetailItem("Transmission Type", widget.autoSpare.moreFields.transmissionType),
-                                  _buildDetailItem("Mileage of Vehicle", widget.autoSpare.moreFields.mileage),
-                                  _buildDetailItem("Fuel Type", widget.autoSpare.moreFields.fuelType),
-                                  _buildDetailItem("Body Type", widget.autoSpare.moreFields.bodyType),
+                                  _buildDetailItem(
+                                    "Part Number",
+                                    widget.autoSpare.moreFields.partNumber,
+                                  ),
+                                  _buildDetailItem(
+                                    "Transmission Type",
+                                    widget
+                                        .autoSpare
+                                        .moreFields
+                                        .transmissionType,
+                                  ),
+                                  _buildDetailItem(
+                                    "Mileage of Vehicle",
+                                    widget.autoSpare.moreFields.mileage,
+                                  ),
+                                  _buildDetailItem(
+                                    "Fuel Type",
+                                    widget.autoSpare.moreFields.fuelType,
+                                  ),
+                                  _buildDetailItem(
+                                    "Body Type",
+                                    widget.autoSpare.moreFields.bodyType,
+                                  ),
                                   _buildDetailItem("Enquiry Time", "24 Hours"),
                                 ],
                               ),
@@ -1805,16 +2069,17 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                       ),
                     ),
                     SizedBox(height: 24),
-                    FooterSection(logo: "lib/assets/images/bidr_logo2.png")
+                    FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
+
   String _getRequestDescription(dynamic request, dynamic item) {
     try {
       if (request?.category == null) return "No description available";
@@ -1830,8 +2095,10 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
 
         case "Vehicle Tyres and Rims":
           if (item?.productDetails != null) {
-            final typeOfElectronics = item.productDetails.typeOfElectronics ?? "Electronics";
-            final brandPreference = item.productDetails.brandPreference ?? "Various Brands";
+            final typeOfElectronics =
+                item.productDetails.typeOfElectronics ?? "Electronics";
+            final brandPreference =
+                item.productDetails.brandPreference ?? "Various Brands";
             final modelSeries = item.productDetails.modelSeries;
             return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
           }
@@ -1842,7 +2109,8 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
             final tyreType = item.productDetails.tyreType ?? "Tyres";
             final tyreWidth = item.productDetails.tyreWidthMm ?? 0;
             final sidewall = item.productDetails.sidewallProfile ?? "";
-            final rimDiameter = item.productDetails.wheelRimDiameterInches ?? "";
+            final rimDiameter =
+                item.productDetails.wheelRimDiameterInches ?? "";
             final brand = item.moreFields?.preferredBrand ?? "Various Brands";
             return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
           }
@@ -1856,6 +2124,7 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
       return "Request information unavailable";
     }
   }
+
   String _formatDate(DateTime? date) {
     if (date == null) return "Date unavailable";
     return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
@@ -1890,7 +2159,10 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
             borderRadius: BorderRadius.circular(360),
             blurRadius: 1,
             spreadRadius: 1,
-            colors: [Colors.transparent, Constants.ftaColorLight.withOpacity(0.4)],
+            colors: [
+              Colors.transparent,
+              Constants.ftaColorLight.withOpacity(0.4),
+            ],
             glowOpacity: 1,
             duration: Duration(milliseconds: 800),
             thickness: 2,
@@ -1918,7 +2190,11 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
     );
   }
 
-  Widget _buildDetailCard(String title, Color borderColor, List<Widget> children) {
+  Widget _buildDetailCard(
+    String title,
+    Color borderColor,
+    List<Widget> children,
+  ) {
     return CustomCard(
       elevation: 3,
       color: Colors.white,
@@ -1942,15 +2218,12 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
               ),
             ),
             // Content
-            SizedBox(height: 16,),
+            SizedBox(height: 16),
             IntrinsicHeight(
               child: Row(
                 children: [
-                  Container(
-                    width: 4,
-                    color: borderColor,
-                  ),
-                  SizedBox(width: 16,),
+                  Container(width: 4, color: borderColor),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1966,7 +2239,12 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
     );
   }
 
-  Widget _buildDetailItem(String label, String value, {bool showImage = false, bool isProductImages = false}) {
+  Widget _buildDetailItem(
+    String label,
+    String value, {
+    bool showImage = false,
+    bool isProductImages = false,
+  }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16),
       child: Column(
@@ -2059,10 +2337,8 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                         ),
                         child: Center(
                           child: IconButton(
-                            onPressed: (){
-                              setState(() {
-
-                              });
+                            onPressed: () {
+                              setState(() {});
                             },
                             icon: Icon(
                               Icons.arrow_back_ios,
@@ -2087,10 +2363,8 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                         ),
                         child: Center(
                           child: IconButton(
-                            onPressed: (){
-                              setState(() {
-
-                              });
+                            onPressed: () {
+                              setState(() {});
                             },
                             icon: Icon(
                               Icons.arrow_forward_ios,
@@ -2144,10 +2418,12 @@ class ConsumerElectronicsDetailScreen extends StatefulWidget {
   });
 
   @override
-  State<ConsumerElectronicsDetailScreen> createState() => _ConsumerElectronicsDetailScreenState();
+  State<ConsumerElectronicsDetailScreen> createState() =>
+      _ConsumerElectronicsDetailScreenState();
 }
 
-class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDetailScreen> {
+class _ConsumerElectronicsDetailScreenState
+    extends State<ConsumerElectronicsDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -2166,25 +2442,33 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
               child: Row(
                 children: [
                   IconButton(
-                      onPressed: (){
-                        Navigator.pop(context);
-                        setState(() {
-
-                        });
-                      }, icon: Icon(Icons.arrow_back_ios_new, size: 20,)
+                    onPressed: () {
+                      Navigator.pop(context);
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.arrow_back_ios_new, size: 20),
                   ),
-                  SizedBox(width: 16,),
+                  SizedBox(width: 16),
                   Text(
                     'Request ',
-                    style: GoogleFonts.manrope(color: Colors.white, fontSize: 16),
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
                   ),
                   Text(
                     '${widget.request.id}',
-                    style: GoogleFonts.manrope(color: Constants.ftaColorLight, fontSize: 24),
+                    style: GoogleFonts.manrope(
+                      color: Constants.ftaColorLight,
+                      fontSize: 24,
+                    ),
                   ),
                   Text(
                     '\t\t\tInformation',
-                    style: GoogleFonts.manrope(color: Colors.white, fontSize: 16),
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),
@@ -2202,7 +2486,10 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                         decoration: BoxDecoration(
                           color: Constants.dtaColorLight.withOpacity(0.55),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Constants.ctaColorLight, width: 1),
+                          border: Border.all(
+                            color: Constants.ctaColorLight,
+                            width: 1,
+                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2222,10 +2509,17 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                                 Row(
                                   children: [
                                     Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
                                       decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.red[300]!),
-                                        borderRadius: BorderRadius.circular(360),
+                                        border: Border.all(
+                                          color: Colors.red[300]!,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          360,
+                                        ),
                                       ),
                                       child: Text(
                                         "Cancel",
@@ -2240,8 +2534,12 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                                       onPressed: () {
                                         setState(() {});
                                       },
-                                      icon: Icon(HugeIcons.strokeRoundedFilter, color: Colors.grey[600], size: 18),
-                                    )
+                                      icon: Icon(
+                                        HugeIcons.strokeRoundedFilter,
+                                        color: Colors.grey[600],
+                                        size: 18,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -2260,7 +2558,12 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                             // Description label
                             Container(
                               decoration: BoxDecoration(
-                                border: Border(left: BorderSide(color: Colors.orange, width: 3)),
+                                border: Border(
+                                  left: BorderSide(
+                                    color: Colors.orange,
+                                    width: 3,
+                                  ),
+                                ),
                               ),
                               padding: EdgeInsets.only(left: 8),
                               child: Column(
@@ -2268,8 +2571,10 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Description -",
@@ -2279,7 +2584,7 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                                         ),
                                       ),
                                       TextButton(
-                                        onPressed: (){},
+                                        onPressed: () {},
                                         child: Text(
                                           "View Details",
                                           style: GoogleFonts.manrope(
@@ -2293,7 +2598,10 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    _getRequestDescription(widget.request, widget.consumerElectronics),
+                                    _getRequestDescription(
+                                      widget.request,
+                                      widget.consumerElectronics,
+                                    ),
                                     style: GoogleFonts.manrope(
                                       fontSize: 14,
                                       color: Colors.black,
@@ -2301,7 +2609,8 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                                   ),
                                   SizedBox(height: 8),
                                   Text(
-                                    widget.request.category ?? "Unknown Category",
+                                    widget.request.category ??
+                                        "Unknown Category",
                                     style: GoogleFonts.manrope(
                                       color: Colors.orange[700],
                                       fontSize: 14,
@@ -2316,17 +2625,40 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                             Row(
                               children: [
                                 Spacer(),
-                                _buildStatusDot("D", _getElapsedTime(widget.request.createdAt, 'days')),
+                                _buildStatusDot(
+                                  "D",
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'days',
+                                  ),
+                                ),
                                 SizedBox(width: 8),
-                                _buildStatusDot("H", _getElapsedTime(widget.request.createdAt, 'hours')),
+                                _buildStatusDot(
+                                  "H",
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'hours',
+                                  ),
+                                ),
                                 SizedBox(width: 8),
-                                _buildStatusDot("M", _getElapsedTime(widget.request.createdAt, 'minutes')),
+                                _buildStatusDot(
+                                  "M",
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'minutes',
+                                  ),
+                                ),
                                 SizedBox(width: 8),
-                                _buildStatusDot("S", _getElapsedTime(widget.request.createdAt, 'seconds')),
+                                _buildStatusDot(
+                                  "S",
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'seconds',
+                                  ),
+                                ),
                                 Spacer(),
                               ],
                             ),
-
                           ],
                         ),
                       ),
@@ -2345,12 +2677,50 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                                 "Product Details",
                                 Constants.ctaColorLight,
                                 [
-                                  _buildDetailItem("Type of Electronics", widget.consumerElectronics.productDetails.typeOfElectronics),
-                                  _buildDetailItem("Brand Preference", widget.consumerElectronics.productDetails.brandPreference),
-                                  _buildDetailItem("Model Series", widget.consumerElectronics.productDetails.modelSeries ?? "-"),
-                                  _buildDetailItem("Quantity Needed", widget.consumerElectronics.productDetails.quantityNeeded.toString()),
-                                  _buildDetailItem("Purpose", widget.consumerElectronics.featuresAndSpecs.purpose),
-                                  _buildDetailItem("Condition Preference", widget.consumerElectronics.featuresAndSpecs.conditionPreference),
+                                  _buildDetailItem(
+                                    "Type of Electronics",
+                                    widget
+                                        .consumerElectronics
+                                        .productDetails
+                                        .typeOfElectronics,
+                                  ),
+                                  _buildDetailItem(
+                                    "Brand Preference",
+                                    widget
+                                        .consumerElectronics
+                                        .productDetails
+                                        .brandPreference,
+                                  ),
+                                  _buildDetailItem(
+                                    "Model Series",
+                                    widget
+                                            .consumerElectronics
+                                            .productDetails
+                                            .modelSeries ??
+                                        "-",
+                                  ),
+                                  _buildDetailItem(
+                                    "Quantity Needed",
+                                    widget
+                                        .consumerElectronics
+                                        .productDetails
+                                        .quantityNeeded
+                                        .toString(),
+                                  ),
+                                  _buildDetailItem(
+                                    "Purpose",
+                                    widget
+                                        .consumerElectronics
+                                        .featuresAndSpecs
+                                        .purpose,
+                                  ),
+                                  _buildDetailItem(
+                                    "Condition Preference",
+                                    widget
+                                        .consumerElectronics
+                                        .featuresAndSpecs
+                                        .conditionPreference,
+                                  ),
                                 ],
                               ),
                             ),
@@ -2361,10 +2731,42 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                                 "Budget & Timeline",
                                 Colors.orange,
                                 [
-                                  _buildDetailItem("Min Price", widget.consumerElectronics.budgetTimeline.minPrice != null ? "\$${widget.consumerElectronics.budgetTimeline.minPrice!.toStringAsFixed(2)}" : "-"),
-                                  _buildDetailItem("Max Price", widget.consumerElectronics.budgetTimeline.maxPrice != null ? "\$${widget.consumerElectronics.budgetTimeline.maxPrice!.toStringAsFixed(2)}" : "-"),
-                                  _buildDetailItem("Urgency", widget.consumerElectronics.budgetTimeline.urgency),
-                                  _buildDetailItem("Needs Installation", widget.consumerElectronics.budgetTimeline.needsInstallation ? "Yes" : "No"),
+                                  _buildDetailItem(
+                                    "Min Price",
+                                    widget
+                                                .consumerElectronics
+                                                .budgetTimeline
+                                                .minPrice !=
+                                            null
+                                        ? "\$${widget.consumerElectronics.budgetTimeline.minPrice!.toStringAsFixed(2)}"
+                                        : "-",
+                                  ),
+                                  _buildDetailItem(
+                                    "Max Price",
+                                    widget
+                                                .consumerElectronics
+                                                .budgetTimeline
+                                                .maxPrice !=
+                                            null
+                                        ? "\$${widget.consumerElectronics.budgetTimeline.maxPrice!.toStringAsFixed(2)}"
+                                        : "-",
+                                  ),
+                                  _buildDetailItem(
+                                    "Urgency",
+                                    widget
+                                        .consumerElectronics
+                                        .budgetTimeline
+                                        .urgency,
+                                  ),
+                                  _buildDetailItem(
+                                    "Needs Installation",
+                                    widget
+                                            .consumerElectronics
+                                            .budgetTimeline
+                                            .needsInstallation
+                                        ? "Yes"
+                                        : "No",
+                                  ),
                                 ],
                               ),
                             ),
@@ -2375,9 +2777,31 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                                 "Features & Specifications",
                                 Colors.orange,
                                 [
-                                  _buildDetailItem("Required Features", widget.consumerElectronics.featuresAndSpecs.requiredFeatures ?? "-"),
-                                  _buildDetailItem("Additional Comments", widget.consumerElectronics.featuresAndSpecs.additionalComments ?? "-"),
-                                  _buildDetailItem("Documents/Images", "", isProductImages: true, imageList: widget.consumerElectronics.featuresAndSpecs.documentsOrImages),
+                                  _buildDetailItem(
+                                    "Required Features",
+                                    widget
+                                            .consumerElectronics
+                                            .featuresAndSpecs
+                                            .requiredFeatures ??
+                                        "-",
+                                  ),
+                                  _buildDetailItem(
+                                    "Additional Comments",
+                                    widget
+                                            .consumerElectronics
+                                            .featuresAndSpecs
+                                            .additionalComments ??
+                                        "-",
+                                  ),
+                                  _buildDetailItem(
+                                    "Documents/Images",
+                                    "",
+                                    isProductImages: true,
+                                    imageList: widget
+                                        .consumerElectronics
+                                        .featuresAndSpecs
+                                        .documentsOrImages,
+                                  ),
                                 ],
                               ),
                             ),
@@ -2386,11 +2810,11 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                       ),
                     ),
                     SizedBox(height: 24),
-                    FooterSection(logo: "lib/assets/images/bidr_logo2.png")
+                    FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -2412,8 +2836,10 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
 
         case "Vehicle Tyres and Rims":
           if (item?.productDetails != null) {
-            final typeOfElectronics = item.productDetails.typeOfElectronics ?? "Electronics";
-            final brandPreference = item.productDetails.brandPreference ?? "Various Brands";
+            final typeOfElectronics =
+                item.productDetails.typeOfElectronics ?? "Electronics";
+            final brandPreference =
+                item.productDetails.brandPreference ?? "Various Brands";
             final modelSeries = item.productDetails.modelSeries;
             return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
           }
@@ -2424,7 +2850,8 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
             final tyreType = item.productDetails.tyreType ?? "Tyres";
             final tyreWidth = item.productDetails.tyreWidthMm ?? 0;
             final sidewall = item.productDetails.sidewallProfile ?? "";
-            final rimDiameter = item.productDetails.wheelRimDiameterInches ?? "";
+            final rimDiameter =
+                item.productDetails.wheelRimDiameterInches ?? "";
             final brand = item.moreFields?.preferredBrand ?? "Various Brands";
             return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
           }
@@ -2473,7 +2900,10 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
             borderRadius: BorderRadius.circular(360),
             blurRadius: 1,
             spreadRadius: 1,
-            colors: [Colors.transparent, Constants.ftaColorLight.withOpacity(0.4)],
+            colors: [
+              Colors.transparent,
+              Constants.ftaColorLight.withOpacity(0.4),
+            ],
             glowOpacity: 1,
             duration: Duration(milliseconds: 800),
             thickness: 2,
@@ -2501,7 +2931,11 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
     );
   }
 
-  Widget _buildDetailCard(String title, Color borderColor, List<Widget> children) {
+  Widget _buildDetailCard(
+    String title,
+    Color borderColor,
+    List<Widget> children,
+  ) {
     return CustomCard(
       elevation: 3,
       color: Colors.white,
@@ -2525,15 +2959,12 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
               ),
             ),
             // Content
-            SizedBox(height: 16,),
+            SizedBox(height: 16),
             IntrinsicHeight(
               child: Row(
                 children: [
-                  Container(
-                    width: 4,
-                    color: borderColor,
-                  ),
-                  SizedBox(width: 16,),
+                  Container(width: 4, color: borderColor),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2549,7 +2980,13 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
     );
   }
 
-  Widget _buildDetailItem(String label, String value, {bool showImage = false, bool isProductImages = false, List<String>? imageList}) {
+  Widget _buildDetailItem(
+    String label,
+    String value, {
+    bool showImage = false,
+    bool isProductImages = false,
+    List<String>? imageList,
+  }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16),
       child: Column(
@@ -2643,10 +3080,8 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                           ),
                           child: Center(
                             child: IconButton(
-                              onPressed: (){
-                                setState(() {
-
-                                });
+                              onPressed: () {
+                                setState(() {});
                               },
                               icon: Icon(
                                 Icons.arrow_back_ios,
@@ -2671,10 +3106,8 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                           ),
                           child: Center(
                             child: IconButton(
-                              onPressed: (){
-                                setState(() {
-
-                                });
+                              onPressed: () {
+                                setState(() {});
                               },
                               icon: Icon(
                                 Icons.arrow_forward_ios,
@@ -2692,7 +3125,10 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                         top: 8,
                         right: 8,
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.black.withOpacity(0.6),
                             borderRadius: BorderRadius.circular(10),
@@ -2749,10 +3185,8 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                           ),
                           child: Center(
                             child: IconButton(
-                              onPressed: (){
-                                setState(() {
-
-                                });
+                              onPressed: () {
+                                setState(() {});
                               },
                               icon: Icon(
                                 Icons.arrow_back_ios,
@@ -2777,10 +3211,8 @@ class _ConsumerElectronicsDetailScreenState extends State<ConsumerElectronicsDet
                           ),
                           child: Center(
                             child: IconButton(
-                              onPressed: (){
-                                setState(() {
-
-                                });
+                              onPressed: () {
+                                setState(() {});
                               },
                               icon: Icon(
                                 Icons.arrow_forward_ios,
@@ -2857,25 +3289,33 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
               child: Row(
                 children: [
                   IconButton(
-                      onPressed: (){
-                        Navigator.pop(context);
-                        setState(() {
-
-                        });
-                      }, icon: Icon(Icons.arrow_back_ios_new, size: 20,)
+                    onPressed: () {
+                      Navigator.pop(context);
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.arrow_back_ios_new, size: 20),
                   ),
-                  SizedBox(width: 16,),
+                  SizedBox(width: 16),
                   Text(
                     'Request ',
-                    style: GoogleFonts.manrope(color: Colors.white, fontSize: 16),
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
                   ),
                   Text(
                     '${widget.request.id}',
-                    style: GoogleFonts.manrope(color: Constants.ftaColorLight, fontSize: 24),
+                    style: GoogleFonts.manrope(
+                      color: Constants.ftaColorLight,
+                      fontSize: 24,
+                    ),
                   ),
                   Text(
                     '\t\t\tInformation',
-                    style: GoogleFonts.manrope(color: Colors.white, fontSize: 16),
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),
@@ -2893,7 +3333,10 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                         decoration: BoxDecoration(
                           color: Constants.dtaColorLight.withOpacity(0.55),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Constants.ctaColorLight, width: 1),
+                          border: Border.all(
+                            color: Constants.ctaColorLight,
+                            width: 1,
+                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2913,10 +3356,17 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                 Row(
                                   children: [
                                     Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
                                       decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.red[300]!),
-                                        borderRadius: BorderRadius.circular(360),
+                                        border: Border.all(
+                                          color: Colors.red[300]!,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          360,
+                                        ),
                                       ),
                                       child: Text(
                                         "Cancel",
@@ -2931,8 +3381,12 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                       onPressed: () {
                                         setState(() {});
                                       },
-                                      icon: Icon(HugeIcons.strokeRoundedFilter, color: Colors.grey[600], size: 18),
-                                    )
+                                      icon: Icon(
+                                        HugeIcons.strokeRoundedFilter,
+                                        color: Colors.grey[600],
+                                        size: 18,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -2951,7 +3405,12 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                             // Description label
                             Container(
                               decoration: BoxDecoration(
-                                border: Border(left: BorderSide(color: Colors.orange, width: 3)),
+                                border: Border(
+                                  left: BorderSide(
+                                    color: Colors.orange,
+                                    width: 3,
+                                  ),
+                                ),
                               ),
                               padding: EdgeInsets.only(left: 8),
                               child: Column(
@@ -2959,8 +3418,10 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Description -",
@@ -2970,7 +3431,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                         ),
                                       ),
                                       TextButton(
-                                        onPressed: (){},
+                                        onPressed: () {},
                                         child: Text(
                                           "View Details",
                                           style: GoogleFonts.manrope(
@@ -2984,7 +3445,10 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    _getRequestDescription(widget.request, widget.rimTyre),
+                                    _getRequestDescription(
+                                      widget.request,
+                                      widget.rimTyre,
+                                    ),
                                     style: GoogleFonts.manrope(
                                       fontSize: 14,
                                       color: Colors.black,
@@ -2992,7 +3456,8 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                   ),
                                   SizedBox(height: 8),
                                   Text(
-                                    widget.request.category ?? "Unknown Category",
+                                    widget.request.category ??
+                                        "Unknown Category",
                                     style: GoogleFonts.manrope(
                                       color: Colors.orange[700],
                                       fontSize: 14,
@@ -3007,17 +3472,40 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                             Row(
                               children: [
                                 Spacer(),
-                                _buildStatusDot("D", _getElapsedTime(widget.request.createdAt, 'days')),
+                                _buildStatusDot(
+                                  "D",
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'days',
+                                  ),
+                                ),
                                 SizedBox(width: 8),
-                                _buildStatusDot("H", _getElapsedTime(widget.request.createdAt, 'hours')),
+                                _buildStatusDot(
+                                  "H",
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'hours',
+                                  ),
+                                ),
                                 SizedBox(width: 8),
-                                _buildStatusDot("M", _getElapsedTime(widget.request.createdAt, 'minutes')),
+                                _buildStatusDot(
+                                  "M",
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'minutes',
+                                  ),
+                                ),
                                 SizedBox(width: 8),
-                                _buildStatusDot("S", _getElapsedTime(widget.request.createdAt, 'seconds')),
+                                _buildStatusDot(
+                                  "S",
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'seconds',
+                                  ),
+                                ),
                                 Spacer(),
                               ],
                             ),
-
                           ],
                         ),
                       ),
@@ -3036,12 +3524,38 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                 "Product Details",
                                 Constants.ctaColorLight,
                                 [
-                                  _buildDetailItem("Tyre Width (mm)", widget.rimTyre.productDetails.tyreWidthMm.toString()),
-                                  _buildDetailItem("Sidewall Profile", widget.rimTyre.productDetails.sidewallProfile),
-                                  _buildDetailItem("Wheel Rim Diameter (inches)", widget.rimTyre.productDetails.wheelRimDiameterInches),
-                                  _buildDetailItem("Tyre Type", widget.rimTyre.productDetails.tyreType),
-                                  _buildDetailItem("Quantity", widget.rimTyre.productDetails.quantity.toString()),
-                                  _buildDetailItem("Urgency", widget.rimTyre.productDetails.urgency),
+                                  _buildDetailItem(
+                                    "Tyre Width (mm)",
+                                    widget.rimTyre.productDetails.tyreWidthMm
+                                        .toString(),
+                                  ),
+                                  _buildDetailItem(
+                                    "Sidewall Profile",
+                                    widget
+                                        .rimTyre
+                                        .productDetails
+                                        .sidewallProfile,
+                                  ),
+                                  _buildDetailItem(
+                                    "Wheel Rim Diameter (inches)",
+                                    widget
+                                        .rimTyre
+                                        .productDetails
+                                        .wheelRimDiameterInches,
+                                  ),
+                                  _buildDetailItem(
+                                    "Tyre Type",
+                                    widget.rimTyre.productDetails.tyreType,
+                                  ),
+                                  _buildDetailItem(
+                                    "Quantity",
+                                    widget.rimTyre.productDetails.quantity
+                                        .toString(),
+                                  ),
+                                  _buildDetailItem(
+                                    "Urgency",
+                                    widget.rimTyre.productDetails.urgency,
+                                  ),
                                   _buildDetailItem(
                                     "Tyre Size",
                                     "${widget.rimTyre.productDetails.tyreWidthMm}/${widget.rimTyre.productDetails.sidewallProfile}R${widget.rimTyre.productDetails.wheelRimDiameterInches}",
@@ -3050,17 +3564,38 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                               ),
                             ),
                             SizedBox(width: 16),
-// Vehicle & Brand Details Card
+                            // Vehicle & Brand Details Card
                             Expanded(
                               child: _buildDetailCard(
                                 "Vehicle & Brand Details",
                                 Colors.orange,
                                 [
-                                  _buildDetailItem("Vehicle Type", widget.rimTyre.moreFields.vehicleType),
-                                  _buildDetailItem("Preferred Brand", widget.rimTyre.moreFields.preferredBrand),
-                                  _buildDetailItem("Pitch Circle Diameter", widget.rimTyre.moreFields.pitchCircleDiameter),
-                                  _buildDetailItem("Tyre Construction Type", widget.rimTyre.moreFields.tyreConstructionType),
-                                  _buildDetailItem("Description", widget.rimTyre.moreFields.description),
+                                  _buildDetailItem(
+                                    "Vehicle Type",
+                                    widget.rimTyre.moreFields.vehicleType,
+                                  ),
+                                  _buildDetailItem(
+                                    "Preferred Brand",
+                                    widget.rimTyre.moreFields.preferredBrand,
+                                  ),
+                                  _buildDetailItem(
+                                    "Pitch Circle Diameter",
+                                    widget
+                                        .rimTyre
+                                        .moreFields
+                                        .pitchCircleDiameter,
+                                  ),
+                                  _buildDetailItem(
+                                    "Tyre Construction Type",
+                                    widget
+                                        .rimTyre
+                                        .moreFields
+                                        .tyreConstructionType,
+                                  ),
+                                  _buildDetailItem(
+                                    "Description",
+                                    widget.rimTyre.moreFields.description,
+                                  ),
                                 ],
                               ),
                             ),
@@ -3070,29 +3605,47 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                 "Service Requirements",
                                 Colors.orange,
                                 [
-                                  _buildDetailItem("Fitment Required", widget.rimTyre.moreFields.fitmentRequired ? "Yes" : "No"),
-                                  _buildDetailItem("Balancing Required", widget.rimTyre.moreFields.balancingRequired ? "Yes" : "No"),
-                                  _buildDetailItem("Tyre Rotation Required", widget.rimTyre.moreFields.tyreRotationRequired ? "Yes" : "No"),
+                                  _buildDetailItem(
+                                    "Fitment Required",
+                                    widget.rimTyre.moreFields.fitmentRequired
+                                        ? "Yes"
+                                        : "No",
+                                  ),
+                                  _buildDetailItem(
+                                    "Balancing Required",
+                                    widget.rimTyre.moreFields.balancingRequired
+                                        ? "Yes"
+                                        : "No",
+                                  ),
+                                  _buildDetailItem(
+                                    "Tyre Rotation Required",
+                                    widget
+                                            .rimTyre
+                                            .moreFields
+                                            .tyreRotationRequired
+                                        ? "Yes"
+                                        : "No",
+                                  ),
                                   _buildDetailItem(
                                     "Product Images",
                                     "",
                                     isProductImages: true,
-                                    imageList: widget.rimTyre.moreFields.imageUrls,
+                                    imageList:
+                                        widget.rimTyre.moreFields.imageUrls,
                                   ),
                                 ],
                               ),
                             ),
-
                           ],
                         ),
                       ),
                     ),
                     SizedBox(height: 24),
-                    FooterSection(logo: "lib/assets/images/bidr_logo2.png")
+                    FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -3114,8 +3667,10 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
 
         case "Vehicle Tyres and Rims":
           if (item?.productDetails != null) {
-            final typeOfElectronics = item.productDetails.typeOfElectronics ?? "Electronics";
-            final brandPreference = item.productDetails.brandPreference ?? "Various Brands";
+            final typeOfElectronics =
+                item.productDetails.typeOfElectronics ?? "Electronics";
+            final brandPreference =
+                item.productDetails.brandPreference ?? "Various Brands";
             final modelSeries = item.productDetails.modelSeries;
             return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
           }
@@ -3126,7 +3681,8 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
             final tyreType = item.productDetails.tyreType ?? "Tyres";
             final tyreWidth = item.productDetails.tyreWidthMm ?? 0;
             final sidewall = item.productDetails.sidewallProfile ?? "";
-            final rimDiameter = item.productDetails.wheelRimDiameterInches ?? "";
+            final rimDiameter =
+                item.productDetails.wheelRimDiameterInches ?? "";
             final brand = item.moreFields?.preferredBrand ?? "Various Brands";
             return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
           }
@@ -3175,7 +3731,10 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
             borderRadius: BorderRadius.circular(360),
             blurRadius: 1,
             spreadRadius: 1,
-            colors: [Colors.transparent, Constants.ftaColorLight.withOpacity(0.4)],
+            colors: [
+              Colors.transparent,
+              Constants.ftaColorLight.withOpacity(0.4),
+            ],
             glowOpacity: 1,
             duration: Duration(milliseconds: 800),
             thickness: 2,
@@ -3203,7 +3762,11 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
     );
   }
 
-  Widget _buildDetailCard(String title, Color borderColor, List<Widget> children) {
+  Widget _buildDetailCard(
+    String title,
+    Color borderColor,
+    List<Widget> children,
+  ) {
     return CustomCard(
       elevation: 3,
       color: Colors.white,
@@ -3227,15 +3790,12 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
               ),
             ),
             // Content
-            SizedBox(height: 16,),
+            SizedBox(height: 16),
             IntrinsicHeight(
               child: Row(
                 children: [
-                  Container(
-                    width: 4,
-                    color: borderColor,
-                  ),
-                  SizedBox(width: 16,),
+                  Container(width: 4, color: borderColor),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -3251,7 +3811,13 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
     );
   }
 
-  Widget _buildDetailItem(String label, String value, {bool showImage = false, bool isProductImages = false, List<String>? imageList}) {
+  Widget _buildDetailItem(
+    String label,
+    String value, {
+    bool showImage = false,
+    bool isProductImages = false,
+    List<String>? imageList,
+  }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16),
       child: Column(
@@ -3345,10 +3911,8 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                           ),
                           child: Center(
                             child: IconButton(
-                              onPressed: (){
-                                setState(() {
-
-                                });
+                              onPressed: () {
+                                setState(() {});
                               },
                               icon: Icon(
                                 Icons.arrow_back_ios,
@@ -3373,10 +3937,8 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                           ),
                           child: Center(
                             child: IconButton(
-                              onPressed: (){
-                                setState(() {
-
-                                });
+                              onPressed: () {
+                                setState(() {});
                               },
                               icon: Icon(
                                 Icons.arrow_forward_ios,
@@ -3394,7 +3956,10 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                         top: 8,
                         right: 8,
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.black.withOpacity(0.6),
                             borderRadius: BorderRadius.circular(10),
@@ -3451,10 +4016,8 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                           ),
                           child: Center(
                             child: IconButton(
-                              onPressed: (){
-                                setState(() {
-
-                                });
+                              onPressed: () {
+                                setState(() {});
                               },
                               icon: Icon(
                                 Icons.arrow_back_ios,
@@ -3479,10 +4042,8 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                           ),
                           child: Center(
                             child: IconButton(
-                              onPressed: (){
-                                setState(() {
-
-                                });
+                              onPressed: () {
+                                setState(() {});
                               },
                               icon: Icon(
                                 Icons.arrow_forward_ios,

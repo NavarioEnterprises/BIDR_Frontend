@@ -8,8 +8,10 @@ import '../customWdget/custom_input2.dart';
 import '../services/shared_preferences.dart';
 import '../pages/buyer_home.dart';
 import '../pages/seller/seller_home_dashboard.dart';
+import '../models/user.dart';
 import 'auth_api_service.dart';
 import 'forgot_password.dart';
+import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -61,38 +63,30 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     if (response != null) {
-      // Store credentials in shared preferences
+      // Store complete login information as JSON
+      final loginResponseJson = jsonEncode(response);
+      await Sharedprefs.saveCompleteLoginDataSharedPreference(loginResponseJson);
+      
+      // Store login status
       await Sharedprefs.saveUserLoggedInSharedPreference(true);
-      await Sharedprefs.saveUserAccessTokenSharedPreference(
-        response['access_token'],
-      );
-      await Sharedprefs.saveUserRefreshTokenSharedPreference(
-        response['refresh_token'],
-      );
 
-      // Store user data
-      final user = response['user'];
-      await Sharedprefs.saveUserIdSharedPreference(user['id']);
-      await Sharedprefs.saveUserUidSharedPreference(user['uid']);
-      await Sharedprefs.saveUserEmailSharedPreference(user['email']);
-      await Sharedprefs.saveUserNameSharedPreference(
-        '${user['first_name']} ${user['last_name']}',
-      );
-      await Sharedprefs.saveUserRoleSharedPreference(user['role']);
-      await Sharedprefs.saveUserCellSharedPreference(
-        user['phone_number'] ?? '',
-      );
+      // Create user model and set as current user
+      final loginResponse = LoginResponse.fromJson(response);
+      Constants.currentUser = loginResponse.user;
+      
+      // Store user role for backward compatibility
+      await Sharedprefs.saveUserRoleSharedPreference(loginResponse.user.role);
 
       // Navigate based on user role
-      if (mounted) {
-        // Update global constants
-        Constants.myUid = user['uid'];
-        Constants.userId = user['id'];
-        Constants.myCell = user['phone_number'] ?? '';
-        Constants.myDisplayname = '${user['first_name']} ${user['last_name']}';
-        Constants.myCategoryRole = user['role'];
-        Constants.myUsername = Constants.myDisplayname;
-        Constants.myEmail = user['email'];
+      if (mounted && Constants.currentUser != null) {
+        // Update global constants from the user model
+        Constants.myUid = Constants.currentUser!.uid;
+        Constants.userId = Constants.currentUser!.id;
+        Constants.myCell = Constants.currentUser!.phoneNumber;
+        Constants.myDisplayname = Constants.currentUser!.fullName;
+        Constants.myCategoryRole = Constants.currentUser!.role;
+        Constants.myUsername = Constants.currentUser!.fullName;
+        Constants.myEmail = Constants.currentUser!.email;
 
         // Navigate to dashboard
         context.go('/dashboard');
@@ -477,38 +471,30 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
     });
 
     if (response != null) {
-      // Store credentials in shared preferences
+      // Store complete login information as JSON
+      final loginResponseJson = jsonEncode(response);
+      await Sharedprefs.saveCompleteLoginDataSharedPreference(loginResponseJson);
+      
+      // Store login status
       await Sharedprefs.saveUserLoggedInSharedPreference(true);
-      await Sharedprefs.saveUserAccessTokenSharedPreference(
-        response['access_token'],
-      );
-      await Sharedprefs.saveUserRefreshTokenSharedPreference(
-        response['refresh_token'],
-      );
 
-      // Store user data
-      final user = response['user'];
-      await Sharedprefs.saveUserIdSharedPreference(user['id']);
-      await Sharedprefs.saveUserUidSharedPreference(user['uid']);
-      await Sharedprefs.saveUserEmailSharedPreference(user['email']);
-      await Sharedprefs.saveUserNameSharedPreference(
-        '${user['first_name']} ${user['last_name']}',
-      );
-      await Sharedprefs.saveUserRoleSharedPreference(user['role']);
-      await Sharedprefs.saveUserCellSharedPreference(
-        user['phone_number'] ?? '',
-      );
+      // Create user model and set as current user
+      final loginResponse = LoginResponse.fromJson(response);
+      Constants.currentUser = loginResponse.user;
+      
+      // Store user role for backward compatibility
+      await Sharedprefs.saveUserRoleSharedPreference(loginResponse.user.role);
 
       // Navigate based on user role
-      if (mounted) {
-        // Update global constants
-        Constants.myUid = user['uid'];
-        Constants.userId = user['id'];
-        Constants.myCell = user['phone_number'] ?? '';
-        Constants.myDisplayname = '${user['first_name']} ${user['last_name']}';
-        Constants.myCategoryRole = user['role'];
-        Constants.myUsername = Constants.myDisplayname;
-        Constants.myEmail = user['email'];
+      if (mounted && Constants.currentUser != null) {
+        // Update global constants from the user model
+        Constants.myUid = Constants.currentUser!.uid;
+        Constants.userId = Constants.currentUser!.id;
+        Constants.myCell = Constants.currentUser!.phoneNumber;
+        Constants.myDisplayname = Constants.currentUser!.fullName;
+        Constants.myCategoryRole = Constants.currentUser!.role;
+        Constants.myUsername = Constants.currentUser!.fullName;
+        Constants.myEmail = Constants.currentUser!.email;
 
         // Navigate to dashboard
         context.go('/dashboard');

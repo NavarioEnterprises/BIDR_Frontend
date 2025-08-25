@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:bidr/pages/seller/seller_home_dashboard.dart';
@@ -7,12 +6,16 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 import '../authentication/forgot_password.dart';
 import '../constants/Constants.dart';
 import '../customWdget/appbar.dart';
 import '../customWdget/customCard.dart';
 import '../customWdget/custom_input2.dart';
+import '../services/api_service.dart';
 import '../notifier/my_notifier.dart';
 import 'buyer_dashboard.dart';
 import 'buyer/blog.dart';
@@ -29,11 +32,14 @@ class BuyerHomePage extends StatefulWidget {
   @override
   _BuyerHomePageState createState() => _BuyerHomePageState();
 }
+
 MyNotifier? myNotifier;
 MyNotifier? mySellerNotifier;
 final buyerHomeValueNotifier = ValueNotifier<int>(0);
 final sellerHomeValueNotifier = ValueNotifier<int>(0);
-class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateMixin {
+
+class _BuyerHomePageState extends State<BuyerHomePage>
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
   int selectedIndex = -1;
@@ -58,11 +64,9 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
     mySellerNotifier = MyNotifier(sellerHomeValueNotifier, context);
     buyerHomeValueNotifier.addListener(() {
       setState(() {});
-
     });
     sellerHomeValueNotifier.addListener(() {
       setState(() {});
-
     });
     // Initialize animation controllers
     _fadeController = AnimationController(
@@ -86,37 +90,22 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
     );
 
     // Initialize animations
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.5),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.elasticOut,
-    ));
+    _slideAnimation = Tween<Offset>(begin: Offset(0, 0.5), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.elasticOut),
+        );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.bounceOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.bounceOut),
+    );
 
-    _categoryAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _categoryController,
-      curve: Curves.easeOutBack,
-    ));
+    _categoryAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _categoryController, curve: Curves.easeOutBack),
+    );
 
     // Start animations
     _startAnimations();
@@ -158,13 +147,16 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
   final List<Map<String, String>> categories = [
     {"icon": "lib/assets/images/spares1.png", "name": "Vehicle\nSpares"},
     {"icon": "lib/assets/images/rims.png", "name": "Vehicle Tyres\nand Rims"},
-    {"icon": "lib/assets/images/consumer.png", "name": "Consumer \nElectronics"},
+    {
+      "icon": "lib/assets/images/consumer.png",
+      "name": "Consumer \nElectronics",
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,//
+      backgroundColor: Colors.white, //
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -178,190 +170,236 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
               child: SlideTransition(
                 position: _slideAnimation,
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 32, right: 32),//BlogCardsScreen
+                  padding: const EdgeInsets.only(
+                    left: 32,
+                    right: 32,
+                  ), //BlogCardsScreen
                   child: HeaderSection(),
                 ),
               ),
             ),
 
-            Constants.buyerAppBarValue==0?Expanded(
-              child: Container(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        constraints: BoxConstraints(maxWidth: 1600),
+            Constants.buyerAppBarValue == 0
+                ? Expanded(
+                    child: Container(
+                      child: SingleChildScrollView(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            SizedBox(height: 24),
+                            Container(
+                              constraints: BoxConstraints(maxWidth: 1600),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(height: 24),
 
-                            // Animated Banner Section
-                            ScaleTransition(
-                              scale: _scaleAnimation,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 64, right: 64),
-                                child: Center(
-                                    child: _buildAnimatedBannerSection("lib/assets/images/competitive.png")
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(height: 24),
-
-                            // Animated Category Section
-                            Center(
-                              child: SlideTransition(
-                                position: _slideAnimation,
-                                child: FadeTransition(
-                                  opacity: _categoryAnimation,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 64, right: 64),
-                                    child: Center(child: _buildCategoryItems()),
+                                  // Animated Banner Section
+                                  ScaleTransition(
+                                    scale: _scaleAnimation,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 64,
+                                        right: 64,
+                                      ),
+                                      child: Center(
+                                        child: _buildAnimatedBannerSection(
+                                          "lib/assets/images/competitive.png",
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
+
+                                  SizedBox(height: 24),
+
+                                  // Animated Category Section
+                                  Center(
+                                    child: SlideTransition(
+                                      position: _slideAnimation,
+                                      child: FadeTransition(
+                                        opacity: _categoryAnimation,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 64,
+                                            right: 64,
+                                          ),
+                                          child: Center(
+                                            child: _buildCategoryItems(),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  // Animated Form Section
+                                  AnimatedSwitcher(
+                                    duration: Duration(milliseconds: 500),
+                                    transitionBuilder:
+                                        (
+                                          Widget child,
+                                          Animation<double> animation,
+                                        ) {
+                                          return SlideTransition(
+                                            position: Tween<Offset>(
+                                              begin: Offset(0.0, 0.3),
+                                              end: Offset.zero,
+                                            ).animate(animation),
+                                            child: FadeTransition(
+                                              opacity: animation,
+                                              child: child,
+                                            ),
+                                          );
+                                        },
+                                    child: Center(
+                                      key: ValueKey(selectedIndex),
+                                      child: selectedIndex == 0
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 64,
+                                                right: 64,
+                                              ),
+                                              child: VehicleDetailsQuoteForm(),
+                                            )
+                                          : selectedIndex == 1
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 64,
+                                                right: 64,
+                                              ),
+                                              child: ProductQuoteForm(),
+                                            )
+                                          : selectedIndex == 2
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 64,
+                                                right: 64,
+                                              ),
+                                              child: TireProductQuoteForm(),
+                                            )
+                                          : SizedBox.shrink(),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
 
-                            // Animated Form Section
-                            AnimatedSwitcher(
-                              duration: Duration(milliseconds: 500),
-                              transitionBuilder: (Widget child, Animation<double> animation) {
-                                return SlideTransition(
-                                  position: Tween<Offset>(
-                                    begin: Offset(0.0, 0.3),
-                                    end: Offset.zero,
-                                  ).animate(animation),
-                                  child: FadeTransition(
-                                    opacity: animation,
-                                    child: child,
+                            // Animated About Us Section
+                            selectedIndex < 0
+                                ? SizedBox.shrink()
+                                : SizedBox(height: 60),
+                            TweenAnimationBuilder<double>(
+                              tween: Tween<double>(begin: 0.0, end: 1.0),
+                              duration: Duration(milliseconds: 1000),
+                              builder: (context, value, child) {
+                                return Transform.translate(
+                                  offset: Offset(0, 50 * (1 - value)),
+                                  child: Opacity(
+                                    opacity: value,
+                                    child: Center(
+                                      child: _buildAboutUsSection(),
+                                    ),
                                   ),
                                 );
                               },
+                            ),
+
+                            SizedBox(height: 24),
+
+                            // Animated Bottom Banner
+                            FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: Container(
+                                constraints: BoxConstraints(maxWidth: 1600),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 64,
+                                    right: 64,
+                                  ),
+                                  child: Center(
+                                    child: _buildAnimatedBannerSection(
+                                      "lib/assets/images/mask_group.png",
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: 24),
+
+                            // Animated Footer
+                            SlideTransition(
+                              position: Tween<Offset>(
+                                begin: Offset(0, 1),
+                                end: Offset.zero,
+                              ).animate(_slideController),
                               child: Center(
-                                key: ValueKey(selectedIndex),
-                                child: selectedIndex == 0
-                                    ? Padding(
-                                      padding: const EdgeInsets.only(left: 64,right: 64),
-                                      child: VehicleDetailsQuoteForm(),
-                                    )
-                                    : selectedIndex == 1
-                                    ? Padding(
-                                       padding: const EdgeInsets.only(left: 64,right: 64),
-                                      child: ProductQuoteForm(),
-                                    )
-                                    : selectedIndex == 2
-                                    ? Padding(
-                                      padding: const EdgeInsets.only(left: 64,right: 64),
-                                      child: TireProductQuoteForm(),
-                                    )
-                                    : SizedBox.shrink(),
+                                child: FooterSection(
+                                  logo: "lib/assets/images/bidr_logo2.png",
+                                  onFooterLinkTap: (String text) {
+                                    switch (text) {
+                                      case 'Home':
+                                        setState(() {
+                                          Constants.buyerAppBarValue = 0;
+                                          buyerHomeValueNotifier.value++;
+                                        });
+                                        break;
+                                      case 'Support':
+                                        setState(() {
+                                          Constants.buyerAppBarValue = 1;
+                                          buyerHomeValueNotifier.value++;
+                                        });
+                                        break;
+                                      case 'FAQs':
+                                        setState(() {
+                                          Constants.buyerAppBarValue = 2;
+                                          buyerHomeValueNotifier.value++;
+                                        });
+                                        break;
+                                      case 'Policies':
+                                        setState(() {
+                                          Constants.buyerAppBarValue = 3;
+                                          buyerHomeValueNotifier.value++;
+                                        });
+                                        break;
+                                      case 'Blogs':
+                                        setState(() {
+                                          Constants.buyerAppBarValue = 4;
+                                          buyerHomeValueNotifier.value++;
+                                        });
+                                        break;
+                                      case 'Contact Us':
+                                        setState(() {
+                                          Constants.buyerAppBarValue = 5;
+                                          buyerHomeValueNotifier.value++;
+                                        });
+                                        break;
+                                    }
+                                  },
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-
-                      // Animated About Us Section
-                      selectedIndex <0?SizedBox.shrink():SizedBox(height: 60,),
-                      TweenAnimationBuilder<double>(
-                        tween: Tween<double>(begin: 0.0, end: 1.0),
-                        duration: Duration(milliseconds: 1000),
-                        builder: (context, value, child) {
-                          return Transform.translate(
-                            offset: Offset(0, 50 * (1 - value)),
-                            child: Opacity(
-                              opacity: value,
-                              child: Center(child: _buildAboutUsSection()),
-                            ),
-                          );
-                        },
-                      ),
-
-                      SizedBox(height: 24),
-
-                      // Animated Bottom Banner
-                      FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Container(
-                          constraints: BoxConstraints(maxWidth: 1600),
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 64, right: 64),
-                            child: Center(
-                                child: _buildAnimatedBannerSection("lib/assets/images/mask_group.png")
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 24),
-
-                      // Animated Footer
-                      SlideTransition(
-                        position: Tween<Offset>(
-                          begin: Offset(0, 1),
-                          end: Offset.zero,
-                        ).animate(_slideController),
-                        child: Center(
-                            child: FooterSection(
-                              logo: "lib/assets/images/bidr_logo2.png",
-                              onFooterLinkTap: (String text) {
-                                switch (text) {
-                                  case 'Home':
-                                    setState(() {
-                                      Constants.buyerAppBarValue = 0;
-                                      buyerHomeValueNotifier.value++;
-                                    });
-                                    break;
-                                  case 'Support':
-                                    setState(() {
-                                      Constants.buyerAppBarValue = 1;
-                                      buyerHomeValueNotifier.value++;
-                                    });
-                                    break;
-                                  case 'FAQs':
-                                    setState(() {
-                                      Constants.buyerAppBarValue = 2;
-                                      buyerHomeValueNotifier.value++;
-                                    });
-                                    break;
-                                  case 'Policies':
-                                    setState(() {
-                                      Constants.buyerAppBarValue = 3;
-                                      buyerHomeValueNotifier.value++;
-                                    });
-                                    break;
-                                  case 'Blogs':
-                                    setState(() {
-                                      Constants.buyerAppBarValue = 4;
-                                      buyerHomeValueNotifier.value++;
-                                    });
-                                    break;
-                                  case 'Contact Us':
-                                    setState(() {
-                                      Constants.buyerAppBarValue = 5;
-                                      buyerHomeValueNotifier.value++;
-                                    });
-                                    break;
-                                }
-                              },
-                            )
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ):
-            Constants.buyerAppBarValue==1?Expanded(child: Support()):
-            Constants.buyerAppBarValue==2?Expanded(child: FAQScreen()):
-            Constants.buyerAppBarValue==3?Expanded(child: PoliciesScreen()):
-            Constants.buyerAppBarValue==4?Expanded(child: BlogCardsScreen()):
-            Constants.buyerAppBarValue==5?Expanded(child: ContactFormScreen()):
-            Constants.buyerAppBarValue==6?Expanded(child: DashboardScreen()):
-            Constants.buyerAppBarValue==7?Expanded(child: SellerDashboard()):
-            Constants.buyerAppBarValue==8?Expanded(child: NotificationPage(notifications: notifications)):
-            Container()
+                    ),
+                  )
+                : Constants.buyerAppBarValue == 1
+                ? Expanded(child: Support())
+                : Constants.buyerAppBarValue == 2
+                ? Expanded(child: FAQScreen())
+                : Constants.buyerAppBarValue == 3
+                ? Expanded(child: PoliciesScreen())
+                : Constants.buyerAppBarValue == 4
+                ? Expanded(child: BlogCardsScreen())
+                : Constants.buyerAppBarValue == 5
+                ? Expanded(child: ContactFormScreen())
+                : Constants.buyerAppBarValue == 6
+                ? Expanded(child: BuyerDashboardScreen())
+                : Constants.buyerAppBarValue == 7
+                ? Expanded(child: SellerDashboard())
+                : Constants.buyerAppBarValue == 8
+                ? Expanded(
+                    child: NotificationPage(notifications: notifications),
+                  )
+                : Container(),
           ],
         ),
       ),
@@ -400,28 +438,33 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _buildAnimatedVideoSection(
-                      "About Us",
-                      "Created in 2024, BIDR™ is South Africa's newest e-commerce platform. Our unique buyer centric service makes searching for the best price for common goods easy. Headquartered in Johannesburg, we currently serve all of SA.BIDR was born out of its founders' frustrations of always trying to source the best deals for commonly required items such as vehicle tyres or spares, expensive mobile bills, and countless hours trying to negotiate with sellers to get the best deals.We have now taken our expertise and automated the process for you. Why not consider registering as a buyer or seller (as the case may be) and see how our system can save you time, money and stress.",
-                      "Why Join As A Buyer?",
-                      0
+                    "About Us",
+                    "Created in 2024, BIDR™ is South Africa's newest e-commerce platform. Our unique buyer centric service makes searching for the best price for common goods easy. Headquartered in Johannesburg, we currently serve all of SA.BIDR was born out of its founders' frustrations of always trying to source the best deals for commonly required items such as vehicle tyres or spares, expensive mobile bills, and countless hours trying to negotiate with sellers to get the best deals.We have now taken our expertise and automated the process for you. Why not consider registering as a buyer or seller (as the case may be) and see how our system can save you time, money and stress.",
+                    "Why Join As A Buyer?",
+                    0,
                   ),
                   SizedBox(width: 16),
                   _buildAnimatedVideoSection(
-                      "How It Works",
-                      "Unlike catalogue-based online shops, BIDR allows buyers to send out a single request to multiple sellers that are registered on our platform.The buyer simply specifies the area to search and all sellers within that area are notified of therequest. If the seller has the product (or similar products), they will make an offer. The sellers are continuously updated of the current market price offered by other sellers in the area, and should they opt to do so, they will have the opportunity of revising their bid with a best and final offer. No more long repetitive phone calls, waiting in queues, or countless hours browsing for special deals. With BIDR the sellers come to you with their best price.",
-                      "Why Join As A Business?",
-                      1
+                    "How It Works",
+                    "Unlike catalogue-based online shops, BIDR allows buyers to send out a single request to multiple sellers that are registered on our platform.The buyer simply specifies the area to search and all sellers within that area are notified of therequest. If the seller has the product (or similar products), they will make an offer. The sellers are continuously updated of the current market price offered by other sellers in the area, and should they opt to do so, they will have the opportunity of revising their bid with a best and final offer. No more long repetitive phone calls, waiting in queues, or countless hours browsing for special deals. With BIDR the sellers come to you with their best price.",
+                    "Why Join As A Business?",
+                    1,
                   ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildAnimatedVideoSection(String title, String description, String buttonTitle, int index) {
+  Widget _buildAnimatedVideoSection(
+    String title,
+    String description,
+    String buttonTitle,
+    int index,
+  ) {
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.0, end: 1.0),
       duration: Duration(milliseconds: 800 + (index * 200)),
@@ -475,7 +518,9 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                                   style: GoogleFonts.manrope(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
-                                    color: Constants.ftaColorLight.withOpacity(0.65),
+                                    color: Constants.ftaColorLight.withOpacity(
+                                      0.65,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -486,11 +531,13 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                             Expanded(
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: CustomVideoPlayerWidget(
-                                      videoUrl: 'https://videocdn.cdnpk.net/videos/83f87a00-c832-4e39-811f-df9ddde83898/horizontal/previews/clear/large.mp4?token=exp=1755697238~hmac=5202134e7d9eb8da3a24a10b5798bab437686787321e18dc3b710fc8aa4b6199',
+                                      videoUrl:
+                                          'https://videocdn.cdnpk.net/videos/83f87a00-c832-4e39-811f-df9ddde83898/horizontal/previews/clear/large.mp4?token=exp=1755697238~hmac=5202134e7d9eb8da3a24a10b5798bab437686787321e18dc3b710fc8aa4b6199',
                                       autoPlay: false,
                                       looping: true,
                                       placeholder: 'Loading awesome video...',
@@ -499,7 +546,8 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                                   SizedBox(width: 16),
                                   Expanded(
                                     child: CustomVideoPlayerWidget(
-                                      videoUrl: 'https://videocdn.cdnpk.net/videos/1023b72a-f207-5513-9046-9e86aff44a23/horizontal/previews/clear/large.mp4?token=exp=1755697314~hmac=f8602bae3e1a7957fdf7bb67f723a230d3802e4d3542b8518e0d673fc34175d3',
+                                      videoUrl:
+                                          'https://videocdn.cdnpk.net/videos/1023b72a-f207-5513-9046-9e86aff44a23/horizontal/previews/clear/large.mp4?token=exp=1755697314~hmac=f8602bae3e1a7957fdf7bb67f723a230d3802e4d3542b8518e0d673fc34175d3',
                                       autoPlay: false,
                                       looping: true,
                                       placeholder: 'Loading awesome video...',
@@ -507,17 +555,19 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                                   ),
                                 ],
                               ),
-                            )
+                            ),
                           ],
                           if (title == "How It Works") ...[
                             Expanded(
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: CustomVideoPlayerWidget(
-                                      videoUrl: 'https://videocdn.cdnpk.net/videos/45d47465-c3a1-54ef-aa83-466722d851ad/horizontal/previews/clear/large.mp4?token=exp=1755697358~hmac=426a8baec13e32ba767cbd9a89368f19f1af446166d941db9ac11d5662dc61f1',
+                                      videoUrl:
+                                          'https://videocdn.cdnpk.net/videos/45d47465-c3a1-54ef-aa83-466722d851ad/horizontal/previews/clear/large.mp4?token=exp=1755697358~hmac=426a8baec13e32ba767cbd9a89368f19f1af446166d941db9ac11d5662dc61f1',
                                       autoPlay: false,
                                       looping: true,
                                       placeholder: 'Loading awesome video...',
@@ -525,8 +575,8 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                                   ),
                                 ],
                               ),
-                            )
-                          ]
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -534,7 +584,7 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                   SizedBox(height: 40),
                   AnimatedContainer(
                     duration: Duration(milliseconds: 300),
-                    padding: EdgeInsets.only(left: 12,right: 12),
+                    padding: EdgeInsets.only(left: 12, right: 12),
                     height: 65,
                     width: MediaQuery.of(context).size.width * 0.35,
                     decoration: BoxDecoration(
@@ -570,44 +620,71 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                                 Navigator.push(
                                   context,
                                   PageRouteBuilder(
-                                    pageBuilder: (context, animation, secondaryAnimation) => BusinessLandingPage(),
-                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                      return SlideTransition(
-                                        position: Tween<Offset>(
-                                          begin: Offset(1.0, 0.0),
-                                          end: Offset.zero,
-                                        ).animate(animation),
-                                        child: child,
-                                      );
-                                    },
+                                    pageBuilder:
+                                        (
+                                          context,
+                                          animation,
+                                          secondaryAnimation,
+                                        ) => BusinessLandingPage(),
+                                    transitionsBuilder:
+                                        (
+                                          context,
+                                          animation,
+                                          secondaryAnimation,
+                                          child,
+                                        ) {
+                                          return SlideTransition(
+                                            position: Tween<Offset>(
+                                              begin: Offset(1.0, 0.0),
+                                              end: Offset.zero,
+                                            ).animate(animation),
+                                            child: child,
+                                          );
+                                        },
                                   ),
                                 );
                               } else {
                                 Navigator.push(
                                   context,
                                   PageRouteBuilder(
-                                    pageBuilder: (context, animation, secondaryAnimation) => BuyerLandingPage(),
-                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                      return SlideTransition(
-                                        position: Tween<Offset>(
-                                          begin: Offset(1.0, 0.0),
-                                          end: Offset.zero,
-                                        ).animate(animation),
-                                        child: child,
-                                      );
-                                    },
+                                    pageBuilder:
+                                        (
+                                          context,
+                                          animation,
+                                          secondaryAnimation,
+                                        ) => BuyerLandingPage(),
+                                    transitionsBuilder:
+                                        (
+                                          context,
+                                          animation,
+                                          secondaryAnimation,
+                                          child,
+                                        ) {
+                                          return SlideTransition(
+                                            position: Tween<Offset>(
+                                              begin: Offset(1.0, 0.0),
+                                              end: Offset.zero,
+                                            ).animate(animation),
+                                            child: child,
+                                          );
+                                        },
                                   ),
                                 );
                               }
                               setState(() {});
                             },
-                            style: IconButton.styleFrom(backgroundColor: Constants.ftaColorLight),
-                            icon: Icon(Icons.arrow_forward, color: Colors.white),
+                            style: IconButton.styleFrom(
+                              backgroundColor: Constants.ftaColorLight,
+                            ),
+                            icon: Icon(
+                              Icons.arrow_forward,
+                              color: Colors.white,
+                            ),
                           ),
-                        )
+                        ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -727,13 +804,14 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                     child: Opacity(
                       opacity: value,
                       child: Container(
-                        width: (MediaQuery.of(context).size.width - 48 - 48) / 6.8,
+                        width:
+                            (MediaQuery.of(context).size.width - 48 - 48) / 6.8,
                         child: _categoryCard(
                           category["icon"]!,
                           category["name"]!,
                           index,
                           selectedIndex,
-                              () => _onCategoryTap(index),
+                          () => _onCategoryTap(index),
                         ),
                       ),
                     ),
@@ -749,13 +827,12 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
   }
 
   Widget _categoryCard(
-      String iconImage,
-      String name,
-      int index,
-      int selectedIndex,
-      VoidCallback onPressed,
-      )
-  {
+    String iconImage,
+    String name,
+    int index,
+    int selectedIndex,
+    VoidCallback onPressed,
+  ) {
     final bool isSelected = index == selectedIndex;
 
     return AnimatedContainer(
@@ -785,21 +862,18 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
                   ),
                   boxShadow: isSelected
                       ? [
-                    BoxShadow(
-                      color: Constants.ftaColorLight.withOpacity(0.1),
-                      blurRadius: 12,
-                      offset: Offset(0, 3),
-                    ),
-                  ]
+                          BoxShadow(
+                            color: Constants.ftaColorLight.withOpacity(0.1),
+                            blurRadius: 12,
+                            offset: Offset(0, 3),
+                          ),
+                        ]
                       : [],
                 ),
                 child: AnimatedScale(
-                  scale: isSelected ? 0.91: 0.8,
+                  scale: isSelected ? 0.91 : 0.8,
                   duration: Duration(milliseconds: 200),
-                  child: Image.asset(
-                    iconImage,
-                    fit: BoxFit.contain,
-                  ),
+                  child: Image.asset(iconImage, fit: BoxFit.contain),
                 ),
               ),
               SizedBox(height: 16),
@@ -822,10 +896,10 @@ class _BuyerHomePageState extends State<BuyerHomePage> with TickerProviderStateM
   }
 }
 
-
 class VehicleDetailsQuoteForm extends StatefulWidget {
   @override
-  _VehicleDetailsQuoteFormState createState() => _VehicleDetailsQuoteFormState();
+  _VehicleDetailsQuoteFormState createState() =>
+      _VehicleDetailsQuoteFormState();
 }
 
 class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
@@ -836,6 +910,11 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _partNumberController = TextEditingController();
   final TextEditingController _mileageController = TextEditingController();
+
+  // Location variables
+  LatLng? _selectedLocation;
+  String _selectedAddress = '';
+  static const String _googleMapsApiKey = 'AIzaSyAKFP-Mf1TQ1z2o8vEBjx2P-_5SwB0lA-k';
 
   // Focus Nodes
   final FocusNode _vinFocus = FocusNode();
@@ -869,6 +948,10 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   List<XFile> _selectedImages = [];
   Map<String, Uint8List> _imageBytes = {};
 
+  // VIN Image picker (image-only, no text input)
+  List<XFile> _vinImages = [];
+  Map<String, Uint8List> _vinImageBytes = {};
+
   @override
   void initState() {
     super.initState();
@@ -896,7 +979,13 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     super.dispose();
   }
 
-  Widget _buildCustomTextField(String hintText, TextEditingController controller, FocusNode focusNode, FocusNode? nextFocusNode, {Widget? suffixIcon}) {
+  Widget _buildCustomTextField(
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocusNode, {
+    Widget? suffixIcon,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -916,7 +1005,9 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
           hintText: hintText,
           controller: controller,
           focusNode: focusNode,
-          textInputAction: nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+          textInputAction: nextFocusNode != null
+              ? TextInputAction.next
+              : TextInputAction.done,
           isPasswordField: false,
           suffix: suffixIcon,
           onChanged: (value) {},
@@ -930,7 +1021,12 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     );
   }
 
-  Widget _buildCustomDropdown(String label, String? value, List<String> items, Function(String?) onChanged) {
+  Widget _buildCustomDropdown(
+    String label,
+    String? value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -992,7 +1088,13 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     );
   }
 
-  Widget _buildSliderField(String label, double value, double min, double max, Function(double) onChanged) {
+  Widget _buildSliderField(
+    String label,
+    double value,
+    double min,
+    double max,
+    Function(double) onChanged,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1085,63 +1187,70 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
               width: double.infinity,
               height: _selectedImages.isEmpty ? 120 : null,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey[300]!, style: BorderStyle.solid),
+                border: Border.all(
+                  color: Colors.grey[300]!,
+                  style: BorderStyle.solid,
+                ),
                 borderRadius: BorderRadius.circular(8),
                 color: Colors.grey[50],
               ),
               child: _selectedImages.isEmpty
                   ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.cloud_upload_outlined,
-                      size: 24,
-                      color: Colors.grey[500],
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Upload Documents or Images',
-                      style: GoogleFonts.manrope(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-                  : Padding(
-                padding: EdgeInsets.all(8),
-                child: Column(
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _selectedImages.map((image) => _buildImagePreview(image)).toList(),
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      width: double.infinity,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Constants.ctaColorLight),
-                        borderRadius: BorderRadius.circular(6),
-                        color: Colors.white,
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Add More Images',
-                          style: GoogleFonts.manrope(
-                            color: Constants.ctaColorLight,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.cloud_upload_outlined,
+                            size: 24,
+                            color: Colors.grey[500],
                           ),
-                        ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Upload Documents or Images',
+                            style: GoogleFonts.manrope(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Padding(
+                      padding: EdgeInsets.all(8),
+                      child: Column(
+                        children: [
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: _selectedImages
+                                .map((image) => _buildImagePreview(image))
+                                .toList(),
+                          ),
+                          SizedBox(height: 8),
+                          Container(
+                            width: double.infinity,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Constants.ctaColorLight,
+                              ),
+                              borderRadius: BorderRadius.circular(6),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Add More Images',
+                                style: GoogleFonts.manrope(
+                                  color: Constants.ctaColorLight,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
             ),
           ),
         ),
@@ -1150,10 +1259,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             padding: EdgeInsets.only(top: 8),
             child: Text(
               '${_selectedImages.length} image(s) selected',
-              style: GoogleFonts.manrope(
-                color: Colors.grey[600],
-                fontSize: 12,
-              ),
+              style: GoogleFonts.manrope(color: Colors.grey[600], fontSize: 12),
             ),
           ),
       ],
@@ -1182,7 +1288,10 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: Colors.grey[200],
-                        child: Icon(Icons.broken_image, color: Colors.grey[400]),
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.grey[400],
+                        ),
                       );
                     },
                   );
@@ -1214,11 +1323,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 color: Colors.red,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.close,
-                size: 12,
-                color: Colors.white,
-              ),
+              child: Icon(Icons.close, size: 12, color: Colors.white),
             ),
           ),
         ),
@@ -1235,9 +1340,9 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error picking images: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error picking images: $e')));
     }
   }
 
@@ -1283,212 +1388,253 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
 
   @override
   Widget build(BuildContext context) {
-    return  Column(
+    return Column(
       children: [
         // Vehicle Details Section
-        _buildSection(
-          'Vehicle Details',
-          [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomTextField(
-                    'VIN (Vehicle Identification Number)*',
-                    _vinController,
-                    _vinFocus,
-                    null,
-                    suffixIcon: Container(
-                      margin: EdgeInsets.all(4),
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF2C3E50),
-                        borderRadius: BorderRadius.circular(360),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.camera_alt, color: Colors.white, size: 14),
-                          SizedBox(width: 4),
-                          Text(
-                            'Upload Photo',
-                            style: GoogleFonts.manrope(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+        _buildSection('Vehicle Details', [
+          Row(
+            children: [
+              Expanded(child: _buildVinField()),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Manufacturer*',
+                  _selectedManufacturer,
+                  [
+                    'Select Manufacturer',
+                    'Toyota',
+                    'Honda',
+                    'Ford',
+                    'BMW',
+                    'Mercedes',
+                    'Audi',
+                    'Volkswagen',
+                  ],
+                  (value) => setState(() => _selectedManufacturer = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Manufacturer*',
-                    _selectedManufacturer,
-                    ['Select Manufacturer', 'Toyota', 'Honda', 'Ford', 'BMW', 'Mercedes', 'Audi', 'Volkswagen'],
-                        (value) => setState(() => _selectedManufacturer = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Makes & Models*',
+                  _selectedMakeModel,
+                  [
+                    'Select Makes & Models',
+                    'Corolla',
+                    'Camry',
+                    'Civic',
+                    'Accord',
+                    'Focus',
+                    'Mustang',
+                  ],
+                  (value) => setState(() => _selectedMakeModel = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Makes & Models*',
-                    _selectedMakeModel,
-                    ['Select Makes & Models', 'Corolla', 'Camry', 'Civic', 'Accord', 'Focus', 'Mustang'],
-                        (value) => setState(() => _selectedMakeModel = value),
-                  ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Type*',
+                  _selectedType,
+                  [
+                    'Select Type',
+                    'Sedan',
+                    'SUV',
+                    'Hatchback',
+                    'Coupe',
+                    'Truck',
+                    'Van',
+                  ],
+                  (value) => setState(() => _selectedType = value),
                 ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Type*',
-                    _selectedType,
-                    ['Select Type', 'Sedan', 'SUV', 'Hatchback', 'Coupe', 'Truck', 'Van'],
-                        (value) => setState(() => _selectedType = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'New/Used Part*',
+                  _selectedNewUsedPart,
+                  ['Select New/Used Part', 'New', 'Used', 'Refurbished'],
+                  (value) => setState(() => _selectedNewUsedPart = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'New/Used Part*',
-                    _selectedNewUsedPart,
-                    ['Select New/Used Part', 'New', 'Used', 'Refurbished'],
-                        (value) => setState(() => _selectedNewUsedPart = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Year*',
+                  _selectedYear,
+                  [
+                    'Select Year',
+                    '2024',
+                    '2023',
+                    '2022',
+                    '2021',
+                    '2020',
+                    '2019',
+                    '2018',
+                    '2017',
+                  ],
+                  (value) => setState(() => _selectedYear = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Year*',
-                    _selectedYear,
-                    ['Select Year', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017'],
-                        (value) => setState(() => _selectedYear = value),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ]),
         SizedBox(height: 20),
 
         // Part Details Section
-        _buildSection(
-          'Part Details',
-          [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomTextField('Part Name/Description*', _partNameController, _partNameFocus, _locationFocus),
+        _buildSection('Part Details', [
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomTextField(
+                  'Part Name/Description*',
+                  _partNameController,
+                  _partNameFocus,
+                  _locationFocus,
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Quantity*',
-                    _selectedQuantity,
-                    ['Select Quantity', '1', '2', '3', '4', '5', '6', '7', '8'],
-                        (value) => setState(() => _selectedQuantity = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Quantity*',
+                  _selectedQuantity,
+                  ['Select Quantity', '1', '2', '3', '4', '5', '6', '7', '8'],
+                  (value) => setState(() => _selectedQuantity = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomTextField(
-                    'Your Location*',
-                    _locationController,
-                    _locationFocus,
-                    null,
-                    suffixIcon: Icon(Icons.location_on, color: Colors.grey[500], size: 20),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildLocationField(),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildSliderField(
+                  'Max Distance You Want to Travel (km)*',
+                  _maxDistance,
+                  0,
+                  200,
+                  (value) => setState(() => _maxDistance = value),
                 ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildSliderField(
-                    'Max Distance You Want to Travel (km)*',
-                    _maxDistance,
-                    0,
-                    200,
-                        (value) => setState(() => _maxDistance = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'How Soon Do You Need To Buy This Product?*',
+                  _selectedTimeframe,
+                  [
+                    'Select Time',
+                    '12 Hours',
+                    '24 Hours',
+                    '2-3 Days',
+                    '1 Week',
+                    '2 Weeks',
+                    'Within a Month',
+                  ],
+                  (value) => setState(() => _selectedTimeframe = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'How Soon Do You Need To Buy This Product?*',
-                    _selectedTimeframe,
-                    ['Select Time', '12 Hours', '24 Hours', '2-3 Days', '1 Week', '2 Weeks', 'Within a Month'],
-                        (value) => setState(() => _selectedTimeframe = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomTextField(
+                  'Description of the Product*',
+                  _descriptionController,
+                  _descriptionFocus,
+                  null,
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomTextField('Description of the Product*', _descriptionController, _descriptionFocus, null),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            _buildImageUploadSection(),
-          ],
-        ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          _buildImageUploadSection(),
+        ]),
         SizedBox(height: 20),
 
         // More Fields Section
-        _buildSection(
-          'More Fields',
-          [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomTextField('Part Number', _partNumberController, _partNumberFocus, _mileageFocus),
+        _buildSection('More Fields', [
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomTextField(
+                  'Part Number',
+                  _partNumberController,
+                  _partNumberFocus,
+                  _mileageFocus,
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Transmission Type (Manual/Auto)',
-                    _selectedTransmissionType,
-                    ['Select Type', 'Manual', 'Automatic', 'CVT', 'Semi-Automatic'],
-                        (value) => setState(() => _selectedTransmissionType = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Transmission Type (Manual/Auto)',
+                  _selectedTransmissionType,
+                  [
+                    'Select Type',
+                    'Manual',
+                    'Automatic',
+                    'CVT',
+                    'Semi-Automatic',
+                  ],
+                  (value) => setState(() => _selectedTransmissionType = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomTextField('Mileage of Vehicle', _mileageController, _mileageFocus, null),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomTextField(
+                  'Mileage of Vehicle',
+                  _mileageController,
+                  _mileageFocus,
+                  null,
                 ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Fuel Type',
-                    _selectedFuelType,
-                    ['Select Type', 'Petrol', 'Diesel', 'Electric', 'Hybrid', 'LPG'],
-                        (value) => setState(() => _selectedFuelType = value),
-                  ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Fuel Type',
+                  _selectedFuelType,
+                  [
+                    'Select Type',
+                    'Petrol',
+                    'Diesel',
+                    'Electric',
+                    'Hybrid',
+                    'LPG',
+                  ],
+                  (value) => setState(() => _selectedFuelType = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Body Type',
-                    _selectedBodyType,
-                    ['Select Type', 'Sedan', 'Hatchback', 'SUV', 'Coupe', 'Convertible', 'Wagon', 'Pickup'],
-                        (value) => setState(() => _selectedBodyType = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Body Type',
+                  _selectedBodyType,
+                  [
+                    'Select Type',
+                    'Sedan',
+                    'Hatchback',
+                    'SUV',
+                    'Coupe',
+                    'Convertible',
+                    'Wagon',
+                    'Pickup',
+                  ],
+                  (value) => setState(() => _selectedBodyType = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(child: Container()), // Empty space for alignment
-              ],
-            ),
-          ],
-        ),
+              ),
+              SizedBox(width: 16),
+              Expanded(child: Container()), // Empty space for alignment
+            ],
+          ),
+        ]),
         SizedBox(height: 20),
 
         // Checkboxes
@@ -1512,7 +1658,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 children: [
                   Checkbox(
                     value: _agreeToTerms,
-                    onChanged: (value) => setState(() => _agreeToTerms = value ?? false),
+                    onChanged: (value) =>
+                        setState(() => _agreeToTerms = value ?? false),
                     activeColor: Constants.ctaColorLight,
                   ),
                   Expanded(
@@ -1530,7 +1677,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 children: [
                   Checkbox(
                     value: _consentToContact,
-                    onChanged: (value) => setState(() => _consentToContact = value ?? false),
+                    onChanged: (value) =>
+                        setState(() => _consentToContact = value ?? false),
                     activeColor: Constants.ctaColorLight,
                   ),
                   Expanded(
@@ -1551,31 +1699,317 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
 
         // Submit Button
         Container(
-          width: MediaQuery.of(context).size.width*0.5,
+          width: MediaQuery.of(context).size.width * 0.5,
           height: 45,
           child: ElevatedButton(
-            onPressed: () {
-              if (_agreeToTerms && _consentToContact) {
-                _submitForm();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Please agree to terms and consent to contact.')),
-                );
-              }
-            },
+            onPressed: _isSubmitting
+                ? null
+                : () {
+                    if (_agreeToTerms && _consentToContact) {
+                      _submitForm();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Please agree to terms and consent to contact.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Constants.ctaColorLight,
+              backgroundColor: _isSubmitting
+                  ? Colors.grey
+                  : Constants.ctaColorLight,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(360),
               ),
               elevation: 5,
             ),
-            child: Text(
-              'Submit',
-              style: GoogleFonts.manrope(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: Colors.white,
+            child: _isSubmitting
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Text(
+                    'Submit',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.white,
+                    ),
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Loading state
+  bool _isSubmitting = false;
+
+  void _submitForm() async {
+    // Basic validation
+    if (!_validateForm()) {
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      // Get JWT token first
+      final token = await ApiService.getJWTToken();
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to authenticate. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final result = await ApiService.submitVehicleRequest(
+        accessToken: token,
+        selectedManufacturer: _selectedManufacturer,
+        selectedMakeModel: _selectedMakeModel,
+        selectedYear: _selectedYear,
+        selectedType: _selectedType,
+        selectedNewUsedPart: _selectedNewUsedPart,
+        selectedQuantity: _selectedQuantity,
+        selectedTimeframe: _selectedTimeframe,
+        selectedTransmissionType: _selectedTransmissionType,
+        selectedFuelType: _selectedFuelType,
+        selectedBodyType: _selectedBodyType,
+        vinNumber: _vinController.text,
+        partName: _partNameController.text,
+        partNumber: _partNumberController.text,
+        location: _locationController.text,
+        description: _descriptionController.text,
+        mileage: _mileageController.text,
+        maxDistance: _maxDistance,
+        images: _selectedImages,
+        vinImages: _vinImages,
+        locationLat: _selectedLocation?.latitude,
+        locationLng: _selectedLocation?.longitude,
+      );
+
+      if (result['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Vehicle quote request submitted successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Reset form after successful submission
+        _resetForm();
+        
+        // Navigate to dashboard
+        if (mounted) {
+          context.go('/dashboard');
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to submit request: ${result['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error submitting request: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
+  }
+
+  bool _validateForm() {
+    List<String> errors = [];
+
+    if (_selectedManufacturer == null || _selectedManufacturer!.isEmpty) {
+      errors.add('Manufacturer is required');
+    }
+    if (_selectedMakeModel == null || _selectedMakeModel!.isEmpty) {
+      errors.add('Make & Model is required');
+    }
+    if (_selectedYear == null || _selectedYear!.isEmpty) {
+      errors.add('Year is required');
+    }
+    if (_partNameController.text.trim().isEmpty) {
+      errors.add('Part name is required');
+    }
+    if (_locationController.text.trim().isEmpty) {
+      errors.add('Location is required');
+    }
+    if (_descriptionController.text.trim().isEmpty) {
+      errors.add('Description is required');
+    }
+
+    if (errors.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill in required fields: ${errors.join(', ')}'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  void _resetForm() {
+    setState(() {
+      // Clear controllers
+      _vinController.clear();
+      _partNameController.clear();
+      _locationController.clear();
+      _descriptionController.clear();
+      _partNumberController.clear();
+      _mileageController.clear();
+
+      // Reset dropdowns
+      _selectedManufacturer = null;
+      _selectedMakeModel = null;
+      _selectedType = null;
+      _selectedNewUsedPart = null;
+      _selectedYear = null;
+      _selectedQuantity = null;
+      _selectedTimeframe = null;
+      _selectedTransmissionType = null;
+      _selectedFuelType = null;
+      _selectedBodyType = null;
+
+      // Reset slider
+      _maxDistance = 50.0;
+
+      // Reset checkboxes
+      _agreeToTerms = false;
+      _consentToContact = false;
+
+      // Clear images
+      _selectedImages.clear();
+      _vinImages.clear();
+      _imageBytes.clear();
+      _vinImageBytes.clear();
+    });
+  }
+
+  Future<void> _pickVinImages() async {
+    try {
+      final List<XFile>? images = await _imagePicker.pickMultiImage();
+      if (images != null && images.isNotEmpty) {
+        setState(() {
+          _vinImages.addAll(images);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error picking VIN images: $e')));
+    }
+  }
+
+  void _removeVinImage(XFile image) {
+    setState(() {
+      _vinImages.remove(image);
+      _vinImageBytes.remove(image.path);
+    });
+  }
+
+  void _showLocationPicker() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return LocationPickerDialog(
+          apiKey: _googleMapsApiKey,
+          initialLocation: const LatLng(-26.2041, 28.0473), // Johannesburg
+          onLocationSelected: (LatLng location, String address) {
+            setState(() {
+              _selectedLocation = location;
+              _selectedAddress = address;
+              _locationController.text = address;
+            });
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildLocationField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Text(
+            'Your Location*',
+            style: GoogleFonts.manrope(
+              color: Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        SizedBox(height: 8),
+        GestureDetector(
+          onTap: _showLocationPicker,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.white,
+            ),
+            child: TextField(
+              controller: _locationController,
+              focusNode: _locationFocus,
+              enabled: false,
+              decoration: InputDecoration(
+                hintText: 'Tap to select location',
+                hintStyle: GoogleFonts.manrope(
+                  color: Colors.grey.shade500,
+                  fontSize: 14,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                suffixIcon: Container(
+                  margin: EdgeInsets.all(8),
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF2C3E50),
+                    borderRadius: BorderRadius.circular(360),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.location_on, color: Colors.white, size: 16),
+                      SizedBox(width: 6),
+                      Text(
+                        'Select Location',
+                        style: GoogleFonts.manrope(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -1584,41 +2018,364 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     );
   }
 
-  void _submitForm() {
-    Map<String, dynamic> formData = {
-      'vin': _vinController.text,
-      'manufacturer': _selectedManufacturer,
-      'makeModel': _selectedMakeModel,
-      'type': _selectedType,
-      'newUsedPart': _selectedNewUsedPart,
-      'year': _selectedYear,
-      'partName': _partNameController.text,
-      'quantity': _selectedQuantity,
-      'location': _locationController.text,
-      'maxDistance': _maxDistance,
-      'timeframe': _selectedTimeframe,
-      'description': _descriptionController.text,
-      'partNumber': _partNumberController.text,
-      'transmissionType': _selectedTransmissionType,
-      'mileage': _mileageController.text,
-      'fuelType': _selectedFuelType,
-      'bodyType': _selectedBodyType,
-      'selectedImages': _selectedImages.map((image) => image.path).toList(),
-      'agreeToTerms': _agreeToTerms,
-      'consentToContact': _consentToContact,
-    };
+  Widget _buildVinField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Text(
+            'VIN (Vehicle Identification Number)*',
+            style: GoogleFonts.manrope(
+              color: Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        SizedBox(height: 8),
+        GestureDetector(
+          onTap: _pickVinImages,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey.shade50,
+            ),
+            child: TextField(
+              controller: _vinController,
+              focusNode: _vinFocus,
+              enabled: false,
+              decoration: InputDecoration(
+                hintText: 'Click to upload images or use upload button',
+                hintStyle: GoogleFonts.manrope(
+                  color: Colors.grey.shade500,
+                  fontSize: 14,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                prefixIcon: _vinImages.isNotEmpty
+                    ? Container(
+                        margin: EdgeInsets.all(8),
+                        padding: EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade50,
+                          borderRadius: BorderRadius.circular(360),
+                          border: Border.all(color: Colors.green.shade300),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                              size: 16,
+                            ),
+                            SizedBox(width: 4),
+                            Text(
+                              '${_vinImages.length} image${_vinImages.length > 1 ? 's' : ''}',
+                              style: GoogleFonts.manrope(
+                                color: Colors.green.shade700,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(width: 4),
+                            GestureDetector(
+                              onTap: _showVinImages,
+                              child: Icon(
+                                Icons.visibility,
+                                color: Colors.green.shade700,
+                                size: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : null,
+                suffixIcon: GestureDetector(
+                  onTap: _pickVinImages,
+                  child: Container(
+                    margin: EdgeInsets.all(8),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF2C3E50),
+                      borderRadius: BorderRadius.circular(360),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.camera_alt, color: Colors.white, size: 16),
+                        SizedBox(width: 6),
+                        Text(
+                          'Upload Photo',
+                          style: GoogleFonts.manrope(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
-    print('Form Data: $formData');
+  Widget _buildVinImageField(String label) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Text(
+            label,
+            style: GoogleFonts.manrope(
+              color: Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.w300,
+            ),
+          ),
+        ),
+        SizedBox(height: 8),
+        GestureDetector(
+          onTap: _pickVinImages,
+          child: Container(
+            width: double.infinity,
+            height: _vinImages.isEmpty ? 120 : null,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.grey[300]!,
+                style: BorderStyle.solid,
+              ),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey[50],
+            ),
+            child: _vinImages.isEmpty
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.camera_alt, size: 40, color: Colors.grey[400]),
+                      SizedBox(height: 8),
+                      Text(
+                        'Upload VIN Images',
+                        style: GoogleFonts.manrope(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Tap to add images of VIN number',
+                        style: GoogleFonts.manrope(
+                          color: Colors.grey[500],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _vinImages
+                          .map(
+                            (image) => Stack(
+                              children: [
+                                Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      image.path,
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Container(
+                                              width: 80,
+                                              height: 80,
+                                              color: Colors.grey[200],
+                                              child: Icon(
+                                                Icons.image,
+                                                color: Colors.grey[400],
+                                              ),
+                                            );
+                                          },
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: -5,
+                                  right: -5,
+                                  child: GestureDetector(
+                                    onTap: () => _removeVinImage(image),
+                                    child: Container(
+                                      width: 18,
+                                      height: 18,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.close,
+                                        size: 12,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Vehicle quote request submitted successfully!'),
-        backgroundColor: Constants.ctaColorLight,
-      ),
+  void _showVinImages() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'VIN Images (${_vinImages.length})',
+                      style: GoogleFonts.manrope(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(Icons.close),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Container(
+                  height: 300,
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                    ),
+                    itemCount: _vinImages.length,
+                    itemBuilder: (context, index) {
+                      final image = _vinImages[index];
+                      return Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                image.path,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[200],
+                                    child: Icon(
+                                      Icons.image,
+                                      color: Colors.grey[400],
+                                      size: 40,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () {
+                                _removeVinImage(image);
+                                if (_vinImages.isEmpty) {
+                                  Navigator.of(context).pop();
+                                }
+                                setState(() {});
+                              },
+                              child: Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.delete,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _pickVinImages,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Constants.ctaColorLight,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      'Add More Images',
+                      style: GoogleFonts.manrope(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
-
 
 class ProductQuoteForm extends StatefulWidget {
   @override
@@ -1661,11 +2418,13 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
   List<XFile> _selectedImages = [];
   Map<String, Uint8List> _imageBytes = {};
 
+  // Loading state
+  bool _isSubmitting = false;
+
   @override
   void initState() {
     super.initState();
     // Set initial values
-
   }
 
   @override
@@ -1712,7 +2471,10 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
             width: double.infinity,
             height: _selectedImages.isEmpty ? 120 : null,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!, style: BorderStyle.solid),
+              border: Border.all(
+                color: Colors.grey[300]!,
+                style: BorderStyle.solid,
+              ),
               borderRadius: BorderRadius.circular(8),
               color: Colors.grey[50],
             ),
@@ -1744,7 +2506,9 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: _selectedImages.map((image) => _buildImagePreview(image)).toList(),
+                          children: _selectedImages
+                              .map((image) => _buildImagePreview(image))
+                              .toList(),
                         ),
                         SizedBox(height: 8),
                         Container(
@@ -1776,10 +2540,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
             padding: EdgeInsets.only(top: 8),
             child: Text(
               '${_selectedImages.length} image(s) selected',
-              style: GoogleFonts.manrope(
-                color: Colors.grey[600],
-                fontSize: 12,
-              ),
+              style: GoogleFonts.manrope(color: Colors.grey[600], fontSize: 12),
             ),
           ),
       ],
@@ -1808,7 +2569,10 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: Colors.grey[200],
-                        child: Icon(Icons.broken_image, color: Colors.grey[400]),
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.grey[400],
+                        ),
                       );
                     },
                   );
@@ -1840,11 +2604,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                 color: Colors.red,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.close,
-                size: 12,
-                color: Colors.white,
-              ),
+              child: Icon(Icons.close, size: 12, color: Colors.white),
             ),
           ),
         ),
@@ -1861,9 +2621,9 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error picking images: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error picking images: $e')));
     }
   }
 
@@ -1874,7 +2634,13 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
     });
   }
 
-  Widget _buildCustomTextField(String hintText, TextEditingController controller, FocusNode focusNode, FocusNode? nextFocusNode, {Widget? suffixIcon}) {
+  Widget _buildCustomTextField(
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocusNode, {
+    Widget? suffixIcon,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1894,7 +2660,9 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
           hintText: hintText,
           controller: controller,
           focusNode: focusNode,
-          textInputAction: nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+          textInputAction: nextFocusNode != null
+              ? TextInputAction.next
+              : TextInputAction.done,
           isPasswordField: false,
           suffix: suffixIcon,
           onChanged: (value) {},
@@ -1908,7 +2676,12 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
     );
   }
 
-  Widget _buildCustomDropdown(String label, String? value, List<String> items, Function(String?) onChanged) {
+  Widget _buildCustomDropdown(
+    String label,
+    String? value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2008,174 +2781,211 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
     return Column(
       children: [
         // Product Details Section
-        _buildSection(
-          'Product Details',
-          [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomTextField('Type of Electronics', _typeController, _typeFocus, _brandFocus),
+        _buildSection('Product Details', [
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomTextField(
+                  'Type of Electronics',
+                  _typeController,
+                  _typeFocus,
+                  _brandFocus,
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomTextField('Brand Preference', _brandController, _brandFocus, _modelFocus),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomTextField(
+                  'Brand Preference',
+                  _brandController,
+                  _brandFocus,
+                  _modelFocus,
                 ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomTextField('Model/Series (if known)', _modelController, _modelFocus, _quantityFocus),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomTextField(
+                  'Model/Series (if known)',
+                  _modelController,
+                  _modelFocus,
+                  _quantityFocus,
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomTextField('Quantity Needed', _quantityController, _quantityFocus, _minPriceFocus),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomTextField(
+                  'Quantity Needed',
+                  _quantityController,
+                  _quantityFocus,
+                  _minPriceFocus,
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ]),
         SizedBox(height: 20),
 
         // Budget And Timeline Section
-        _buildSection(
-          'Budget And Timeline',
-          [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomTextField('Min Price', _minPriceController, _minPriceFocus, _maxPriceFocus),
+        _buildSection('Budget And Timeline', [
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomTextField(
+                  'Min Price',
+                  _minPriceController,
+                  _minPriceFocus,
+                  _maxPriceFocus,
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomTextField('Max Price', _maxPriceController, _maxPriceFocus, null),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomTextField(
+                  'Max Price',
+                  _maxPriceController,
+                  _maxPriceFocus,
+                  null,
                 ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'How Soon Do You Need the Product?',
-                    _selectedTimeframe,
-                    ['Within a week', 'Within 2 weeks', 'Within a month', 'Within 3 months', 'No rush'],
-                        (value) => setState(() => _selectedTimeframe = value),
-                  ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomDropdown(
+                  'How Soon Do You Need the Product?',
+                  _selectedTimeframe,
+                  [
+                    'Within a week',
+                    'Within 2 weeks',
+                    'Within a month',
+                    'Within 3 months',
+                    'No rush',
+                  ],
+                  (value) => setState(() => _selectedTimeframe = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Do You Need Installation Services?',
-                    _selectedInstallation,
-                    ['Yes', 'No', 'Maybe'],
-                        (value) => setState(() => _selectedInstallation = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Do You Need Installation Services?',
+                  _selectedInstallation,
+                  ['Yes', 'No', 'Maybe'],
+                  (value) => setState(() => _selectedInstallation = value),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ]),
         SizedBox(height: 20),
 
         // Features and Specifications Section
-        _buildSection(
-          'Features and Specifications',
-          [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Required Features or Specifications',
-                  style: GoogleFonts.manrope(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[700],
+        _buildSection('Features and Specifications', [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Required Features or Specifications',
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[700],
+                ),
+              ),
+              SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white,
+                ),
+                child: TextField(
+                  controller: _featuresController,
+                  focusNode: _featuresFocus,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: 'Required Features or Specifications',
+                    hintStyle: GoogleFonts.manrope(color: Colors.grey[500]),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(16),
                   ),
                 ),
-                SizedBox(height: 8),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.white,
-                  ),
-                  child: TextField(
-                    controller: _featuresController,
-                    focusNode: _featuresFocus,
-                    maxLines: 4,
-                    decoration: InputDecoration(
-                      hintText: 'Required Features or Specifications',
-                      hintStyle: GoogleFonts.manrope(color: Colors.grey[500]),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(16),
-                    ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Condition Preference',
+                  _selectedCondition,
+                  [
+                    'New / Refurbished',
+                    'New only',
+                    'Refurbished only',
+                    'Used acceptable',
+                  ],
+                  (value) => setState(() => _selectedCondition = value),
+                ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Purpose of Purchase',
+                  _selectedPurpose,
+                  [
+                    'Home Use',
+                    'Business Use',
+                    'Commercial Use',
+                    'Industrial Use',
+                  ],
+                  (value) => setState(() => _selectedPurpose = value),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          _buildImageUploadSection(),
+          SizedBox(height: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Additional Comments',
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[700],
+                ),
+              ),
+              SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white,
+                ),
+                child: TextField(
+                  controller: _commentsController,
+                  focusNode: _commentsFocus,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    hintText: 'Additional Comments',
+                    hintStyle: GoogleFonts.manrope(color: Colors.grey[500]),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(16),
                   ),
                 ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Condition Preference',
-                    _selectedCondition,
-                    ['New / Refurbished', 'New only', 'Refurbished only', 'Used acceptable'],
-                        (value) => setState(() => _selectedCondition = value),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Purpose of Purchase',
-                    _selectedPurpose,
-                    ['Home Use', 'Business Use', 'Commercial Use', 'Industrial Use'],
-                        (value) => setState(() => _selectedPurpose = value),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            _buildImageUploadSection(),
-            SizedBox(height: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Additional Comments',
-                  style: GoogleFonts.manrope(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                SizedBox(height: 8),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.white,
-                  ),
-                  child: TextField(
-                    controller: _commentsController,
-                    focusNode: _commentsFocus,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      hintText: 'Additional Comments',
-                      hintStyle: GoogleFonts.manrope(color: Colors.grey[500]),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(16),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ]),
         SizedBox(height: 20),
 
         // Checkboxes
@@ -2199,7 +3009,8 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                 children: [
                   Checkbox(
                     value: _agreeToTerms,
-                    onChanged: (value) => setState(() => _agreeToTerms = value ?? false),
+                    onChanged: (value) =>
+                        setState(() => _agreeToTerms = value ?? false),
                     activeColor: Constants.ctaColorLight,
                   ),
                   Expanded(
@@ -2217,7 +3028,8 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                 children: [
                   Checkbox(
                     value: _consentToContact,
-                    onChanged: (value) => setState(() => _consentToContact = value ?? false),
+                    onChanged: (value) =>
+                        setState(() => _consentToContact = value ?? false),
                     activeColor: Constants.ctaColorLight,
                   ),
                   Expanded(
@@ -2238,44 +3050,180 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
 
         // Submit Button
         Container(
-          width: MediaQuery.of(context).size.width*0.5,
+          width: MediaQuery.of(context).size.width * 0.5,
           height: 45,
           child: ElevatedButton(
-            onPressed: () {
-              // Handle form submission
-              if (_agreeToTerms && _consentToContact) {
-                // Process form data
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Quote request submitted successfully!')),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Please agree to terms and consent to contact.')),
-                );
-              }
-            },
+            onPressed: _isSubmitting
+                ? null
+                : () {
+                    if (_agreeToTerms && _consentToContact) {
+                      _submitElectronicsForm();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Please agree to terms and consent to contact.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Constants.ctaColorLight,
+              backgroundColor: _isSubmitting
+                  ? Colors.grey
+                  : Constants.ctaColorLight,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(360),
               ),
               elevation: 5,
             ),
-            child: Text(
-              'Submit',
-              style: GoogleFonts.manrope(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
+            child: _isSubmitting
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Text(
+                    'Submit',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
           ),
         ),
       ],
     );
   }
-}
 
+  void _submitElectronicsForm() async {
+    // Basic validation
+    if (!_validateElectronicsForm()) {
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      // Get JWT token first
+      final token = await ApiService.getJWTToken();
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to authenticate. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final result = await ApiService.submitElectronicsRequest(
+        accessToken: token,
+        electronicsType: _typeController.text,
+        brandPreference: _brandController.text,
+        modelSeries: _modelController.text,
+        quantityNeeded: _quantityController.text,
+        minPrice: _minPriceController.text,
+        maxPrice: _maxPriceController.text,
+        timeframe: _selectedTimeframe ?? 'Within a week',
+        installationRequired: _selectedInstallation ?? 'No',
+        conditionPreference: _selectedCondition ?? 'New / Refurbished',
+        purposeOfPurchase: _selectedPurpose ?? 'Home Use',
+        requiredFeatures: _featuresController.text,
+        additionalComments: _commentsController.text,
+        images: _selectedImages,
+      );
+
+      if (result['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Electronics request submitted successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Reset form after successful submission
+        _resetElectronicsForm();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to submit request: ${result['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error submitting request: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
+  }
+
+  bool _validateElectronicsForm() {
+    List<String> errors = [];
+
+    if (_typeController.text.trim().isEmpty) {
+      errors.add('Electronics type is required');
+    }
+    if (_quantityController.text.trim().isEmpty) {
+      errors.add('Quantity is required');
+    }
+
+    if (errors.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill in required fields: ${errors.join(', ')}'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  void _resetElectronicsForm() {
+    setState(() {
+      // Clear controllers
+      _typeController.clear();
+      _brandController.clear();
+      _modelController.clear();
+      _quantityController.clear();
+      _minPriceController.clear();
+      _maxPriceController.clear();
+      _featuresController.clear();
+      _commentsController.clear();
+
+      // Reset dropdowns
+      _selectedTimeframe = 'Within a week';
+      _selectedInstallation = 'Yes';
+      _selectedCondition = 'New / Refurbished';
+      _selectedPurpose = 'Home Use';
+
+      // Reset checkboxes
+      _agreeToTerms = false;
+      _consentToContact = false;
+
+      // Clear images
+      _selectedImages.clear();
+      _imageBytes.clear();
+    });
+  }
+}
 
 class TireProductQuoteForm extends StatefulWidget {
   @override
@@ -2286,7 +3234,8 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
   // Controllers
   final TextEditingController _tyreWidthController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _preferredBrandController = TextEditingController();
+  final TextEditingController _preferredBrandController =
+      TextEditingController();
   final TextEditingController _pcdController = TextEditingController();
 
   // Focus Nodes
@@ -2316,6 +3265,9 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
   List<XFile> _selectedImages = [];
   Map<String, Uint8List> _imageBytes = {};
 
+  // Loading state
+  bool _isSubmitting = false;
+
   @override
   void initState() {
     super.initState();
@@ -2338,7 +3290,13 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     super.dispose();
   }
 
-  Widget _buildCustomTextField(String hintText, TextEditingController controller, FocusNode focusNode, FocusNode? nextFocusNode, {Widget? suffixIcon}) {
+  Widget _buildCustomTextField(
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocusNode, {
+    Widget? suffixIcon,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2358,7 +3316,9 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
           hintText: hintText,
           controller: controller,
           focusNode: focusNode,
-          textInputAction: nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+          textInputAction: nextFocusNode != null
+              ? TextInputAction.next
+              : TextInputAction.done,
           isPasswordField: false,
           suffix: suffixIcon,
           onChanged: (value) {},
@@ -2372,7 +3332,12 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     );
   }
 
-  Widget _buildCustomDropdown(String label, String? value, List<String> items, Function(String?) onChanged) {
+  Widget _buildCustomDropdown(
+    String label,
+    String? value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2453,71 +3418,76 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
             width: double.infinity,
             height: _selectedImages.isEmpty ? 120 : null,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!, style: BorderStyle.solid),
+              border: Border.all(
+                color: Colors.grey[300]!,
+                style: BorderStyle.solid,
+              ),
               borderRadius: BorderRadius.circular(8),
               color: Colors.grey[50],
             ),
             child: _selectedImages.isEmpty
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.cloud_upload_outlined,
-                    size: 32,
-                    color: Colors.grey[500],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Upload Images',
-                    style: GoogleFonts.manrope(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Tap to select images from gallery',
-                    style: GoogleFonts.manrope(
-                      color: Colors.grey[500],
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            )
-                : Padding(
-              padding: EdgeInsets.all(8),
-              child: Column(
-                children: [
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _selectedImages.map((image) => _buildImagePreview(image)).toList(),
-                  ),
-                  SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Constants.ctaColorLight),
-                      borderRadius: BorderRadius.circular(6),
-                      color: Colors.white,
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Add More Images',
-                        style: GoogleFonts.manrope(
-                          color: Constants.ctaColorLight,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.cloud_upload_outlined,
+                          size: 32,
+                          color: Colors.grey[500],
                         ),
-                      ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Upload Images',
+                          style: GoogleFonts.manrope(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Tap to select images from gallery',
+                          style: GoogleFonts.manrope(
+                            color: Colors.grey[500],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      children: [
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _selectedImages
+                              .map((image) => _buildImagePreview(image))
+                              .toList(),
+                        ),
+                        SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Constants.ctaColorLight),
+                            borderRadius: BorderRadius.circular(6),
+                            color: Colors.white,
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Add More Images',
+                              style: GoogleFonts.manrope(
+                                color: Constants.ctaColorLight,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
           ),
         ),
         if (_selectedImages.isNotEmpty)
@@ -2525,10 +3495,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
             padding: EdgeInsets.only(top: 8),
             child: Text(
               '${_selectedImages.length} image(s) selected',
-              style: GoogleFonts.manrope(
-                color: Colors.grey[600],
-                fontSize: 12,
-              ),
+              style: GoogleFonts.manrope(color: Colors.grey[600], fontSize: 12),
             ),
           ),
       ],
@@ -2557,7 +3524,10 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: Colors.grey[200],
-                        child: Icon(Icons.broken_image, color: Colors.grey[400]),
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.grey[400],
+                        ),
                       );
                     },
                   );
@@ -2589,11 +3559,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                 color: Colors.red,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.close,
-                size: 14,
-                color: Colors.white,
-              ),
+              child: Icon(Icons.close, size: 14, color: Colors.white),
             ),
           ),
         ),
@@ -2610,9 +3576,9 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error picking images: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error picking images: $e')));
     }
   }
 
@@ -2661,147 +3627,166 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     return Column(
       children: [
         // Product Details Section
-        _buildSection(
-          'Product Details',
-          [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomTextField('Tyre width (mm)*', _tyreWidthController, _tyreWidthFocus, null),
+        _buildSection('Product Details', [
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomTextField(
+                  'Tyre width (mm)*',
+                  _tyreWidthController,
+                  _tyreWidthFocus,
+                  null,
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Sidewall Profile*',
-                    _selectedSidewallProfile,
-                    ['35', '40', '45', '50', '55', '60', '65', '70', '75'],
-                        (value) => setState(() => _selectedSidewallProfile = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Sidewall Profile*',
+                  _selectedSidewallProfile,
+                  ['35', '40', '45', '50', '55', '60', '65', '70', '75'],
+                  (value) => setState(() => _selectedSidewallProfile = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Wheel Rim Diameter (inches)*',
-                    _selectedWheelRimDiameter,
-                    ['13', '14', '15', '16', '17', '18', '19', '20', '21', '22'],
-                        (value) => setState(() => _selectedWheelRimDiameter = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Wheel Rim Diameter (inches)*',
+                  _selectedWheelRimDiameter,
+                  ['13', '14', '15', '16', '17', '18', '19', '20', '21', '22'],
+                  (value) => setState(() => _selectedWheelRimDiameter = value),
                 ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Select Tyres/Rims*',
-                    _selectedTyresRims,
-                    ['Tyres', 'Rims', 'Tyres & Rims'],
-                        (value) => setState(() => _selectedTyresRims = value),
-                  ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Select Tyres/Rims*',
+                  _selectedTyresRims,
+                  ['Tyres', 'Rims', 'Tyres & Rims'],
+                  (value) => setState(() => _selectedTyresRims = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Quantity*',
-                    _selectedQuantity,
-                    ['1', '2', '3', '4', '5', '6', '7', '8'],
-                        (value) => setState(() => _selectedQuantity = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Quantity*',
+                  _selectedQuantity,
+                  ['1', '2', '3', '4', '5', '6', '7', '8'],
+                  (value) => setState(() => _selectedQuantity = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'How Soon Do You Need To Buy This Product?*',
-                    _selectedTimeframe,
-                    ['12 Hours', '24 Hours', '2-3 Days', '1 Week', '2 Weeks', 'Within a Month'],
-                        (value) => setState(() => _selectedTimeframe = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'How Soon Do You Need To Buy This Product?*',
+                  _selectedTimeframe,
+                  [
+                    '12 Hours',
+                    '24 Hours',
+                    '2-3 Days',
+                    '1 Week',
+                    '2 Weeks',
+                    'Within a Month',
+                  ],
+                  (value) => setState(() => _selectedTimeframe = value),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ]),
         SizedBox(height: 20),
 
         // More Fields Section
-        _buildSection(
-          'More Fields',
-          [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomTextField('Description Of Item', _descriptionController, _descriptionFocus, _preferredBrandFocus),
+        _buildSection('More Fields', [
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomTextField(
+                  'Description Of Item',
+                  _descriptionController,
+                  _descriptionFocus,
+                  _preferredBrandFocus,
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Vehicle Type',
-                    _selectedVehicleType,
-                    ['Passenger Car', 'SUV', 'Truck', 'Van', 'Motorcycle', 'Bus'],
-                        (value) => setState(() => _selectedVehicleType = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Vehicle Type',
+                  _selectedVehicleType,
+                  ['Passenger Car', 'SUV', 'Truck', 'Van', 'Motorcycle', 'Bus'],
+                  (value) => setState(() => _selectedVehicleType = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomTextField('Pitch Circle Diameter (PCD)', _pcdController, _pcdFocus, null),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomTextField(
+                  'Pitch Circle Diameter (PCD)',
+                  _pcdController,
+                  _pcdFocus,
+                  null,
                 ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomTextField('Preferred Brand', _preferredBrandController, _preferredBrandFocus, null),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomTextField(
+                  'Preferred Brand',
+                  _preferredBrandController,
+                  _preferredBrandFocus,
+                  null,
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Tyre Construction Type',
-                    _selectedTyreConstruction,
-                    ['Radial', 'Bias', 'Bias-Belted'],
-                        (value) => setState(() => _selectedTyreConstruction = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Tyre Construction Type',
+                  _selectedTyreConstruction,
+                  ['Radial', 'Bias', 'Bias-Belted'],
+                  (value) => setState(() => _selectedTyreConstruction = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Fitment Required',
-                    _selectedFitmentRequired,
-                    ['Yes', 'No'],
-                        (value) => setState(() => _selectedFitmentRequired = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Fitment Required',
+                  _selectedFitmentRequired,
+                  ['Yes', 'No'],
+                  (value) => setState(() => _selectedFitmentRequired = value),
                 ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Balancing Required',
-                    _selectedBalancingRequired,
-                    ['Yes', 'No'],
-                        (value) => setState(() => _selectedBalancingRequired = value),
-                  ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Balancing Required',
+                  _selectedBalancingRequired,
+                  ['Yes', 'No'],
+                  (value) => setState(() => _selectedBalancingRequired = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildCustomDropdown(
-                    'Tyre Rotation Required',
-                    _selectedTyreRotation,
-                    ['Yes', 'No'],
-                        (value) => setState(() => _selectedTyreRotation = value),
-                  ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildCustomDropdown(
+                  'Tyre Rotation Required',
+                  _selectedTyreRotation,
+                  ['Yes', 'No'],
+                  (value) => setState(() => _selectedTyreRotation = value),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildImageUploadSection(),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+              SizedBox(width: 16),
+              Expanded(child: _buildImageUploadSection()),
+            ],
+          ),
+        ]),
         SizedBox(height: 20),
 
         // Checkboxes
@@ -2825,7 +3810,8 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                 children: [
                   Checkbox(
                     value: _agreeToTerms,
-                    onChanged: (value) => setState(() => _agreeToTerms = value ?? false),
+                    onChanged: (value) =>
+                        setState(() => _agreeToTerms = value ?? false),
                     activeColor: Constants.ctaColorLight,
                   ),
                   Expanded(
@@ -2843,7 +3829,8 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                 children: [
                   Checkbox(
                     value: _consentToContact,
-                    onChanged: (value) => setState(() => _consentToContact = value ?? false),
+                    onChanged: (value) =>
+                        setState(() => _consentToContact = value ?? false),
                     activeColor: Constants.ctaColorLight,
                   ),
                   Expanded(
@@ -2864,105 +3851,207 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
 
         // Submit Button
         Container(
-          width: MediaQuery.of(context).size.width*0.5,
+          width: MediaQuery.of(context).size.width * 0.5,
           height: 45,
           child: ElevatedButton(
-            onPressed: () {
-              // Handle form submission
-              if (_agreeToTerms && _consentToContact) {
-                // Process form data
-                _submitForm();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Please agree to terms and consent to contact.')),
-                );
-              }
-            },
+            onPressed: _isSubmitting
+                ? null
+                : () {
+                    if (_agreeToTerms && _consentToContact) {
+                      _submitTyresRimsForm();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Please agree to terms and consent to contact.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Constants.ctaColorLight,
+              backgroundColor: _isSubmitting
+                  ? Colors.grey
+                  : Constants.ctaColorLight,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(360),
               ),
               elevation: 5,
             ),
-            child: Text(
-              'Submit',
-              style: GoogleFonts.manrope(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: Colors.white,
-              ),
-            ),
+            child: _isSubmitting
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Text(
+                    'Submit',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.white,
+                    ),
+                  ),
           ),
         ),
       ],
     );
   }
 
-  void _submitForm() {
-    // Collect all form data
-    Map<String, dynamic> formData = {
-      'tyreWidth': _tyreWidthController.text,
-      'sidewallProfile': _selectedSidewallProfile,
-      'wheelRimDiameter': _selectedWheelRimDiameter,
-      'tyresRims': _selectedTyresRims,
-      'quantity': _selectedQuantity,
-      'timeframe': _selectedTimeframe,
-      'description': _descriptionController.text,
-      'vehicleType': _selectedVehicleType,
-      'pcd': _pcdController.text,
-      'preferredBrand': _preferredBrandController.text,
-      'tyreConstruction': _selectedTyreConstruction,
-      'fitmentRequired': _selectedFitmentRequired,
-      'balancingRequired': _selectedBalancingRequired,
-      'tyreRotation': _selectedTyreRotation,
-      'selectedImages': _selectedImages.map((image) => image.path).toList(),
-      'agreeToTerms': _agreeToTerms,
-      'consentToContact': _consentToContact,
-    };
+  void _submitTyresRimsForm() async {
+    // Basic validation
+    if (!_validateTyresRimsForm()) {
+      return;
+    }
 
-    // Print form data (replace with your API call)
-    print('Form Data: $formData');
+    setState(() {
+      _isSubmitting = true;
+    });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Quote request submitted successfully!'),
-        backgroundColor: Constants.ctaColorLight,
-      ),
-    );
+    try {
+      // Get JWT token first
+      final token = await ApiService.getJWTToken();
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to authenticate. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final result = await ApiService.submitTyresRimsRequest(
+        accessToken: token,
+        tyreWidth: _tyreWidthController.text,
+        sidewallProfile: _selectedSidewallProfile ?? '55',
+        wheelRimDiameter: _selectedWheelRimDiameter ?? '16',
+        tyresRims: _selectedTyresRims ?? 'Tyres',
+        quantity: _selectedQuantity ?? '1',
+        timeframe: _selectedTimeframe ?? '12 Hours',
+        description: _descriptionController.text,
+        vehicleType: _selectedVehicleType ?? 'Passenger Car',
+        pcd: _pcdController.text,
+        preferredBrand: _preferredBrandController.text,
+        tyreConstruction: _selectedTyreConstruction ?? 'Radial',
+        fitmentRequired: _selectedFitmentRequired ?? 'Yes',
+        balancingRequired: _selectedBalancingRequired ?? 'Yes',
+        tyreRotation: _selectedTyreRotation ?? 'No',
+        images: _selectedImages,
+      );
+
+      if (result['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Tyres/Rims request submitted successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Reset form after successful submission
+        _resetTyresRimsForm();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to submit request: ${result['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error submitting request: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
+  }
+
+  bool _validateTyresRimsForm() {
+    List<String> errors = [];
+
+    if (_tyreWidthController.text.trim().isEmpty) {
+      errors.add('Tyre width is required');
+    }
+    if (_selectedSidewallProfile == null || _selectedSidewallProfile!.isEmpty) {
+      errors.add('Sidewall profile is required');
+    }
+    if (_selectedWheelRimDiameter == null || _selectedWheelRimDiameter!.isEmpty) {
+      errors.add('Wheel rim diameter is required');
+    }
+
+    if (errors.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill in required fields: ${errors.join(', ')}'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  void _resetTyresRimsForm() {
+    setState(() {
+      // Clear controllers
+      _tyreWidthController.clear();
+      _descriptionController.clear();
+      _preferredBrandController.clear();
+      _pcdController.clear();
+
+      // Reset dropdowns
+      _selectedSidewallProfile = '55';
+      _selectedWheelRimDiameter = '16';
+      _selectedTyresRims = 'Tyres';
+      _selectedQuantity = '1';
+      _selectedTimeframe = '12 Hours';
+      _selectedVehicleType = 'Passenger Car';
+      _selectedTyreConstruction = 'Radial';
+      _selectedFitmentRequired = 'Yes';
+      _selectedBalancingRequired = 'Yes';
+      _selectedTyreRotation = 'No';
+
+      // Reset checkboxes
+      _agreeToTerms = false;
+      _consentToContact = false;
+
+      // Clear images
+      _selectedImages.clear();
+      _imageBytes.clear();
+    });
   }
 }
-
-
-
 
 class FooterSection extends StatelessWidget {
   final String logo;
   final Function(String)? onFooterLinkTap;
 
-  const FooterSection({
-    Key? key,
-    required this.logo,
-    this.onFooterLinkTap,
-  }) : super(key: key);
+  const FooterSection({Key? key, required this.logo, this.onFooterLinkTap})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(50),
-      decoration: BoxDecoration(
-        color: Constants.ftaColorLight,
-      ),
+      decoration: BoxDecoration(color: Constants.ftaColorLight),
       child: Column(
         children: [
           Container(
             padding: EdgeInsets.all(30),
             child: Column(
               children: [
-                Image.asset(
-                  logo,
-                  fit: BoxFit.contain,
-                ),
+                Image.asset(logo, fit: BoxFit.contain),
                 SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -3022,12 +4111,12 @@ class FooterSection extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: TextButton(
-        onPressed: onFooterLinkTap != null ? () => onFooterLinkTap!(text) : () {},
+        onPressed: onFooterLinkTap != null
+            ? () => onFooterLinkTap!(text)
+            : () {},
         child: Text(
           text,
-          style: GoogleFonts.manrope(
-            color: Colors.white.withOpacity(0.7),
-          ),
+          style: GoogleFonts.manrope(color: Colors.white.withOpacity(0.7)),
         ),
       ),
     );
@@ -3074,12 +4163,195 @@ class SocialMediaButton extends StatelessWidget {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(360.0),
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit.cover,
-          ),
+          child: Image.asset(imagePath, fit: BoxFit.cover),
         ),
       ),
     );
+  }
+}
+
+class LocationPickerDialog extends StatefulWidget {
+  final String apiKey;
+  final LatLng initialLocation;
+  final Function(LatLng, String) onLocationSelected;
+
+  const LocationPickerDialog({
+    Key? key,
+    required this.apiKey,
+    required this.initialLocation,
+    required this.onLocationSelected,
+  }) : super(key: key);
+
+  @override
+  State<LocationPickerDialog> createState() => _LocationPickerDialogState();
+}
+
+class _LocationPickerDialogState extends State<LocationPickerDialog> {
+  GoogleMapController? _mapController;
+  LatLng _selectedLocation = const LatLng(-26.2041, 28.0473);
+  String _selectedAddress = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedLocation = widget.initialLocation;
+  }
+
+  void _onMapTapped(LatLng location) async {
+    setState(() {
+      _selectedLocation = location;
+    });
+    
+    // Get address from coordinates (reverse geocoding)
+    // You can add geocoding package functionality here
+    _selectedAddress = 'Selected Location: ${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.8,
+        height: MediaQuery.of(context).size.height * 0.8,
+        child: Column(
+          children: [
+            // Header
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Color(0xFF2C3E50),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(8),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Select Location',
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.close, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Search bar
+            Container(
+              padding: EdgeInsets.all(16),
+              child: GooglePlaceAutoCompleteTextField(
+                textEditingController: _searchController,
+                googleAPIKey: widget.apiKey,
+                inputDecoration: InputDecoration(
+                  hintText: 'Search for a location...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  prefixIcon: Icon(Icons.search),
+                ),
+                debounceTime: 800,
+                getPlaceDetailWithLatLng: (placeDetails) {
+                  // Handle the response for place details with coordinates
+                  // This will be called when a place is selected
+                },
+                itemClick: (prediction) {
+                  _searchController.text = prediction.description ?? '';
+                  // You can add logic here to get the coordinates for this prediction
+                  setState(() {
+                    _selectedAddress = prediction.description ?? '';
+                  });
+                },
+              ),
+            ),
+            
+            // Map
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: GoogleMap(
+                  onMapCreated: (GoogleMapController controller) {
+                    _mapController = controller;
+                  },
+                  initialCameraPosition: CameraPosition(
+                    target: _selectedLocation,
+                    zoom: 14.0,
+                  ),
+                  onTap: _onMapTapped,
+                  markers: {
+                    Marker(
+                      markerId: MarkerId('selected_location'),
+                      position: _selectedLocation,
+                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+                    ),
+                  },
+                ),
+              ),
+            ),
+            
+            // Selected location info
+            if (_selectedAddress.isNotEmpty)
+              Container(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  _selectedAddress,
+                  style: GoogleFonts.manrope(fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            
+            // Action buttons
+            Container(
+              padding: EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade300,
+                      foregroundColor: Colors.black,
+                    ),
+                    child: Text('Cancel'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      final address = _selectedAddress.isNotEmpty 
+                          ? _selectedAddress 
+                          : 'Selected Location: ${_selectedLocation.latitude.toStringAsFixed(4)}, ${_selectedLocation.longitude.toStringAsFixed(4)}';
+                      widget.onLocationSelected(_selectedLocation, address);
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF2C3E50),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text('Select Location'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 }
