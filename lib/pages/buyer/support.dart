@@ -137,7 +137,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                 children: [
                   Container(
                     padding: const EdgeInsets.only(left: 68, right: 68, top: 24),
-                    constraints: BoxConstraints(maxWidth: 1600,maxHeight: 500),
+                    constraints: BoxConstraints(maxWidth: 1600, maxHeight: 600),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -149,14 +149,21 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                             child: AnimatedContainer(
                               duration: Duration(milliseconds: 300),
                               decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(15),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.white,
+                                    Colors.grey.shade50,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.grey.withOpacity(0.55),
-                                    spreadRadius: 1,
-                                    blurRadius: 4,
-                                    offset: Offset(0, 2),
+                                    color: Colors.grey.withOpacity(0.15),
+                                    spreadRadius: 2,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 4),
                                   ),
                                 ],
                               ),
@@ -170,13 +177,23 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                     builder: (context, value, child) {
                                       return Opacity(
                                         opacity: value,
-                                        child: Text(
-                                          'My Tickets',
-                                          style: GoogleFonts.manrope(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Constants.ftaColorLight
-                                          ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.confirmation_number_outlined,
+                                              color: Constants.ftaColorLight,
+                                              size: 24,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'My Tickets',
+                                              style: GoogleFonts.manrope(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Constants.ftaColorLight
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       );
                                     },
@@ -209,9 +226,25 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                                     margin: EdgeInsets.only(bottom: 12),
                                                     padding: EdgeInsets.all(16),
                                                     decoration: BoxDecoration(
-                                                      color: Colors.grey.shade100,
-                                                      borderRadius: BorderRadius.circular(16),
-                                                      border: Border.all(color: Constants.ftaColorLight),
+                                                      gradient: LinearGradient(
+                                                        colors: [
+                                                          Colors.white,
+                                                          Colors.grey.shade50,
+                                                        ],
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(12),
+                                                      border: Border.all(
+                                                        color: Constants.ftaColorLight.withOpacity(0.3),
+                                                        width: 1.5,
+                                                      ),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Constants.ftaColorLight.withOpacity(0.1),
+                                                          spreadRadius: 1,
+                                                          blurRadius: 4,
+                                                          offset: Offset(0, 2),
+                                                        ),
+                                                      ],
                                                     ),
                                                     child: Column(
                                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -305,21 +338,56 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                             child: AnimatedContainer(
                               duration: Duration(milliseconds: 300),
                               decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.white,
+                                    Colors.grey.shade50,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.grey.withOpacity(0.55),
-                                    spreadRadius: 1,
-                                    blurRadius: 4,
-                                    offset: Offset(0, 2),
+                                    color: Colors.grey.withOpacity(0.15),
+                                    spreadRadius: 2,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 4),
                                   ),
                                 ],
                               ),
-                              padding: EdgeInsets.all(32),
+                              padding: EdgeInsets.all(24),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.add_circle_outline,
+                                        color: Constants.ctaColorLight,
+                                        size: 24,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Create New Ticket',
+                                        style: GoogleFonts.manrope(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Constants.ctaColorLight
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Fill out the form below to submit a support request',
+                                    style: GoogleFonts.manrope(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.grey.shade600
+                                    ),
+                                  ),
+                                  SizedBox(height: 24),
                                   TweenAnimationBuilder<double>(
                                     duration: Duration(milliseconds: 1000),
                                     tween: Tween(begin: 0.0, end: 1.0),
@@ -352,6 +420,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                             _descriptionController,
                                             _descriptionFocusNode,
                                             null,
+                                            isDescription: true,
                                           ),
                                         ),
                                       );
@@ -390,9 +459,10 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                                   style: ElevatedButton.styleFrom(
                                                     backgroundColor: Constants.ctaColorLight,
                                                     shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(360),
+                                                      borderRadius: BorderRadius.circular(30),
                                                     ),
-                                                    elevation: 0,
+                                                    elevation: 2,
+                                                    shadowColor: Constants.ctaColorLight.withOpacity(0.3),
                                                   ),
                                                   child: Text(
                                                     'Raise a Ticket',
@@ -441,7 +511,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildCustomTextField(String hintText, TextEditingController controller, FocusNode focusNode, FocusNode? nextFocusNode, {Widget? suffixIcon}) {
+  Widget _buildCustomTextField(String hintText, TextEditingController controller, FocusNode focusNode, FocusNode? nextFocusNode, {Widget? suffixIcon, bool isDescription = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -452,25 +522,62 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
             style: GoogleFonts.manrope(
               color: Colors.black,
               fontSize: 14,
-              fontWeight: FontWeight.w300,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
         SizedBox(height: 8),
-        CustomInputTransparent4(
-          hintText: hintText,
-          controller: controller,
-          focusNode: focusNode,
-          textInputAction: nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
-          isPasswordField: false,
-          suffix: suffixIcon,
-          onChanged: (value) {},
-          onSubmitted: (value) {
-            if (nextFocusNode != null) {
-              nextFocusNode.requestFocus();
-            }
-          },
-        ),
+        if (isDescription)
+          Container(
+            height: 120,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.withOpacity(0.3)),
+              color: Colors.grey.withOpacity(0.05),
+            ),
+            child: TextField(
+              controller: controller,
+              focusNode: focusNode,
+              maxLines: 5,
+              textInputAction: nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+              decoration: InputDecoration(
+                hintText: 'Enter your detailed description here...',
+                hintStyle: GoogleFonts.manrope(
+                  fontSize: 13,
+                  color: Colors.grey.withOpacity(0.7),
+                  fontWeight: FontWeight.w400,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.all(16),
+              ),
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: Colors.black87,
+                fontWeight: FontWeight.w400,
+              ),
+              onChanged: (value) {},
+              onSubmitted: (value) {
+                if (nextFocusNode != null) {
+                  nextFocusNode.requestFocus();
+                }
+              },
+            ),
+          )
+        else
+          CustomInputTransparent4(
+            hintText: hintText,
+            controller: controller,
+            focusNode: focusNode,
+            textInputAction: nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+            isPasswordField: false,
+            suffix: suffixIcon,
+            onChanged: (value) {},
+            onSubmitted: (value) {
+              if (nextFocusNode != null) {
+                nextFocusNode.requestFocus();
+              }
+            },
+          ),
       ],
     );
   }

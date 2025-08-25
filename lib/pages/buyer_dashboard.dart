@@ -46,7 +46,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
                 color: Constants.ftaColorLight,
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -117,7 +117,11 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                               child: ShareWidget(),
                             )
                           : dashboardIndex == 2
-                          ? TransactionDashboard()
+                          ? Column(
+                            children: [
+                              Expanded(child: TransactionDashboard()),
+                            ],
+                          )
                           : dashboardIndex == 3
                           ? AccountManagementPage()
                           : Container(),

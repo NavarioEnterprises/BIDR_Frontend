@@ -131,9 +131,16 @@ class _HeaderSectionState extends State<HeaderSection> {
           return Row(
             children: [
               ElevatedButton(
-                onPressed: () => context.go('/dashboard'),
+                onPressed: () {
+                  Constants.buyerAppBarValue = 7;
+                  appBarValueNotifier.value++;
+                  buyerHomeValueNotifier.value++;
+                },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Constants.ctaColorLight,
+                  backgroundColor: Colors.white,
+                  foregroundColor: Constants.ftaColorLight,
+                  elevation: 3,
+                  side: BorderSide(color: Constants.ftaColorLight, width: 1.4),
                   padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25),
@@ -141,7 +148,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                 ),
                 child: Text(
                   'Seller Dashboard',
-                  style: GoogleFonts.manrope(color: Colors.white),
+                  style: GoogleFonts.manrope(fontSize: 14),
                 ),
               ),
               SizedBox(width: 12),
@@ -155,11 +162,16 @@ class _HeaderSectionState extends State<HeaderSection> {
                 onPressed: () {
                   if (mounted) {
                     Constants.buyerAppBarValue = 6;
-                    context.go('/dashboard');
+                    appBarValueNotifier.value++;
+                    buyerHomeValueNotifier.value++;
+
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Constants.ctaColorLight,
+                  backgroundColor: Colors.white,
+                  foregroundColor: Constants.ftaColorLight,
+                  elevation: 3,
+                  side: BorderSide(color: Constants.ftaColorLight, width: 1.4),
                   padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25),
@@ -167,7 +179,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                 ),
                 child: Text(
                   'Buyer Dashboard',
-                  style: GoogleFonts.manrope(color: Colors.white),
+                  style: GoogleFonts.manrope(fontSize: 14),
                 ),
               ),
               SizedBox(width: 12),
@@ -199,36 +211,19 @@ class _HeaderSectionState extends State<HeaderSection> {
     return ElevatedButton(
       onPressed: () async {
         // Clear all authentication data from Constants
-        Constants.currentUser = null;
-        Constants.isLoggedIn = false;
-        Constants.myUid = "";
-        Constants.userId = -1;
-        Constants.myDisplayname = "Guest";
-        Constants.myCategoryRole = "";
-        Constants.myEmail = "";
-        Constants.myCell = "";
 
-        // Clear SharedPreferences
-        await Sharedprefs.saveUserLoggedInSharedPreference(false);
-        await Sharedprefs.saveUserAccessTokenSharedPreference('');
-        await Sharedprefs.saveUserRefreshTokenSharedPreference('');
-        await Sharedprefs.saveUserRoleSharedPreference('');
-        await Sharedprefs.saveCompleteLoginDataSharedPreference('');
-
-        // Navigate to login
-        if (mounted) {
-          context.go('/');
-        }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        side: BorderSide(color: Constants.ftaColorLight, width: 1.4),
+        backgroundColor: Constants.ctaColorLight,
+        foregroundColor: Colors.white,
+        elevation: 3,
+        //side: BorderSide(color: Constants.ftaColorLight, width: 1.4),
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       ),
       child: Text(
-        'Logout',
-        style: GoogleFonts.manrope(color: Constants.ftaColorLight),
+        Constants.myDisplayname,
+        style: GoogleFonts.manrope(fontSize: 14),
       ),
     );
   }

@@ -15,6 +15,7 @@ import 'package:hugeicons/hugeicons.dart';
 
 import '../../customWdget/appbar.dart';
 import '../../models/alert.dart';
+import '../buyer/share_with_friends.dart';
 import '../buyer_home.dart';
 import '../notification.dart';
 import 'enter_pin.dart';
@@ -357,7 +358,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                     Container()
                   ]
                else if(tabActiveIndex==3)...[
-                    Container()
+                      ShareWidget()
                 ]
                 else if(tabActiveIndex==4)...[
                   Padding(

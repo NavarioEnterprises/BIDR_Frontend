@@ -1,3 +1,4 @@
+import 'package:bidr/constants/Constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -126,7 +127,7 @@ Let's grow together and enjoy exclusive benefits! 💰
             style: GoogleFonts.manrope(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF2B3A5C),
+              color: Constants.ftaColorLight,
             ),
             textAlign: TextAlign.center,
           ),
@@ -163,7 +164,7 @@ Let's grow together and enjoy exclusive benefits! 💰
                     style: GoogleFonts.manrope(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF2B3A5C),
+                      color:Constants.ftaColorLight,
                       letterSpacing: 1.2,
                     ),
                   ),
@@ -191,16 +192,16 @@ Let's grow together and enjoy exclusive benefits! 💰
 
           // Share Link Button
           SizedBox(
-            width: double.infinity,
+            width: MediaQuery.of(context).size.width*0.3,
             child: ElevatedButton(
               onPressed: _shareLink,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
+                backgroundColor: Constants.ctaColorLight,
                 padding: EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(360),
                 ),
-                elevation: 0,
+                elevation: 3,
               ),
               child: Text(
                 'Share Link',

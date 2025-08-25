@@ -36,7 +36,8 @@ class ApiService {
     // Add location coordinates parameters
     double? locationLat,
     double? locationLng,
-  }) async {
+  }) async
+  {
     try {
       final uri = Uri.parse('$baseUrl$requestsEndpoint');
 
@@ -195,7 +196,8 @@ class ApiService {
     XFile file,
     String field,
     String filename,
-  ) async {
+  ) async
+  {
     if (kIsWeb) {
       // For web platform - read as bytes
       final bytes = await file.readAsBytes();
@@ -214,7 +216,8 @@ class ApiService {
   static Future<String?> getJWTToken({
     String username = 'testuser',
     String password = 'testpass123',
-  }) async {
+  }) async
+  {
     try {
       final uri = Uri.parse('$baseUrl/api/token/');
       final response = await http.post(

@@ -864,17 +864,17 @@ class _AccountManagementPageState extends State<AccountManagementPage>
               child: OutlinedButton(
                 onPressed: () => _onMenuItemSelected('Edit Profile'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.grey[600],
+                  foregroundColor: Constants.ftaColorLight,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(360),
                   ),
                 ),
                 child: Text(
                   'Cancel',
                   style: GoogleFonts.manrope(
                     fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -888,7 +888,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(360),
                   ),
                   elevation: 0,
                 ),
@@ -896,7 +896,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                   'Sign Out',
                   style: GoogleFonts.manrope(
                     fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -1644,6 +1644,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
       if (accessToken != null && refreshToken != null) {
         // Call API to logout
+
         await _authService.signOut(
           accessToken: accessToken,
           refreshToken: refreshToken,
