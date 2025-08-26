@@ -91,7 +91,7 @@ metadata:
   labels:
     app: payment-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: payment-service
   ports:
@@ -99,5 +99,3 @@ spec:
     targetPort: 8000
     protocol: TCP
     name: http
-  loadBalancerSourceRanges:
-  - 0.0.0.0/0

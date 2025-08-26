@@ -79,7 +79,7 @@ metadata:
   labels:
     app: chat-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: chat-service
   ports:
@@ -87,5 +87,3 @@ spec:
     targetPort: 8000
     protocol: TCP
     name: http
-  loadBalancerSourceRanges:
-  - 0.0.0.0/0

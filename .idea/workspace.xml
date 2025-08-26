@@ -4,7 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="Initial Commit" />
+    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="Initial Commit">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/auth-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/uat/auth-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/chat-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/uat/chat-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/grafana.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/uat/grafana.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/nginx-proxy.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/uat/nginx-proxy.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/notifications-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/uat/notifications-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/payment-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/uat/payment-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/product-management-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/uat/product-management-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/prometheus.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/uat/prometheus.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/resolution-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/uat/resolution-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/reviews-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/uat/reviews-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/transactions-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/uat/transactions-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/secrets.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/secrets.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring/prometheus.yml" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring/prometheus.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/logs/product_management_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/logs/product_management_service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/views.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -84,6 +103,9 @@
       <workItem from="1755781772169" duration="181000" />
       <workItem from="1755806689089" duration="6829000" />
       <workItem from="1755877151218" duration="679000" />
+      <workItem from="1756050915101" duration="1234000" />
+      <workItem from="1756057185810" duration="3347000" />
+      <workItem from="1756080025435" duration="17096000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <option name="closed" value="true" />

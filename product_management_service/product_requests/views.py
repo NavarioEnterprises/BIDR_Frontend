@@ -4,7 +4,7 @@ from django.db.models import F
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -34,7 +34,7 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
         'buyer_id', 'consumer_electronics', 'vehicle_spares', 'vehicle_tyres_rims'
     ).prefetch_related('images', 'specifications', 'messages')
     
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     
     # Filter fields
@@ -66,9 +66,14 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         """Set the buyer to the current user when creating a request."""
-        # If buyer_id is not provided, use the current user
+        # If buyer_id is not provided and user is authenticated, use the current user
+        # For anonymous submissions, buyer_id must be provided in the request data
         if 'buyer_id' not in serializer.validated_data:
-            instance = serializer.save(buyer_id=self.request.user)
+            if self.request.user.is_authenticated:
+                instance = serializer.save(buyer_id=self.request.user)
+            else:
+                # For anonymous submissions, buyer_id should be provided or will be null
+                instance = serializer.save()
         else:
             instance = serializer.save()
         
@@ -79,7 +84,10 @@ class ProductRequestViewSet(viewsets.ModelViewSet):
         """Override retrieve to increment view count."""
         instance = self.get_object()
         # Increment view count if it's not the owner viewing
-        if request.user != instance.buyer_id:
+        if request.user.is_authenticated and request.user != instance.buyer_id:
+            instance.mark_as_viewed()
+        elif not request.user.is_authenticated:
+            # Always increment for anonymous users
             instance.mark_as_viewed()
         
         serializer = self.get_serializer(instance)
@@ -316,7 +324,7 @@ class ConsumerElectronicsViewSet(viewsets.ModelViewSet):
     
     queryset = ConsumerElectronics.objects.all()
     serializer_class = ConsumerElectronicsSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     
     filterset_fields = {
@@ -337,7 +345,7 @@ class VehicleSparesViewSet(viewsets.ModelViewSet):
     
     queryset = VehicleSpares.objects.all()
     serializer_class = VehicleSparesSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     
     filterset_fields = {
@@ -359,7 +367,7 @@ class VehicleTyresRimsViewSet(viewsets.ModelViewSet):
     
     queryset = VehicleTyresRims.objects.all()
     serializer_class = VehicleTyresRimsSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     
     filterset_fields = {

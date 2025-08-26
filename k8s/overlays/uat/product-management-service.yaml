@@ -92,7 +92,7 @@ metadata:
   labels:
     app: product-management-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: product-management-service
   ports:
@@ -100,5 +100,3 @@ spec:
     targetPort: 8000
     protocol: TCP
     name: http
-  loadBalancerSourceRanges:
-  - 0.0.0.0/0

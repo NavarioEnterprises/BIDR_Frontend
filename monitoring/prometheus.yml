@@ -10,54 +10,110 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  # BIDR Services
-  - job_name: 'auth-service'
+  # BIDR Services with correct ports and full DNS names
+  - job_name: 'bidr-auth-service'
     static_configs:
-      - targets: ['auth-service:8000']
+      - targets: ['auth-service.bidr-uat.svc.cluster.local:8001']
     metrics_path: /metrics
-    scrape_interval: 30s
+    scrape_interval: 15s
+    relabel_configs:
+      - target_label: service
+        replacement: auth
+      - target_label: app
+        replacement: bidr
+      - target_label: environment
+        replacement: uat
 
-  - job_name: 'chat-service'
+  - job_name: 'bidr-chat-service'
     static_configs:
-      - targets: ['chat-service:8000']
+      - targets: ['chat-service.bidr-uat.svc.cluster.local:8002']
     metrics_path: /metrics
-    scrape_interval: 30s
+    scrape_interval: 15s
+    relabel_configs:
+      - target_label: service
+        replacement: chat
+      - target_label: app
+        replacement: bidr
+      - target_label: environment
+        replacement: uat
 
-  - job_name: 'payment-service'
+  - job_name: 'bidr-payment-service'
     static_configs:
-      - targets: ['payment-service:8000']
+      - targets: ['payment-service.bidr-uat.svc.cluster.local:8003']
     metrics_path: /metrics
-    scrape_interval: 30s
+    scrape_interval: 15s
+    relabel_configs:
+      - target_label: service
+        replacement: payment
+      - target_label: app
+        replacement: bidr
+      - target_label: environment
+        replacement: uat
 
-  - job_name: 'resolution-service'
+  - job_name: 'bidr-product-service'
     static_configs:
-      - targets: ['resolution-service:8000']
+      - targets: ['product-management-service.bidr-uat.svc.cluster.local:8004']
     metrics_path: /metrics
-    scrape_interval: 30s
+    scrape_interval: 15s
+    relabel_configs:
+      - target_label: service
+        replacement: product
+      - target_label: app
+        replacement: bidr
+      - target_label: environment
+        replacement: uat
 
-  - job_name: 'product-service'
+  - job_name: 'bidr-notifications-service'
     static_configs:
-      - targets: ['product-service:8000']
+      - targets: ['notifications-service.bidr-uat.svc.cluster.local:8005']
     metrics_path: /metrics
-    scrape_interval: 30s
+    scrape_interval: 15s
+    relabel_configs:
+      - target_label: service
+        replacement: notifications
+      - target_label: app
+        replacement: bidr
+      - target_label: environment
+        replacement: uat
 
-  - job_name: 'notifications-service'
+  - job_name: 'bidr-transactions-service'
     static_configs:
-      - targets: ['notifications-service:8000']
+      - targets: ['transactions-service.bidr-uat.svc.cluster.local:8006']
     metrics_path: /metrics
-    scrape_interval: 30s
+    scrape_interval: 15s
+    relabel_configs:
+      - target_label: service
+        replacement: transactions
+      - target_label: app
+        replacement: bidr
+      - target_label: environment
+        replacement: uat
 
-  - job_name: 'transactions-service'
+  - job_name: 'bidr-reviews-service'
     static_configs:
-      - targets: ['transactions-service:8000']
+      - targets: ['reviews-service.bidr-uat.svc.cluster.local:8007']
     metrics_path: /metrics
-    scrape_interval: 30s
+    scrape_interval: 15s
+    relabel_configs:
+      - target_label: service
+        replacement: reviews
+      - target_label: app
+        replacement: bidr
+      - target_label: environment
+        replacement: uat
 
-  - job_name: 'reviews-service'
+  - job_name: 'bidr-resolution-service'
     static_configs:
-      - targets: ['reviews-service:8000']
+      - targets: ['resolution-service.bidr-uat.svc.cluster.local:8008']
     metrics_path: /metrics
-    scrape_interval: 30s
+    scrape_interval: 15s
+    relabel_configs:
+      - target_label: service
+        replacement: resolution
+      - target_label: app
+        replacement: bidr
+      - target_label: environment
+        replacement: uat
 
   # Infrastructure Exporters
   - job_name: 'postgres'

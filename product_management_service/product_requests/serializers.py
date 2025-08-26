@@ -2,6 +2,7 @@
 Serializers for Product Request models.
 """
 
+import json
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import (
@@ -9,6 +10,21 @@ from .models import (
     ProductRequest, RequestImage, RequestSpecification, 
     RequestMessage, RequestWatchlist, RequestTemplate
 )
+
+
+class JSONStringField(serializers.JSONField):
+    """Custom JSON field that can handle JSON strings in multipart form data."""
+    
+    def to_internal_value(self, data):
+        if isinstance(data, str):
+            try:
+                # Handle empty JSON objects
+                if data.strip() in ['{}', '']:
+                    return {}
+                return json.loads(data)
+            except (json.JSONDecodeError, ValueError) as e:
+                self.fail('invalid', message=f'Invalid JSON format: {str(e)}')
+        return super().to_internal_value(data)
 
 
 class ConsumerElectronicsSerializer(serializers.ModelSerializer):
@@ -112,6 +128,11 @@ class ProductRequestCreateSerializer(serializers.ModelSerializer):
     vehicle_spares_data = VehicleSparesSerializer(required=False, write_only=True)
     vehicle_tyres_rims_data = VehicleTyresRimsSerializer(required=False, write_only=True)
     
+    # Override JSON fields to handle strings from multipart form data
+    product_specifications = JSONStringField()
+    buyer_location = JSONStringField()
+    product_images = JSONStringField(required=False, allow_null=True)
+    
     # User ID field for setting the buyer
     buyer_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     
@@ -125,6 +146,29 @@ class ProductRequestCreateSerializer(serializers.ModelSerializer):
             'consumer_electronics_data', 'vehicle_spares_data', 'vehicle_tyres_rims_data'
         ]
         
+    def to_internal_value(self, data):
+        """Custom parsing to handle JSON strings for nested data fields."""
+        # Handle multipart form data where nested objects come as JSON strings
+        json_fields = [
+            'vehicle_spares_data', 'consumer_electronics_data', 'vehicle_tyres_rims_data',
+            'buyer_location', 'product_specifications'
+        ]
+        
+        for field in json_fields:
+            if field in data and isinstance(data[field], str):
+                try:
+                    # Handle empty JSON objects
+                    if data[field].strip() in ['{}', '']:
+                        data[field] = {}
+                    else:
+                        data[field] = json.loads(data[field])
+                except (json.JSONDecodeError, ValueError) as e:
+                    raise serializers.ValidationError({
+                        field: f"Invalid JSON format: {str(e)}"
+                    })
+        
+        return super().to_internal_value(data)
+    
     def validate(self, data):
         """Validate that the category matches the provided nested data."""
         category = data.get('category')

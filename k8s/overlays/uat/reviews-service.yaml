@@ -83,7 +83,7 @@ metadata:
   labels:
     app: reviews-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: reviews-service
   ports:
@@ -91,5 +91,3 @@ spec:
     targetPort: 8000
     protocol: TCP
     name: http
-  loadBalancerSourceRanges:
-  - 0.0.0.0/0

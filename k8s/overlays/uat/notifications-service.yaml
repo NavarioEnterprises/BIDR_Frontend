@@ -101,7 +101,7 @@ metadata:
   labels:
     app: notifications-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: notifications-service
   ports:
@@ -109,5 +109,3 @@ spec:
     targetPort: 8000
     protocol: TCP
     name: http
-  loadBalancerSourceRanges:
-  - 0.0.0.0/0

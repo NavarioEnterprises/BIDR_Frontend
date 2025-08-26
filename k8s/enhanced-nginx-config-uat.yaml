@@ -2,10 +2,12 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: nginx-proxy-config
+  namespace: bidr-uat
+  labels:
+    environment: uat
 data:
   default.conf: |
     # NGINX reverse proxy for BIDR services
-    # Upstreams to internal ClusterIP services
     upstream auth_service {
         server auth-service.bidr-uat.svc.cluster.local:8001;
     }
@@ -30,12 +32,6 @@ data:
     upstream resolution_service {
         server resolution-service.bidr-uat.svc.cluster.local:8008;
     }
-    upstream grafana_service {
-        server grafana-service.bidr-uat.svc.cluster.local:3000;
-    }
-    upstream prometheus_service {
-        server prometheus-service.bidr-uat.svc.cluster.local:9090;
-    }
 
     server {
         listen 80 default_server;
@@ -48,7 +44,18 @@ data:
             add_header Content-Type text/plain;
         }
 
-        # Auth
+        # Auth service admin - direct mapping  
+        location /admin/ {
+            proxy_pass http://auth_service/admin/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_redirect /admin/ /admin/;
+            proxy_redirect /accounts/ /accounts/;
+        }
+
+        # Auth service API and paths
         location /api/auth/ {
             proxy_pass http://auth_service/api/auth/;
             proxy_set_header Host $host;
@@ -64,18 +71,31 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        # Chat at root prefix
+        # Chat service - complete isolation with enhanced URL rewriting
         location ^~ /chat/ {
-            # Strip /chat/ -> /
+            # Rewrite /chat/xxx -> /xxx for the backend
             rewrite ^/chat/(.*)$ /$1 break;
             proxy_pass http://chat_service;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # Essential: rewrite ALL possible redirect URLs
+            proxy_redirect ~^/admin(.*)$ /chat/admin$1;
+            proxy_redirect ~^/accounts(.*)$ /chat/accounts$1;
+            proxy_redirect ~^/$ /chat/;
+            
+            # Fix URLs in HTML content
+            sub_filter 'action="/admin/' 'action="/chat/admin/';
+            sub_filter 'href="/admin/' 'href="/chat/admin/';
+            sub_filter 'action="/accounts/' 'action="/chat/accounts/';
+            sub_filter 'href="/accounts/' 'href="/chat/accounts/';
+            sub_filter_once off;
+            sub_filter_types text/html text/css text/xml text/javascript application/javascript application/json;
         }
 
-        # Payments at root prefix
+        # Payment service - complete isolation with enhanced URL rewriting  
         location ^~ /payments/ {
             rewrite ^/payments/(.*)$ /$1 break;
             proxy_pass http://payment_service;
@@ -83,9 +103,22 @@ data:
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # Essential: rewrite ALL possible redirect URLs
+            proxy_redirect ~^/admin(.*)$ /payments/admin$1;
+            proxy_redirect ~^/accounts(.*)$ /payments/accounts$1;
+            proxy_redirect ~^/$ /payments/;
+            
+            # Fix URLs in HTML content  
+            sub_filter 'action="/admin/' 'action="/payments/admin/';
+            sub_filter 'href="/admin/' 'href="/payments/admin/';
+            sub_filter 'action="/accounts/' 'action="/payments/accounts/';
+            sub_filter 'href="/accounts/' 'href="/payments/accounts/';
+            sub_filter_once off;
+            sub_filter_types text/html text/css text/xml text/javascript application/javascript application/json;
         }
 
-        # Products at root prefix
+        # Product service - complete isolation
         location ^~ /products/ {
             rewrite ^/products/(.*)$ /$1 break;
             proxy_pass http://product_management_service;
@@ -93,9 +126,12 @@ data:
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_redirect ~^/admin(.*)$ /products/admin$1;
+            proxy_redirect ~^/accounts(.*)$ /products/accounts$1;
+            proxy_redirect ~^/$ /products/;
         }
 
-        # Notifications at root prefix
+        # Notifications service - complete isolation
         location ^~ /notifications/ {
             rewrite ^/notifications/(.*)$ /$1 break;
             proxy_pass http://notifications_service;
@@ -103,9 +139,12 @@ data:
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_redirect ~^/admin(.*)$ /notifications/admin$1;
+            proxy_redirect ~^/accounts(.*)$ /notifications/accounts$1;
+            proxy_redirect ~^/$ /notifications/;
         }
 
-        # Transactions at root prefix
+        # Transactions service - complete isolation
         location ^~ /transactions/ {
             rewrite ^/transactions/(.*)$ /$1 break;
             proxy_pass http://transactions_service;
@@ -113,9 +152,12 @@ data:
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_redirect ~^/admin(.*)$ /transactions/admin$1;
+            proxy_redirect ~^/accounts(.*)$ /transactions/accounts$1;
+            proxy_redirect ~^/$ /transactions/;
         }
 
-        # Reviews at root prefix
+        # Reviews service - complete isolation
         location ^~ /reviews/ {
             rewrite ^/reviews/(.*)$ /$1 break;
             proxy_pass http://reviews_service;
@@ -123,9 +165,12 @@ data:
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_redirect ~^/admin(.*)$ /reviews/admin$1;
+            proxy_redirect ~^/accounts(.*)$ /reviews/accounts$1;
+            proxy_redirect ~^/$ /reviews/;
         }
 
-        # Resolution at root prefix
+        # Resolution service - complete isolation
         location ^~ /resolution/ {
             rewrite ^/resolution/(.*)$ /$1 break;
             proxy_pass http://resolution_service;
@@ -133,13 +178,12 @@ data:
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_redirect ~^/admin(.*)$ /resolution/admin$1;
+            proxy_redirect ~^/accounts(.*)$ /resolution/accounts$1;
+            proxy_redirect ~^/$ /resolution/;
         }
 
-        # Note: Grafana and Prometheus are available via dedicated external services
-        # Grafana: Direct external IP access
-        # Prometheus: Direct external IP access (when assigned)
-
-        # Default: send to auth
+        # Default: send to auth service
         location / {
             proxy_pass http://auth_service/;
             proxy_set_header Host $host;
@@ -148,76 +192,3 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
     }
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-proxy
-  labels:
-    app: nginx-proxy
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: nginx-proxy
-  template:
-    metadata:
-      labels:
-        app: nginx-proxy
-    spec:
-      containers:
-        - name: nginx
-          image: nginx:1.25-alpine
-          ports:
-            - containerPort: 80
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 80
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 80
-            initialDelaySeconds: 10
-            periodSeconds: 20
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "250m"
-              memory: "256Mi"
-          volumeMounts:
-            - name: nginx-config
-              mountPath: /etc/nginx/conf.d/default.conf
-              subPath: default.conf
-          # Reasonable default proxy headers
-          env:
-            - name: NGINX_ENTRYPOINT_QUIET_LOGS
-              value: "1"
-      volumes:
-        - name: nginx-config
-          configMap:
-            name: nginx-proxy-config
-            items:
-              - key: default.conf
-                path: default.conf
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-proxy
-  labels:
-    app: nginx-proxy
-spec:
-  type: ClusterIP
-  selector:
-    app: nginx-proxy
-  ports:
-    - name: http
-      protocol: TCP
-      port: 80
-      targetPort: 80
-

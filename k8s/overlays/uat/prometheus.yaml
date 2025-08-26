@@ -6,10 +6,20 @@ data:
   prometheus.yml: |
     global:
       scrape_interval: 15s
+      evaluation_interval: 15s
+    
+    rule_files:
+      # - "first_rules.yml"
+      # - "second_rules.yml"
+    
     scrape_configs:
+      # Kubernetes pods with prometheus annotations
       - job_name: 'kubernetes-pods'
         kubernetes_sd_configs:
         - role: pod
+          namespaces:
+            names:
+            - bidr-uat
         relabel_configs:
         - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
           action: keep
@@ -31,11 +41,104 @@ data:
         - source_labels: [__meta_kubernetes_pod_name]
           action: replace
           target_label: kubernetes_pod_name
-      - job_name: 'bidr-services'
+        - source_labels: [__meta_kubernetes_pod_label_app]
+          action: replace
+          target_label: bidr_service
+      
+      # BIDR Django Services
+      - job_name: 'bidr-auth-service'
         static_configs:
-        - targets: ['auth-service:8000', 'chat-service:8000', 'payment-service:8000', 
-                    'resolution-service:8000', 'product-management-service:8000',
-                    'notifications-service:8000', 'transactions-service:8000', 'reviews-service:8000']
+        - targets: ['auth-service.bidr-uat.svc.cluster.local:8001']
+          labels:
+            service: 'auth'
+            app: 'bidr'
+            environment: 'uat'
+        metrics_path: '/metrics'
+        scrape_interval: 30s
+      
+      - job_name: 'bidr-chat-service'
+        static_configs:
+        - targets: ['chat-service.bidr-uat.svc.cluster.local:8002']
+          labels:
+            service: 'chat'
+            app: 'bidr'
+            environment: 'uat'
+        metrics_path: '/metrics'
+        scrape_interval: 30s
+      
+      - job_name: 'bidr-payment-service'
+        static_configs:
+        - targets: ['payment-service.bidr-uat.svc.cluster.local:8003']
+          labels:
+            service: 'payment'
+            app: 'bidr'
+            environment: 'uat'
+        metrics_path: '/metrics'
+        scrape_interval: 30s
+      
+      - job_name: 'bidr-product-service'
+        static_configs:
+        - targets: ['product-management-service.bidr-uat.svc.cluster.local:8004']
+          labels:
+            service: 'product-management'
+            app: 'bidr'
+            environment: 'uat'
+        metrics_path: '/metrics'
+        scrape_interval: 30s
+      
+      - job_name: 'bidr-notifications-service'
+        static_configs:
+        - targets: ['notifications-service.bidr-uat.svc.cluster.local:8005']
+          labels:
+            service: 'notifications'
+            app: 'bidr'
+            environment: 'uat'
+        metrics_path: '/metrics'
+        scrape_interval: 30s
+      
+      - job_name: 'bidr-transactions-service'
+        static_configs:
+        - targets: ['transactions-service.bidr-uat.svc.cluster.local:8006']
+          labels:
+            service: 'transactions'
+            app: 'bidr'
+            environment: 'uat'
+        metrics_path: '/metrics'
+        scrape_interval: 30s
+      
+      - job_name: 'bidr-reviews-service'
+        static_configs:
+        - targets: ['reviews-service.bidr-uat.svc.cluster.local:8007']
+          labels:
+            service: 'reviews'
+            app: 'bidr'
+            environment: 'uat'
+        metrics_path: '/metrics'
+        scrape_interval: 30s
+      
+      - job_name: 'bidr-resolution-service'
+        static_configs:
+        - targets: ['resolution-service.bidr-uat.svc.cluster.local:8008']
+          labels:
+            service: 'resolution'
+            app: 'bidr'
+            environment: 'uat'
+        metrics_path: '/metrics'
+        scrape_interval: 30s
+      
+      # Infrastructure monitoring
+      - job_name: 'kubernetes-nodes'
+        kubernetes_sd_configs:
+        - role: node
+        relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        - target_label: __address__
+          replacement: kubernetes.default.svc:443
+        - source_labels: [__meta_kubernetes_node_name]
+          regex: (.+)
+          target_label: __metrics_path__
+          replacement: /api/v1/nodes/${1}/proxy/metrics
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -93,4 +196,4 @@ spec:
   ports:
     - port: 9090
       targetPort: 9090
-  type: LoadBalancer
+  type: ClusterIP

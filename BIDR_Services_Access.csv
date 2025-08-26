@@ -1,0 +1,13 @@
+Service Name,Service Type,Admin Panel URL,Health Check URL,Swagger/API URL,Login Type,Username,Email,Password,Notes
+Auth Service,Django,http://108.141.192.60/admin/,http://108.141.192.60/health/,http://108.141.192.60/swagger/,Email-based,N/A,admin@bidr.com,AdminPassword123!,Custom user model uses email as username
+Chat Service,Django,http://108.141.192.60/chat/admin/,http://108.141.192.60/chat/health/,http://108.141.192.60/chat/swagger/,Username,admin,admin@bidr.com,AdminPassword123!,Standard Django user model
+Payment Service,Django,http://108.141.192.60/payments/admin/,http://108.141.192.60/payments/health/,http://108.141.192.60/payments/swagger/,Username,admin,admin@bidr.com,AdminPassword123!,Standard Django user model
+Notifications Service,Django,http://108.141.192.60/notifications/admin/,http://108.141.192.60/notifications/health/,http://108.141.192.60/notifications/swagger/,Username,admin,admin@bidr.com,AdminPassword123!,Standard Django user model
+Product Management Service,Django,http://108.141.192.60/products/admin/,http://108.141.192.60/products/health/,http://108.141.192.60/products/swagger/,Username,admin,admin@bidr.com,AdminPassword123!,Standard Django user model
+Transactions Service,Django,http://108.141.192.60/transactions/admin/,http://108.141.192.60/transactions/health/,http://108.141.192.60/transactions/swagger/,Username,admin,admin@bidr.com,AdminPassword123!,Database migrations applied and working
+Reviews Service,Django,http://108.141.192.60/reviews/admin/,http://108.141.192.60/reviews/health/,http://108.141.192.60/reviews/swagger/,Username,admin,admin@bidr.com,AdminPassword123!,Database migrations applied and working
+Resolution Service,Django,http://108.141.192.60/resolution/admin/,http://108.141.192.60/resolution/health/,http://108.141.192.60/resolution/swagger/,Username,admin,admin@bidr.com,AdminPassword123!,Standard Django user model
+Nginx Proxy,Nginx,N/A,http://108.141.192.60/health,N/A,N/A,N/A,N/A,N/A,Main entry point for all services
+Grafana,Monitoring,N/A,N/A,N/A,Username,admin,N/A,bidr-admin123,Internal monitoring dashboard
+Prometheus,Monitoring,N/A,N/A,N/A,N/A,N/A,N/A,N/A,Metrics collection service
+PostgreSQL Database,Database,N/A,N/A,N/A,N/A,N/A,N/A,N/A,Internal database service
