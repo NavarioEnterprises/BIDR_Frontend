@@ -8,8 +8,9 @@ import 'package:flutter/foundation.dart';
 import 'dart:io' if (dart.library.html) 'dart:html' as io;
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:8000';
-  static const String requestsEndpoint = '/inventory/api/v1/requests/requests/';
+  static const String baseUrl = 'http://108.141.192.60/';
+  static const String requestsEndpoint =
+      'http://108.141.192.60/products/api/v1/product-requests/requests/';
 
   /// Submit a vehicle spare parts request
   static Future<Map<String, dynamic>> submitVehicleRequest({
@@ -36,10 +37,9 @@ class ApiService {
     // Add location coordinates parameters
     double? locationLat,
     double? locationLng,
-  }) async
-  {
+  }) async {
     try {
-      final uri = Uri.parse('$baseUrl$requestsEndpoint');
+      final uri = Uri.parse('$requestsEndpoint');
 
       // Create multipart request
       var request = http.MultipartRequest('POST', uri);
@@ -111,16 +111,13 @@ class ApiService {
         'category': 'VEHICLE_SPARES',
         'title': partName.isNotEmpty ? partName : 'Vehicle Spare Request',
         'description': description,
-        'buyer_location': jsonEncode({
-          'address': location,
-          'latitude': locationLat,
-          'longitude': locationLng,
-        }), // buyer_location must be JSON
+        'buyer_location':
+            '{"address":"${location.isNotEmpty ? location : ''}","lat":${locationLat ?? 'null'},"lng":${locationLng ?? 'null'}}',
         'condition_preference': _mapConditionPreference(selectedNewUsedPart),
         'quantity': selectedQuantity ?? '1',
         'urgency_timeline': _mapTimeframeToUrgency(selectedTimeframe),
         'max_travel_distance': maxDistance.round().toString(),
-        'product_specifications': jsonEncode(vehicleSparesData),
+        'product_specifications': jsonEncode(_cleanJsonData(vehicleSparesData)),
         'terms_accepted': 'true',
         'contact_consent': 'true',
         'buyer_id': '2', // Use testuser ID for now
@@ -128,11 +125,19 @@ class ApiService {
 
       // The backend expects vehicle_spares_data as a dictionary/object, not as individual fields
       // Since this is multipart form data, we'll add it as a JSON string that the serializer can parse
-      request.fields['vehicle_spares_data'] = jsonEncode(vehicleSparesData);
-      
-      print('Added vehicle_spares_data as JSON:');
-      print(jsonEncode(vehicleSparesData));
-      print('All request fields: ${request.fields}');
+      request.fields['vehicle_spares_data'] = jsonEncode(
+        _cleanJsonData(vehicleSparesData),
+      );
+
+      print('=== DEBUG JSON FIELDS ===');
+      print('buyer_location raw: ${request.fields['buyer_location']}');
+      print(
+        'product_specifications raw: ${request.fields['product_specifications']}',
+      );
+      print(
+        'vehicle_spares_data raw: ${request.fields['vehicle_spares_data']}',
+      );
+      print('=== END DEBUG ===');
 
       // Add image files (cross-platform)
       for (int i = 0; i < images.length; i++) {
@@ -196,8 +201,7 @@ class ApiService {
     XFile file,
     String field,
     String filename,
-  ) async
-  {
+  ) async {
     if (kIsWeb) {
       // For web platform - read as bytes
       final bytes = await file.readAsBytes();
@@ -213,32 +217,38 @@ class ApiService {
   }
 
   /// Get JWT token for authentication
-  static Future<String?> getJWTToken({
-    String username = 'testuser',
-    String password = 'testpass123',
-  }) async
-  {
+  static Future<String?> getAuthToken({
+    String email = 'admin@bidr.com',
+    String password = 'AdminPassword123!',
+  }) async {
     try {
-      final uri = Uri.parse('$baseUrl/api/token/');
+      final uri = Uri.parse(
+        '$baseUrl/login/',
+      ); // Use /login/ instead of /api/token/
       final response = await http.post(
         uri,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: jsonEncode({'username': username, 'password': password}),
+        body: jsonEncode({
+          'email': email, // Use 'email' not 'username'
+          'password': password,
+        }),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data['access'];
+        // The login endpoint returns a different token structure
+        return data['token'] ??
+            data['access_token']; // Check response structure
       } else {
-        print('Failed to get JWT token: ${response.statusCode}');
+        print('Failed to get auth token: ${response.statusCode}');
         print('Response: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Error getting JWT token: $e');
+      print('Error getting auth token: $e');
       return null;
     }
   }
@@ -621,5 +631,25 @@ class ApiService {
       default:
         return 'PASSENGER_CAR';
     }
+  }
+
+  /// Clean JSON data by removing null values and ensuring proper formatting
+  static Map<String, dynamic> _cleanJsonData(Map<String, dynamic> data) {
+    Map<String, dynamic> cleaned = {};
+
+    for (var entry in data.entries) {
+      if (entry.value != null) {
+        if (entry.value is Map) {
+          cleaned[entry.key] = _cleanJsonData(entry.value);
+        } else if (entry.value is String && entry.value.isEmpty) {
+          // Keep empty strings as they might be expected by backend
+          cleaned[entry.key] = entry.value;
+        } else {
+          cleaned[entry.key] = entry.value;
+        }
+      }
+    }
+
+    return cleaned;
   }
 }

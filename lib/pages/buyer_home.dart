@@ -914,7 +914,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   // Location variables
   LatLng? _selectedLocation;
   String _selectedAddress = '';
-  static const String _googleMapsApiKey = 'AIzaSyAKFP-Mf1TQ1z2o8vEBjx2P-_5SwB0lA-k';
+  static const String _googleMapsApiKey =
+      'AIzaSyAKFP-Mf1TQ1z2o8vEBjx2P-_5SwB0lA-k';
 
   // Focus Nodes
   final FocusNode _vinFocus = FocusNode();
@@ -1506,9 +1507,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 ),
               ),
               SizedBox(width: 16),
-              Expanded(
-                child: _buildLocationField(),
-              ),
+              Expanded(child: _buildLocationField()),
             ],
           ),
           SizedBox(height: 16),
@@ -1764,7 +1763,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
 
     try {
       // Get JWT token first
-      final token = await ApiService.getJWTToken();
+      final token = await ApiService.getAuthToken();
       if (token == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1810,7 +1809,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
 
         // Reset form after successful submission
         _resetForm();
-        
+
         // Navigate to dashboard
         if (mounted) {
           context.go('/dashboard');
@@ -1986,7 +1985,10 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   fontSize: 14,
                 ),
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 suffixIcon: Container(
                   margin: EdgeInsets.all(8),
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -3112,7 +3114,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
 
     try {
       // Get JWT token first
-      final token = await ApiService.getJWTToken();
+      final token = await ApiService.getAuthToken();
       if (token == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -3913,7 +3915,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
 
     try {
       // Get JWT token first
-      final token = await ApiService.getJWTToken();
+      final token = await ApiService.getAuthToken();
       if (token == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -3984,7 +3986,8 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     if (_selectedSidewallProfile == null || _selectedSidewallProfile!.isEmpty) {
       errors.add('Sidewall profile is required');
     }
-    if (_selectedWheelRimDiameter == null || _selectedWheelRimDiameter!.isEmpty) {
+    if (_selectedWheelRimDiameter == null ||
+        _selectedWheelRimDiameter!.isEmpty) {
       errors.add('Wheel rim diameter is required');
     }
 
@@ -4202,10 +4205,11 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
     setState(() {
       _selectedLocation = location;
     });
-    
+
     // Get address from coordinates (reverse geocoding)
     // You can add geocoding package functionality here
-    _selectedAddress = 'Selected Location: ${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)}';
+    _selectedAddress =
+        'Selected Location: ${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)}';
   }
 
   @override
@@ -4244,7 +4248,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                 ],
               ),
             ),
-            
+
             // Search bar
             Container(
               padding: EdgeInsets.all(16),
@@ -4272,7 +4276,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                 },
               ),
             ),
-            
+
             // Map
             Expanded(
               child: Container(
@@ -4294,13 +4298,15 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                     Marker(
                       markerId: MarkerId('selected_location'),
                       position: _selectedLocation,
-                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(
+                        BitmapDescriptor.hueRed,
+                      ),
                     ),
                   },
                 ),
               ),
             ),
-            
+
             // Selected location info
             if (_selectedAddress.isNotEmpty)
               Container(
@@ -4311,7 +4317,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                   textAlign: TextAlign.center,
                 ),
               ),
-            
+
             // Action buttons
             Container(
               padding: EdgeInsets.all(16),
@@ -4328,8 +4334,8 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      final address = _selectedAddress.isNotEmpty 
-                          ? _selectedAddress 
+                      final address = _selectedAddress.isNotEmpty
+                          ? _selectedAddress
                           : 'Selected Location: ${_selectedLocation.latitude.toStringAsFixed(4)}, ${_selectedLocation.longitude.toStringAsFixed(4)}';
                       widget.onLocationSelected(_selectedLocation, address);
                       Navigator.of(context).pop();

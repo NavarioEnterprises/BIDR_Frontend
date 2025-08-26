@@ -7,7 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 import '../models/request_models.dart';
+import '../models/product_request_api.dart';
 import 'package:gradient_glow_border/gradient_glow_border.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import 'buyer/account_management.dart';
 import 'buyer/share_with_friends.dart';
@@ -20,9 +23,14 @@ class BuyerDashboardScreen extends StatefulWidget {
 }
 
 class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
+  List<ProductRequestItem> _productRequests = [];
+  bool _isLoading = true;
+  String? _error;
+
   @override
   void initState() {
     super.initState();
+    _fetchProductRequests();
   }
 
   @override
@@ -118,10 +126,10 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                             )
                           : dashboardIndex == 2
                           ? Column(
-                            children: [
-                              Expanded(child: TransactionDashboard()),
-                            ],
-                          )
+                              children: [
+                                Expanded(child: TransactionDashboard()),
+                              ],
+                            )
                           : dashboardIndex == 3
                           ? AccountManagementPage()
                           : Container(),
@@ -240,27 +248,52 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
   Widget _buildEmptyStateCard() {
     return Container(
-      padding: EdgeInsets.all(16),
       width: 350,
-      height: 200,
+      height: 400,
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!, width: 1),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300),
       ),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.inbox_outlined, color: Colors.grey[400], size: 48),
+            Icon(
+              Icons.inventory_2_outlined,
+              size: 48,
+              color: Colors.grey.shade400,
+            ),
             SizedBox(height: 16),
             Text(
-              "No requests available",
+              'No Requests Yet',
               style: GoogleFonts.manrope(
-                color: Colors.grey[600],
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade700,
               ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Start creating product requests to see them here',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: Colors.grey.shade600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to create request page or refresh
+                _fetchProductRequests();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Constants.ftaColorLight,
+                foregroundColor: Colors.white,
+              ),
+              child: Text('Refresh'),
             ),
           ],
         ),
@@ -1683,6 +1716,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       ],
     );
   }
+
+  void _fetchProductRequests() {}
 }
 
 class SparesDetailScreen extends StatefulWidget {

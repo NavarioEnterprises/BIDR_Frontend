@@ -23,33 +23,44 @@ class Sharedprefs {
   static String sharedPreferenceBusinessIdKey = "USEREBUSINESSIDKEY";
   static String sharedPreferenceBusinessEmailKey = "USEREBUSINESEMAILKEY";
   static String sharedPreferenceBusinessNameKey = "USEREBUSINESSNAMEKEY";
-  static String sharedPreferenceBusinessPhoneNumberKey = "USEREBUSINESSPHONENUMBERKEY";
-  static String sharedPreferenceCompleteLoginDataKey = "USERCOMPLETELOGINDATAKEY";
+  static String sharedPreferenceBusinessPhoneNumberKey =
+      "USEREBUSINESSPHONENUMBERKEY";
+  static String sharedPreferenceCompleteLoginDataKey =
+      "USERCOMPLETELOGINDATAKEY";
 
   static Future<bool> saveUserLoggedInSharedPreference(
-      bool isUserLoggedIn) async {
+    bool isUserLoggedIn,
+  ) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.setBool(
-        sharedPreferenceUserLoggedInKey, isUserLoggedIn);
-  }
-  static Future<bool> saveUserAccessTokenSharedPreference(
-      String accessToken) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    return await preferences.setString(
-        sharedPreferenceUserAccessTokenKey, accessToken);
-  }
-  static Future<bool> saveUserRefreshTokenSharedPreference(
-      String refreshToken) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    return await preferences.setString(
-        sharedPreferenceUserRefreshTokenKey, refreshToken);
+      sharedPreferenceUserLoggedInKey,
+      isUserLoggedIn,
+    );
   }
 
-  static Future<bool> saveUserRoleSharedPreference(
-      String userRole) async {
+  static Future<bool> saveUserAccessTokenSharedPreference(
+    String accessToken,
+  ) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.setString(
-        sharedPreferenceUserRoleKey, userRole);
+      sharedPreferenceUserAccessTokenKey,
+      accessToken,
+    );
+  }
+
+  static Future<bool> saveUserRefreshTokenSharedPreference(
+    String refreshToken,
+  ) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.setString(
+      sharedPreferenceUserRefreshTokenKey,
+      refreshToken,
+    );
+  }
+
+  static Future<bool> saveUserRoleSharedPreference(String userRole) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return await preferences.setString(sharedPreferenceUserRoleKey, userRole);
   }
 
   static Future<bool> saveUserNameSharedPreference(String userName) async {
@@ -61,21 +72,45 @@ class Sharedprefs {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.setInt(sharedPreferenceBusinessIdKey, businessId);
   }
-  static Future<bool> saveBusinessUidSharedPreference(String businessUid) async {
+
+  static Future<bool> saveBusinessUidSharedPreference(
+    String businessUid,
+  ) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    return await preferences.setString(sharedPreferenceBusinessUidKey, businessUid);
+    return await preferences.setString(
+      sharedPreferenceBusinessUidKey,
+      businessUid,
+    );
   }
-  static Future<bool> saveBusinessNameSharedPreference(String businessName) async {
+
+  static Future<bool> saveBusinessNameSharedPreference(
+    String businessName,
+  ) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    return await preferences.setString(sharedPreferenceBusinessNameKey, businessName);
+    return await preferences.setString(
+      sharedPreferenceBusinessNameKey,
+      businessName,
+    );
   }
-  static Future<bool> saveBusinessEmailSharedPreference(String businessEmail) async {
+
+  static Future<bool> saveBusinessEmailSharedPreference(
+    String businessEmail,
+  ) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    return await preferences.setString(sharedPreferenceBusinessEmailKey, businessEmail);
+    return await preferences.setString(
+      sharedPreferenceBusinessEmailKey,
+      businessEmail,
+    );
   }
-  static Future<bool> saveBusinessPhoneNumberSharedPreference(String businessPhone) async {
+
+  static Future<bool> saveBusinessPhoneNumberSharedPreference(
+    String businessPhone,
+  ) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    return await preferences.setString(sharedPreferenceBusinessPhoneNumberKey, businessPhone);
+    return await preferences.setString(
+      sharedPreferenceBusinessPhoneNumberKey,
+      businessPhone,
+    );
   }
 
   static Future<bool> saveUserEmpIdSharedPreference(int cec_employeeid) async {
@@ -91,14 +126,19 @@ class Sharedprefs {
   static Future<bool> saveUserTargetCaloriesPreference(double calories) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.setDouble(
-        sharedPreferenceUserCaloriesKey, calories);
+      sharedPreferenceUserCaloriesKey,
+      calories,
+    );
   }
 
   static Future<bool> saveUserCecClientIdSharedPreference(
-      int cec_client_id) async {
+    int cec_client_id,
+  ) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.setInt(
-        sharedPreferenceCecClientIdKey, cec_client_id);
+      sharedPreferenceCecClientIdKey,
+      cec_client_id,
+    );
   }
 
   static Future<bool> saveUserUidSharedPreference(String uid) async {
@@ -124,7 +164,9 @@ class Sharedprefs {
   static Future<bool> saveUserEmailSharedPreference2(String userEmail) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.setString(
-        sharedPreferenceUserEmailKey2, userEmail);
+      sharedPreferenceUserEmailKey2,
+      userEmail,
+    );
   }
 
   static Future<bool> saveUserCellSharedPreference(String userCell) async {
@@ -132,9 +174,14 @@ class Sharedprefs {
     return await preferences.setString(sharedPreferenceCellKey, userCell);
   }
 
-  static Future<bool> saveCompleteLoginDataSharedPreference(String loginData) async {
+  static Future<bool> saveCompleteLoginDataSharedPreference(
+    String loginData,
+  ) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    return await preferences.setString(sharedPreferenceCompleteLoginDataKey, loginData);
+    return await preferences.setString(
+      sharedPreferenceCompleteLoginDataKey,
+      loginData,
+    );
   }
 
   //Get Prefs
@@ -142,33 +189,37 @@ class Sharedprefs {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.getInt(sharedPreferenceBusinessIdKey);
   }
+
   static Future<String?> getBusinessUidSharedPreference() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.getString(sharedPreferenceBusinessUidKey);
   }
+
   static Future<String?> getBusinessNameSharedPreference() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.getString(sharedPreferenceBusinessNameKey);
   }
+
   static Future<String?> getBusinessEmailSharedPreference() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.getString(sharedPreferenceBusinessEmailKey);
   }
+
   static Future<String?> getBusinessPhoneNumberSharedPreference() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.getString(sharedPreferenceBusinessPhoneNumberKey);
   }
 
-
-
   static Future<bool?> getUserLoggedInSharedPreference() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.getBool(sharedPreferenceUserLoggedInKey);
   }
+
   static Future<String?> getUserAccessTokenSharedPreference() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.getString(sharedPreferenceUserAccessTokenKey);
   }
+
   static Future<String?> getUserRefreshTokenSharedPreference() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.getString(sharedPreferenceUserRefreshTokenKey);
@@ -255,8 +306,10 @@ class EncryptedSharedPreferences {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final encryptedValue = prefs.getString(key);
     if (encryptedValue != null) {
-      return encrypter.decrypt(encrypt.Encrypted.fromBase64(encryptedValue),
-          iv: iv);
+      return encrypter.decrypt(
+        encrypt.Encrypted.fromBase64(encryptedValue),
+        iv: iv,
+      );
     }
     return null;
   }
@@ -294,8 +347,10 @@ class EncryptedSharedPreferences {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final encryptedValue = prefs.getString(key);
     if (encryptedValue != null) {
-      return encrypter.decrypt(encrypt.Encrypted.fromBase64(encryptedValue),
-          iv: iv);
+      return encrypter.decrypt(
+        encrypt.Encrypted.fromBase64(encryptedValue),
+        iv: iv,
+      );
     }
     return null;
   }
@@ -306,8 +361,9 @@ class EncryptedSharedPreferences {
   }
 
   static Future<DateTime?> getLastLoginDateTime() async {
-    final String? decryptedDateTimeString =
-        await getDecryptedString('lastLoginDateTime');
+    final String? decryptedDateTimeString = await getDecryptedString(
+      'lastLoginDateTime',
+    );
     if (decryptedDateTimeString != null) {
       return DateTime.tryParse(decryptedDateTimeString);
     }
@@ -315,14 +371,16 @@ class EncryptedSharedPreferences {
   }
 
   static Future<bool> saveUserCredentials(
-      Map<String, dynamic> credentials) async {
+    Map<String, dynamic> credentials,
+  ) async {
     final String credentialsJson = jsonEncode(credentials);
     return saveEncryptedString('userCredentials', credentialsJson);
   }
 
   static Future<Map<String, dynamic>?> getUserCredentials() async {
-    final String? decryptedCredentialsJson =
-        await getDecryptedString('userCredentials');
+    final String? decryptedCredentialsJson = await getDecryptedString(
+      'userCredentials',
+    );
     if (decryptedCredentialsJson != null) {
       return jsonDecode(decryptedCredentialsJson) as Map<String, dynamic>;
     }
