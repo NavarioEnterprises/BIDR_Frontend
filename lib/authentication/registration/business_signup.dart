@@ -11,11 +11,14 @@ import 'dart:io';
 import '../../constants/Constants.dart';
 import '../../customWdget/customCard.dart';
 import '../../customWdget/custom_input2.dart';
+import '../../customWdget/custom_dialogs.dart';
+import '../auth_api_service.dart';
 import '../otp_screen.dart';
+import 'buyer_signup.dart';
 import 'complete_business_registration.dart';
 
 class BusinessSignUpPage extends StatefulWidget {
-  const BusinessSignUpPage({Key? key}) : super(key: key);
+  const BusinessSignUpPage({super.key});
 
   @override
   State<BusinessSignUpPage> createState() => _BusinessSignUpPageState();
@@ -252,7 +255,12 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
 
       if (currentStep < steps.length - 1) {
         setState(() {
-          currentStep++;
+          if(currentStep==0){
+            _handleSignUp();
+          }else{
+            currentStep++;
+          }
+
         });
 
         // Animate to next page with a smooth transition
@@ -269,7 +277,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       _showValidationError();
     }
   }
-
+  AuthApiService authApiService = AuthApiService();
   void _previousStep() {
     if (currentStep > 0) {
       setState(() {
@@ -297,13 +305,13 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       _isLoading = false;
     });
 
-    // Show success message or navigate to next screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Business registration submitted successfully!'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-      ),
+    // Show success message with custom dialog
+    CustomDialogs.showSuccessDialog(
+      context,
+      'Business registration submitted successfully! We will review your application and get back to you soon.',
+      onDismiss: () {
+        // Navigate to next screen or perform any action after dismissal
+      },
     );
   }
 
@@ -339,7 +347,13 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         errorMessage = 'Please complete all required fields';
     }
 
-    _showErrorSnackBar(errorMessage);
+    CustomDialogs.showErrorDialog(
+      context,
+      errorMessage,
+      onRetry: () {
+        // Optional: Add any retry logic here if needed
+      },
+    );
   }
 
   bool _validateCurrentStep() {
@@ -376,6 +390,83 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     }
   }
 
+  void _handleSignUp() async {
+    if (!_validateCurrentStep()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final result = await authApiService.registerUser(
+        email: _userEmailController.text,
+        firstName: _firstNameController.text,
+        lastName:  _lastNameController.text,
+        phoneNumber: _userPhoneController.text,
+        role: "seller",
+        password: _passwordController.text,
+        confirmPassword: _confirmPasswordController.text,
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (result != null) {
+        // Check if registration was successful
+        if (result['success'] != false &&
+            result['statusCode'] != 400 &&
+            result['statusCode'] != 500) {
+          // Success case
+          final message = result['message'] ?? 'User registered successfully';
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+
+          print("tyytyttyty ${message}");
+          // Navigate to OTP verification
+          if (message.contains("Please verify your email") ||
+              result['email'] != null) {
+            print("tyytyttyty ${message}");
+            currentStep=1;
+            setState(() {
+
+            });
+          }
+        } else {
+          // Handle errors
+          handleRegistrationErrors(context, result);
+        }
+      } else {
+        // Handle null response
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Registration failed. Please try again.'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: $e'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   Future<void> _getCoordinatesFromAddress([StateSetter? setDialogState]) async {
     if (_physicalAddressController.text.isEmpty) return;
 
@@ -383,7 +474,11 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
 
     // Validate address format before geocoding
     if (address.length < 5) {
-      _showLocationError('Please enter a more complete address');
+      CustomDialogs.showErrorDialog(
+        context,
+        'Please enter a more complete address',
+        onRetry: () => _getCoordinatesFromAddress(setDialogState),
+      );
       return;
     }
 
@@ -463,32 +558,49 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         }
 
         // Show success message
-        _showLocationSuccess('Location found successfully!');
+        CustomDialogs.showSuccessDialog(
+          context,
+          'Location found successfully!',
+        );
       } else {
         print('❌ No locations found for address: "$address"');
-        _showLocationError(
+        CustomDialogs.showErrorDialog(
+          context,
           'Could not find location for "$address". Please try:\n'
           '• Adding more details (street number, city, country)\n'
           '• Checking spelling\n'
           '• Using a different format',
+          onRetry: () => _getCoordinatesFromAddress(setDialogState),
         );
       }
     } on PlatformException catch (e) {
       print('❌ Platform exception during geocoding: ${e.message}');
       if (e.code == 'PERMISSION_DENIED') {
-        _showLocationError(
+        CustomDialogs.showErrorDialog(
+          context,
           'Location permission denied. Please enable location services.',
+          onRetry: () => _getCoordinatesFromAddress(setDialogState),
         );
       } else if (e.code == 'NETWORK_ERROR') {
-        _showLocationError(
+        CustomDialogs.showErrorDialog(
+          context,
           'Network error. Please check your internet connection.',
+          onRetry: () => _getCoordinatesFromAddress(setDialogState),
         );
       } else {
-        _showLocationError('Platform error: ${e.message}');
+        CustomDialogs.showErrorDialog(
+          context,
+          'Platform error: ${e.message}',
+          onRetry: () => _getCoordinatesFromAddress(setDialogState),
+        );
       }
     } catch (e) {
       print('❌ Unexpected error during geocoding: $e');
-      _showLocationError('Unexpected error occurred. Please try again.');
+      CustomDialogs.showErrorDialog(
+        context,
+        'Unexpected error occurred. Please try again.',
+        onRetry: () => _getCoordinatesFromAddress(setDialogState),
+      );
     } finally {
       if (setDialogState != null) {
         setDialogState(() {
@@ -527,51 +639,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     }
 
     return variations;
-  }
-
-  // Show success message
-  void _showLocationSuccess(String message) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white),
-              const SizedBox(width: 8),
-              Expanded(child: Text(message)),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-
-  // Enhanced error message function
-  void _showLocationError(String message) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error_outline, color: Colors.white),
-              const SizedBox(width: 8),
-              Expanded(child: Text(message)),
-            ],
-          ),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 4),
-          action: SnackBarAction(
-            label: 'RETRY',
-            textColor: Colors.white,
-            onPressed: () {
-              _getCoordinatesFromAddress();
-            },
-          ),
-        ),
-      );
-    }
   }
 
   // Get address from coordinates (reverse geocoding)
@@ -615,15 +682,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     }
   }
 
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

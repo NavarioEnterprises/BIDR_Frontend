@@ -9,6 +9,7 @@ import 'package:hugeicons/hugeicons.dart';
 import '../../constants/Constants.dart';
 import '../../customWdget/customCard.dart';
 import '../../customWdget/custom_input2.dart';
+import '../../customWdget/custom_dialogs.dart';
 import '../../pages/buyer_home.dart';
 import '../login.dart';
 import '../otp_screen.dart';
@@ -19,6 +20,44 @@ class BuyerSignUpPage extends StatefulWidget {
 
   @override
   State<BuyerSignUpPage> createState() => _BuyerSignUpPageState();
+}
+
+void handleRegistrationErrors(BuildContext context, Map<String, dynamic> result) {
+  String errorMessage = 'Registration failed. ';
+
+  // Handle different types of errors
+  if (result['errors'] != null) {
+    final errors = result['errors'] as Map<String, dynamic>;
+    List<String> errorMessages = [];
+
+    // Extract specific field errors
+    errors.forEach((field, messages) {
+      if (messages is List) {
+        for (var message in messages) {
+          errorMessages.add('$field: $message');
+        }
+      } else {
+        errorMessages.add('$field: $messages');
+      }
+    });
+
+    if (errorMessages.isNotEmpty) {
+      errorMessage += errorMessages.join('\n');
+    }
+  } else if (result['error'] != null) {
+    errorMessage += result['error'].toString();
+  } else if (result['statusCode'] == 500) {
+    errorMessage += 'Server error. Please check your password requirements.';
+  }
+
+  // Show error message with custom dialog
+  CustomDialogs.showErrorDialog(
+    context,
+    errorMessage,
+    onRetry: () {
+      // Optional retry functionality
+    },
+  );
 }
 
 class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
@@ -59,15 +98,6 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
 
   void _handleSignUp() async {
     if (!_validateForm()) return;
@@ -99,12 +129,12 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
           // Success case
           final message = result['message'] ?? 'User registered successfully';
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-            ),
+          CustomDialogs.showSuccessDialog(
+            context,
+            message,
+            onDismiss: () {
+              // Optional: Add any action after success dialog dismissal
+            },
           );
 
           // Navigate to OTP verification
@@ -121,16 +151,14 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
           }
         } else {
           // Handle errors
-          _handleRegistrationErrors(result);
+          handleRegistrationErrors(context,result);
         }
       } else {
         // Handle null response
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registration failed. Please try again.'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
+        CustomDialogs.showErrorDialog(
+          context,
+          'Registration failed. Please try again.',
+          onRetry: () => _handleSignUp(),
         );
       }
     } catch (e) {
@@ -138,56 +166,15 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
         _isLoading = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred: $e'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
+      CustomDialogs.showErrorDialog(
+        context,
+        'An error occurred: $e',
+        onRetry: () => _handleSignUp(),
       );
     }
   }
 
-  void _handleRegistrationErrors(Map<String, dynamic> result) {
-    String errorMessage = 'Registration failed. ';
 
-    // Handle different types of errors
-    if (result['errors'] != null) {
-      final errors = result['errors'] as Map<String, dynamic>;
-      List<String> errorMessages = [];
-
-      // Extract specific field errors
-      errors.forEach((field, messages) {
-        if (messages is List) {
-          for (var message in messages) {
-            errorMessages.add('$field: $message');
-          }
-        } else {
-          errorMessages.add('$field: $messages');
-        }
-      });
-
-      if (errorMessages.isNotEmpty) {
-        errorMessage += errorMessages.join('\n');
-      }
-    } else if (result['error'] != null) {
-      errorMessage += result['error'].toString();
-    } else if (result['statusCode'] == 500) {
-      errorMessage += 'Server error. Please check your password requirements.';
-    }
-
-    // Show error message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(errorMessage),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(
-          seconds: 5,
-        ), // Longer duration for error messages
-      ),
-    );
-  }
 
   // Improved password validation based on server requirements
   bool _validateForm() {
@@ -196,11 +183,25 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
         _mobileController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _confirmPasswordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields'),
-          backgroundColor: Colors.orange,
-        ),
+      CustomDialogs.showWarningDialog(
+        context,
+        'Please fill in all fields',
+        onConfirm: () {
+          // Focus on the first empty field
+          if (_fullNameController.text.isEmpty) {
+            _fullNameFocusNode.requestFocus();
+          } else if (_mobileController.text.isEmpty) {
+            _mobileFocusNode.requestFocus();
+          } else if (_emailController.text.isEmpty) {
+            _emailFocusNode.requestFocus();
+          } else if (_passwordController.text.isEmpty) {
+            _passwordFocusNode.requestFocus();
+          } else if (_confirmPasswordController.text.isEmpty) {
+            _confirmPasswordFocusNode.requestFocus();
+          }
+        },
+        confirmText: 'OK',
+        cancelText: 'Cancel',
       );
       return false;
     }
@@ -209,11 +210,14 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     if (!RegExp(
       r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
     ).hasMatch(_emailController.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a valid email address'),
-          backgroundColor: Colors.orange,
-        ),
+      CustomDialogs.showWarningDialog(
+        context,
+        'Please enter a valid email address',
+        onConfirm: () {
+          _emailFocusNode.requestFocus();
+        },
+        confirmText: 'OK',
+        cancelText: 'Cancel',
       );
       return false;
     }
@@ -221,42 +225,54 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     // Validate password requirements (based on server logs)
     final password = _passwordController.text;
     if (password.length < 8) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password must be at least 8 characters long'),
-          backgroundColor: Colors.orange,
-        ),
+      CustomDialogs.showWarningDialog(
+        context,
+        'Password must be at least 8 characters long',
+        onConfirm: () {
+          _passwordFocusNode.requestFocus();
+        },
+        confirmText: 'OK',
+        cancelText: 'Cancel',
       );
       return false;
     }
 
     if (!RegExp(r'[A-Z]').hasMatch(password)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password must contain at least one uppercase letter'),
-          backgroundColor: Colors.orange,
-        ),
+      CustomDialogs.showWarningDialog(
+        context,
+        'Password must contain at least one uppercase letter',
+        onConfirm: () {
+          _passwordFocusNode.requestFocus();
+        },
+        confirmText: 'OK',
+        cancelText: 'Cancel',
       );
       return false;
     }
 
     if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password must contain at least one special character'),
-          backgroundColor: Colors.orange,
-        ),
+      CustomDialogs.showWarningDialog(
+        context,
+        'Password must contain at least one special character (!@#%^&*(),.?":{}|<>)',
+        onConfirm: () {
+          _passwordFocusNode.requestFocus();
+        },
+        confirmText: 'OK',
+        cancelText: 'Cancel',
       );
       return false;
     }
 
     // Validate password confirmation
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Passwords do not match'),
-          backgroundColor: Colors.orange,
-        ),
+      CustomDialogs.showWarningDialog(
+        context,
+        'Passwords do not match',
+        onConfirm: () {
+          _confirmPasswordFocusNode.requestFocus();
+        },
+        confirmText: 'OK',
+        cancelText: 'Cancel',
       );
       return false;
     }

@@ -1746,12 +1746,12 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
         body: Column(
           children: [
             // Request Header Card
-            SizedBox(height: 24),
+            SizedBox(height: 32),
             Container(
-              height: 50,
+              height: 60,
               width: MediaQuery.of(context).size.width,
               color: Constants.ctaColorLight,
-              padding: EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 8),
+              padding: EdgeInsets.only(left: 64, right: 64, top: 8, bottom: 8),
               child: Row(
                 children: [
                   IconButton(
@@ -1786,328 +1786,334 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 32),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Center(
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(16),
-                        constraints: BoxConstraints(maxWidth: 1400),
-                        decoration: BoxDecoration(
-                          color: Constants.dtaColorLight.withOpacity(0.55),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Constants.ctaColorLight,
-                            width: 1,
+                    Padding(
+                      padding: EdgeInsets.only(left: 64, right: 64),
+                      child: Center(
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(16),
+                          constraints: BoxConstraints(maxWidth: 1600),
+                          decoration: BoxDecoration(
+                            color: Constants.dtaColorLight.withOpacity(0.55),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Constants.ctaColorLight,
+                              width: 1,
+                            ),
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  _formatDate(widget.request.createdAt),
-                                  style: GoogleFonts.manrope(
-                                    color: Colors.grey.shade700,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Spacer(),
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.red[300]!,
-                                        ),
-                                        borderRadius: BorderRadius.circular(
-                                          360,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        "Cancel",
-                                        style: GoogleFonts.manrope(
-                                          color: Colors.red,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    IconButton(
-                                      onPressed: () {
-                                        setState(() {});
-                                      },
-                                      icon: Icon(
-                                        HugeIcons.strokeRoundedFilter,
-                                        color: Colors.grey[600],
-                                        size: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 12),
-                            // Request title
-                            Text(
-                              "REQUEST ID: ${widget.request.id ?? 'Unknown'}",
-                              style: GoogleFonts.manrope(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Constants.ftaColorLight,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            // Description label
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  left: BorderSide(
-                                    color: Colors.orange,
-                                    width: 3,
-                                  ),
-                                ),
-                              ),
-                              padding: EdgeInsets.only(left: 8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
+                                  Text(
+                                    _formatDate(widget.request.createdAt),
+                                    style: GoogleFonts.manrope(
+                                      color: Colors.grey.shade700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Spacer(),
                                   Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        "Description -",
-                                        style: GoogleFonts.manrope(
-                                          color: Colors.black54,
-                                          fontSize: 14,
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Colors.red[300]!,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            360,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          "Cancel",
+                                          style: GoogleFonts.manrope(
+                                            color: Colors.red,
+                                            fontSize: 11,
+                                          ),
                                         ),
                                       ),
-                                      TextButton(
-                                        onPressed: () {},
-                                        child: Text(
-                                          "View Details",
-                                          style: GoogleFonts.manrope(
-                                            color: Color(0xFF2B3A5C),
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                      SizedBox(width: 8),
+                                      IconButton(
+                                        onPressed: () {
+                                          setState(() {});
+                                        },
+                                        icon: Icon(
+                                          HugeIcons.strokeRoundedFilter,
+                                          color: Colors.grey[600],
+                                          size: 18,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    _getRequestDescription(
-                                      widget.request,
-                                      widget.autoSpare,
-                                    ),
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    widget.request.category ??
-                                        "Unknown Category",
-                                    style: GoogleFonts.manrope(
-                                      color: Colors.orange[700],
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
                                 ],
                               ),
-                            ),
-                            SizedBox(height: 16),
-                            // Status dots - showing elapsed time
-                            Row(
-                              children: [
-                                Spacer(),
-                                _buildStatusDot(
-                                  "D",
-                                  _getElapsedTime(
-                                    widget.request.createdAt,
-                                    'days',
+                              SizedBox(height: 12),
+                              // Request title
+                              Text(
+                                "REQUEST ID: ${widget.request.id ?? 'Unknown'}",
+                                style: GoogleFonts.manrope(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Constants.ftaColorLight,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              // Description label
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                      color: Colors.orange,
+                                      width: 3,
+                                    ),
                                   ),
                                 ),
-                                SizedBox(width: 8),
-                                _buildStatusDot(
-                                  "H",
-                                  _getElapsedTime(
-                                    widget.request.createdAt,
-                                    'hours',
-                                  ),
+                                padding: EdgeInsets.only(left: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Description -",
+                                          style: GoogleFonts.manrope(
+                                            color: Colors.black54,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {},
+                                          child: Text(
+                                            "View Details",
+                                            style: GoogleFonts.manrope(
+                                              color: Color(0xFF2B3A5C),
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      _getRequestDescription(
+                                        widget.request,
+                                        widget.autoSpare,
+                                      ),
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      widget.request.category ??
+                                          "Unknown Category",
+                                      style: GoogleFonts.manrope(
+                                        color: Colors.orange[700],
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(width: 8),
-                                _buildStatusDot(
-                                  "M",
-                                  _getElapsedTime(
-                                    widget.request.createdAt,
-                                    'minutes',
+                              ),
+                              SizedBox(height: 16),
+                              // Status dots - showing elapsed time
+                              Row(
+                                children: [
+                                  Spacer(),
+                                  _buildStatusDot(
+                                    "D",
+                                    _getElapsedTime(
+                                      widget.request.createdAt,
+                                      'days',
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 8),
-                                _buildStatusDot(
-                                  "S",
-                                  _getElapsedTime(
-                                    widget.request.createdAt,
-                                    'seconds',
+                                  SizedBox(width: 8),
+                                  _buildStatusDot(
+                                    "H",
+                                    _getElapsedTime(
+                                      widget.request.createdAt,
+                                      'hours',
+                                    ),
                                   ),
-                                ),
-                                Spacer(),
-                              ],
-                            ),
-                          ],
+                                  SizedBox(width: 8),
+                                  _buildStatusDot(
+                                    "M",
+                                    _getElapsedTime(
+                                      widget.request.createdAt,
+                                      'minutes',
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  _buildStatusDot(
+                                    "S",
+                                    _getElapsedTime(
+                                      widget.request.createdAt,
+                                      'seconds',
+                                    ),
+                                  ),
+                                  Spacer(),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 24),
-                    Center(
-                      child: Container(
-                        width: double.infinity,
-                        constraints: BoxConstraints(maxWidth: 1400),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Vehicle Details Card
-                            Expanded(
-                              child: _buildDetailCard(
-                                "Vehicle Details",
-                                Constants.ctaColorLight,
-                                [
-                                  _buildDetailItem(
-                                    "VIN Number",
-                                    widget.autoSpare.vehicleDetails.vin,
-                                    showImage: true,
-                                  ),
-                                  _buildDetailItem(
-                                    "Manufacturer",
-                                    widget
-                                        .autoSpare
-                                        .vehicleDetails
-                                        .manufacturer,
-                                  ),
-                                  _buildDetailItem(
-                                    "Makes & Models",
-                                    widget.autoSpare.vehicleDetails.makeModel,
-                                  ),
-                                  _buildDetailItem(
-                                    "Year",
-                                    widget.autoSpare.vehicleDetails.year,
-                                  ),
-                                  _buildDetailItem(
-                                    "Type",
-                                    widget.autoSpare.vehicleDetails.type,
-                                  ),
-                                  _buildDetailItem(
-                                    "Vehicle",
-                                    "${widget.autoSpare.vehicleDetails.makeModel} ${widget.autoSpare.vehicleDetails.year}",
-                                  ),
-                                  _buildDetailItem(
-                                    "New/Used Part",
-                                    widget.autoSpare.vehicleDetails.condition,
-                                  ),
-                                ],
+                    SizedBox(height: 32),
+                    Padding(
+                      padding: EdgeInsets.only(left: 64, right: 64),
+                      child: Center(
+                        child: Container(
+                          width: double.infinity,
+                          constraints: BoxConstraints(maxWidth: 1600),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Vehicle Details Card
+                              Expanded(
+                                child: _buildDetailCard(
+                                  "Vehicle Details",
+                                  Constants.ctaColorLight,
+                                  [
+                                    _buildDetailItem(
+                                      "VIN Number",
+                                      widget.autoSpare.vehicleDetails.vin,
+                                      showImage: true,
+                                    ),
+                                    _buildDetailItem(
+                                      "Manufacturer",
+                                      widget
+                                          .autoSpare
+                                          .vehicleDetails
+                                          .manufacturer,
+                                    ),
+                                    _buildDetailItem(
+                                      "Makes & Models",
+                                      widget.autoSpare.vehicleDetails.makeModel,
+                                    ),
+                                    _buildDetailItem(
+                                      "Year",
+                                      widget.autoSpare.vehicleDetails.year,
+                                    ),
+                                    _buildDetailItem(
+                                      "Type",
+                                      widget.autoSpare.vehicleDetails.type,
+                                    ),
+                                    _buildDetailItem(
+                                      "Vehicle",
+                                      "${widget.autoSpare.vehicleDetails.makeModel} ${widget.autoSpare.vehicleDetails.year}",
+                                    ),
+                                    _buildDetailItem(
+                                      "New/Used Part",
+                                      widget.autoSpare.vehicleDetails.condition,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(width: 16),
-                            // Part Details Card
-                            Expanded(
-                              child: _buildDetailCard(
-                                "Part Details",
-                                Colors.orange,
-                                [
-                                  _buildDetailItem(
-                                    "Part Name/Description",
-                                    widget.autoSpare.partDetails.partName,
-                                  ),
-                                  _buildDetailItem(
-                                    "Quantity",
-                                    widget.autoSpare.partDetails.quantity
-                                        .toString(),
-                                  ),
-                                  _buildDetailItem(
-                                    "Your Location",
-                                    widget.autoSpare.partDetails.location,
-                                  ),
-                                  _buildDetailItem(
-                                    "Max Distance You Want to Travel (km)",
-                                    widget.autoSpare.partDetails.maxDistanceKm
-                                        .toString(),
-                                  ),
-                                  _buildDetailItem(
-                                    "How soon do you need to buy this product?",
-                                    widget.autoSpare.partDetails.urgency,
-                                  ),
-                                  _buildDetailItem(
-                                    "Description of the Product",
-                                    widget
-                                        .autoSpare
-                                        .partDetails
-                                        .productDescription,
-                                  ),
-                                  _buildDetailItem(
-                                    "Product Images",
-                                    "",
-                                    isProductImages: true,
-                                  ),
-                                ],
+                              SizedBox(width: 16),
+                              // Part Details Card
+                              Expanded(
+                                child: _buildDetailCard(
+                                  "Part Details",
+                                  Colors.orange,
+                                  [
+                                    _buildDetailItem(
+                                      "Part Name/Description",
+                                      widget.autoSpare.partDetails.partName,
+                                    ),
+                                    _buildDetailItem(
+                                      "Quantity",
+                                      widget.autoSpare.partDetails.quantity
+                                          .toString(),
+                                    ),
+                                    _buildDetailItem(
+                                      "Your Location",
+                                      widget.autoSpare.partDetails.location,
+                                    ),
+                                    _buildDetailItem(
+                                      "Max Distance You Want to Travel (km)",
+                                      widget.autoSpare.partDetails.maxDistanceKm
+                                          .toString(),
+                                    ),
+                                    _buildDetailItem(
+                                      "How soon do you need to buy this product?",
+                                      widget.autoSpare.partDetails.urgency,
+                                    ),
+                                    _buildDetailItem(
+                                      "Description of the Product",
+                                      widget
+                                          .autoSpare
+                                          .partDetails
+                                          .productDescription,
+                                    ),
+                                    _buildDetailItem(
+                                      "Product Images",
+                                      "",
+                                      isProductImages: true,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(width: 16),
-                            // More Details Card
-                            Expanded(
-                              child: _buildDetailCard(
-                                "More Details",
-                                Colors.orange,
-                                [
-                                  _buildDetailItem(
-                                    "Part Number",
-                                    widget.autoSpare.moreFields.partNumber,
-                                  ),
-                                  _buildDetailItem(
-                                    "Transmission Type",
-                                    widget
-                                        .autoSpare
-                                        .moreFields
-                                        .transmissionType,
-                                  ),
-                                  _buildDetailItem(
-                                    "Mileage of Vehicle",
-                                    widget.autoSpare.moreFields.mileage,
-                                  ),
-                                  _buildDetailItem(
-                                    "Fuel Type",
-                                    widget.autoSpare.moreFields.fuelType,
-                                  ),
-                                  _buildDetailItem(
-                                    "Body Type",
-                                    widget.autoSpare.moreFields.bodyType,
-                                  ),
-                                  _buildDetailItem("Enquiry Time", "24 Hours"),
-                                ],
+                              SizedBox(width: 16),
+                              // More Details Card
+                              Expanded(
+                                child: _buildDetailCard(
+                                  "More Details",
+                                  Colors.orange,
+                                  [
+                                    _buildDetailItem(
+                                      "Part Number",
+                                      widget.autoSpare.moreFields.partNumber,
+                                    ),
+                                    _buildDetailItem(
+                                      "Transmission Type",
+                                      widget
+                                          .autoSpare
+                                          .moreFields
+                                          .transmissionType,
+                                    ),
+                                    _buildDetailItem(
+                                      "Mileage of Vehicle",
+                                      widget.autoSpare.moreFields.mileage,
+                                    ),
+                                    _buildDetailItem(
+                                      "Fuel Type",
+                                      widget.autoSpare.moreFields.fuelType,
+                                    ),
+                                    _buildDetailItem(
+                                      "Body Type",
+                                      widget.autoSpare.moreFields.bodyType,
+                                    ),
+                                    _buildDetailItem("Enquiry Time", "24 Hours"),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 24),
+                    SizedBox(height: 32),
                     FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
                   ],
                 ),
@@ -2242,7 +2248,7 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Color(0xFFE0E0E0), width: 1),
+          //border: Border.all(color: Color(0xFFE0E0E0), width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2472,7 +2478,7 @@ class _ConsumerElectronicsDetailScreenState
         body: Column(
           children: [
             // Request Header Card
-            SizedBox(height: 24),
+            SizedBox(height: 32),
             Container(
               height: 50,
               width: MediaQuery.of(context).size.width,
@@ -2512,343 +2518,349 @@ class _ConsumerElectronicsDetailScreenState
                 ],
               ),
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 32),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Center(
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(16),
-                        constraints: BoxConstraints(maxWidth: 1400),
-                        decoration: BoxDecoration(
-                          color: Constants.dtaColorLight.withOpacity(0.55),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Constants.ctaColorLight,
-                            width: 1,
+                    Padding(
+                      padding: EdgeInsets.only(left: 64, right: 64),
+                      child: Center(
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(16),
+                          constraints: BoxConstraints(maxWidth: 1600),
+                          decoration: BoxDecoration(
+                            color: Constants.dtaColorLight.withOpacity(0.55),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Constants.ctaColorLight,
+                              width: 1,
+                            ),
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  _formatDate(widget.request.createdAt),
-                                  style: GoogleFonts.manrope(
-                                    color: Colors.grey.shade700,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Spacer(),
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.red[300]!,
-                                        ),
-                                        borderRadius: BorderRadius.circular(
-                                          360,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        "Cancel",
-                                        style: GoogleFonts.manrope(
-                                          color: Colors.red,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    IconButton(
-                                      onPressed: () {
-                                        setState(() {});
-                                      },
-                                      icon: Icon(
-                                        HugeIcons.strokeRoundedFilter,
-                                        color: Colors.grey[600],
-                                        size: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 12),
-                            // Request title
-                            Text(
-                              "REQUEST ID: ${widget.request.id ?? 'Unknown'}",
-                              style: GoogleFonts.manrope(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Constants.ftaColorLight,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            // Description label
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  left: BorderSide(
-                                    color: Colors.orange,
-                                    width: 3,
-                                  ),
-                                ),
-                              ),
-                              padding: EdgeInsets.only(left: 8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
+                                  Text(
+                                    _formatDate(widget.request.createdAt),
+                                    style: GoogleFonts.manrope(
+                                      color: Colors.grey.shade700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Spacer(),
                                   Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        "Description -",
-                                        style: GoogleFonts.manrope(
-                                          color: Colors.black54,
-                                          fontSize: 14,
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Colors.red[300]!,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            360,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          "Cancel",
+                                          style: GoogleFonts.manrope(
+                                            color: Colors.red,
+                                            fontSize: 11,
+                                          ),
                                         ),
                                       ),
-                                      TextButton(
-                                        onPressed: () {},
-                                        child: Text(
-                                          "View Details",
-                                          style: GoogleFonts.manrope(
-                                            color: Color(0xFF2B3A5C),
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                      SizedBox(width: 8),
+                                      IconButton(
+                                        onPressed: () {
+                                          setState(() {});
+                                        },
+                                        icon: Icon(
+                                          HugeIcons.strokeRoundedFilter,
+                                          color: Colors.grey[600],
+                                          size: 18,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    _getRequestDescription(
-                                      widget.request,
-                                      widget.consumerElectronics,
-                                    ),
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    widget.request.category ??
-                                        "Unknown Category",
-                                    style: GoogleFonts.manrope(
-                                      color: Colors.orange[700],
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
                                 ],
                               ),
-                            ),
-                            SizedBox(height: 16),
-                            // Status dots - showing elapsed time
-                            Row(
-                              children: [
-                                Spacer(),
-                                _buildStatusDot(
-                                  "D",
-                                  _getElapsedTime(
-                                    widget.request.createdAt,
-                                    'days',
+                              SizedBox(height: 12),
+                              // Request title
+                              Text(
+                                "REQUEST ID: ${widget.request.id ?? 'Unknown'}",
+                                style: GoogleFonts.manrope(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Constants.ftaColorLight,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              // Description label
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                      color: Colors.orange,
+                                      width: 3,
+                                    ),
                                   ),
                                 ),
-                                SizedBox(width: 8),
-                                _buildStatusDot(
-                                  "H",
-                                  _getElapsedTime(
-                                    widget.request.createdAt,
-                                    'hours',
-                                  ),
+                                padding: EdgeInsets.only(left: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Description -",
+                                          style: GoogleFonts.manrope(
+                                            color: Colors.black54,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {},
+                                          child: Text(
+                                            "View Details",
+                                            style: GoogleFonts.manrope(
+                                              color: Color(0xFF2B3A5C),
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      _getRequestDescription(
+                                        widget.request,
+                                        widget.consumerElectronics,
+                                      ),
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      widget.request.category ??
+                                          "Unknown Category",
+                                      style: GoogleFonts.manrope(
+                                        color: Colors.orange[700],
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(width: 8),
-                                _buildStatusDot(
-                                  "M",
-                                  _getElapsedTime(
-                                    widget.request.createdAt,
-                                    'minutes',
+                              ),
+                              SizedBox(height: 16),
+                              // Status dots - showing elapsed time
+                              Row(
+                                children: [
+                                  Spacer(),
+                                  _buildStatusDot(
+                                    "D",
+                                    _getElapsedTime(
+                                      widget.request.createdAt,
+                                      'days',
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 8),
-                                _buildStatusDot(
-                                  "S",
-                                  _getElapsedTime(
-                                    widget.request.createdAt,
-                                    'seconds',
+                                  SizedBox(width: 8),
+                                  _buildStatusDot(
+                                    "H",
+                                    _getElapsedTime(
+                                      widget.request.createdAt,
+                                      'hours',
+                                    ),
                                   ),
-                                ),
-                                Spacer(),
-                              ],
-                            ),
-                          ],
+                                  SizedBox(width: 8),
+                                  _buildStatusDot(
+                                    "M",
+                                    _getElapsedTime(
+                                      widget.request.createdAt,
+                                      'minutes',
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  _buildStatusDot(
+                                    "S",
+                                    _getElapsedTime(
+                                      widget.request.createdAt,
+                                      'seconds',
+                                    ),
+                                  ),
+                                  Spacer(),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 24),
-                    Center(
-                      child: Container(
-                        width: double.infinity,
-                        constraints: BoxConstraints(maxWidth: 1400),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Product Details Card
-                            Expanded(
-                              child: _buildDetailCard(
-                                "Product Details",
-                                Constants.ctaColorLight,
-                                [
-                                  _buildDetailItem(
-                                    "Type of Electronics",
-                                    widget
-                                        .consumerElectronics
-                                        .productDetails
-                                        .typeOfElectronics,
-                                  ),
-                                  _buildDetailItem(
-                                    "Brand Preference",
-                                    widget
-                                        .consumerElectronics
-                                        .productDetails
-                                        .brandPreference,
-                                  ),
-                                  _buildDetailItem(
-                                    "Model Series",
-                                    widget
-                                            .consumerElectronics
-                                            .productDetails
-                                            .modelSeries ??
-                                        "-",
-                                  ),
-                                  _buildDetailItem(
-                                    "Quantity Needed",
-                                    widget
-                                        .consumerElectronics
-                                        .productDetails
-                                        .quantityNeeded
-                                        .toString(),
-                                  ),
-                                  _buildDetailItem(
-                                    "Purpose",
-                                    widget
-                                        .consumerElectronics
-                                        .featuresAndSpecs
-                                        .purpose,
-                                  ),
-                                  _buildDetailItem(
-                                    "Condition Preference",
-                                    widget
-                                        .consumerElectronics
-                                        .featuresAndSpecs
-                                        .conditionPreference,
-                                  ),
-                                ],
+                    SizedBox(height: 32),
+                    Padding(
+                      padding: EdgeInsets.only(left: 64, right: 64),
+                      child: Center(
+                        child: Container(
+                          width: double.infinity,
+                          constraints: BoxConstraints(maxWidth: 1600),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Product Details Card
+                              Expanded(
+                                child: _buildDetailCard(
+                                  "Product Details",
+                                  Constants.ctaColorLight,
+                                  [
+                                    _buildDetailItem(
+                                      "Type of Electronics",
+                                      widget
+                                          .consumerElectronics
+                                          .productDetails
+                                          .typeOfElectronics,
+                                    ),
+                                    _buildDetailItem(
+                                      "Brand Preference",
+                                      widget
+                                          .consumerElectronics
+                                          .productDetails
+                                          .brandPreference,
+                                    ),
+                                    _buildDetailItem(
+                                      "Model Series",
+                                      widget
+                                              .consumerElectronics
+                                              .productDetails
+                                              .modelSeries ??
+                                          "-",
+                                    ),
+                                    _buildDetailItem(
+                                      "Quantity Needed",
+                                      widget
+                                          .consumerElectronics
+                                          .productDetails
+                                          .quantityNeeded
+                                          .toString(),
+                                    ),
+                                    _buildDetailItem(
+                                      "Purpose",
+                                      widget
+                                          .consumerElectronics
+                                          .featuresAndSpecs
+                                          .purpose,
+                                    ),
+                                    _buildDetailItem(
+                                      "Condition Preference",
+                                      widget
+                                          .consumerElectronics
+                                          .featuresAndSpecs
+                                          .conditionPreference,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(width: 16),
-                            // Budget & Timeline Card
-                            Expanded(
-                              child: _buildDetailCard(
-                                "Budget & Timeline",
-                                Colors.orange,
-                                [
-                                  _buildDetailItem(
-                                    "Min Price",
-                                    widget
-                                                .consumerElectronics
-                                                .budgetTimeline
-                                                .minPrice !=
-                                            null
-                                        ? "\$${widget.consumerElectronics.budgetTimeline.minPrice!.toStringAsFixed(2)}"
-                                        : "-",
-                                  ),
-                                  _buildDetailItem(
-                                    "Max Price",
-                                    widget
-                                                .consumerElectronics
-                                                .budgetTimeline
-                                                .maxPrice !=
-                                            null
-                                        ? "\$${widget.consumerElectronics.budgetTimeline.maxPrice!.toStringAsFixed(2)}"
-                                        : "-",
-                                  ),
-                                  _buildDetailItem(
-                                    "Urgency",
-                                    widget
-                                        .consumerElectronics
-                                        .budgetTimeline
-                                        .urgency,
-                                  ),
-                                  _buildDetailItem(
-                                    "Needs Installation",
-                                    widget
-                                            .consumerElectronics
-                                            .budgetTimeline
-                                            .needsInstallation
-                                        ? "Yes"
-                                        : "No",
-                                  ),
-                                ],
+                              SizedBox(width: 16),
+                              // Budget & Timeline Card
+                              Expanded(
+                                child: _buildDetailCard(
+                                  "Budget & Timeline",
+                                  Colors.orange,
+                                  [
+                                    _buildDetailItem(
+                                      "Min Price",
+                                      widget
+                                                  .consumerElectronics
+                                                  .budgetTimeline
+                                                  .minPrice !=
+                                              null
+                                          ? "\$${widget.consumerElectronics.budgetTimeline.minPrice!.toStringAsFixed(2)}"
+                                          : "-",
+                                    ),
+                                    _buildDetailItem(
+                                      "Max Price",
+                                      widget
+                                                  .consumerElectronics
+                                                  .budgetTimeline
+                                                  .maxPrice !=
+                                              null
+                                          ? "\$${widget.consumerElectronics.budgetTimeline.maxPrice!.toStringAsFixed(2)}"
+                                          : "-",
+                                    ),
+                                    _buildDetailItem(
+                                      "Urgency",
+                                      widget
+                                          .consumerElectronics
+                                          .budgetTimeline
+                                          .urgency,
+                                    ),
+                                    _buildDetailItem(
+                                      "Needs Installation",
+                                      widget
+                                              .consumerElectronics
+                                              .budgetTimeline
+                                              .needsInstallation
+                                          ? "Yes"
+                                          : "No",
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(width: 16),
-                            // Features & Specifications Card
-                            Expanded(
-                              child: _buildDetailCard(
-                                "Features & Specifications",
-                                Colors.orange,
-                                [
-                                  _buildDetailItem(
-                                    "Required Features",
-                                    widget
-                                            .consumerElectronics
-                                            .featuresAndSpecs
-                                            .requiredFeatures ??
-                                        "-",
-                                  ),
-                                  _buildDetailItem(
-                                    "Additional Comments",
-                                    widget
-                                            .consumerElectronics
-                                            .featuresAndSpecs
-                                            .additionalComments ??
-                                        "-",
-                                  ),
-                                  _buildDetailItem(
-                                    "Documents/Images",
-                                    "",
-                                    isProductImages: true,
-                                    imageList: widget
-                                        .consumerElectronics
-                                        .featuresAndSpecs
-                                        .documentsOrImages,
-                                  ),
-                                ],
+                              SizedBox(width: 16),
+                              // Features & Specifications Card
+                              Expanded(
+                                child: _buildDetailCard(
+                                  "Features & Specifications",
+                                  Colors.orange,
+                                  [
+                                    _buildDetailItem(
+                                      "Required Features",
+                                      widget
+                                              .consumerElectronics
+                                              .featuresAndSpecs
+                                              .requiredFeatures ??
+                                          "-",
+                                    ),
+                                    _buildDetailItem(
+                                      "Additional Comments",
+                                      widget
+                                              .consumerElectronics
+                                              .featuresAndSpecs
+                                              .additionalComments ??
+                                          "-",
+                                    ),
+                                    _buildDetailItem(
+                                      "Documents/Images",
+                                      "",
+                                      isProductImages: true,
+                                      imageList: widget
+                                          .consumerElectronics
+                                          .featuresAndSpecs
+                                          .documentsOrImages,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 24),
+                    SizedBox(height: 32),
                     FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
                   ],
                 ),
@@ -2983,7 +2995,7 @@ class _ConsumerElectronicsDetailScreenState
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Color(0xFFE0E0E0), width: 1),
+          //border: Border.all(color: Color(0xFFE0E0E0), width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -3319,12 +3331,12 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
         body: Column(
           children: [
             // Request Header Card
-            SizedBox(height: 24),
+            SizedBox(height: 32),
             Container(
-              height: 50,
+              height: 60,
               width: MediaQuery.of(context).size.width,
               color: Constants.ctaColorLight,
-              padding: EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 8),
+              padding: EdgeInsets.only(left: 64, right: 64, top: 8, bottom: 8),
               child: Row(
                 children: [
                   IconButton(
@@ -3359,327 +3371,333 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 32),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Center(
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(16),
-                        constraints: BoxConstraints(maxWidth: 1400),
-                        decoration: BoxDecoration(
-                          color: Constants.dtaColorLight.withOpacity(0.55),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Constants.ctaColorLight,
-                            width: 1,
+                    Padding(
+                      padding: EdgeInsets.only(left: 64, right: 64),
+                      child: Center(
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(16),
+                          constraints: BoxConstraints(maxWidth: 1600),
+                          decoration: BoxDecoration(
+                            color: Constants.dtaColorLight.withOpacity(0.55),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Constants.ctaColorLight,
+                              width: 1,
+                            ),
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  _formatDate(widget.request.createdAt),
-                                  style: GoogleFonts.manrope(
-                                    color: Colors.grey.shade700,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Spacer(),
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.red[300]!,
-                                        ),
-                                        borderRadius: BorderRadius.circular(
-                                          360,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        "Cancel",
-                                        style: GoogleFonts.manrope(
-                                          color: Colors.red,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    IconButton(
-                                      onPressed: () {
-                                        setState(() {});
-                                      },
-                                      icon: Icon(
-                                        HugeIcons.strokeRoundedFilter,
-                                        color: Colors.grey[600],
-                                        size: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 12),
-                            // Request title
-                            Text(
-                              "REQUEST ID: ${widget.request.id ?? 'Unknown'}",
-                              style: GoogleFonts.manrope(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Constants.ftaColorLight,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            // Description label
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  left: BorderSide(
-                                    color: Colors.orange,
-                                    width: 3,
-                                  ),
-                                ),
-                              ),
-                              padding: EdgeInsets.only(left: 8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
+                                  Text(
+                                    _formatDate(widget.request.createdAt),
+                                    style: GoogleFonts.manrope(
+                                      color: Colors.grey.shade700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Spacer(),
                                   Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        "Description -",
-                                        style: GoogleFonts.manrope(
-                                          color: Colors.black54,
-                                          fontSize: 14,
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Colors.red[300]!,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            360,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          "Cancel",
+                                          style: GoogleFonts.manrope(
+                                            color: Colors.red,
+                                            fontSize: 11,
+                                          ),
                                         ),
                                       ),
-                                      TextButton(
-                                        onPressed: () {},
-                                        child: Text(
-                                          "View Details",
-                                          style: GoogleFonts.manrope(
-                                            color: Color(0xFF2B3A5C),
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                      SizedBox(width: 8),
+                                      IconButton(
+                                        onPressed: () {
+                                          setState(() {});
+                                        },
+                                        icon: Icon(
+                                          HugeIcons.strokeRoundedFilter,
+                                          color: Colors.grey[600],
+                                          size: 18,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    _getRequestDescription(
-                                      widget.request,
-                                      widget.rimTyre,
-                                    ),
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    widget.request.category ??
-                                        "Unknown Category",
-                                    style: GoogleFonts.manrope(
-                                      color: Colors.orange[700],
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
                                 ],
                               ),
-                            ),
-                            SizedBox(height: 16),
-                            // Status dots - showing elapsed time
-                            Row(
-                              children: [
-                                Spacer(),
-                                _buildStatusDot(
-                                  "D",
-                                  _getElapsedTime(
-                                    widget.request.createdAt,
-                                    'days',
+                              SizedBox(height: 12),
+                              // Request title
+                              Text(
+                                "REQUEST ID: ${widget.request.id ?? 'Unknown'}",
+                                style: GoogleFonts.manrope(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Constants.ftaColorLight,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              // Description label
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                      color: Colors.orange,
+                                      width: 3,
+                                    ),
                                   ),
                                 ),
-                                SizedBox(width: 8),
-                                _buildStatusDot(
-                                  "H",
-                                  _getElapsedTime(
-                                    widget.request.createdAt,
-                                    'hours',
-                                  ),
+                                padding: EdgeInsets.only(left: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Description -",
+                                          style: GoogleFonts.manrope(
+                                            color: Colors.black54,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {},
+                                          child: Text(
+                                            "View Details",
+                                            style: GoogleFonts.manrope(
+                                              color: Color(0xFF2B3A5C),
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      _getRequestDescription(
+                                        widget.request,
+                                        widget.rimTyre,
+                                      ),
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      widget.request.category ??
+                                          "Unknown Category",
+                                      style: GoogleFonts.manrope(
+                                        color: Colors.orange[700],
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(width: 8),
-                                _buildStatusDot(
-                                  "M",
-                                  _getElapsedTime(
-                                    widget.request.createdAt,
-                                    'minutes',
+                              ),
+                              SizedBox(height: 16),
+                              // Status dots - showing elapsed time
+                              Row(
+                                children: [
+                                  Spacer(),
+                                  _buildStatusDot(
+                                    "D",
+                                    _getElapsedTime(
+                                      widget.request.createdAt,
+                                      'days',
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 8),
-                                _buildStatusDot(
-                                  "S",
-                                  _getElapsedTime(
-                                    widget.request.createdAt,
-                                    'seconds',
+                                  SizedBox(width: 8),
+                                  _buildStatusDot(
+                                    "H",
+                                    _getElapsedTime(
+                                      widget.request.createdAt,
+                                      'hours',
+                                    ),
                                   ),
-                                ),
-                                Spacer(),
-                              ],
-                            ),
-                          ],
+                                  SizedBox(width: 8),
+                                  _buildStatusDot(
+                                    "M",
+                                    _getElapsedTime(
+                                      widget.request.createdAt,
+                                      'minutes',
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  _buildStatusDot(
+                                    "S",
+                                    _getElapsedTime(
+                                      widget.request.createdAt,
+                                      'seconds',
+                                    ),
+                                  ),
+                                  Spacer(),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 24),
-                    Center(
-                      child: Container(
-                        width: double.infinity,
-                        constraints: BoxConstraints(maxWidth: 1400),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Product Details Card
-                            Expanded(
-                              child: _buildDetailCard(
-                                "Product Details",
-                                Constants.ctaColorLight,
-                                [
-                                  _buildDetailItem(
-                                    "Tyre Width (mm)",
-                                    widget.rimTyre.productDetails.tyreWidthMm
-                                        .toString(),
-                                  ),
-                                  _buildDetailItem(
-                                    "Sidewall Profile",
-                                    widget
-                                        .rimTyre
-                                        .productDetails
-                                        .sidewallProfile,
-                                  ),
-                                  _buildDetailItem(
-                                    "Wheel Rim Diameter (inches)",
-                                    widget
-                                        .rimTyre
-                                        .productDetails
-                                        .wheelRimDiameterInches,
-                                  ),
-                                  _buildDetailItem(
-                                    "Tyre Type",
-                                    widget.rimTyre.productDetails.tyreType,
-                                  ),
-                                  _buildDetailItem(
-                                    "Quantity",
-                                    widget.rimTyre.productDetails.quantity
-                                        .toString(),
-                                  ),
-                                  _buildDetailItem(
-                                    "Urgency",
-                                    widget.rimTyre.productDetails.urgency,
-                                  ),
-                                  _buildDetailItem(
-                                    "Tyre Size",
-                                    "${widget.rimTyre.productDetails.tyreWidthMm}/${widget.rimTyre.productDetails.sidewallProfile}R${widget.rimTyre.productDetails.wheelRimDiameterInches}",
-                                  ),
-                                ],
+                    SizedBox(height: 32),
+                    Padding(
+                        padding: EdgeInsets.only(left: 64, right: 64),
+                      child: Center(
+                        child: Container(
+                          width: double.infinity,
+                          constraints: BoxConstraints(maxWidth: 1600),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Product Details Card
+                              Expanded(
+                                child: _buildDetailCard(
+                                  "Product Details",
+                                  Constants.ctaColorLight,
+                                  [
+                                    _buildDetailItem(
+                                      "Tyre Width (mm)",
+                                      widget.rimTyre.productDetails.tyreWidthMm
+                                          .toString(),
+                                    ),
+                                    _buildDetailItem(
+                                      "Sidewall Profile",
+                                      widget
+                                          .rimTyre
+                                          .productDetails
+                                          .sidewallProfile,
+                                    ),
+                                    _buildDetailItem(
+                                      "Wheel Rim Diameter (inches)",
+                                      widget
+                                          .rimTyre
+                                          .productDetails
+                                          .wheelRimDiameterInches,
+                                    ),
+                                    _buildDetailItem(
+                                      "Tyre Type",
+                                      widget.rimTyre.productDetails.tyreType,
+                                    ),
+                                    _buildDetailItem(
+                                      "Quantity",
+                                      widget.rimTyre.productDetails.quantity
+                                          .toString(),
+                                    ),
+                                    _buildDetailItem(
+                                      "Urgency",
+                                      widget.rimTyre.productDetails.urgency,
+                                    ),
+                                    _buildDetailItem(
+                                      "Tyre Size",
+                                      "${widget.rimTyre.productDetails.tyreWidthMm}/${widget.rimTyre.productDetails.sidewallProfile}R${widget.rimTyre.productDetails.wheelRimDiameterInches}",
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(width: 16),
-                            // Vehicle & Brand Details Card
-                            Expanded(
-                              child: _buildDetailCard(
-                                "Vehicle & Brand Details",
-                                Colors.orange,
-                                [
-                                  _buildDetailItem(
-                                    "Vehicle Type",
-                                    widget.rimTyre.moreFields.vehicleType,
-                                  ),
-                                  _buildDetailItem(
-                                    "Preferred Brand",
-                                    widget.rimTyre.moreFields.preferredBrand,
-                                  ),
-                                  _buildDetailItem(
-                                    "Pitch Circle Diameter",
-                                    widget
-                                        .rimTyre
-                                        .moreFields
-                                        .pitchCircleDiameter,
-                                  ),
-                                  _buildDetailItem(
-                                    "Tyre Construction Type",
-                                    widget
-                                        .rimTyre
-                                        .moreFields
-                                        .tyreConstructionType,
-                                  ),
-                                  _buildDetailItem(
-                                    "Description",
-                                    widget.rimTyre.moreFields.description,
-                                  ),
-                                ],
+                              SizedBox(width: 32),
+                              // Vehicle & Brand Details Card
+                              Expanded(
+                                child: _buildDetailCard(
+                                  "Vehicle & Brand Details",
+                                  Colors.orange,
+                                  [
+                                    _buildDetailItem(
+                                      "Vehicle Type",
+                                      widget.rimTyre.moreFields.vehicleType,
+                                    ),
+                                    _buildDetailItem(
+                                      "Preferred Brand",
+                                      widget.rimTyre.moreFields.preferredBrand,
+                                    ),
+                                    _buildDetailItem(
+                                      "Pitch Circle Diameter",
+                                      widget
+                                          .rimTyre
+                                          .moreFields
+                                          .pitchCircleDiameter,
+                                    ),
+                                    _buildDetailItem(
+                                      "Tyre Construction Type",
+                                      widget
+                                          .rimTyre
+                                          .moreFields
+                                          .tyreConstructionType,
+                                    ),
+                                    _buildDetailItem(
+                                      "Description",
+                                      widget.rimTyre.moreFields.description,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(width: 16),
-                            Expanded(
-                              child: _buildDetailCard(
-                                "Service Requirements",
-                                Colors.orange,
-                                [
-                                  _buildDetailItem(
-                                    "Fitment Required",
-                                    widget.rimTyre.moreFields.fitmentRequired
-                                        ? "Yes"
-                                        : "No",
-                                  ),
-                                  _buildDetailItem(
-                                    "Balancing Required",
-                                    widget.rimTyre.moreFields.balancingRequired
-                                        ? "Yes"
-                                        : "No",
-                                  ),
-                                  _buildDetailItem(
-                                    "Tyre Rotation Required",
-                                    widget
-                                            .rimTyre
-                                            .moreFields
-                                            .tyreRotationRequired
-                                        ? "Yes"
-                                        : "No",
-                                  ),
-                                  _buildDetailItem(
-                                    "Product Images",
-                                    "",
-                                    isProductImages: true,
-                                    imageList:
-                                        widget.rimTyre.moreFields.imageUrls,
-                                  ),
-                                ],
+                              SizedBox(width: 32),
+                              Expanded(
+                                child: _buildDetailCard(
+                                  "Service Requirements",
+                                  Colors.orange,
+                                  [
+                                    _buildDetailItem(
+                                      "Fitment Required",
+                                      widget.rimTyre.moreFields.fitmentRequired
+                                          ? "Yes"
+                                          : "No",
+                                    ),
+                                    _buildDetailItem(
+                                      "Balancing Required",
+                                      widget.rimTyre.moreFields.balancingRequired
+                                          ? "Yes"
+                                          : "No",
+                                    ),
+                                    _buildDetailItem(
+                                      "Tyre Rotation Required",
+                                      widget
+                                              .rimTyre
+                                              .moreFields
+                                              .tyreRotationRequired
+                                          ? "Yes"
+                                          : "No",
+                                    ),
+                                    _buildDetailItem(
+                                      "Product Images",
+                                      "",
+                                      isProductImages: true,
+                                      imageList:
+                                          widget.rimTyre.moreFields.imageUrls,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 24),
+                    SizedBox(height: 32),
                     FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
                   ],
                 ),
@@ -3814,7 +3832,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Color(0xFFE0E0E0), width: 1),
+          //border: Border.all(color: Color(0xFFE0E0E0), width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

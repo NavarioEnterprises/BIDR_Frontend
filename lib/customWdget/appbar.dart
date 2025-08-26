@@ -235,7 +235,7 @@ class _HeaderSectionState extends State<HeaderSection> {
         children: [
           IntrinsicWidth(
             child: Container(
-              constraints: BoxConstraints(minWidth: 60),
+              constraints: BoxConstraints(minWidth: 65),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [

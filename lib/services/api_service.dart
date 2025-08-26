@@ -327,7 +327,8 @@ class ApiService {
     required String requiredFeatures,
     required String additionalComments,
     required List<XFile> images,
-  }) async {
+  }) async
+  {
     try {
       final uri = Uri.parse('$baseUrl$requestsEndpoint');
       var request = http.MultipartRequest('POST', uri);
