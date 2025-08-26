@@ -28,10 +28,10 @@ class _CustomCardState extends State<CustomCard> {
         borderRadius: BorderRadius.all(Radius.circular(12)),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: Offset(0, 3),
+            color: Colors.grey.withOpacity(0.15),
+            spreadRadius: 7,
+            blurRadius: 5,
+            offset: Offset(0, 2),
           ),
         ],
       ),

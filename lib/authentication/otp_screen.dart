@@ -722,7 +722,7 @@ class _SellerOTPVerificationScreenState extends State<SellerOTPVerificationScree
       );
 
       print('OTP Verification Status: ${response.statusCode}');
-      print('OTP Verification Response: ${response.body}');
+      print('OTP Verification Response: ${response.body} $email');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final jsonResponse = jsonDecode(response.body);
