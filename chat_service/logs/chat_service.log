@@ -203,3 +203,109 @@ INFO 2025-08-10 03:07:56,700 autoreload 67345 8771748224 /Users/thulanimoyo/MEGA
 INFO 2025-08-10 03:07:57,178 autoreload 77589 8771748224 Watching for file changes with StatReloader
 INFO 2025-08-10 03:07:57,287 autoreload 77593 8771748224 Watching for file changes with StatReloader
 INFO 2025-08-10 03:07:57,300 autoreload 77594 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-26 23:33:54,928 autoreload 13838 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-26 23:41:37,034 autoreload 16713 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-26 23:42:37,350 autoreload 13838 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/models.py changed, reloading.
+INFO 2025-08-26 23:42:37,909 autoreload 17107 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-26 23:42:45,379 autoreload 17107 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/models.py changed, reloading.
+INFO 2025-08-26 23:42:45,711 autoreload 17152 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-26 23:44:38,680 autoreload 17972 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-26 23:47:05,965 autoreload 17152 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/urls.py changed, reloading.
+INFO 2025-08-26 23:47:06,302 autoreload 19372 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-26 23:47:06,473 autoreload 17972 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/urls.py changed, reloading.
+INFO 2025-08-26 23:47:06,731 autoreload 19381 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 03:58:22,550 basehttp 19381 6137589760 "OPTIONS /api/auth/token/ HTTP/1.1" 200 0
+WARNING 2025-08-27 03:58:22,692 log 19381 6137589760 Bad Request: /api/auth/token/
+WARNING 2025-08-27 03:58:22,692 basehttp 19381 6137589760 "POST /api/auth/token/ HTTP/1.1" 400 68
+INFO 2025-08-27 03:58:22,695 basehttp 19381 6137589760 "OPTIONS /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+WARNING 2025-08-27 03:58:22,696 log 19381 6137589760 Unauthorized: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-27 03:58:22,696 basehttp 19381 6137589760 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 401 58
+INFO 2025-08-27 04:58:25,632 basehttp 19381 6137589760 "OPTIONS /api/auth/token/ HTTP/1.1" 200 0
+WARNING 2025-08-27 04:58:25,785 log 19381 6137589760 Bad Request: /api/auth/token/
+WARNING 2025-08-27 04:58:25,786 basehttp 19381 6137589760 "POST /api/auth/token/ HTTP/1.1" 400 68
+INFO 2025-08-27 04:58:25,790 basehttp 19381 6137589760 "OPTIONS /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+WARNING 2025-08-27 04:58:25,792 log 19381 6137589760 Unauthorized: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-27 04:58:25,792 basehttp 19381 6137589760 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 401 58
+WARNING 2025-08-27 05:04:22,244 log 19381 6137589760 Bad Request: /api/auth/token/
+WARNING 2025-08-27 05:04:22,245 basehttp 19381 6137589760 "POST /api/auth/token/ HTTP/1.1" 400 68
+WARNING 2025-08-27 05:04:22,252 log 19381 6137589760 Unauthorized: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-27 05:04:22,252 basehttp 19381 6137589760 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 401 58
+WARNING 2025-08-27 05:10:34,251 log 19381 6137589760 Bad Request: /api/auth/token/
+WARNING 2025-08-27 05:10:34,252 basehttp 19381 6137589760 "POST /api/auth/token/ HTTP/1.1" 400 68
+WARNING 2025-08-27 05:10:34,257 log 19381 6137589760 Unauthorized: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-27 05:10:34,257 basehttp 19381 6137589760 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 401 58
+WARNING 2025-08-27 06:27:53,889 log 19381 6137589760 Bad Request: /api/auth/token/
+WARNING 2025-08-27 06:27:53,890 basehttp 19381 6137589760 "POST /api/auth/token/ HTTP/1.1" 400 68
+WARNING 2025-08-27 06:27:53,919 log 19381 6137589760 Unauthorized: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-27 06:27:53,919 basehttp 19381 6137589760 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 401 58
+INFO 2025-08-27 06:33:10,828 basehttp 19372 6163099648 "OPTIONS //api/auth/token/ HTTP/1.1" 200 0
+WARNING 2025-08-27 06:33:10,903 log 19372 6163099648 Not Found: //api/auth/token/
+WARNING 2025-08-27 06:33:10,904 basehttp 19372 6163099648 "POST //api/auth/token/ HTTP/1.1" 404 3224
+INFO 2025-08-27 06:33:10,937 basehttp 19372 6163099648 "OPTIONS //api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+WARNING 2025-08-27 06:33:10,950 log 19372 6163099648 Not Found: //api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-27 06:33:10,950 basehttp 19372 6163099648 "POST //api/v1/chat/conversations/create_for_request/ HTTP/1.1" 404 3314
+INFO 2025-08-27 06:34:15,792 basehttp 19372 6163099648 "OPTIONS /api/auth/token/ HTTP/1.1" 200 0
+WARNING 2025-08-27 06:34:16,065 log 19372 6163099648 Bad Request: /api/auth/token/
+WARNING 2025-08-27 06:34:16,065 basehttp 19372 6163099648 "POST /api/auth/token/ HTTP/1.1" 400 68
+INFO 2025-08-27 06:34:16,102 basehttp 19372 6163099648 "OPTIONS /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+WARNING 2025-08-27 06:34:16,106 log 19372 6163099648 Unauthorized: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-27 06:34:16,106 basehttp 19372 6163099648 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 401 58
+WARNING 2025-08-27 06:38:41,467 log 19372 6163099648 Unauthorized: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-27 06:38:41,469 basehttp 19372 6163099648 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 401 58
+WARNING 2025-08-27 06:39:18,653 log 19372 6163099648 Unauthorized: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-27 06:39:18,671 basehttp 19372 6163099648 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 401 58
+INFO 2025-08-27 06:45:40,085 autoreload 19372 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-27 06:45:40,330 autoreload 19381 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-27 06:45:41,836 autoreload 11843 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 06:45:41,836 autoreload 11849 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 06:45:53,849 autoreload 11843 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_messaging/serializers.py changed, reloading.
+INFO 2025-08-27 06:45:53,880 autoreload 11849 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_messaging/serializers.py changed, reloading.
+INFO 2025-08-27 06:45:54,419 autoreload 11996 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 06:45:54,419 autoreload 11998 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 06:46:07,222 autoreload 11996 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_messaging/models.py changed, reloading.
+INFO 2025-08-27 06:46:07,240 autoreload 11998 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_messaging/models.py changed, reloading.
+INFO 2025-08-27 06:46:08,087 autoreload 12151 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 06:46:08,088 autoreload 12152 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 06:46:18,079 autoreload 12152 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_messaging/models.py changed, reloading.
+INFO 2025-08-27 06:46:18,080 autoreload 12151 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_messaging/models.py changed, reloading.
+INFO 2025-08-27 06:46:18,964 autoreload 12287 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 06:46:19,006 autoreload 12288 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 06:46:30,863 autoreload 12288 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/models.py changed, reloading.
+INFO 2025-08-27 06:46:30,898 autoreload 12287 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/models.py changed, reloading.
+INFO 2025-08-27 06:46:32,907 autoreload 12416 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 06:46:32,907 autoreload 12417 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 06:47:05,667 autoreload 12417 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_messaging/serializers.py changed, reloading.
+INFO 2025-08-27 06:47:05,668 autoreload 12416 8697595328 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_messaging/serializers.py changed, reloading.
+INFO 2025-08-27 06:47:06,551 autoreload 12943 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 06:47:06,552 autoreload 12944 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 06:47:38,370 basehttp 12943 6124187648 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 201 591
+INFO 2025-08-27 06:47:38,910 basehttp 12943 6124187648 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 591
+INFO 2025-08-27 07:14:15,508 basehttp 12943 6124187648 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 591
+INFO 2025-08-27 07:14:16,180 basehttp 12943 6124187648 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 591
+WARNING 2025-08-27 07:22:35,764 log 12944 6131871744 Not Found: /api/conversations/
+WARNING 2025-08-27 07:22:35,768 basehttp 12944 6131871744 "GET /api/conversations/ HTTP/1.1" 404 3229
+INFO 2025-08-27 07:22:59,317 basehttp 12944 6131871744 "GET /api/v1/chat/conversations/ HTTP/1.1" 200 1262
+INFO 2025-08-27 07:23:15,203 basehttp 12944 6131871744 "GET /api/v1/chat/conversations/ HTTP/1.1" 200 1262
+INFO 2025-08-27 07:23:15,221 basehttp 12944 6148698112 "POST /api/v1/chat/conversations/d677f0e6-3ef5-4e09-8a18-481ef0b04704/send_message/ HTTP/1.1" 201 189
+INFO 2025-08-27 07:23:25,877 basehttp 12944 6131871744 "GET /api/v1/chat/conversations/ HTTP/1.1" 200 1262
+INFO 2025-08-27 07:23:25,898 basehttp 12944 6148698112 "GET /api/v1/chat/conversations/d677f0e6-3ef5-4e09-8a18-481ef0b04704/messages/ HTTP/1.1" 200 1657
+INFO 2025-08-27 08:21:52,582 basehttp 12943 6124187648 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 201 591
+INFO 2025-08-27 08:21:53,458 basehttp 12943 6124187648 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 591
+INFO 2025-08-27 10:00:34,366 basehttp 12943 6124187648 "OPTIONS /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+INFO 2025-08-27 10:00:35,178 basehttp 12943 6124187648 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 616
+INFO 2025-08-27 10:00:35,412 basehttp 12943 6124187648 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 616
+INFO 2025-08-27 10:08:37,554 basehttp 12944 6131871744 "OPTIONS /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+INFO 2025-08-27 10:08:37,762 basehttp 12944 6131871744 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 591
+INFO 2025-08-27 10:08:38,208 basehttp 12944 6131871744 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 591
+INFO 2025-08-27 10:08:38,252 basehttp 12944 6131871744 "OPTIONS /api/v1/chat/conversations/725ec1fc-f48a-4fca-a981-6887aea21493/messages/ HTTP/1.1" 200 0
+INFO 2025-08-27 10:08:38,292 basehttp 12944 6131871744 "GET /api/v1/chat/conversations/725ec1fc-f48a-4fca-a981-6887aea21493/messages/ HTTP/1.1" 200 2
+INFO 2025-08-27 10:08:52,672 basehttp 12944 6131871744 "OPTIONS /api/v1/chat/conversations/725ec1fc-f48a-4fca-a981-6887aea21493/send_message/ HTTP/1.1" 200 0
+INFO 2025-08-27 10:08:52,842 basehttp 12944 6131871744 "POST /api/v1/chat/conversations/725ec1fc-f48a-4fca-a981-6887aea21493/send_message/ HTTP/1.1" 201 173
+INFO 2025-08-27 10:08:52,966 basehttp 12944 6131871744 "GET /api/v1/chat/conversations/725ec1fc-f48a-4fca-a981-6887aea21493/messages/ HTTP/1.1" 200 817
+INFO 2025-08-27 10:11:18,088 basehttp 12944 6148698112 "GET /api/v1/chat/conversations/ HTTP/1.1" 200 1879
+INFO 2025-08-27 10:11:18,141 basehttp 12944 6165524480 "GET /api/v1/chat/conversations/725ec1fc-f48a-4fca-a981-6887aea21493/messages/ HTTP/1.1" 200 817
+INFO 2025-08-27 10:15:09,949 basehttp 12944 6131871744 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 616
+INFO 2025-08-27 10:15:10,415 basehttp 12944 6131871744 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 616
+INFO 2025-08-27 10:15:10,535 basehttp 12944 6131871744 "GET /api/v1/chat/conversations/725ec1fc-f48a-4fca-a981-6887aea21493/messages/ HTTP/1.1" 200 817
+INFO 2025-08-27 10:15:23,365 basehttp 12944 6131871744 "POST /api/v1/chat/conversations/725ec1fc-f48a-4fca-a981-6887aea21493/send_message/ HTTP/1.1" 201 172
+INFO 2025-08-27 10:15:23,424 basehttp 12944 6131871744 "GET /api/v1/chat/conversations/725ec1fc-f48a-4fca-a981-6887aea21493/messages/ HTTP/1.1" 200 1632

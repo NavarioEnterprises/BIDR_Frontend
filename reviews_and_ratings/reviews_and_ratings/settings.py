@@ -43,6 +43,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'django_prometheus',
+    'django_filters',
+    
+    # Local apps
+    'reviews',
+    'ratings',
+    'content',
 ]
 
 MIDDLEWARE = [

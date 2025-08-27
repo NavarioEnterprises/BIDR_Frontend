@@ -1554,6 +1554,251 @@ class RequestWatchlist(models.Model):
         return f"{self.user.username} watching {self.request.request_id}"
 
 
+class Order(models.Model):
+    """
+    Orders created when a buyer accepts a quote.
+    Represents processed/successful transactions.
+    """
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending Payment'),
+        ('PAID', 'Payment Confirmed'),
+        ('PROCESSING', 'Processing'),
+        ('SHIPPED', 'Shipped'),
+        ('DELIVERED', 'Delivered'),
+        ('COMPLETED', 'Completed'),
+        ('CANCELLED', 'Cancelled'),
+        ('REFUNDED', 'Refunded'),
+    ]
+    
+    PAYMENT_STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('PROCESSING', 'Processing'),
+        ('COMPLETED', 'Completed'),
+        ('FAILED', 'Failed'),
+        ('REFUNDED', 'Refunded'),
+    ]
+    
+    # Primary key
+    order_id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text="Order identifier"
+    )
+    
+    # References
+    request_id = models.ForeignKey(
+        ProductRequest,
+        on_delete=models.CASCADE,
+        related_name='orders',
+        help_text="Reference to the original product request"
+    )
+    quote_id = models.ForeignKey(
+        'quotes.Quote',
+        on_delete=models.CASCADE,
+        related_name='orders',
+        help_text="Reference to the accepted quote"
+    )
+    buyer_id = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='orders_as_buyer',
+        help_text="Buyer who created the order"
+    )
+    seller_id = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='orders_as_seller',
+        help_text="Seller fulfilling the order"
+    )
+    
+    # Order details
+    order_number = models.CharField(
+        max_length=20,
+        unique=True,
+        help_text="Human-readable order number"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='PENDING'
+    )
+    
+    # Pricing information (copied from quote at time of order)
+    total_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="Total order amount"
+    )
+    delivery_cost = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Delivery charges"
+    )
+    installation_cost = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Installation charges"
+    )
+    currency = models.CharField(
+        max_length=3,
+        default='ZAR',
+        help_text="Currency code"
+    )
+    
+    # Payment information
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default='PENDING'
+    )
+    payment_method = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        help_text="Payment method used (e.g., Credit Card, EFT, etc.)"
+    )
+    payment_reference = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="Payment gateway reference number"
+    )
+    payment_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When payment was completed"
+    )
+    
+    # Delivery information
+    delivery_address = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="Delivery address details"
+    )
+    estimated_delivery_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Expected delivery date"
+    )
+    actual_delivery_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Actual delivery date"
+    )
+    tracking_number = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="Shipping tracking number"
+    )
+    
+    # Additional information
+    special_instructions = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Special delivery or handling instructions"
+    )
+    notes = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Internal order notes"
+    )
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'orders'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['buyer_id', 'status']),
+            models.Index(fields=['seller_id', 'status']),
+            models.Index(fields=['status', 'created_at']),
+            models.Index(fields=['payment_status']),
+            models.Index(fields=['order_number']),
+        ]
+    
+    def __str__(self):
+        return f"Order {self.order_number} - {self.buyer_id.username}"
+    
+    def save(self, *args, **kwargs):
+        # Auto-generate order number if not provided
+        if not self.order_number:
+            self.order_number = self.generate_order_number()
+        super().save(*args, **kwargs)
+    
+    def generate_order_number(self):
+        """Generate a unique order number."""
+        import random
+        import string
+        
+        # Generate format: BF + 7 random digits
+        while True:
+            random_part = ''.join(random.choices(string.digits, k=7))
+            order_number = f"BF{random_part}"
+            if not Order.objects.filter(order_number=order_number).exists():
+                return order_number
+    
+    @property
+    def is_completed(self):
+        """Check if order is completed."""
+        return self.status in ['COMPLETED', 'DELIVERED']
+    
+    @property
+    def is_active(self):
+        """Check if order is still active (not completed/cancelled)."""
+        return self.status not in ['COMPLETED', 'CANCELLED', 'REFUNDED']
+    
+    @property
+    def can_cancel(self):
+        """Check if order can be cancelled."""
+        return self.status in ['PENDING', 'PAID', 'PROCESSING']
+    
+    def mark_as_paid(self, payment_method=None, payment_reference=None):
+        """Mark order as paid."""
+        self.payment_status = 'COMPLETED'
+        self.status = 'PAID'
+        self.payment_date = timezone.now()
+        if payment_method:
+            self.payment_method = payment_method
+        if payment_reference:
+            self.payment_reference = payment_reference
+        self.save(update_fields=['payment_status', 'status', 'payment_date', 'payment_method', 'payment_reference'])
+    
+    def mark_as_shipped(self, tracking_number=None):
+        """Mark order as shipped."""
+        self.status = 'SHIPPED'
+        if tracking_number:
+            self.tracking_number = tracking_number
+        self.save(update_fields=['status', 'tracking_number'])
+    
+    def mark_as_delivered(self):
+        """Mark order as delivered."""
+        self.status = 'DELIVERED'
+        self.actual_delivery_date = timezone.now()
+        self.save(update_fields=['status', 'actual_delivery_date'])
+    
+    def cancel_order(self, reason=None):
+        """Cancel the order."""
+        if not self.can_cancel:
+            raise ValueError("Order cannot be cancelled in current status")
+        
+        self.status = 'CANCELLED'
+        if reason:
+            self.notes = f"Cancelled: {reason}\n{self.notes or ''}"
+        self.save(update_fields=['status', 'notes'])
+        
+        # Update the associated quote status
+        self.quote_id.status = 'REJECTED'
+        self.quote_id.save(update_fields=['status'])
+
+
 class RequestTemplate(models.Model):
     """
     Templates for common product request types.

@@ -1394,3 +1394,15 @@ INFO 2025-08-21 23:34:02,949 basehttp 39945 6134951936 "GET /?format=openapi HTT
 INFO 2025-08-21 23:45:15,059 autoreload 39945 8651146688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/user/views.py changed, reloading.
 INFO 2025-08-21 23:45:15,609 autoreload 83422 8651146688 Watching for file changes with StatReloader
 INFO 2025-08-22 00:10:43,271 autoreload 83422 8651146688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/authentication_service/settings.py changed, reloading.
+INFO 2025-08-27 04:44:45,523 autoreload 32403 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 04:52:07,824 autoreload 37588 8697595328 Watching for file changes with StatReloader
+INFO 2025-08-27 04:57:35,386 basehttp 37588 6171422720 "OPTIONS /register/ HTTP/1.1" 200 0
+WARNING 2025-08-27 04:57:35,434 log 37588 6171422720 Bad Request: /register/
+WARNING 2025-08-27 04:57:35,435 basehttp 37588 6171422720 "POST /register/ HTTP/1.1" 400 54
+INFO 2025-08-27 04:58:06,363 basehttp 37588 6171422720 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-08-27 04:58:06,688 basehttp 37588 6171422720 "POST /login/ HTTP/1.1" 200 976
+INFO 2025-08-27 10:00:23,224 basehttp 37588 6171422720 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-08-27 10:00:23,664 basehttp 37588 6171422720 "POST /login/ HTTP/1.1" 200 976
+INFO 2025-08-27 10:16:43,528 basehttp 37588 6171422720 "OPTIONS //login/ HTTP/1.1" 200 0
+WARNING 2025-08-27 10:16:43,716 log 37588 6171422720 Not Found: //login/
+WARNING 2025-08-27 10:16:43,718 basehttp 37588 6171422720 "POST //login/ HTTP/1.1" 404 7897

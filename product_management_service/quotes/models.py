@@ -9,7 +9,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.utils import timezone
+from datetime import timedelta
 from decimal import Decimal
+
+
+def get_default_expiry():
+    """Return default expiry date (30 days from now)."""
+    return timezone.now() + timedelta(days=30)
 
 
 class Quote(models.Model):
@@ -106,6 +112,7 @@ class Quote(models.Model):
     
     # Validity and timestamps
     valid_until = models.DateTimeField(
+        default=get_default_expiry,
         help_text="Quote expiration"
     )
     created_at = models.DateTimeField(
@@ -131,6 +138,8 @@ class Quote(models.Model):
     @property
     def is_expired(self):
         """Check if the quote has expired."""
+        if self.valid_until is None:
+            return False
         return timezone.now() > self.valid_until
     
     @property

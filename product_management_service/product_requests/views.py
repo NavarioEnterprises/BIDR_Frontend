@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.utils import timezone
-from django.db.models import F
+from django.db.models import F, Q
+from django.http import JsonResponse
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,25 +10,29 @@ from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from decimal import Decimal
+from core.cors_decorators import CORSMixin
 
 from .models import (
     ConsumerElectronics, VehicleSpares, VehicleTyresRims, 
     ProductRequest, RequestImage, RequestSpecification, 
-    RequestMessage, RequestWatchlist
+    RequestMessage, RequestWatchlist, Order
 )
 from .serializers import (
     ConsumerElectronicsSerializer, VehicleSparesSerializer, VehicleTyresRimsSerializer,
     ProductRequestListSerializer, ProductRequestDetailSerializer, ProductRequestCreateSerializer,
     RequestImageSerializer, RequestSpecificationSerializer, 
-    RequestMessageSerializer, RequestWatchlistSerializer
+    RequestMessageSerializer, RequestWatchlistSerializer,
+    OrderListSerializer, OrderDetailSerializer, OrderCreateSerializer,
+    OrderUpdateSerializer, OrderStatusUpdateSerializer
 )
 
 
-class ProductRequestViewSet(viewsets.ModelViewSet):
+class ProductRequestViewSet(CORSMixin, viewsets.ModelViewSet):
     """
     ViewSet for ProductRequest model.
     
     Provides CRUD operations for product requests with category-specific handling.
+    Includes CORS support for Flutter web compatibility.
     """
     
     queryset = ProductRequest.objects.all().select_related(
@@ -455,3 +460,354 @@ class RequestWatchlistViewSet(viewsets.ModelViewSet):
         )
         analytics.watchlist_additions = F('watchlist_additions') + 1
         analytics.save(update_fields=['watchlist_additions'])
+
+
+class OrderViewSet(CORSMixin, viewsets.ModelViewSet):
+    """
+    ViewSet for Order model.
+    
+    Provides CRUD operations for orders with buyer/seller filtering.
+    Includes CORS support for Flutter web compatibility.
+    """
+    
+    queryset = Order.objects.all().select_related(
+        'buyer_id', 'seller_id', 'request_id', 'quote_id'
+    )
+    
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    
+    # Filter fields
+    filterset_fields = {
+        'status': ['exact', 'in'],
+        'payment_status': ['exact', 'in'],
+        'buyer_id': ['exact'],
+        'seller_id': ['exact'],
+        'created_at': ['gte', 'lte', 'exact'],
+        'total_amount': ['gte', 'lte'],
+        'currency': ['exact'],
+        'order_number': ['exact'],
+    }
+    
+    # Search fields
+    search_fields = [
+        'order_number', 'request_id__title', 'buyer_id__username',
+        'seller_id__username', 'tracking_number'
+    ]
+    
+    # Ordering fields
+    ordering_fields = [
+        'created_at', 'updated_at', 'total_amount', 'payment_date',
+        'estimated_delivery_date', 'actual_delivery_date'
+    ]
+    ordering = ['-created_at']
+    
+    def get_serializer_class(self):
+        """Return different serializers based on the action."""
+        if self.action == 'create':
+            return OrderCreateSerializer
+        elif self.action in ['update', 'partial_update']:
+            return OrderUpdateSerializer
+        elif self.action in ['retrieve', 'update_status']:
+            return OrderDetailSerializer
+        else:
+            return OrderListSerializer
+    
+    def get_queryset(self):
+        """Filter orders based on user role (buyer or seller)."""
+        queryset = super().get_queryset()
+        
+        # Skip user filtering for anonymous users
+        if not self.request.user.is_authenticated:
+            return queryset
+            
+        user = self.request.user
+        
+        # Filter by user role if query parameter is provided
+        role = self.request.query_params.get('role')
+        
+        if role == 'buyer':
+            return queryset.filter(buyer_id=user)
+        elif role == 'seller':
+            return queryset.filter(seller_id=user)
+        else:
+            # Default: show orders where user is either buyer or seller
+            return queryset.filter(
+                Q(buyer_id=user) | Q(seller_id=user)
+            )
+    
+    def perform_create(self, serializer):
+        """Create order and handle business logic."""
+        order = serializer.save()
+        
+        # Update analytics for new order creation
+        self._update_analytics_for_new_order(order)
+    
+    @action(detail=False, methods=['get'])
+    def my_purchases(self, request):
+        """Get current user's orders as a buyer."""
+        queryset = self.get_queryset().filter(buyer_id=request.user)
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def my_sales(self, request):
+        """Get current user's orders as a seller."""
+        queryset = self.get_queryset().filter(seller_id=request.user)
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'])
+    def update_status(self, request, pk=None):
+        """Update order status with validation."""
+        order = self.get_object()
+        
+        # Only seller can update order status (except for cancellation)
+        if request.user != order.seller_id and 'CANCELLED' not in request.data.get('status', ''):
+            return Response(
+                {'error': 'Only the seller can update order status.'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Buyers can cancel their own orders
+        if request.data.get('status') == 'CANCELLED' and request.user not in [order.buyer_id, order.seller_id]:
+            return Response(
+                {'error': 'Only buyer or seller can cancel the order.'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        serializer = OrderStatusUpdateSerializer(
+            data=request.data,
+            context={'order': order}
+        )
+        
+        if serializer.is_valid():
+            validated_data = serializer.validated_data
+            new_status = validated_data['status']
+            
+            # Update order status based on the new status
+            if new_status == 'PAID':
+                order.mark_as_paid(
+                    payment_method=validated_data.get('payment_method'),
+                    payment_reference=validated_data.get('payment_reference')
+                )
+            elif new_status == 'SHIPPED':
+                order.mark_as_shipped(
+                    tracking_number=validated_data.get('tracking_number')
+                )
+            elif new_status == 'DELIVERED':
+                order.mark_as_delivered()
+            elif new_status == 'CANCELLED':
+                order.cancel_order(reason=validated_data.get('reason'))
+            else:
+                # General status update
+                order.status = new_status
+                if validated_data.get('tracking_number'):
+                    order.tracking_number = validated_data['tracking_number']
+                order.save(update_fields=['status', 'tracking_number'])
+            
+            # Return updated order data
+            order.refresh_from_db()
+            response_serializer = OrderDetailSerializer(order)
+            return Response(response_serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['post'])
+    def mark_as_paid(self, request, pk=None):
+        """Mark order as paid."""
+        order = self.get_object()
+        
+        # Only seller can mark as paid
+        if request.user != order.seller_id:
+            return Response(
+                {'error': 'Only the seller can mark orders as paid.'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        payment_method = request.data.get('payment_method')
+        payment_reference = request.data.get('payment_reference')
+        
+        try:
+            order.mark_as_paid(
+                payment_method=payment_method,
+                payment_reference=payment_reference
+            )
+            return Response({
+                'message': 'Order marked as paid successfully.',
+                'order_id': str(order.order_id),
+                'status': order.status
+            })
+        except ValueError as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        """Cancel an order."""
+        order = self.get_object()
+        
+        # Only buyer or seller can cancel
+        if request.user not in [order.buyer_id, order.seller_id]:
+            return Response(
+                {'error': 'Only buyer or seller can cancel the order.'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        reason = request.data.get('reason', '')
+        
+        try:
+            order.cancel_order(reason=reason)
+            return Response({
+                'message': 'Order cancelled successfully.',
+                'order_id': str(order.order_id),
+                'status': order.status
+            })
+        except ValueError as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def by_status_categories(self, request):
+        """Get orders grouped by Flutter app status categories."""
+        # Status mappings for Flutter app categories
+        status_mappings = {
+            'onGoingOrders': ['PENDING', 'PAID', 'PROCESSING', 'SHIPPED'],
+            'purchasedOrders': ['DELIVERED', 'COMPLETED'],
+            'returnsRefundsOrders': ['REFUNDED'],
+            'cancelledOrders': ['CANCELLED'],
+        }
+        
+        result = {}
+        
+        for category, statuses in status_mappings.items():
+            queryset = Order.objects.filter(status__in=statuses)
+            
+            # Convert to list of dictionaries with required fields for Flutter
+            orders = []
+            for order in queryset:
+                order_data = {
+                    'vendorName': order.seller_id.get_full_name() or order.seller_id.username,
+                    'product': order.request_id.title,
+                    'vehicle': self._get_product_summary(order.request_id),
+                    'orderNumber': order.order_number,
+                    'status': order.get_status_display(),
+                    'dateTime': order.created_at.isoformat(),
+                    'price': float(order.total_amount),
+                    'rating': 0.0,  # TODO: Get actual rating when ratings are implemented
+                    'distanceInKm': 25,  # TODO: Calculate actual distance
+                    'location': self._get_seller_location(order.seller_id),
+                    'comments': [{
+                        'commentId': '1',
+                        'description': order.special_instructions or order.notes or 'No comments'
+                    }]
+                }
+                orders.append(order_data)
+            
+            result[category] = orders
+        
+        return Response(result)
+    
+    def _get_product_summary(self, product_request):
+        """Get a summary description of the product."""
+        if product_request.tyres_rims_summary:
+            return product_request.tyres_rims_summary
+        elif product_request.vehicle_spares_summary:
+            return product_request.vehicle_spares_summary
+        elif product_request.consumer_electronics_summary:
+            return product_request.consumer_electronics_summary
+        return product_request.description or 'Product details'
+    
+    def _get_seller_location(self, seller):
+        """Get seller location or return default."""
+        # TODO: Get actual seller location from profile
+        return "Location not specified"
+    
+    @action(detail=False, methods=['get'])
+    def statistics(self, request):
+        """Get order statistics for the current user."""
+        user = request.user
+        from django.db.models import Count, Sum, Avg
+        
+        # Get buyer statistics
+        buyer_stats = Order.objects.filter(buyer_id=user).aggregate(
+            total_orders=Count('order_id'),
+            total_spent=Sum('total_amount'),
+            avg_order_value=Avg('total_amount'),
+            completed_orders=Count('order_id', filter=Q(status='COMPLETED')),
+            pending_orders=Count('order_id', filter=Q(status__in=['PENDING', 'PAID', 'PROCESSING', 'SHIPPED']))
+        )
+        
+        # Get seller statistics
+        seller_stats = Order.objects.filter(seller_id=user).aggregate(
+            total_sales=Count('order_id'),
+            total_revenue=Sum('total_amount'),
+            avg_sale_value=Avg('total_amount'),
+            completed_sales=Count('order_id', filter=Q(status='COMPLETED')),
+            pending_sales=Count('order_id', filter=Q(status__in=['PENDING', 'PAID', 'PROCESSING', 'SHIPPED']))
+        )
+        
+        return Response({
+            'buyer_statistics': buyer_stats,
+            'seller_statistics': seller_stats
+        })
+    
+    def _update_analytics_for_new_order(self, order):
+        """Update analytics when a new order is created."""
+        try:
+            from analytics.models import OrderAnalytics, CategoryAnalytics
+            
+            today = timezone.now().date()
+            
+            # Update OrderAnalytics
+            order_analytics, created = OrderAnalytics.objects.get_or_create(
+                date=today,
+                timeframe='daily',
+                defaults={
+                    'total_orders': 0,
+                    'total_revenue': Decimal('0.00'),
+                    'average_order_value': Decimal('0.00'),
+                    'completed_orders': 0,
+                    'cancelled_orders': 0,
+                    'conversion_rate': Decimal('0.00')
+                }
+            )
+            order_analytics.total_orders = F('total_orders') + 1
+            order_analytics.total_revenue = F('total_revenue') + order.total_amount
+            order_analytics.save(update_fields=['total_orders', 'total_revenue'])
+            
+            # Update CategoryAnalytics
+            category_analytics, created = CategoryAnalytics.objects.get_or_create(
+                category=order.request_id.category,
+                date=today,
+                timeframe='daily',
+                defaults={
+                    'requests_created': 0,
+                    'quotes_submitted': 0,
+                    'orders_completed': 0,
+                    'total_value': Decimal('0.00'),
+                    'average_fulfillment_time': Decimal('0.00'),
+                    'supplier_participation_rate': Decimal('0.00')
+                }
+            )
+            category_analytics.total_value = F('total_value') + order.total_amount
+            category_analytics.save(update_fields=['total_value'])
+            
+        except Exception as e:
+            print(f"Error updating order analytics: {e}")

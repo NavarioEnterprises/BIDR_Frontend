@@ -33,7 +33,7 @@ class Message(BaseModel):
     
     # Core message data
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages', null=True, blank=True)
     message_type = models.CharField(max_length=20, choices=MESSAGE_TYPES, default='text')
     
     # Message content
@@ -87,14 +87,16 @@ class Message(BaseModel):
     
     def __str__(self):
         content_preview = self.content[:50] + '...' if len(self.content) > 50 else self.content
-        return f"{self.sender.username}: {content_preview}"
+        sender_name = self.sender.username if self.sender else "Anonymous"
+        return f"{sender_name}: {content_preview}"
     
     def save(self, *args, **kwargs):
         # Generate message hash for deduplication
         if not self.message_hash and self.content:
             # Include timestamp to ensure uniqueness
             timestamp = timezone.now().isoformat()
-            content_for_hash = f"{self.sender.id}:{self.conversation.id}:{self.content}:{timestamp}"
+            sender_id = self.sender.id if self.sender else "anonymous"
+            content_for_hash = f"{sender_id}:{self.conversation.id}:{self.content}:{timestamp}"
             self.message_hash = hashlib.sha256(content_for_hash.encode()).hexdigest()
         
         # Set thread_id if this is a reply

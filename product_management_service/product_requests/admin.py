@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 from django.urls import reverse
 from .models import (
     ConsumerElectronics, VehicleSpares, VehicleTyresRims, ProductRequest, RequestImage, RequestSpecification, 
-    RequestMessage, RequestWatchlist, RequestTemplate
+    RequestMessage, RequestWatchlist, RequestTemplate, Order
 )
 from core.admin import CoreAdminMixin
 
@@ -503,6 +503,180 @@ class RequestWatchlistAdmin(admin.ModelAdmin, CoreAdminMixin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user', 'request')
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin, CoreAdminMixin):
+    list_display = [
+        'order_number', 'buyer_id', 'seller_id', 'status_display', 'payment_status_display',
+        'total_amount', 'currency', 'payment_method', 'created_at_display'
+    ]
+    list_filter = [
+        'status', 'payment_status', 'currency', 'payment_method',
+        'created_at', 'payment_date', 'estimated_delivery_date'
+    ]
+    search_fields = [
+        'order_number', 'order_id', 'buyer_id__username', 'seller_id__username',
+        'payment_reference', 'tracking_number'
+    ]
+    readonly_fields = [
+        'order_id', 'order_number', 'created_at_display', 'updated_at_display',
+        'is_completed', 'is_active', 'can_cancel'
+    ]
+    date_hierarchy = 'created_at'
+    
+    fieldsets = (
+        ('Order Information', {
+            'fields': ('order_id', 'order_number', 'status')
+        }),
+        ('Related Records', {
+            'fields': ('request_id', 'quote_id', 'buyer_id', 'seller_id')
+        }),
+        ('Pricing', {
+            'fields': ('total_amount', 'delivery_cost', 'installation_cost', 'currency')
+        }),
+        ('Payment Information', {
+            'fields': ('payment_status', 'payment_method', 'payment_reference', 'payment_date'),
+            'classes': ('collapse',)
+        }),
+        ('Delivery Information', {
+            'fields': ('delivery_address', 'estimated_delivery_date', 'actual_delivery_date', 'tracking_number'),
+            'classes': ('collapse',)
+        }),
+        ('Additional Information', {
+            'fields': ('special_instructions', 'notes'),
+            'classes': ('collapse',)
+        }),
+        ('Status Checks', {
+            'fields': ('is_completed', 'is_active', 'can_cancel'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at_display', 'updated_at_display'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    def status_display(self, obj):
+        """Display order status with color coding."""
+        status_colors = {
+            'PENDING': 'orange',
+            'PAID': 'blue',
+            'PROCESSING': 'purple',
+            'SHIPPED': 'teal',
+            'DELIVERED': 'green',
+            'COMPLETED': 'green',
+            'CANCELLED': 'red',
+            'REFUNDED': 'red'
+        }
+        color = status_colors.get(obj.status, 'black')
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            color, obj.get_status_display()
+        )
+    status_display.short_description = 'Status'
+    status_display.admin_order_field = 'status'
+    
+    def payment_status_display(self, obj):
+        """Display payment status with color coding."""
+        status_colors = {
+            'PENDING': 'orange',
+            'PROCESSING': 'blue',
+            'COMPLETED': 'green',
+            'FAILED': 'red',
+            'REFUNDED': 'red'
+        }
+        color = status_colors.get(obj.payment_status, 'black')
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            color, obj.get_payment_status_display()
+        )
+    payment_status_display.short_description = 'Payment'
+    payment_status_display.admin_order_field = 'payment_status'
+    
+    def is_completed(self, obj):
+        if obj.is_completed:
+            return format_html('<span style="color: green;">✓ Completed</span>')
+        return format_html('<span style="color: orange;">⏳ In Progress</span>')
+    is_completed.short_description = 'Completed'
+    
+    def is_active(self, obj):
+        if obj.is_active:
+            return format_html('<span style="color: green;">✓ Active</span>')
+        return format_html('<span style="color: grey;">✗ Inactive</span>')
+    is_active.short_description = 'Active'
+    
+    def can_cancel(self, obj):
+        if obj.can_cancel:
+            return format_html('<span style="color: orange;">⚠ Can Cancel</span>')
+        return format_html('<span style="color: grey;">✗ Cannot Cancel</span>')
+    can_cancel.short_description = 'Cancellable'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related(
+            'request_id', 'quote_id', 'buyer_id', 'seller_id'
+        )
+    
+    actions = ['mark_as_paid', 'mark_as_shipped', 'mark_as_delivered', 'cancel_selected_orders']
+    
+    def mark_as_paid(self, request, queryset):
+        """Mark selected orders as paid."""
+        updated = 0
+        for order in queryset:
+            if order.status == 'PENDING':
+                order.mark_as_paid(payment_method='Admin Update')
+                updated += 1
+        self.message_user(
+            request, 
+            f'{updated} order(s) marked as paid.',
+            level='SUCCESS' if updated > 0 else 'WARNING'
+        )
+    mark_as_paid.short_description = 'Mark selected orders as paid'
+    
+    def mark_as_shipped(self, request, queryset):
+        """Mark selected orders as shipped."""
+        updated = 0
+        for order in queryset:
+            if order.status in ['PAID', 'PROCESSING']:
+                order.mark_as_shipped()
+                updated += 1
+        self.message_user(
+            request, 
+            f'{updated} order(s) marked as shipped.',
+            level='SUCCESS' if updated > 0 else 'WARNING'
+        )
+    mark_as_shipped.short_description = 'Mark selected orders as shipped'
+    
+    def mark_as_delivered(self, request, queryset):
+        """Mark selected orders as delivered."""
+        updated = 0
+        for order in queryset:
+            if order.status == 'SHIPPED':
+                order.mark_as_delivered()
+                updated += 1
+        self.message_user(
+            request, 
+            f'{updated} order(s) marked as delivered.',
+            level='SUCCESS' if updated > 0 else 'WARNING'
+        )
+    mark_as_delivered.short_description = 'Mark selected orders as delivered'
+    
+    def cancel_selected_orders(self, request, queryset):
+        """Cancel selected orders."""
+        updated = 0
+        for order in queryset:
+            if order.can_cancel:
+                try:
+                    order.cancel_order(reason='Cancelled by admin')
+                    updated += 1
+                except ValueError:
+                    pass
+        self.message_user(
+            request, 
+            f'{updated} order(s) cancelled.',
+            level='SUCCESS' if updated > 0 else 'WARNING'
+        )
+    cancel_selected_orders.short_description = 'Cancel selected orders'
 
 
 @admin.register(RequestTemplate)

@@ -19,6 +19,8 @@ from django.urls import path, include
 from django.http import JsonResponse
 from django.utils import timezone
 from django_prometheus.exports import ExportToDjangoView
+from django.conf import settings
+from django.conf.urls.static import static
 
 # Health check endpoint
 def health_check(request):
@@ -32,8 +34,16 @@ def health_check(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     
+    # App URLs
+    path('', include('reviews.urls')),
+    path('', include('content.urls')),
+    
     # Health check
     # Metrics endpoint for Prometheus
     path('metrics', ExportToDjangoView, name='prometheus-django-metrics'),
     path('health/', health_check, name='health-check'),
 ]
+
+# Serve media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -81,6 +81,7 @@ urlpatterns = [
     
     # API endpoints - Version 1
     path('', include('chat_core.urls')),
+    path('', include('chat_conversations.urls')),
 ]
 
 # Add media files serving in development

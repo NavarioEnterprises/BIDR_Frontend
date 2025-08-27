@@ -14,6 +14,7 @@ router.register(r'vehicle-spares', views.VehicleSparesViewSet, basename='vehicle
 router.register(r'tyres-rims', views.VehicleTyresRimsViewSet, basename='vehicletyresrims')
 router.register(r'messages', views.RequestMessageViewSet, basename='requestmessage')
 router.register(r'watchlist', views.RequestWatchlistViewSet, basename='requestwatchlist')
+router.register(r'orders', views.OrderViewSet, basename='order')
 
 urlpatterns = [
     path('', include(router.urls)),

@@ -123,10 +123,11 @@ class MessageSerializer(serializers.ModelSerializer):
     
     def get_reply_to_message(self, obj):
         if obj.reply_to:
+            sender_name = obj.reply_to.sender.username if obj.reply_to.sender else "Anonymous"
             return {
                 'id': obj.reply_to.id,
                 'content': obj.reply_to.content[:100],  # Truncated content
-                'sender': obj.reply_to.sender.username,
+                'sender': sender_name,
                 'created_at': obj.reply_to.created_at
             }
         return None
@@ -143,7 +144,10 @@ class MessageCreateSerializer(serializers.ModelSerializer):
         ]
     
     def create(self, validated_data):
-        validated_data['sender'] = self.context['request'].user
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            validated_data['sender'] = request.user
+        # For unauthenticated users, sender will be None (which should be allowed)
         return super().create(validated_data)
 
 

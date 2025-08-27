@@ -39,11 +39,12 @@ class Conversation(BaseModel):
     status = models.CharField(max_length=20, choices=CONVERSATION_STATUS, default='active')
     
     # Participants
-    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='buyer_conversations')
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='buyer_conversations', null=True, blank=True)
     participants = models.ManyToManyField(User, through='ConversationParticipant', related_name='chat_conversations')
     
     # External References
     product_request_id = models.UUIDField(null=True, blank=True)  # Reference to product request
+    request_id = models.CharField(max_length=100, null=True, blank=True)  # General request ID for linking
     quote_id = models.UUIDField(null=True, blank=True)  # Reference to quote
     
     # Conversation Settings
@@ -70,6 +71,7 @@ class Conversation(BaseModel):
             models.Index(fields=['buyer', 'status']),
             models.Index(fields=['conversation_type', 'status']),
             models.Index(fields=['product_request_id']),
+            models.Index(fields=['request_id']),
             models.Index(fields=['quote_id']),
             models.Index(fields=['last_message_at']),
             models.Index(fields=['created_at']),
