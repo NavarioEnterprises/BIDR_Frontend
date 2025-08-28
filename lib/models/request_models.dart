@@ -33,9 +33,7 @@ class ProductRequest {
   factory ProductRequest.fromJson(Map<String, dynamic> json) =>
       ProductRequest(description: json['description']);
 
-  Map<String, dynamic> toJson() => {
-    'description': description,
-  };
+  Map<String, dynamic> toJson() => {'description': description};
 }
 
 class Message {
@@ -58,9 +56,10 @@ class Message {
     content: json['content'],
     timestamp: DateTime.parse(json['timestamp']),
     isReply: json['is_reply'] ?? false,
-    replies: (json['replies'] as List<dynamic>?)
-        ?.map((reply) => Message.fromJson(reply))
-        .toList() ??
+    replies:
+        (json['replies'] as List<dynamic>?)
+            ?.map((reply) => Message.fromJson(reply))
+            .toList() ??
         [],
   );
 
@@ -78,11 +77,7 @@ class User {
   final String role; // "Buyer" or "Seller"
   final String? profileImageUrl; // optional
 
-  User({
-    required this.name,
-    required this.role,
-    this.profileImageUrl,
-  });
+  User({required this.name, required this.role, this.profileImageUrl});
 
   factory User.fromJson(Map<String, dynamic> json) => User(
     name: json['name'],
@@ -130,19 +125,19 @@ class CombinedRequest {
       'id': id,
       'auto_spares_request': autoSparesRequest.map((e) => e.toJson()).toList(),
       'rim_tyre_request': rimTyreRequest.map((e) => e.toJson()).toList(),
-      'consumer_electronics_request': consumerElectronicsRequest.map((e) => e.toJson()).toList(),
+      'consumer_electronics_request': consumerElectronicsRequest
+          .map((e) => e.toJson())
+          .toList(),
     };
   }
 }
 
-
 // seller
-
 
 // Combined Request
 
-
 class Seller {
+  final int id;
   final String name;
   final double bid;
   final DateTime bidTime;
@@ -152,6 +147,7 @@ class Seller {
   final double radius;
 
   Seller({
+    required this.id,
     required this.name,
     required this.comment,
     required this.radius,
@@ -163,26 +159,31 @@ class Seller {
 
   factory Seller.fromJson(Map<String, dynamic> json) {
     return Seller(
-      name: json['name']??"",
-      comment: json['comment']??"",
-      radius: json['radius']??0.0,
+      id: json['id'] ?? 0,
+      name: json['name'] ?? "",
+      comment: json['comment'] ?? "",
+      radius: json['radius'] ?? 0.0,
       bid: (json['bid'] as num).toDouble(),
       bidTime: DateTime.parse(json['bid_time']),
       rating: (json['rating'] as num).toDouble(),
-      maxRating: json['max_rating']??0,
+      maxRating: json['max_rating'] ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'bid': bid,
       'bid_time': bidTime.toIso8601String(),
       'rating': rating,
       'max_rating': maxRating,
+      'comment': comment,
+      'radius': radius,
     };
   }
 }
+
 // Auto Spares
 class VehicleDetails {
   final String vin;
@@ -313,7 +314,6 @@ class AutoSpares {
     required this.vehicleDetails,
     required this.partDetails,
     required this.moreFields,
-
   });
 
   factory AutoSpares.fromJson(Map<String, dynamic> json) {
@@ -334,12 +334,12 @@ class AutoSpares {
 }
 
 class AutoSparesRequest {
-  final int id;
+  final String id;
   final String status;
   final String category;
   final DateTime createdAt;
   final AutoSpares autoSpares;
-  final List<Seller> sellerOffers;
+  final List<dynamic> sellerOffers;
 
   AutoSparesRequest({
     required this.id,
@@ -347,20 +347,17 @@ class AutoSparesRequest {
     required this.createdAt,
     required this.autoSpares,
     required this.sellerOffers,
-    required this.category
-
+    required this.category,
   });
 
   factory AutoSparesRequest.fromJson(Map<String, dynamic> json) {
     return AutoSparesRequest(
-      id: json['id']??0,
-      status: json['status']??"",
-      category: json['category']??"",
+      id: json['id'] ?? 0,
+      status: json['status'] ?? "",
+      category: json['category'] ?? "",
       createdAt: DateTime.parse(json['created_at']),
-      autoSpares: AutoSpares.fromJson(json['auto_spares']??{}),
-      sellerOffers: (json['seller_offers'] as List<dynamic>)
-          .map((item) => Seller.fromJson(item))
-          .toList(),
+      autoSpares: AutoSpares.fromJson(json['auto_spares'] ?? {}),
+      sellerOffers: json['seller_offers'] as List<dynamic>? ?? [],
     );
   }
 
@@ -483,12 +480,10 @@ class ConsumerElectronics {
     required this.productDetails,
     required this.budgetTimeline,
     required this.featuresAndSpecs,
-
   });
 
   factory ConsumerElectronics.fromJson(Map<String, dynamic> json) {
     return ConsumerElectronics(
-
       productDetails: ProductDetails.fromJson(json['product_details']),
       budgetTimeline: BudgetTimeline.fromJson(json['budget_timeline']),
       featuresAndSpecs: FeaturesAndSpecs.fromJson(json['features_and_specs']),
@@ -505,12 +500,12 @@ class ConsumerElectronics {
 }
 
 class ConsumerElectronicsRequest {
-  final int id;
+  final String id;
   final DateTime createdAt;
   final String status;
   final String category;
   final ConsumerElectronics consumerElectronics;
-  final List<Seller> sellerOffers;
+  final List<dynamic> sellerOffers;
 
   ConsumerElectronicsRequest({
     required this.id,
@@ -518,19 +513,19 @@ class ConsumerElectronicsRequest {
     required this.category,
     required this.createdAt,
     required this.consumerElectronics,
-    required this.sellerOffers
+    required this.sellerOffers,
   });
 
   factory ConsumerElectronicsRequest.fromJson(Map<String, dynamic> json) {
     return ConsumerElectronicsRequest(
       id: json['id'],
-      status: json['status']??"",
-      category: json['category']??"",
+      status: json['status'] ?? "",
+      category: json['category'] ?? "",
       createdAt: DateTime.parse(json['created_at']),
-      consumerElectronics:ConsumerElectronics.fromJson(json['consumer_electronics']??{}),
-      sellerOffers: (json['seller_offers'] as List<dynamic>)
-          .map((item) => Seller.fromJson(item))
-          .toList(),
+      consumerElectronics: ConsumerElectronics.fromJson(
+        json['consumer_electronics'] ?? {},
+      ),
+      sellerOffers: json['seller_offers'] as List<dynamic>? ?? [],
     );
   }
 
@@ -542,7 +537,6 @@ class ConsumerElectronicsRequest {
     };
   }
 }
-
 
 // Consumer Electronics
 class RimTyreProductDetails {
@@ -641,11 +635,7 @@ class RimTyre {
   final RimTyreProductDetails productDetails;
   final RimTyreMoreFields moreFields;
 
-  RimTyre({
-    required this.productDetails,
-    required this.moreFields,
-
-  });
+  RimTyre({required this.productDetails, required this.moreFields});
 
   factory RimTyre.fromJson(Map<String, dynamic> json) {
     return RimTyre(
@@ -663,12 +653,12 @@ class RimTyre {
 }
 
 class RimTyreRequest {
-  final int id;
+  final String id;
   final String status;
   final String category;
   final DateTime createdAt;
   final RimTyre rimTyre;
-  final List<Seller> sellerOffers;
+  final List<dynamic> sellerOffers;
 
   RimTyreRequest({
     required this.id,
@@ -676,19 +666,17 @@ class RimTyreRequest {
     required this.category,
     required this.createdAt,
     required this.rimTyre,
-    required this.sellerOffers
+    required this.sellerOffers,
   });
 
   factory RimTyreRequest.fromJson(Map<String, dynamic> json) {
     return RimTyreRequest(
       id: json['id'],
-      status: json['status']??"",
-      category: json['category']??"",
+      status: json['status'] ?? "",
+      category: json['category'] ?? "",
       createdAt: DateTime.parse(json['created_at']),
-      rimTyre: RimTyre.fromJson(json['rim_tyre']??{}),
-      sellerOffers: (json['seller_offers'] as List<dynamic>)
-          .map((item) => Seller.fromJson(item))
-          .toList(),
+      rimTyre: RimTyre.fromJson(json['rim_tyre'] ?? {}),
+      sellerOffers: json['seller_offers'] as List<dynamic>? ?? [],
     );
   }
 
@@ -700,10 +688,3 @@ class RimTyreRequest {
     };
   }
 }
-
-
-
-
-
-
-

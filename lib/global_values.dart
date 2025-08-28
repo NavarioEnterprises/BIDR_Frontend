@@ -1,27 +1,11 @@
-
 import 'package:bidr/models/alert.dart';
+import 'package:bidr/config/environment_config.dart';
 
 import 'models/request_models.dart';
 
-class   GlobalVariables{
+class GlobalVariables {
   static List<WebNotification> alertList = [];
 
-
-  static Seller seller1 = Seller(
-    name: 'ABC Motors',
-    bid: 2500.0,
-    bidTime: DateTime.now().subtract(const Duration(hours: 2)),
-    rating: 4.6,
-    maxRating: 5, comment: 'trusted spares for years', radius: 30.0,
-  );
-
-  static Seller seller2 = Seller(
-    name: 'TyreZone',
-    bid: 3150.0,
-    bidTime: DateTime.now().subtract(const Duration(hours: 1, minutes: 30)),
-    rating: 4.3,
-    maxRating: 5, comment: 'Our parts are fresh and new from the box', radius: 40.4,
-  );
   static RimTyreProductDetails rimTyreProductDetails = RimTyreProductDetails(
     tyreWidthMm: 205,
     sidewallProfile: '55',
@@ -31,7 +15,8 @@ class   GlobalVariables{
     urgency: '1 Day',
   );
   static RimTyreMoreFields rimTyreMoreFields = RimTyreMoreFields(
-    description: 'High-performance radial tyre suitable for all-season driving.',
+    description:
+        'High-performance radial tyre suitable for all-season driving.',
     vehicleType: 'Passenger Car',
     pitchCircleDiameter: '114.3',
     preferredBrand: 'Michelin',
@@ -44,7 +29,6 @@ class   GlobalVariables{
       'https://example.com/images/tyre2.jpg',
     ],
   );
-
 
   /* ---------- 1) Auto‑Spares branch ---------- */
   static VehicleDetails vehicleDetails = VehicleDetails(
@@ -63,7 +47,7 @@ class   GlobalVariables{
     maxDistanceKm: 50,
     urgency: 'Immediately',
     productDescription: 'OEM alternator for Honda Accord 2.4 L (2003)',
-    imageUrls: const [],           // supply paths/URLs if you have any
+    imageUrls: const [], // supply paths/URLs if you have any
   );
 
   static MoreFields moreFields = MoreFields(
@@ -75,19 +59,9 @@ class   GlobalVariables{
   );
 
   static AutoSpares autoSparesItem = AutoSpares(
-
     vehicleDetails: vehicleDetails,
     partDetails: partDetails,
     moreFields: moreFields,
-  );
-
-  static AutoSparesRequest autoSparesRequest = AutoSparesRequest(
-    id: 101,
-    status: 'Offer',
-    category: 'Vehicle Spares',
-    createdAt: DateTime.now(),
-    autoSpares: autoSparesItem,
-    sellerOffers: [seller1],
   );
 
   /* ---------- 2) Rim & Tyre / Electronics‑style branch ---------- */
@@ -114,17 +88,10 @@ class   GlobalVariables{
     additionalComments: 'Wall‑mount bracket preferred.',
   );
 
-  static RimTyre rimTyreItem = RimTyre(// keep the name you need for the backend
-    moreFields: rimTyreMoreFields, productDetails: rimTyreProductDetails,
-  );
-
-  static RimTyreRequest rimTyreRequest = RimTyreRequest(
-    id: 202,
-    status: 'Offer',
-    category: 'Vehicle Tyres and Rims',
-    createdAt: DateTime.now(),
-    rimTyre: rimTyreItem,
-    sellerOffers: [seller2,seller1],
+  static RimTyre rimTyreItem = RimTyre(
+    // keep the name you need for the backend
+    moreFields: rimTyreMoreFields,
+    productDetails: rimTyreProductDetails,
   );
 
   /* ---------- 3) Consumer‑side Tyre branch ---------- */
@@ -149,7 +116,8 @@ class   GlobalVariables{
       'https://example.com/specsheet.pdf',
       'https://example.com/image1.jpg',
     ],
-    additionalComments: 'Looking for devices with international warranty support.',
+    additionalComments:
+        'Looking for devices with international warranty support.',
   );
 
   static ConsumerElectronics consumerElectronics = ConsumerElectronics(
@@ -158,26 +126,37 @@ class   GlobalVariables{
     featuresAndSpecs: exampleFeaturesAndSpecs,
   );
 
-
-
-
-  static ConsumerElectronicsRequest consumerElectronicsRequest = ConsumerElectronicsRequest(
-    id: 303,
-    status: 'Waiting',
-    category: 'Consumer Electronics',
-    createdAt: DateTime.now(),
-    consumerElectronics: consumerElectronics,
-    sellerOffers: const [],        // no offers yet
-  );
-
   /* ---------- 4) Combine everything ---------- */
   static CombinedRequest combinedRequest = CombinedRequest(
     id: 1,
-    autoSparesRequest: [autoSparesRequest],
-    rimTyreRequest: [rimTyreRequest],
-    consumerElectronicsRequest: [consumerElectronicsRequest],
+    autoSparesRequest: [],
+    rimTyreRequest: [],
+    consumerElectronicsRequest: [],
   );
 
-  // Print to verify (optional)
-
+  /* ---------- Environment Configuration Getters ---------- */
+  // Service URLs
+  static String get authServiceUrl => AppConfig.authServiceUrl;
+  static String get chatServiceUrl => AppConfig.chatServiceUrl;
+  static String get paymentServiceUrl => AppConfig.paymentServiceUrl;
+  static String get resolutionServiceUrl => AppConfig.resolutionServiceUrl;
+  static String get productsServiceUrl => AppConfig.productsServiceUrl;
+  static String get notificationsServiceUrl => AppConfig.notificationsServiceUrl;
+  static String get transactionsServiceUrl => AppConfig.transactionsServiceUrl;
+  static String get reviewsServiceUrl => AppConfig.reviewsServiceUrl;
+  
+  // Admin URLs
+  static String get authAdminUrl => AppConfig.authAdminUrl;
+  static String get chatAdminUrl => AppConfig.chatAdminUrl;
+  static String get paymentAdminUrl => AppConfig.paymentAdminUrl;
+  static String get resolutionAdminUrl => AppConfig.resolutionAdminUrl;
+  static String get productsAdminUrl => AppConfig.productsAdminUrl;
+  static String get notificationsAdminUrl => AppConfig.notificationsAdminUrl;
+  static String get transactionsAdminUrl => AppConfig.transactionsAdminUrl;
+  static String get reviewsAdminUrl => AppConfig.reviewsAdminUrl;
+  
+  // Monitoring URLs
+  static String get grafanaUrl => AppConfig.grafanaUrl;
+  static String get prometheusUrl => AppConfig.prometheusUrl;
+  
 }

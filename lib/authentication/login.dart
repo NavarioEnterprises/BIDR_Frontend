@@ -9,7 +9,7 @@ import '../services/shared_preferences.dart';
 import '../pages/buyer_home.dart';
 import '../pages/seller/seller_home_dashboard.dart';
 import '../models/user.dart';
-import 'auth_api_service.dart';
+import '../services/auth_api_service.dart';
 import 'forgot_password.dart';
 import 'dart:convert';
 
@@ -65,15 +65,17 @@ class _LoginPageState extends State<LoginPage> {
     if (response != null) {
       // Store complete login information as JSON
       final loginResponseJson = jsonEncode(response);
-      await Sharedprefs.saveCompleteLoginDataSharedPreference(loginResponseJson);
-      
+      await Sharedprefs.saveCompleteLoginDataSharedPreference(
+        loginResponseJson,
+      );
+
       // Store login status
       await Sharedprefs.saveUserLoggedInSharedPreference(true);
 
       // Create user model and set as current user
       final loginResponse = LoginResponse.fromJson(response);
       Constants.currentUser = loginResponse.user;
-      
+
       // Store user role for backward compatibility
       await Sharedprefs.saveUserRoleSharedPreference(loginResponse.user.role);
 
@@ -122,8 +124,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-            border: Border.all(color: Constants.gtaColorLight,width: 20),
-
+            border: Border.all(color: Constants.gtaColorLight, width: 20),
           ),
           child: Row(
             children: [
@@ -153,10 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 40,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 40),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -204,11 +202,9 @@ class _LoginPageState extends State<LoginPage> {
 
                         // Email input
                         SizedBox(
-                          width:
-                          MediaQuery.of(context).size.height * 0.5,
+                          width: MediaQuery.of(context).size.height * 0.5,
                           child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
                                 padding: const EdgeInsets.only(left: 8),
@@ -240,11 +236,9 @@ class _LoginPageState extends State<LoginPage> {
 
                         // Password input
                         SizedBox(
-                          width:
-                          MediaQuery.of(context).size.height * 0.5,
+                          width: MediaQuery.of(context).size.height * 0.5,
                           child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
                                 padding: const EdgeInsets.only(left: 8),
@@ -280,8 +274,7 @@ class _LoginPageState extends State<LoginPage> {
 
                         // Forgot password
                         SizedBox(
-                          width:
-                          MediaQuery.of(context).size.height * 0.5,
+                          width: MediaQuery.of(context).size.height * 0.5,
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: TextButton(
@@ -309,8 +302,7 @@ class _LoginPageState extends State<LoginPage> {
 
                         // Sign in button
                         SizedBox(
-                          width:
-                          MediaQuery.of(context).size.height * 0.5,
+                          width: MediaQuery.of(context).size.height * 0.5,
                           height: 45,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _handleLogin,
@@ -323,32 +315,30 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             child: _isLoading
                                 ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor:
-                                AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
-                                ),
-                              ),
-                            )
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
                                 : Text(
-                              'Sign In',
-                              style: GoogleFonts.manrope(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
+                                    'Sign In',
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
                         const SizedBox(height: 12),
 
                         // Sign up link
                         SizedBox(
-                          width:
-                          MediaQuery.of(context).size.height * 0.5,
+                          width: MediaQuery.of(context).size.height * 0.5,
                           child: MouseRegion(
                             cursor: SystemMouseCursors.click,
                             child: GestureDetector(
@@ -367,9 +357,7 @@ class _LoginPageState extends State<LoginPage> {
                                 child: RichText(
                                   textAlign: TextAlign.center,
                                   text: TextSpan(
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 14,
-                                    ),
+                                    style: GoogleFonts.manrope(fontSize: 14),
                                     children: [
                                       TextSpan(
                                         text: "Don't Have an Account? ",
@@ -384,7 +372,8 @@ class _LoginPageState extends State<LoginPage> {
                                           color: Constants.ftaColorLight,
                                           fontWeight: FontWeight.bold,
                                           decoration: TextDecoration.underline,
-                                          decorationColor: Constants.ftaColorLight,
+                                          decorationColor:
+                                              Constants.ftaColorLight,
                                         ),
                                       ),
                                     ],
@@ -473,15 +462,17 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
     if (response != null) {
       // Store complete login information as JSON
       final loginResponseJson = jsonEncode(response);
-      await Sharedprefs.saveCompleteLoginDataSharedPreference(loginResponseJson);
-      
+      await Sharedprefs.saveCompleteLoginDataSharedPreference(
+        loginResponseJson,
+      );
+
       // Store login status
       await Sharedprefs.saveUserLoggedInSharedPreference(true);
 
       // Create user model and set as current user
       final loginResponse = LoginResponse.fromJson(response);
       Constants.currentUser = loginResponse.user;
-      
+
       // Store user role for backward compatibility
       await Sharedprefs.saveUserRoleSharedPreference(loginResponse.user.role);
 

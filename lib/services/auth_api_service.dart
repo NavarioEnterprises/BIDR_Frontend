@@ -1,11 +1,12 @@
 import 'dart:convert';
 
 import 'package:bidr/constants/Constants.dart';
+import 'package:bidr/global_values.dart';
 import 'package:http/http.dart' as http;
 
 class AuthApiService {
   Future<String?> selectRole(String role) async {
-    var url = Uri.parse('${Constants.bidrBaseUrl}role-selection/');
+    var url = Uri.parse('${GlobalVariables.authServiceUrl}role-selection/');
     var headers = {'Content-Type': 'application/json'};
 
     var request = http.Request('POST', url);
@@ -39,9 +40,8 @@ class AuthApiService {
     required String role,
     required String password,
     required String confirmPassword,
-  }) async
-  {
-    final url = Uri.parse('${Constants.bidrBaseUrl}register/');
+  }) async {
+    final url = Uri.parse('${GlobalVariables.authServiceUrl}register/');
 
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
@@ -95,7 +95,7 @@ class AuthApiService {
   }
 
   Future<void> verifyOtp(String email, String otp) async {
-    var url = Uri.parse('${Constants.bidrBaseUrl}verify-otp/');
+    var url = Uri.parse('${GlobalVariables.authServiceUrl}verify-otp/');
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
     request.body = jsonEncode({'email': email, 'otp': otp});
@@ -117,7 +117,7 @@ class AuthApiService {
   }
 
   Future<Map<String, dynamic>?> login(String email, String password) async {
-    var url = Uri.parse('${Constants.bidrBaseUrl}login/');
+    var url = Uri.parse('${GlobalVariables.authServiceUrl}login/');
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
     request.body = jsonEncode({'email': email, 'password': password});
@@ -142,7 +142,7 @@ class AuthApiService {
   }
 
   Future<void> fetchUserProfile(String accessToken) async {
-    var url = Uri.parse('${Constants.bidrBaseUrl}profile/');
+    var url = Uri.parse('${GlobalVariables.authServiceUrl}profile/');
     var request = http.Request('GET', url);
     request.headers['Content-Type'] = 'application/json';
     request.headers['Authorization'] = 'Bearer $accessToken';
@@ -164,7 +164,7 @@ class AuthApiService {
   }
 
   Future<void> logout(String accessToken, String refreshToken) async {
-    var url = Uri.parse('${Constants.bidrBaseUrl}logout/');
+    var url = Uri.parse('${GlobalVariables.authServiceUrl}logout/');
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
     request.headers['Authorization'] = 'Bearer $accessToken';
@@ -189,9 +189,10 @@ class AuthApiService {
     required String userId,
     required String companyName,
     required String companyRegNo,
-  }) async
-  {
-    var url = Uri.parse('${Constants.bidrBaseUrl}api/seller/register/');
+  }) async {
+    var url = Uri.parse(
+      '${GlobalVariables.authServiceUrl}api/seller/register/',
+    );
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
     request.body = jsonEncode({
@@ -220,10 +221,9 @@ class AuthApiService {
     required String sellerId,
     required String businessType,
     required String taxId,
-  }) async
-  {
+  }) async {
     var url = Uri.parse(
-      '${Constants.bidrBaseUrl}api/seller/business-registration/',
+      '${GlobalVariables.authServiceUrl}api/seller/business-registration/',
     );
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
@@ -253,9 +253,10 @@ class AuthApiService {
     required String sellerId,
     required String filePath,
     required String documentType,
-  }) async
-  {
-    var url = Uri.parse('${Constants.bidrBaseUrl}api/seller/upload-document/');
+  }) async {
+    var url = Uri.parse(
+      '${GlobalVariables.authServiceUrl}api/seller/upload-document/',
+    );
     var request = http.MultipartRequest('POST', url);
     request.fields['seller'] = sellerId;
     request.fields['document_type'] = documentType;
@@ -282,9 +283,10 @@ class AuthApiService {
     required String bankName,
     required String accountNumber,
     required String accountType,
-  }) async
-  {
-    var url = Uri.parse('${Constants.bidrBaseUrl}api/seller/bank-details/');
+  }) async {
+    var url = Uri.parse(
+      '${GlobalVariables.authServiceUrl}api/seller/bank-details/',
+    );
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
     request.body = jsonEncode({
@@ -315,9 +317,8 @@ class AuthApiService {
     required String firstName,
     required String lastName,
     required String phoneNumber,
-  }) async
-  {
-    var url = Uri.parse('${Constants.bidrBaseUrl}profile/');
+  }) async {
+    var url = Uri.parse('${GlobalVariables.authServiceUrl}profile/');
     var request = http.Request('PATCH', url);
     request.headers['Content-Type'] = 'application/json';
     request.headers['Authorization'] = 'Bearer $accessToken';
@@ -346,23 +347,19 @@ class AuthApiService {
       }
     } catch (e) {
       print('Error occurred: $e');
-      return {
-        'success': false,
-        'error': 'Network or parsing error: $e',
-      };
+      return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
 
   Future<Map<String, dynamic>?> requestPasswordReset({
     required String email,
-  }) async
-  {
-    var url = Uri.parse('${Constants.bidrBaseUrl}password-reset-request/');
+  }) async {
+    var url = Uri.parse(
+      '${GlobalVariables.authServiceUrl}password-reset-request/',
+    );
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
-    request.body = jsonEncode({
-      'email': email,
-    });
+    request.body = jsonEncode({'email': email});
 
     try {
       http.StreamedResponse response = await request.send();
@@ -383,18 +380,14 @@ class AuthApiService {
       }
     } catch (e) {
       print('Error occurred: $e');
-      return {
-        'success': false,
-        'error': 'Network or parsing error: $e',
-      };
+      return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
 
   Future<Map<String, dynamic>?> deleteAccount({
     required String accessToken,
-  }) async
-  {
-    var url = Uri.parse('${Constants.bidrBaseUrl}profile/');
+  }) async {
+    var url = Uri.parse('${GlobalVariables.authServiceUrl}profile/');
     var request = http.Request('DELETE', url);
     request.headers['Content-Type'] = 'application/json';
     request.headers['Authorization'] = 'Bearer $accessToken';
@@ -417,28 +410,21 @@ class AuthApiService {
       }
     } catch (e) {
       print('Error occurred: $e');
-      return {
-        'success': false,
-        'error': 'Network or parsing error: $e',
-      };
+      return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
 
   Future<Map<String, dynamic>?> signOut({
     required String accessToken,
     required String refreshToken,
-  }) async
-  {
+  }) async {
     try {
       // Call logout API
       await logout(accessToken, refreshToken);
       return {'success': true, 'message': 'Signed out successfully'};
     } catch (e) {
       print('Error during sign out: $e');
-      return {
-        'success': false,
-        'error': 'Sign out error: $e',
-      };
+      return {'success': false, 'error': 'Sign out error: $e'};
     }
   }
 }

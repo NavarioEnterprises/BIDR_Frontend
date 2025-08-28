@@ -94,20 +94,28 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
 
   final List<Ticket> tickets = [
     Ticket(
-      id: '#BAF000223',
-      title: 'Orders Refunds Issue',
-      status: 'Pending',
-      date: '12 June 2021',
+      id: 1,
+      ticketId: 'BAF000223',
+      authUserUid: 'user123',
+      subject: 'Orders Refunds Issue',
       description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.',
-      assignee: 'Mark Jones',
+      status: 'Pending',
+      priority: 'High',
+      assignee: {'name': 'Mark Jones', 'email': 'mark@bidr.com'},
+      createdAt: '2021-06-12T10:00:00Z',
+      updatedAt: '2021-06-12T10:00:00Z',
     ),
     Ticket(
-      id: '#BAF000225',
-      title: 'Login Is Not Worked',
-      status: 'Resolved',
-      date: '12 June 2021',
+      id: 2,
+      ticketId: 'BAF000225',
+      authUserUid: 'user123',
+      subject: 'Login Is Not Worked',
       description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.',
-      assignee: 'Mark Jones',
+      status: 'Resolved',
+      priority: 'Medium',
+      assignee: {'name': 'Mark Jones', 'email': 'mark@bidr.com'},
+      createdAt: '2021-06-12T10:00:00Z',
+      updatedAt: '2021-06-12T10:00:00Z',
     ),
   ];
 
@@ -296,7 +304,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                           children: [
                                                             Text(
-                                                              ticket.id,
+                                                              ticket.ticketId,
                                                               style: GoogleFonts.manrope(
                                                                 fontSize: 12,
                                                                 color: Colors.black,
@@ -805,7 +813,7 @@ class _ChatScreenState extends State<ChatScreen>
               ),
             ),
             Text(
-              widget.ticket.id,
+              widget.ticket.ticketId,
               style: GoogleFonts.manrope(
                 color: Colors.grey[600],
                 fontSize: 12,
@@ -880,7 +888,7 @@ class _ChatScreenState extends State<ChatScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Assigned to ${widget.ticket.assignee}',
+                              'Assigned to ${widget.ticket.assignee?['name'] ?? 'Support Team'}',
                               style: GoogleFonts.manrope(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,

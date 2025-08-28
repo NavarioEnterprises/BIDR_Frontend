@@ -12,7 +12,7 @@ import '../../constants/Constants.dart';
 import '../../customWdget/customCard.dart';
 import '../../customWdget/custom_input2.dart';
 import '../../customWdget/custom_dialogs.dart';
-import '../auth_api_service.dart';
+import '../../services/auth_api_service.dart';
 import '../otp_screen.dart';
 import 'buyer_signup.dart';
 import 'complete_business_registration.dart';
@@ -38,7 +38,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   final TextEditingController _userEmailController = TextEditingController();
   final TextEditingController _userPhoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   // Focus nodes for user information
   final FocusNode _firstNameFocusNode = FocusNode();
@@ -255,12 +256,11 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
 
       if (currentStep < steps.length - 1) {
         setState(() {
-          if(currentStep==0){
+          if (currentStep == 0) {
             _handleSignUp();
-          }else{
+          } else {
             currentStep++;
           }
-
         });
 
         // Animate to next page with a smooth transition
@@ -277,6 +277,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       _showValidationError();
     }
   }
+
   AuthApiService authApiService = AuthApiService();
   void _previousStep() {
     if (currentStep > 0) {
@@ -326,7 +327,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         errorMessage = 'Please verify your email address';
         break;
       case 2: // Company Details
-        errorMessage = 'Please fill in Company Name, Trading Name, and Registration Number';
+        errorMessage =
+            'Please fill in Company Name, Trading Name, and Registration Number';
         break;
       case 3: // Company Address
         errorMessage = 'Please fill in all address and contact information';
@@ -338,7 +340,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         errorMessage = 'Please select at least one product category';
         break;
       case 6: // Display On Platform
-        errorMessage = 'Please select display name option or enter Trading Name';
+        errorMessage =
+            'Please select display name option or enter Trading Name';
         break;
       case 7: // Authorization For Company
         errorMessage = 'Please grant approval for company authorization';
@@ -382,7 +385,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       case 5: // Product Categories
         return selectedCategories.isNotEmpty;
       case 6: // Display On Platform
-        return _isRegisteredNameSelected || _tradingNameController.text.isNotEmpty;
+        return _isRegisteredNameSelected ||
+            _tradingNameController.text.isNotEmpty;
       case 7: // Authorization For Company
         return isApproval;
       default:
@@ -401,7 +405,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       final result = await authApiService.registerUser(
         email: _userEmailController.text,
         firstName: _firstNameController.text,
-        lastName:  _lastNameController.text,
+        lastName: _lastNameController.text,
         phoneNumber: _userPhoneController.text,
         role: "seller",
         password: _passwordController.text,
@@ -433,10 +437,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           if (message.contains("Please verify your email") ||
               result['email'] != null) {
             print("tyytyttyty ${message}");
-            currentStep=1;
-            setState(() {
-
-            });
+            currentStep = 1;
+            setState(() {});
           }
         } else {
           // Handle errors
@@ -682,7 +684,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -692,7 +693,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              border: Border.all(color: Constants.gtaColorLight,width: 20)),
+            border: Border.all(color: Constants.gtaColorLight, width: 20),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -702,10 +704,10 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                 style: GoogleFonts.manrope(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey
+                  color: Colors.grey,
                 ),
               ),
-              SizedBox(height: 16,),
+              SizedBox(height: 16),
               Expanded(
                 child: Container(
                   width: MediaQuery.of(context).size.width,
@@ -717,7 +719,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                         flex: 2,
                         child: Container(
                           width: 350,
-                          padding: EdgeInsets.only(top: 0,bottom: 0),
+                          padding: EdgeInsets.only(top: 0, bottom: 0),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(0),
@@ -728,7 +730,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-
                               Expanded(
                                 child: SingleChildScrollView(
                                   padding: const EdgeInsets.symmetric(
@@ -736,7 +737,9 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                     vertical: 24.0,
                                   ),
                                   child: Column(
-                                    children: steps.asMap().entries.map((entry) {
+                                    children: steps.asMap().entries.map((
+                                      entry,
+                                    ) {
                                       int index = entry.key;
                                       return _buildStepItem(index);
                                     }).toList(),
@@ -773,7 +776,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                   ? SizedBox.shrink()
                                   : SizedBox(
                                       width:
-                                          MediaQuery.of(context).size.width * 0.5,
+                                          MediaQuery.of(context).size.width *
+                                          0.5,
                                       child: Row(
                                         children: [
                                           currentStep > 0
@@ -807,7 +811,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                                 style: GoogleFonts.manrope(
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.bold,
-                                                  color: Constants.ftaColorLight,
+                                                  color:
+                                                      Constants.ftaColorLight,
                                                 ),
                                               ),
                                             ],
@@ -883,7 +888,9 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                             const NeverScrollableScrollPhysics(),
                                         children: [
                                           _buildUserInformationForm(),
-                                          SellerOTPVerificationScreen(email: _userEmailController.text,),
+                                          SellerOTPVerificationScreen(
+                                            email: _userEmailController.text,
+                                          ),
                                           _buildCompanyDetailsForm(),
                                           _buildCompanyAddressForm(),
                                           _buildBankAccountForm(),
@@ -918,9 +925,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                             backgroundColor:
                                                 Constants.ctaColorLight,
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(
-                                                30,
-                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
                                             ),
                                             elevation: _isLoading ? 0 : 2,
                                             shadowColor: Constants.ctaColorLight
@@ -950,7 +956,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                                     ),
                                                     style: GoogleFonts.manrope(
                                                       fontSize: 14,
-                                                      fontWeight: FontWeight.w500,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                       color: Colors.white,
                                                     ),
                                                   ),
@@ -975,9 +982,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                             backgroundColor:
                                                 Constants.ctaColorLight,
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(
-                                                30,
-                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
                                             ),
                                             elevation: _isLoading ? 0 : 2,
                                             shadowColor: Constants.ctaColorLight
@@ -1010,7 +1016,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                                     ),
                                                     style: GoogleFonts.manrope(
                                                       fontSize: 14,
-                                                      fontWeight: FontWeight.w500,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                       color: Colors.white,
                                                     ),
                                                   ),
@@ -1153,161 +1160,158 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       child: Padding(
         padding: const EdgeInsets.all(0.0),
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Personal Information',
-            style: GoogleFonts.manrope(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Enter your personal details to get started',
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 32),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'First Name',
-                      style: GoogleFonts.manrope(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    CustomInputTransparent4(
-                      hintText: 'Enter first name',
-                      controller: _firstNameController,
-                      focusNode: _firstNameFocusNode,
-                      textInputAction: TextInputAction.next,
-                      isPasswordField: false,
-                      onChanged: (value) {},
-                      onSubmitted: (value) {
-                        _lastNameFocusNode.requestFocus();
-                      },
-                    ),
-                  ],
-                ),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Personal Information',
+              style: GoogleFonts.manrope(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Last Name',
-                      style: GoogleFonts.manrope(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Enter your personal details to get started',
+              style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 32),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'First Name',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    CustomInputTransparent4(
-                      hintText: 'Enter last name',
-                      controller: _lastNameController,
-                      focusNode: _lastNameFocusNode,
-                      textInputAction: TextInputAction.next,
-                      isPasswordField: false,
-                      onChanged: (value) {},
-                      onSubmitted: (value) {
-                        _userEmailFocusNode.requestFocus();
-                      },
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      CustomInputTransparent4(
+                        hintText: 'Enter first name',
+                        controller: _firstNameController,
+                        focusNode: _firstNameFocusNode,
+                        textInputAction: TextInputAction.next,
+                        isPasswordField: false,
+                        onChanged: (value) {},
+                        onSubmitted: (value) {
+                          _lastNameFocusNode.requestFocus();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Last Name',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      CustomInputTransparent4(
+                        hintText: 'Enter last name',
+                        controller: _lastNameController,
+                        focusNode: _lastNameFocusNode,
+                        textInputAction: TextInputAction.next,
+                        isPasswordField: false,
+                        onChanged: (value) {},
+                        onSubmitted: (value) {
+                          _userEmailFocusNode.requestFocus();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Email Address',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
               ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Email Address',
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
             ),
-          ),
-          const SizedBox(height: 8),
-          CustomInputTransparent4(
-            hintText: 'Enter email address',
-            controller: _userEmailController,
-            focusNode: _userEmailFocusNode,
-            textInputAction: TextInputAction.next,
-            isPasswordField: false,
-            onChanged: (value) {},
-            onSubmitted: (value) {
-              _userPhoneFocusNode.requestFocus();
-            },
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Phone Number',
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+            const SizedBox(height: 8),
+            CustomInputTransparent4(
+              hintText: 'Enter email address',
+              controller: _userEmailController,
+              focusNode: _userEmailFocusNode,
+              textInputAction: TextInputAction.next,
+              isPasswordField: false,
+              onChanged: (value) {},
+              onSubmitted: (value) {
+                _userPhoneFocusNode.requestFocus();
+              },
             ),
-          ),
-          const SizedBox(height: 8),
-          CustomInputTransparent4(
-            hintText: 'Enter phone number',
-            controller: _userPhoneController,
-            focusNode: _userPhoneFocusNode,
-            textInputAction: TextInputAction.next,
-            isPasswordField: false,
-            onChanged: (value) {},
-            onSubmitted: (value) {
-              _passwordFocusNode.requestFocus();
-            },
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Password',
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+            const SizedBox(height: 24),
+            Text(
+              'Phone Number',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          CustomInputTransparent4(
-            hintText: 'Enter password',
-            controller: _passwordController,
-            focusNode: _passwordFocusNode,
-            textInputAction: TextInputAction.next,
-            isPasswordField: true,
-            onChanged: (value) {},
-            onSubmitted: (value) {
-              _confirmPasswordFocusNode.requestFocus();
-            },
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Confirm Password',
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+            const SizedBox(height: 8),
+            CustomInputTransparent4(
+              hintText: 'Enter phone number',
+              controller: _userPhoneController,
+              focusNode: _userPhoneFocusNode,
+              textInputAction: TextInputAction.next,
+              isPasswordField: false,
+              onChanged: (value) {},
+              onSubmitted: (value) {
+                _passwordFocusNode.requestFocus();
+              },
             ),
-          ),
-          const SizedBox(height: 8),
-          CustomInputTransparent4(
-            hintText: 'Confirm password',
-            controller: _confirmPasswordController,
-            focusNode: _confirmPasswordFocusNode,
-            textInputAction: TextInputAction.done,
-            isPasswordField: true,
-            onChanged: (value) {},
-            onSubmitted: (value) {},
-          ),
-        ],
+            const SizedBox(height: 24),
+            Text(
+              'Password',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            CustomInputTransparent4(
+              hintText: 'Enter password',
+              controller: _passwordController,
+              focusNode: _passwordFocusNode,
+              textInputAction: TextInputAction.next,
+              isPasswordField: true,
+              onChanged: (value) {},
+              onSubmitted: (value) {
+                _confirmPasswordFocusNode.requestFocus();
+              },
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Confirm Password',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            CustomInputTransparent4(
+              hintText: 'Confirm password',
+              controller: _confirmPasswordController,
+              focusNode: _confirmPasswordFocusNode,
+              textInputAction: TextInputAction.done,
+              isPasswordField: true,
+              onChanged: (value) {},
+              onSubmitted: (value) {},
+            ),
+          ],
         ),
       ),
     );
@@ -1330,10 +1334,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           const SizedBox(height: 8),
           Text(
             'We have sent a verification code to ${_userEmailController.text}',
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
           ),
           const SizedBox(height: 32),
           Text(
@@ -1346,10 +1347,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           const SizedBox(height: 16),
           Text(
             'OTP verification will be implemented here',
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
           ),
           const SizedBox(height: 24),
           TextButton(

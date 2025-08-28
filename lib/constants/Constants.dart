@@ -26,8 +26,10 @@ class Constants {
   static int userId = -1;
   static int businessId = -1;
   static int defaultServiceId = 1; //192.168.43.107 172.20.10.2
-  static String bidrBaseUrl =
-      "http://108.141.192.60/"; //#FEEDD5 //Colors.grey[800]
+  static String bidrBaseUrl = "http://127.0.0.1:8005/";
+  static String baseUrl = "http://108.141.192.60/";
+  //static String bidrBaseUrlAuthService = "${baseUrl}";
+
   static String myUsername = "";
   static User? currentUser;
   static Color ctaColorLight = Colors.orange;

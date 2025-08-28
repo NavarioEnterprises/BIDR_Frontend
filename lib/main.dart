@@ -15,6 +15,7 @@ import 'authentication/registration/buyer_signup.dart';
 import 'authentication/splashscreen.dart';
 import 'constants/Constants.dart';
 import 'models/user.dart';
+import 'config/environment_config.dart';
 import 'dart:convert';
 
 Future<void> main() async {
@@ -23,6 +24,9 @@ Future<void> main() async {
   setUrlStrategy(PathUrlStrategy());
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Set the environment configuration
+  AppConfig.setEnvironment(EnvironmentType.dev);
 
   // Check if user is logged in
   final bool isLoggedIn =
@@ -43,6 +47,7 @@ Future<void> main() async {
         // Set individual constants from the user model
         Constants.myUid = loginResponse.user.uid;
         Constants.userId = loginResponse.user.id;
+        print("Loaded user ID: ${loginResponse.toJson()}");
         Constants.myCell = loginResponse.user.phoneNumber;
         Constants.myDisplayname = loginResponse.user.fullName;
         Constants.myCategoryRole = loginResponse.user.role;
@@ -114,12 +119,12 @@ class MyApp extends StatelessWidget {
         '/policies',
       ];
 
-      final protectedRoutes = [
-        '/dashboard',
-      ];
+      final protectedRoutes = ['/dashboard'];
 
       // If not authenticated, redirect to login for protected routes
-      if (!isAuthenticated && (protectedRoutes.contains(state.matchedLocation) || !publicRoutes.contains(state.matchedLocation))) {
+      if (!isAuthenticated &&
+          (protectedRoutes.contains(state.matchedLocation) ||
+              !publicRoutes.contains(state.matchedLocation))) {
         return '/login';
       }
 

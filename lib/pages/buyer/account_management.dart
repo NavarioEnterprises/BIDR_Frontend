@@ -1,6 +1,6 @@
 import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/pages/buyer_home.dart';
-import 'package:bidr/authentication/auth_api_service.dart';
+import 'package:bidr/services/auth_api_service.dart';
 import 'package:bidr/services/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,7 +16,6 @@ class AccountManagementPage extends StatefulWidget {
 
 class _AccountManagementPageState extends State<AccountManagementPage>
     with TickerProviderStateMixin {
-
   // Selected menu item
   String selectedMenuItem = 'Edit Profile';
 
@@ -33,14 +32,17 @@ class _AccountManagementPageState extends State<AccountManagementPage>
   final TextEditingController _emailController = TextEditingController();
 
   // Form controllers for Change Password
-  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _currentPasswordController =
+      TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   // Form controllers for Get Quotes
   final TextEditingController _quoteEmailController = TextEditingController();
   final TextEditingController _companyController = TextEditingController();
-  final TextEditingController _projectDetailsController = TextEditingController();
+  final TextEditingController _projectDetailsController =
+      TextEditingController();
 
   // Form controllers for Message Board
   final TextEditingController _messageController = TextEditingController();
@@ -108,7 +110,9 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
   String? _validatePassword(String? value, {bool isNew = false}) {
     if (value == null || value.isEmpty) {
-      return isNew ? 'New password is required' : 'Current password is required';
+      return isNew
+          ? 'New password is required'
+          : 'Current password is required';
     }
     if (isNew) {
       if (value.length < 8) {
@@ -122,7 +126,10 @@ class _AccountManagementPageState extends State<AccountManagementPage>
   }
 
   bool _validateProfileForm() {
-    final firstNameError = _validateName(_firstNameController.text, 'First name');
+    final firstNameError = _validateName(
+      _firstNameController.text,
+      'First name',
+    );
     final lastNameError = _validateName(_lastNameController.text, 'Last name');
     final phoneError = _validatePhoneNumber(_mobileController.text);
 
@@ -143,7 +150,10 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
   bool _validatePasswordForm() {
     final currentError = _validatePassword(_currentPasswordController.text);
-    final newError = _validatePassword(_newPasswordController.text, isNew: true);
+    final newError = _validatePassword(
+      _newPasswordController.text,
+      isNew: true,
+    );
 
     if (currentError != null) {
       _showErrorDialog('Validation Error', currentError);
@@ -154,7 +164,10 @@ class _AccountManagementPageState extends State<AccountManagementPage>
       return false;
     }
     if (_newPasswordController.text != _confirmPasswordController.text) {
-      _showErrorDialog('Validation Error', 'New password and confirmation do not match');
+      _showErrorDialog(
+        'Validation Error',
+        'New password and confirmation do not match',
+      );
       return false;
     }
     return true;
@@ -178,10 +191,10 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0.3, 0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0.3, 0), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     // Start initial animation
     _fadeController.forward();
@@ -196,13 +209,15 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     final firstName = await Sharedprefs.getUserNameSharedPreference() ?? '';
     final email = await Sharedprefs.getUserEmailSharedPreference() ?? '';
     final phone = await Sharedprefs.getUserCellSharedPreference() ?? '';
-    
+
     // Split full name into first and last name
     final nameParts = firstName.split(' ');
-    
+
     setState(() {
       _firstNameController.text = nameParts.isNotEmpty ? nameParts[0] : '';
-      _lastNameController.text = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+      _lastNameController.text = nameParts.length > 1
+          ? nameParts.sublist(1).join(' ')
+          : '';
       _mobileController.text = phone;
       _emailController.text = email;
     });
@@ -260,7 +275,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
         Expanded(
           child: Container(
             width: double.infinity,
-           // constraints: BoxConstraints(maxWidth: 1400),
+            // constraints: BoxConstraints(maxWidth: 1400),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -276,13 +291,33 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
-                      _buildMenuItem('Edit Profile', HugeIcons.strokeRoundedUser),
-                      _buildMenuItem('Change Password', HugeIcons.strokeRoundedLockPassword),
-                      _buildMenuItem('Get Quotes', HugeIcons.strokeRoundedInvoice03),
-                      _buildMenuItem('Message Board', HugeIcons.strokeRoundedMessage01),
+                      _buildMenuItem(
+                        'Edit Profile',
+                        HugeIcons.strokeRoundedUser,
+                      ),
+                      _buildMenuItem(
+                        'Change Password',
+                        HugeIcons.strokeRoundedLockPassword,
+                      ),
+                      _buildMenuItem(
+                        'Get Quotes',
+                        HugeIcons.strokeRoundedInvoice03,
+                      ),
+                      _buildMenuItem(
+                        'Message Board',
+                        HugeIcons.strokeRoundedMessage01,
+                      ),
                       const Spacer(),
-                      _buildMenuItem('Delete Account', HugeIcons.strokeRoundedDelete02, isDestructive: true),
-                      _buildMenuItem('Sign Out', HugeIcons.strokeRoundedLogout01, isDestructive: true),
+                      _buildMenuItem(
+                        'Delete Account',
+                        HugeIcons.strokeRoundedDelete02,
+                        isDestructive: true,
+                      ),
+                      _buildMenuItem(
+                        'Sign Out',
+                        HugeIcons.strokeRoundedLogout01,
+                        isDestructive: true,
+                      ),
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -290,7 +325,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
                 // Right Content Area
                 Expanded(
-                  child:  Container(
+                  child: Container(
                     margin: const EdgeInsets.all(16),
                     padding: EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -317,18 +352,28 @@ class _AccountManagementPageState extends State<AccountManagementPage>
             ),
           ),
         ),
-
       ],
     );
   }
 
-  Widget _buildMenuItem(String title, IconData icon, {bool isDestructive = false}) {
+  Widget _buildMenuItem(
+    String title,
+    IconData icon, {
+    bool isDestructive = false,
+  }) {
     final bool isSelected = selectedMenuItem == title;
     final bool isSignOutSelected = title == "Sign Out";
     final bool isDeleteSelected = title == "Delete Account";
-    final Color textColor = isSignOutSelected ? Colors.red.shade700 :isDeleteSelected?Constants.ctaColorLight:
-    isSelected ? Colors.white : Colors.blueAccent.withOpacity(0.5);
-    final Color backgroundColor = isSelected ? Colors.white.withOpacity(0.1) : Colors.transparent;
+    final Color textColor = isSignOutSelected
+        ? Colors.red.shade700
+        : isDeleteSelected
+        ? Constants.ctaColorLight
+        : isSelected
+        ? Colors.white
+        : Colors.blueAccent.withOpacity(0.5);
+    final Color backgroundColor = isSelected
+        ? Colors.white.withOpacity(0.1)
+        : Colors.transparent;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -387,10 +432,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           const SizedBox(height: 8),
           Text(
             'Update your personal information',
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
           ),
           Column(
             children: [
@@ -431,7 +473,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
             ],
           ),
           const SizedBox(height: 32),
-      
+
           const SizedBox(height: 32),
           SizedBox(
             width: double.infinity,
@@ -485,13 +527,10 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           const SizedBox(height: 8),
           Text(
             'Update your account password',
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
           ),
           const SizedBox(height: 32),
-      
+
           Column(
             children: [
               _buildCustomInputField(
@@ -524,7 +563,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
               ),
             ],
           ),
-      
+
           const SizedBox(height: 32),
           SizedBox(
             width: double.infinity,
@@ -578,13 +617,10 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           const SizedBox(height: 8),
           Text(
             'Request quotes for your projects',
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
           ),
           const SizedBox(height: 32),
-      
+
           Column(
             children: [
               _buildCustomInputField(
@@ -613,7 +649,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
               ),
             ],
           ),
-      
+
           const SizedBox(height: 32),
           SizedBox(
             width: double.infinity,
@@ -657,10 +693,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
         const SizedBox(height: 8),
         Text(
           'Send us a message or feedback',
-          style: GoogleFonts.manrope(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
         ),
         const SizedBox(height: 24),
 
@@ -727,10 +760,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
         const SizedBox(height: 8),
         Text(
           'Permanently delete your account and all data',
-          style: GoogleFonts.manrope(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
         ),
         const SizedBox(height: 32),
 
@@ -746,7 +776,11 @@ class _AccountManagementPageState extends State<AccountManagementPage>
             children: [
               Row(
                 children: [
-                  Icon(HugeIcons.strokeRoundedAlert02, color: Colors.red[600], size: 24),
+                  Icon(
+                    HugeIcons.strokeRoundedAlert02,
+                    color: Colors.red[600],
+                    size: 24,
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     'Warning: This action cannot be undone',
@@ -813,10 +847,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
         const SizedBox(height: 8),
         Text(
           'Sign out from your account',
-          style: GoogleFonts.manrope(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
         ),
         const SizedBox(height: 32),
 
@@ -832,7 +863,11 @@ class _AccountManagementPageState extends State<AccountManagementPage>
             children: [
               Row(
                 children: [
-                  Icon(HugeIcons.strokeRoundedInformationCircle, color: Colors.orange[600], size: 24),
+                  Icon(
+                    HugeIcons.strokeRoundedInformationCircle,
+                    color: Colors.orange[600],
+                    size: 24,
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     'Are you sure you want to sign out?',
@@ -908,15 +943,15 @@ class _AccountManagementPageState extends State<AccountManagementPage>
   }
 
   Widget _buildCustomInputField(
-      String label,
-      String hintText,
-      TextEditingController controller,
-      FocusNode focusNode,
-      TextInputAction textInputAction, {
-        bool isPassword = false,
-        int maxLines = 1,
-        VoidCallback? onSubmitted,
-      }) {
+    String label,
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    TextInputAction textInputAction, {
+    bool isPassword = false,
+    int maxLines = 1,
+    VoidCallback? onSubmitted,
+  }) {
     return SizedBox(
       width: MediaQuery.of(context).size.height * 0.5,
       child: Column(
@@ -937,7 +972,9 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           Container(
             decoration: BoxDecoration(
               color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(label == "Message" || label == "Project Details" ?12:360),
+              borderRadius: BorderRadius.circular(
+                label == "Message" || label == "Project Details" ? 12 : 360,
+              ),
               border: Border.all(color: Colors.grey[300]!),
             ),
             child: TextFormField(
@@ -960,9 +997,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                   vertical: 8,
                 ),
               ),
-              style: GoogleFonts.manrope(
-                fontWeight: FontWeight.w300,
-              ),
+              style: GoogleFonts.manrope(fontWeight: FontWeight.w300),
             ),
           ),
         ],
@@ -1025,11 +1060,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                                   color: color.withOpacity(0.1),
                                   shape: BoxShape.circle,
                                 ),
-                                child: Icon(
-                                  icon,
-                                  color: color,
-                                  size: 40,
-                                ),
+                                child: Icon(icon, color: color, size: 40),
                               ),
                             );
                           },
@@ -1045,7 +1076,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                               offset: Offset(0, 20 * (1 - textValue)),
                               child: Opacity(
                                 opacity: textValue,
-                                child:                                 Text(
+                                child: Text(
                                   title,
                                   style: GoogleFonts.manrope(
                                     fontSize: 24,
@@ -1069,7 +1100,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                               offset: Offset(0, 20 * (1 - messageValue)),
                               child: Opacity(
                                 opacity: messageValue,
-                                child:                                 Text(
+                                child: Text(
                                   message,
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.manrope(
@@ -1108,7 +1139,8 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                                     child: Row(
                                       children: [
                                         Icon(
-                                          HugeIcons.strokeRoundedInformationCircle,
+                                          HugeIcons
+                                              .strokeRoundedInformationCircle,
                                           color: color,
                                           size: 20,
                                         ),
@@ -1147,13 +1179,20 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                                   children: [
                                     Expanded(
                                       child: OutlinedButton(
-                                        onPressed: () => Navigator.of(context).pop(),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
                                         style: OutlinedButton.styleFrom(
                                           foregroundColor: Colors.grey[600],
-                                          side: BorderSide(color: Colors.grey[300]!),
-                                          padding: const EdgeInsets.symmetric(vertical: 16),
+                                          side: BorderSide(
+                                            color: Colors.grey[300]!,
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 16,
+                                          ),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
                                         ),
                                         child: Text(
@@ -1175,9 +1214,13 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: color,
                                           foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(vertical: 16),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 16,
+                                          ),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
                                           elevation: 0,
                                         ),
@@ -1221,9 +1264,13 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
     try {
       // Get access token
-      final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+      final accessToken =
+          await Sharedprefs.getUserAccessTokenSharedPreference();
       if (accessToken == null || accessToken.isEmpty) {
-        _showErrorDialog('Authentication Error', 'Please log in again to update your profile.');
+        _showErrorDialog(
+          'Authentication Error',
+          'Please log in again to update your profile.',
+        );
         return;
       }
 
@@ -1240,10 +1287,13 @@ class _AccountManagementPageState extends State<AccountManagementPage>
         await Sharedprefs.saveUserNameSharedPreference(
           '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}',
         );
-        await Sharedprefs.saveUserCellSharedPreference(_mobileController.text.trim());
+        await Sharedprefs.saveUserCellSharedPreference(
+          _mobileController.text.trim(),
+        );
 
         // Update global constants
-        Constants.myDisplayname = '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}';
+        Constants.myDisplayname =
+            '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}';
         Constants.myUsername = Constants.myDisplayname;
         Constants.myCell = _mobileController.text.trim();
 
@@ -1252,14 +1302,19 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           message: 'Your profile information has been successfully updated.',
           icon: Icons.person_outline,
           color: const Color(0xFF38A169),
-          additionalInfo: 'Changes will take effect immediately across the platform.',
+          additionalInfo:
+              'Changes will take effect immediately across the platform.',
         );
       } else {
-        final errorMessage = response?['error']?.toString() ?? 'Failed to update profile';
+        final errorMessage =
+            response?['error']?.toString() ?? 'Failed to update profile';
         _showErrorDialog('Update Failed', errorMessage);
       }
     } catch (e) {
-      _showErrorDialog('Error', 'An unexpected error occurred. Please try again.');
+      _showErrorDialog(
+        'Error',
+        'An unexpected error occurred. Please try again.',
+      );
     } finally {
       setState(() {
         _isProfileLoading = false;
@@ -1331,7 +1386,8 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           message: 'A password reset link has been sent to your email.',
           icon: Icons.email_outlined,
           color: const Color(0xFF4299E1),
-          additionalInfo: 'Please check your email and follow the instructions to set a new password.',
+          additionalInfo:
+              'Please check your email and follow the instructions to set a new password.',
           onContinue: () {
             // Clear password fields
             _currentPasswordController.clear();
@@ -1340,11 +1396,15 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           },
         );
       } else {
-        final errorMessage = response?['error']?.toString() ?? 'Failed to send reset link';
+        final errorMessage =
+            response?['error']?.toString() ?? 'Failed to send reset link';
         _showErrorDialog('Reset Failed', errorMessage);
       }
     } catch (e) {
-      _showErrorDialog('Error', 'An unexpected error occurred. Please try again.');
+      _showErrorDialog(
+        'Error',
+        'An unexpected error occurred. Please try again.',
+      );
     } finally {
       setState(() {
         _isPasswordLoading = false;
@@ -1355,7 +1415,10 @@ class _AccountManagementPageState extends State<AccountManagementPage>
   void _requestQuote() {
     // Validate required fields
     if (_quoteEmailController.text.isEmpty || _companyController.text.isEmpty) {
-      _showErrorDialog('Missing Information', 'Please fill in all required fields to request a quote.');
+      _showErrorDialog(
+        'Missing Information',
+        'Please fill in all required fields to request a quote.',
+      );
       return;
     }
 
@@ -1366,7 +1429,8 @@ class _AccountManagementPageState extends State<AccountManagementPage>
       message: 'Your quote request has been submitted successfully.',
       icon: Icons.request_quote_outlined,
       color: const Color(0xFFE29547),
-      additionalInfo: 'Our team will review your request and get back to you within 24 hours.',
+      additionalInfo:
+          'Our team will review your request and get back to you within 24 hours.',
       onContinue: () {
         // Clear form fields
         _quoteEmailController.clear();
@@ -1379,7 +1443,10 @@ class _AccountManagementPageState extends State<AccountManagementPage>
   void _sendMessage() {
     // Validate required fields
     if (_subjectController.text.isEmpty || _messageController.text.isEmpty) {
-      _showErrorDialog('Missing Information', 'Please provide both a subject and message before sending.');
+      _showErrorDialog(
+        'Missing Information',
+        'Please provide both a subject and message before sending.',
+      );
       return;
     }
 
@@ -1538,10 +1605,22 @@ class _AccountManagementPageState extends State<AccountManagementPage>
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('• Your profile and personal information', style: GoogleFonts.manrope(fontSize: 14)),
-                Text('• All your product requests and quotes', style: GoogleFonts.manrope(fontSize: 14)),
-                Text('• Transaction history and reviews', style: GoogleFonts.manrope(fontSize: 14)),
-                Text('• Chat messages and communications', style: GoogleFonts.manrope(fontSize: 14)),
+                Text(
+                  '• Your profile and personal information',
+                  style: GoogleFonts.manrope(fontSize: 14),
+                ),
+                Text(
+                  '• All your product requests and quotes',
+                  style: GoogleFonts.manrope(fontSize: 14),
+                ),
+                Text(
+                  '• Transaction history and reviews',
+                  style: GoogleFonts.manrope(fontSize: 14),
+                ),
+                Text(
+                  '• Chat messages and communications',
+                  style: GoogleFonts.manrope(fontSize: 14),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -1596,36 +1675,47 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     });
 
     try {
-      final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+      final accessToken =
+          await Sharedprefs.getUserAccessTokenSharedPreference();
       if (accessToken == null || accessToken.isEmpty) {
-        _showErrorDialog('Authentication Error', 'Please log in again to delete your account.');
+        _showErrorDialog(
+          'Authentication Error',
+          'Please log in again to delete your account.',
+        );
         return;
       }
 
-      final response = await _authService.deleteAccount(accessToken: accessToken);
+      final response = await _authService.deleteAccount(
+        accessToken: accessToken,
+      );
 
       if (response != null && response['success'] == true) {
         // Clear all shared preferences
         await _clearAllUserData();
-        
+
         // Show success dialog and navigate to login
         _showSuccessDialog(
           title: 'Account Deleted',
           message: 'Your account has been permanently deleted.',
           icon: Icons.check_circle_outline,
           color: Colors.green,
-          additionalInfo: 'Thank you for using BIDR. You will be redirected to the login screen.',
+          additionalInfo:
+              'Thank you for using BIDR. You will be redirected to the login screen.',
           onContinue: () {
             // Navigate to login screen
             context.go('/');
           },
         );
       } else {
-        final errorMessage = response?['error']?.toString() ?? 'Failed to delete account';
+        final errorMessage =
+            response?['error']?.toString() ?? 'Failed to delete account';
         _showErrorDialog('Deletion Failed', errorMessage);
       }
     } catch (e) {
-      _showErrorDialog('Error', 'An unexpected error occurred. Please try again.');
+      _showErrorDialog(
+        'Error',
+        'An unexpected error occurred. Please try again.',
+      );
     } finally {
       setState(() {
         _isPasswordLoading = false;
@@ -1639,8 +1729,10 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     });
 
     try {
-      final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
-      final refreshToken = await Sharedprefs.getUserRefreshTokenSharedPreference();
+      final accessToken =
+          await Sharedprefs.getUserAccessTokenSharedPreference();
+      final refreshToken =
+          await Sharedprefs.getUserRefreshTokenSharedPreference();
 
       if (accessToken != null && refreshToken != null) {
         // Call API to logout
@@ -1660,7 +1752,8 @@ class _AccountManagementPageState extends State<AccountManagementPage>
         message: 'You have been successfully signed out.',
         icon: Icons.logout,
         color: const Color(0xFF38A169),
-        additionalInfo: 'Thank you for using BIDR. You will be redirected to the login screen.',
+        additionalInfo:
+            'Thank you for using BIDR. You will be redirected to the login screen.',
         onContinue: () {
           // Navigate to login screen
           context.go('/getstarted');

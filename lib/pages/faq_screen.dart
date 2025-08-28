@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../constants/Constants.dart';
 
 class FAQScreen extends StatefulWidget {
@@ -10,61 +12,69 @@ class FAQScreen extends StatefulWidget {
 }
 
 class _FAQScreenState extends State<FAQScreen> {
-  final List<FAQItem> _faqItems = [
-    FAQItem(
-      question: "What is BIDR?",
-      answer: "BIDR is a next-generation marketplace platform that revolutionizes buyer-seller connections through competitive bidding mechanisms. We support vehicle spare parts, tyres & rims, and consumer electronics marketplaces.",
-      category: "General",
-    ),
-    FAQItem(
-      question: "How does the PIN verification system work?",
-      answer: "When a transaction is initiated, both buyer and seller receive unique 6-digit PINs. During physical product exchange, both parties exchange PINs to verify the transaction. This dual PIN verification ensures secure transactions and releases payment from escrow.",
-      category: "Security",
-    ),
-    FAQItem(
-      question: "What categories of products can I buy/sell on BIDR?",
-      answer: "BIDR supports three main categories:\n• Vehicle Spare Parts - New and used auto parts\n• Tyres & Rims - All specifications and brands\n• Consumer Electronics - Wide range of electronic products",
-      category: "Products",
-    ),
-    FAQItem(
-      question: "How long is my payment held in escrow?",
-      answer: "Payment hold periods vary by category:\n• Vehicle Parts: 7 days from PIN exchange\n• Electronics: 14 days from PIN exchange\n• Custom/High-value items: 21 days from PIN exchange",
-      category: "Payments",
-    ),
-    FAQItem(
-      question: "How do I create a product request as a buyer?",
-      answer: "1. Navigate to 'Create Request'\n2. Select your product category\n3. Fill in product specifications\n4. Set your budget and timeline\n5. Specify location and travel distance\n6. Submit request for sellers to quote",
-      category: "Buying",
-    ),
-    FAQItem(
-      question: "How do sellers submit quotes?",
-      answer: "Sellers can:\n1. Browse active product requests\n2. Filter by category and location\n3. Review buyer requirements\n4. Submit competitive quotes with pricing, delivery terms, and warranty information\n5. Engage with buyers through the chat system",
-      category: "Selling",
-    ),
-    FAQItem(
-      question: "What happens if I'm not satisfied with my purchase?",
-      answer: "You can initiate a return within the escrow period. You'll need to:\n1. Document the issue with photos\n2. Specify the return reason\n3. Coordinate return shipping with the seller\n4. The seller evaluates the return and decides on the refund",
-      category: "Returns",
-    ),
-    FAQItem(
-      question: "Is communication between buyers and sellers secure?",
-      answer: "Yes! All communication happens through our integrated chat platform. Chat history is maintained for dispute resolution, and personal contact information is protected until you choose to share it.",
-      category: "Security",
-    ),
-    FAQItem(
-      question: "What payment methods are accepted?",
-      answer: "BIDR supports secure payment processing through PayFast and Stripe. All payments are held in escrow until successful transaction completion, protecting both buyers and sellers.",
-      category: "Payments",
-    ),
-    FAQItem(
-      question: "How do I verify my business as a seller?",
-      answer: "During profile completion, sellers must:\n1. Provide business registration details\n2. Submit tax information\n3. Complete business verification process\n4. Upload required documentation\nVerified sellers get a verification badge visible to buyers.",
-      category: "Selling",
-    ),
-  ];
-
+  List<FAQItem> _faqItems = [];
+  List<String> _categories = ["All"];
   String _selectedCategory = "All";
-  final List<String> _categories = ["All", "General", "Security", "Products", "Buying", "Selling", "Returns", "Payments"];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchFAQs();
+  }
+
+  Future<void> _fetchFAQs() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final response = await http.get(
+        Uri.parse('http://127.0.0.1:8078/api/faqs/'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> results = data['results'];
+        
+        final List<FAQItem> faqs = results.map((faqJson) {
+          return FAQItem(
+            question: faqJson['question'],
+            answer: faqJson['answer'], 
+            category: faqJson['category_display'],
+          );
+        }).toList();
+
+        // Extract unique categories
+        final Set<String> categorySet = {'All'};
+        for (final faq in faqs) {
+          categorySet.add(faq.category);
+        }
+
+        setState(() {
+          _faqItems = faqs;
+          _categories = categorySet.toList();
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load FAQs');
+      }
+    } catch (e) {
+      print('Error fetching FAQs: $e');
+      setState(() {
+        _isLoading = false;
+      });
+      // Show error message to user
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to load FAQs. Please try again later.'),
+        ),
+      );
+    }
+  }
 
   List<FAQItem> get _filteredFAQItems {
     if (_selectedCategory == "All") {
@@ -140,7 +150,11 @@ class _FAQScreenState extends State<FAQScreen> {
               padding: const EdgeInsets.only(left: 64, right: 64),
               width: MediaQuery.of(context).size.width,
               constraints: BoxConstraints(maxWidth: 1600),
-              child: ListView.builder(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: _filteredFAQItems.length,
                 itemBuilder: (context, index) {

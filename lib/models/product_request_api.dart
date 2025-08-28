@@ -51,6 +51,7 @@ class ProductRequestItem {
   final String? tyresRimsSummary;
   final String? vehicleSparesSummary;
   final String? consumerElectronicsSummary;
+  final List<QuoteItem> quotes;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -72,9 +73,13 @@ class ProductRequestItem {
     this.tyresRimsSummary,
     this.vehicleSparesSummary,
     this.consumerElectronicsSummary,
+    required this.quotes,
     required this.createdAt,
     required this.updatedAt,
   });
+  
+  // Backward compatibility getter - maps quotes to sellerOffers
+  List<QuoteItem> get sellerOffers => quotes;
 
   factory ProductRequestItem.fromJson(Map<String, dynamic> json) {
     return ProductRequestItem(
@@ -85,7 +90,7 @@ class ProductRequestItem {
       description: json['description'] ?? '',
       quantity: json['quantity'],
       conditionPreference: json['condition_preference'],
-      maxBudget: json['max_budget']?.toDouble(),
+      maxBudget: json['max_budget'] != null ? double.tryParse(json['max_budget'].toString()) : null,
       currency: json['currency'] ?? 'ZAR',
       urgencyTimeline: json['urgency_timeline'] ?? '',
       status: json['status'] ?? '',
@@ -95,6 +100,9 @@ class ProductRequestItem {
       tyresRimsSummary: json['tyres_rims_summary'],
       vehicleSparesSummary: json['vehicle_spares_summary'],
       consumerElectronicsSummary: json['consumer_electronics_summary'],
+      quotes: (json['quotes'] as List<dynamic>? ?? [])
+          .map((quote) => QuoteItem.fromJson(quote))
+          .toList(),
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );
@@ -119,6 +127,7 @@ class ProductRequestItem {
       'tyres_rims_summary': tyresRimsSummary,
       'vehicle_spares_summary': vehicleSparesSummary,
       'consumer_electronics_summary': consumerElectronicsSummary,
+      'quotes': quotes.map((quote) => quote.toJson()).toList(),
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
@@ -157,6 +166,78 @@ class ApiUser {
       'email': email,
       'first_name': firstName,
       'last_name': lastName,
+    };
+  }
+}
+
+class QuoteItem {
+  final String quoteId;
+  final ApiUser sellerId;
+  final double totalAmount;
+  final String currency;
+  final double? deliveryCost;
+  final double? installationCost;
+  final int? estimatedDeliveryDays;
+  final String status;
+  final DateTime validUntil;
+  final bool? isExpired;
+  final bool? isValid;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  QuoteItem({
+    required this.quoteId,
+    required this.sellerId,
+    required this.totalAmount,
+    required this.currency,
+    this.deliveryCost,
+    this.installationCost,
+    this.estimatedDeliveryDays,
+    required this.status,
+    required this.validUntil,
+    this.isExpired,
+    this.isValid,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory QuoteItem.fromJson(Map<String, dynamic> json) {
+    return QuoteItem(
+      quoteId: json['quote_id'] ?? '',
+      sellerId: ApiUser.fromJson(json['seller_id']),
+      totalAmount: double.tryParse(json['total_amount'].toString()) ?? 0.0,
+      currency: json['currency'] ?? 'ZAR',
+      deliveryCost: json['delivery_cost'] != null 
+          ? double.tryParse(json['delivery_cost'].toString()) 
+          : null,
+      installationCost: json['installation_cost'] != null 
+          ? double.tryParse(json['installation_cost'].toString()) 
+          : null,
+      estimatedDeliveryDays: json['estimated_delivery_days'],
+      status: json['status'] ?? 'PENDING',
+      validUntil: DateTime.parse(json['valid_until']),
+      isExpired: json['is_expired'],
+      isValid: json['is_valid'],
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'quote_id': quoteId,
+      'seller_id': sellerId.toJson(),
+      'total_amount': totalAmount,
+      'currency': currency,
+      'delivery_cost': deliveryCost,
+      'installation_cost': installationCost,
+      'estimated_delivery_days': estimatedDeliveryDays,
+      'status': status,
+      'valid_until': validUntil.toIso8601String(),
+      'is_expired': isExpired,
+      'is_valid': isValid,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
     };
   }
 }

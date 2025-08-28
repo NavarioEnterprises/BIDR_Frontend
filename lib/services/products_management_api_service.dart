@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:bidr/constants/Constants.dart';
+import 'package:bidr/global_values.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -8,13 +10,9 @@ import 'package:flutter/foundation.dart';
 import 'dart:io' if (dart.library.html) 'dart:html' as io;
 
 class ApiService {
-  static const String baseUrl = 'http://108.141.192.60/';
-  static const String requestsEndpoint =
-      'http://108.141.192.60/products/api/v1/product-requests/requests/';
-
   /// Submit a vehicle spare parts request
   static Future<Map<String, dynamic>> submitVehicleRequest({
-    String? accessToken, // Add JWT token parameter
+    // String? accessToken, // Remove JWT token parameter for now
     required String? selectedManufacturer,
     required String? selectedMakeModel,
     required String? selectedYear,
@@ -39,20 +37,23 @@ class ApiService {
     double? locationLng,
   }) async {
     try {
-      final uri = Uri.parse('$requestsEndpoint');
+      final uri = Uri.parse(
+        '${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/',
+      );
 
       // Create multipart request
       var request = http.MultipartRequest('POST', uri);
 
-      // Add headers including authentication
+      // Add headers without authentication for now
       request.headers.addAll({
         'Content-Type': 'multipart/form-data',
         'Accept': 'application/json',
       });
 
-      if (accessToken != null) {
-        request.headers['Authorization'] = 'Bearer $accessToken';
-      }
+      // Remove token authentication for now
+      // if (accessToken != null) {
+      //   request.headers['Authorization'] = 'Bearer $accessToken';
+      // }
 
       // Prepare vehicle spares data matching the VehicleSpares model exactly
       Map<String, dynamic> vehicleSparesData = {
@@ -93,16 +94,15 @@ class ApiService {
         'energy_efficiency_required': 'NO',
 
         // Budget information (optional)
-        'max_budget': null,
         'currency': 'ZAR',
 
-        // Product images and location (optional)
-        'product_images': null,
-        'vin_photo': '',
+        // Location information
         'location_info': {
-          'address': location.isNotEmpty ? location : '',
-          'lat': locationLat,
-          'lng': locationLng,
+          'address': location.isNotEmpty
+              ? location
+              : 'Selected Location: ${locationLat ?? 0.0}, ${locationLng ?? 0.0}',
+          'lat': locationLat ?? 0.0,
+          'lng': locationLng ?? 0.0,
         },
       };
 
@@ -111,32 +111,69 @@ class ApiService {
         'category': 'VEHICLE_SPARES',
         'title': partName.isNotEmpty ? partName : 'Vehicle Spare Request',
         'description': description,
-        'buyer_location':
-            '{"address":"${location.isNotEmpty ? location : ''}","lat":${locationLat ?? 'null'},"lng":${locationLng ?? 'null'}}',
+        'buyer_location': jsonEncode({
+          'address': location.isNotEmpty
+              ? location
+              : 'Selected Location: ${locationLat ?? 0.0}, ${locationLng ?? 0.0}',
+          'lat': locationLat ?? 0.0,
+          'lng': locationLng ?? 0.0,
+        }),
         'condition_preference': _mapConditionPreference(selectedNewUsedPart),
         'quantity': selectedQuantity ?? '1',
         'urgency_timeline': _mapTimeframeToUrgency(selectedTimeframe),
         'max_travel_distance': maxDistance.round().toString(),
-        'product_specifications': jsonEncode(_cleanJsonData(vehicleSparesData)),
+        'product_specifications': jsonEncode(vehicleSparesData),
         'terms_accepted': 'true',
         'contact_consent': 'true',
         'buyer_id': '2', // Use testuser ID for now
+        'auth_user_uid': Constants.myUid,
       });
 
-      // The backend expects vehicle_spares_data as a dictionary/object, not as individual fields
-      // Since this is multipart form data, we'll add it as a JSON string that the serializer can parse
-      request.fields['vehicle_spares_data'] = jsonEncode(
-        _cleanJsonData(vehicleSparesData),
-      );
+      // Add vehicle_spares_data as a JSON string
+      request.fields['vehicle_spares_data'] = jsonEncode(vehicleSparesData);
 
       print('=== DEBUG JSON FIELDS ===');
-      print('buyer_location raw: ${request.fields['buyer_location']}');
-      print(
-        'product_specifications raw: ${request.fields['product_specifications']}',
-      );
-      print(
-        'vehicle_spares_data raw: ${request.fields['vehicle_spares_data']}',
-      );
+      
+      // Test the original data before encoding
+      String testBuyerLocation = jsonEncode({
+        'address': location.isNotEmpty
+            ? location
+            : 'Selected Location: ${locationLat ?? 0.0}, ${locationLng ?? 0.0}',
+        'lat': locationLat ?? 0.0,
+        'lng': locationLng ?? 0.0,
+      });
+      
+      String testVehicleData = jsonEncode(vehicleSparesData);
+      
+      print('TEST buyer_location: $testBuyerLocation');
+      print('TEST vehicle_spares_data: $testVehicleData');
+      
+      print('ACTUAL buyer_location raw: ${request.fields['buyer_location']}');
+      print('ACTUAL product_specifications raw: ${request.fields['product_specifications']}');
+      print('ACTUAL vehicle_spares_data raw: ${request.fields['vehicle_spares_data']}');
+
+      // Validate JSON strings
+      try {
+        jsonDecode(request.fields['buyer_location']!);
+        print('✓ buyer_location is valid JSON');
+      } catch (e) {
+        print('✗ buyer_location JSON error: $e');
+      }
+
+      try {
+        jsonDecode(request.fields['product_specifications']!);
+        print('✓ product_specifications is valid JSON');
+      } catch (e) {
+        print('✗ product_specifications JSON error: $e');
+      }
+
+      try {
+        jsonDecode(request.fields['vehicle_spares_data']!);
+        print('✓ vehicle_spares_data is valid JSON');
+      } catch (e) {
+        print('✗ vehicle_spares_data JSON error: $e');
+      }
+
       print('=== END DEBUG ===');
 
       // Add image files (cross-platform)
@@ -223,7 +260,7 @@ class ApiService {
   }) async {
     try {
       final uri = Uri.parse(
-        '$baseUrl/login/',
+        '${GlobalVariables.authServiceUrl}login/',
       ); // Use /login/ instead of /api/token/
       final response = await http.post(
         uri,
@@ -313,7 +350,7 @@ class ApiService {
 
   /// Submit Electronics request
   static Future<Map<String, dynamic>> submitElectronicsRequest({
-    String? accessToken,
+    // String? accessToken, // Remove JWT token parameter for now
     required String electronicsType,
     required String brandPreference,
     required String modelSeries,
@@ -327,10 +364,11 @@ class ApiService {
     required String requiredFeatures,
     required String additionalComments,
     required List<XFile> images,
-  }) async
-  {
+  }) async {
     try {
-      final uri = Uri.parse('$baseUrl$requestsEndpoint');
+      final uri = Uri.parse(
+        '${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/',
+      );
       var request = http.MultipartRequest('POST', uri);
 
       request.headers.addAll({
@@ -338,9 +376,10 @@ class ApiService {
         'Accept': 'application/json',
       });
 
-      if (accessToken != null) {
-        request.headers['Authorization'] = 'Bearer $accessToken';
-      }
+      // Remove token authentication for now
+      // if (accessToken != null) {
+      //   request.headers['Authorization'] = 'Bearer $accessToken';
+      // }
 
       // Prepare electronics data
       Map<String, dynamic> electronicsData = {
@@ -367,7 +406,7 @@ class ApiService {
       request.fields.addAll({
         'category': 'ELECTRONICS',
         'title': electronicsType.isNotEmpty
-            ? '$electronicsType Request'
+            ? '${electronicsType} Request'
             : 'Electronics Request',
         'description': requiredFeatures,
         'buyer_location': jsonEncode({
@@ -384,6 +423,7 @@ class ApiService {
         'terms_accepted': 'true',
         'contact_consent': 'true',
         'buyer_id': '2',
+        'auth_user_uid': Constants.myUid, // Add auth user UID from Constants
       });
 
       // Add image files
@@ -428,7 +468,7 @@ class ApiService {
 
   /// Submit Tyres/Rims request
   static Future<Map<String, dynamic>> submitTyresRimsRequest({
-    String? accessToken,
+    // String? accessToken, // Remove JWT token parameter for now
     required String tyreWidth,
     required String sidewallProfile,
     required String wheelRimDiameter,
@@ -446,7 +486,9 @@ class ApiService {
     required List<XFile> images,
   }) async {
     try {
-      final uri = Uri.parse('$baseUrl$requestsEndpoint');
+      final uri = Uri.parse(
+        '${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/',
+      );
       var request = http.MultipartRequest('POST', uri);
 
       request.headers.addAll({
@@ -454,9 +496,10 @@ class ApiService {
         'Accept': 'application/json',
       });
 
-      if (accessToken != null) {
-        request.headers['Authorization'] = 'Bearer $accessToken';
-      }
+      // Remove token authentication for now
+      // if (accessToken != null) {
+      //   request.headers['Authorization'] = 'Bearer $accessToken';
+      // }
 
       // Prepare tyres/rims data
       Map<String, dynamic> tyresRimsData = {
@@ -498,6 +541,7 @@ class ApiService {
         'terms_accepted': 'true',
         'contact_consent': 'true',
         'buyer_id': '2',
+        'auth_user_uid': Constants.myUid, // Add auth user UID from Constants
       });
 
       // Add image files
@@ -634,23 +678,50 @@ class ApiService {
     }
   }
 
-  /// Clean JSON data by removing null values and ensuring proper formatting
-  static Map<String, dynamic> _cleanJsonData(Map<String, dynamic> data) {
-    Map<String, dynamic> cleaned = {};
+  /// Fetch product requests by auth_user_uid
+  static Future<Map<String, dynamic>> getRequestsByAuthUser({
+    String? authUserUid,
+  }) async {
+    try {
+      // Use the provided authUserUid or fall back to Constants.myUid
+      final uid = authUserUid ?? Constants.myUid;
+      
+      final uri = Uri.parse(
+        '${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/by_auth_user/?auth_user_uid=$uid',
+      );
 
-    for (var entry in data.entries) {
-      if (entry.value != null) {
-        if (entry.value is Map) {
-          cleaned[entry.key] = _cleanJsonData(entry.value);
-        } else if (entry.value is String && entry.value.isEmpty) {
-          // Keep empty strings as they might be expected by backend
-          cleaned[entry.key] = entry.value;
-        } else {
-          cleaned[entry.key] = entry.value;
-        }
+      final response = await http.get(
+        uri,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      print('Get requests response status: ${response.statusCode}');
+      print('Get requests response body: ${response.body}');
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final data = jsonDecode(response.body);
+        return {
+          'success': true,
+          'data': data,
+        };
+      } else {
+        return {
+          'success': false,
+          'message': 'Failed to fetch requests: ${response.statusCode}',
+          'error': response.body,
+        };
       }
+    } catch (e) {
+      print('Error fetching requests: $e');
+      return {
+        'success': false,
+        'message': 'Network error occurred',
+        'error': e.toString(),
+      };
     }
-
-    return cleaned;
   }
+
 }

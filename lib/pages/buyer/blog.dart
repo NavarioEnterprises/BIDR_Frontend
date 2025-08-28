@@ -28,13 +28,10 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
 
   final List<BlogItem> blogItems = [
     BlogItem(
+      id: 1,
       title: 'Auto Spares',
       description: 'Essential Auto Spares for a Smooth Ride Quality parts keep your car safe and running longer. Find top spares on Bid!',
-      date: '15 Jan, 2024',
-      imageUrl: 'lib/assets/images/auto_spares.png',
-      likes: 7,
-      comments: 6,
-      detailContent: '''Is your car not performing at its best? It might be time for a parts upgrade. From brake pads to spark plugs, replacing key components at the right time can save you from costly breakdowns.
+      content: '''Is your car not performing at its best? It might be time for a parts upgrade. From brake pads to spark plugs, replacing key components at the right time can save you from costly breakdowns.
 
 This guide covers must-have auto spares, signs of wear, and how to find top-quality parts without overspending. With BidR, making competitive pricing convenient, you get the best deals on reliable auto spares... shop smarter today!
 
@@ -43,27 +40,45 @@ Section 110.32 of "De Finibus Bonorum et Malorum"
 "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt."
 
 The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 110.32 and 110.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.''',
-      section: 'Auto & Transport',
+      image: 'lib/assets/images/auto_spares.png',
+      section: 'auto_transport',
+      sectionDisplay: 'Auto & Transport',
+      tagsList: ['auto', 'spares', 'car', 'maintenance'],
+      likes: 7,
+      views: 125,
+      commentsCount: 6,
+      createdAt: '2024-01-15T10:00:00Z',
+      publishedAt: '2024-01-15T10:00:00Z',
     ),
     BlogItem(
+      id: 2,
       title: 'Tyres and Rims',
       description: 'Upgrade Your Tyres & Rims Today Better performance starts with the right fit. Get top deals on Bid!',
-      date: '02 June, 2024',
-      imageUrl: 'lib/assets/images/rims_and_tyre.png',
+      content: 'Detailed content about tyres and rims...',
+      image: 'lib/assets/images/rims_and_tyre.png',
+      section: 'auto_transport',
+      sectionDisplay: 'Auto & Transport',
+      tagsList: ['tyres', 'rims', 'wheels', 'upgrade'],
       likes: 254,
-      comments: 32,
-      detailContent: 'Detailed content about tyres and rims...',
-      section: 'Auto & Transport',
+      views: 890,
+      commentsCount: 32,
+      createdAt: '2024-06-02T10:00:00Z',
+      publishedAt: '2024-06-02T10:00:00Z',
     ),
     BlogItem(
+      id: 3,
       title: 'Consumer Electronics',
       description: 'Stay Ahead with Top Electronics From gadgets to home tech, find the best deals on Bid now!',
-      date: '29 August, 2024',
-      imageUrl: 'lib/assets/images/electronics_com.png',
+      content: 'Detailed content about consumer electronics...',
+      image: 'lib/assets/images/electronics_com.png',
+      section: 'electronics',
+      sectionDisplay: 'Electronics',
+      tagsList: ['electronics', 'gadgets', 'tech', 'deals'],
       likes: 156,
-      comments: 285,
-      detailContent: 'Detailed content about consumer electronics...',
-      section: 'Electronics',
+      views: 720,
+      commentsCount: 285,
+      createdAt: '2024-08-29T10:00:00Z',
+      publishedAt: '2024-08-29T10:00:00Z',
     ),
   ];
 
@@ -446,7 +461,7 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                                         SizedBox(width: 12),
                                         _buildAnimatedStatItem(
                                             Icons.chat_bubble_outline,
-                                            widget.blogItem.comments,
+                                            widget.blogItem.commentsCount,
                                             Colors.orange,
                                             value
                                         ),
@@ -566,26 +581,23 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
   final List<BlogComment> blogComments = [
     BlogComment(
       id: 1,
+      user: {'username': 'user1', 'first_name': 'John', 'last_name': 'Smith'},
       content: "Great article! Very informative about auto spares. This really helped me understand the importance of quality parts.",
-      userId: "user1",
-      userName: "John Smith",
-      postId: 1,
+      isApproved: true,
       createdAt: DateTime.now().subtract(Duration(hours: 2)),
     ),
     BlogComment(
       id: 2,
+      user: {'username': 'user2', 'first_name': 'Sarah', 'last_name': 'Johnson'},
       content: "I've been looking for reliable auto spares for months. This guide is exactly what I needed. Thanks for sharing!",
-      userId: "user2",
-      userName: "Sarah Johnson",
-      postId: 1,
+      isApproved: true,
       createdAt: DateTime.now().subtract(Duration(hours: 5)),
     ),
     BlogComment(
       id: 3,
+      user: {'username': 'user3', 'first_name': 'Mike', 'last_name': 'Wilson'},
       content: "The section about brake pads was particularly helpful. Keep up the good work with these detailed posts.",
-      userId: "user3",
-      userName: "Mike Wilson",
-      postId: 1,
+      isApproved: true,
       createdAt: DateTime.now().subtract(Duration(days: 1)),
     ),
   ];
@@ -799,7 +811,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                                   children: [
                                                     _buildAnimatedStatItem(CupertinoIcons.heart_fill, widget.blogItem.likes, Colors.red),
                                                     SizedBox(width: 16),
-                                                    _buildAnimatedStatItem(HugeIcons.strokeRoundedMessage01, widget.blogItem.comments, Colors.orange),
+                                    _buildAnimatedStatItem(HugeIcons.strokeRoundedMessage01, widget.blogItem.commentsCount, Colors.orange),
                                                   ],
                                                 ),
                                               ],
@@ -1174,7 +1186,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                           Icon(Icons.chat_bubble_outline, size: 12, color: Colors.orange),
                           SizedBox(width: 2),
                           Text(
-                            '${item.comments}',
+                            '${item.commentsCount}',
                             style: GoogleFonts.manrope(
                               fontSize: 11,
                               color: Colors.orange,

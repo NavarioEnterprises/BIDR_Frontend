@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/global_values.dart';
@@ -12,6 +14,7 @@ import 'package:intl/intl.dart';
 
 import '../../models/order.dart';
 import '../../models/request_models.dart';
+import '../../services/chat_service.dart';
 import '../buyer_dashboard.dart';
 import '../group_chat.dart';
 
@@ -57,6 +60,11 @@ class _TransactionDashboardState extends State<TransactionDashboard>
         );
 
     _animationController.forward();
+
+    // Load orders when Order tab is initialized
+    if (_selectedTopTab == 1) {
+      _loadOrdersFromAPI();
+    }
   }
 
   @override
@@ -66,112 +74,112 @@ class _TransactionDashboardState extends State<TransactionDashboard>
     super.dispose();
   }
 
-  // Sample data
-  final List<Order> onGoingOrders = [
-    Order(
-      vendorName: "Midas",
-      product: "Fuel Filter, Toyota Corolla, 2015",
-      vehicle: "Toyota Corolla, 2015",
-      orderNumber: "#BF7822626",
-      status: "Ongoing",
-      dateTime: DateTime(2025, 2, 22, 12, 45),
-      price: 1400,
-      rating: 4.0,
-      distanceInKm: 30,
-      location: "10 Daisy Street, Sandon, Gauteng",
-      comments: [
-        OrderComment(
-          commentId: "1",
-          description: "Fuel Filter With 12 MonthsGuarantee",
-        ),
-      ],
-    ),
-    Order(
-      vendorName: "AutoZone",
-      product: "Tyre, Toyota Corolla, 2022",
-      vehicle: "Toyota Corolla, 2022",
-      orderNumber: "#BF7822625",
-      status: "Ongoing",
-      dateTime: DateTime(2025, 2, 21, 12, 43),
-      price: 1300,
-      rating: 3.0,
-      distanceInKm: 30,
-      location: "25 Rivonia Road, Sandon, Gauteng",
-      comments: [
-        OrderComment(
-          commentId: "1",
-          description: "Free Tyre Insurance For 6 Months",
-        ),
-        OrderComment(
-          commentId: "2",
-          description: "Free Fitment And Wheel Alignment",
-        ),
-      ],
-    ),
-  ];
+  // Order data - loaded from API
+  List<Order> onGoingOrders = [];
+  List<Order> purchasedOrders = [];
+  List<Order> returnsRefundsOrders = [];
+  List<Order> cancelledOrders = [];
 
-  final List<Order> purchasedOrders = [
-    Order(
-      vendorName: "TyreMax",
-      product: "All Season Tyres, BMW X3, 2020",
-      vehicle: "BMW X3, 2020",
-      orderNumber: "#BF7822624",
-      status: "Purchased",
-      dateTime: DateTime(2025, 2, 20, 15, 30),
-      price: 2800,
-      rating: 5.0,
-      distanceInKm: 25,
-      location: "15 Main Road, Johannesburg, Gauteng",
-      comments: [
-        OrderComment(
-          commentId: "1",
-          description: "Premium quality tyres with 2-year warranty",
-        ),
-      ],
-    ),
-  ];
+  bool _isLoadingOrders = false;
+  String? _orderLoadingError;
 
-  final List<Order> returnsRefundsOrders = [
-    Order(
-      vendorName: "SpareMax",
-      product: "Air Filter, Honda Civic, 2018",
-      vehicle: "Honda Civic, 2018",
-      orderNumber: "#BF7822623",
-      status: "Refunded",
-      dateTime: DateTime(2025, 2, 19, 11, 20),
-      price: 350,
-      rating: 2.0,
-      distanceInKm: 40,
-      location: "8 Industrial Street, Germiston, Gauteng",
-      comments: [
-        OrderComment(
-          commentId: "1",
-          description: "Wrong part delivered, refund processed",
-        ),
-      ],
-    ),
-  ];
+  // API service method to fetch orders
+  Future<void> _loadOrdersFromAPI() async {
+    setState(() {
+      _isLoadingOrders = true;
+      _orderLoadingError = null;
+    });
 
-  final List<Order> cancelledOrders = [
-    Order(
-      vendorName: "QuickParts",
-      product: "Brake Pads, Ford Focus, 2019",
-      vehicle: "Ford Focus, 2019",
-      orderNumber: "#BF7822622",
-      status: "Cancelled",
-      dateTime: DateTime(2025, 2, 18, 9, 15),
-      price: 890,
-      rating: 0.0,
-      distanceInKm: 35,
-      location: "22 Commerce Street, Sandton, Gauteng",
-      comments: [
-        OrderComment(
-          commentId: "1",
-          description: "Order cancelled by customer",
-        ),
-      ],
-    ),
-  ];
+    try {
+      // Use the correct API endpoint for orders from product-requests
+      final response = await http.get(
+        Uri.parse('${Constants.bidrBaseUrl}api/v1/product-requests/orders/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('API Response: ${response.body}'); // Debug log
+        final jsonData = json.decode(response.body);
+
+        // Handle different possible response structures
+        List<dynamic> ordersData;
+        if (jsonData is List) {
+          ordersData = jsonData;
+        } else if (jsonData is Map && jsonData.containsKey('results')) {
+          ordersData = jsonData['results'];
+        } else if (jsonData is Map && jsonData.containsKey('orders')) {
+          ordersData = jsonData['orders'];
+        } else {
+          ordersData = [];
+        }
+
+        print('Orders data count: ${ordersData.length}'); // Debug log
+
+        // Parse orders and categorize by status
+        List<Order> allOrders = [];
+        for (var orderJson in ordersData) {
+          try {
+            print('Processing order: $orderJson'); // Debug log
+            allOrders.add(Order.fromJson(orderJson));
+          } catch (e, stackTrace) {
+            // More detailed error logging with both error and stack trace
+            print(
+              'Error parsing order: $e\nStack: $stackTrace\nData: $orderJson',
+            );
+            // Continue processing other orders
+          }
+        }
+
+        // Categorize orders by status
+        setState(() {
+          onGoingOrders = allOrders
+              .where(
+                (order) =>
+                    order.status.toLowerCase().contains('ongoing') ||
+                    order.status.toLowerCase().contains('pending') ||
+                    order.status.toLowerCase().contains('paid') ||
+                    order.status.toLowerCase().contains('processing') ||
+                    order.status.toLowerCase().contains('shipped'),
+              )
+              .toList();
+          purchasedOrders = allOrders
+              .where(
+                (order) =>
+                    order.status.toLowerCase().contains('purchased') ||
+                    order.status.toLowerCase().contains('delivered') ||
+                    order.status.toLowerCase().contains('completed'),
+              )
+              .toList();
+          returnsRefundsOrders = allOrders
+              .where((order) => order.status.toLowerCase().contains('refund'))
+              .toList();
+          cancelledOrders = allOrders
+              .where((order) => order.status.toLowerCase().contains('cancel'))
+              .toList();
+
+          _isLoadingOrders = false;
+        });
+
+        print(
+          'Categorized orders - Ongoing: ${onGoingOrders.length}, Purchased: ${purchasedOrders.length}, Refunds: ${returnsRefundsOrders.length}, Cancelled: ${cancelledOrders.length}',
+        );
+      } else {
+        throw Exception(
+          'Failed to load orders: ${response.statusCode} - ${response.body}',
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoadingOrders = false;
+        _orderLoadingError = 'Error loading orders: ${e.toString()}';
+      });
+      print('Error fetching orders: $e');
+    }
+  }
+
   String _getRatingText(double rating) {
     if (rating >= 5) return 'Excellent';
     if (rating >= 4) return 'Very Good';
@@ -190,6 +198,431 @@ class _TransactionDashboardState extends State<TransactionDashboard>
   TextEditingController _commentController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   double _currentRating = 0.0;
+
+  // Order Details Dialog
+  void _showOrderDetailsDialog(Order order) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 10,
+          child: Container(
+            width: 550,
+            constraints: BoxConstraints(
+              maxWidth: 550,
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
+            padding: EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Constants.ctaColorLight.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.receipt_long,
+                        color: Constants.ctaColorLight,
+                        size: 20,
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Order Details',
+                            style: GoogleFonts.manrope(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                          Text(
+                            "Order #${order.orderNumber}",
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(Icons.close, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 24),
+
+                // Content
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Status and Date Row
+                        Container(
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: order.status == "Refunded"
+                                      ? Colors.blue.shade600
+                                      : order.status == "Cancelled"
+                                      ? Colors.red.shade600
+                                      : order.status == "Ongoing"
+                                      ? Colors.orange.shade600
+                                      : order.status == "Purchased"
+                                      ? Colors.green.shade600
+                                      : Constants.ctaColorLight,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  order.status.toUpperCase(),
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                DateFormat(
+                                  'dd/MM/yyyy - HH:mm',
+                                ).format(order.dateTime),
+                                style: GoogleFonts.manrope(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 24),
+
+                        // Vendor Information Section
+                        _buildDetailSection("Vendor Information", [
+                          _buildDetailItem("Vendor Name", order.vendorName),
+                          _buildDetailItem("Rating", "${order.rating}/5"),
+                          _buildDetailItem("Location", order.location),
+                          _buildDetailItem(
+                            "Distance",
+                            "${order.distanceInKm.toInt()} KM",
+                          ),
+                        ]),
+
+                        SizedBox(height: 20),
+
+                        // Product Information Section
+                        _buildDetailSection("Product Information", [
+                          _buildDetailItem("Product", order.product),
+                          _buildDetailItem("Vehicle", order.vehicle),
+                        ]),
+
+                        SizedBox(height: 20),
+
+                        // Pricing Information Section
+                        _buildDetailSection("Pricing Information", [
+                          _buildDetailItem(
+                            "Total Amount",
+                            "R${order.price.toStringAsFixed(2)}",
+                            isHighlighted: true,
+                          ),
+                        ]),
+
+                        SizedBox(height: 20),
+
+                        // Comments Section
+                        if (order.comments.isNotEmpty) ...[
+                          _buildDetailSection(
+                            "Comments",
+                            order.comments
+                                .map(
+                                  (comment) =>
+                                      _buildCommentItem(comment.description),
+                                )
+                                .toList(),
+                          ),
+                        ],
+
+                        SizedBox(height: 32),
+
+                        // Action Buttons
+                        Row(
+                          children: [
+                            if (order.status == "Ongoing") ...[
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: _showCollectGoodsDialog,
+                                  icon: Icon(
+                                    CupertinoIcons.cube_box,
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
+                                  label: Text(
+                                    "Collect Goods",
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Constants.ctaColorLight,
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              OutlinedButton.icon(
+                                onPressed: () {
+                                  // Handle chat action
+                                },
+                                icon: Icon(
+                                  CupertinoIcons.chat_bubble_2,
+                                  size: 18,
+                                  color: Constants.ctaColorLight,
+                                ),
+                                label: Text(
+                                  "Chat",
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Constants.ctaColorLight,
+                                  ),
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 16,
+                                    horizontal: 24,
+                                  ),
+                                  side: BorderSide(
+                                    color: Constants.ctaColorLight,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            ] else if (order.status == "Purchased") ...[
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: _showAddReviewDialog,
+                                  icon: Icon(
+                                    Icons.star_outline,
+                                    size: 18,
+                                    color: Constants.ctaColorLight,
+                                  ),
+                                  label: Text(
+                                    "Write Review",
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Constants.ctaColorLight,
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    side: BorderSide(
+                                      color: Constants.ctaColorLight,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    // Handle return & refund
+                                  },
+                                  icon: Icon(
+                                    Icons.refresh,
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
+                                  label: Text(
+                                    "Return & Refund",
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red[600],
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ] else ...[
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: Text(
+                                    "Close",
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    side: BorderSide(color: Colors.grey[300]!),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailSection(String title, List<Widget> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.manrope(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[200]!, width: 1),
+          ),
+          child: Column(children: items),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailItem(
+    String label,
+    String value, {
+    bool isHighlighted = false,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              label,
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+          SizedBox(width: 16),
+          Expanded(
+            flex: 3,
+            child: Text(
+              value,
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: isHighlighted ? FontWeight.w700 : FontWeight.w600,
+                color: isHighlighted ? Constants.ctaColorLight : Colors.black87,
+              ),
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCommentItem(String comment) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            margin: EdgeInsets.only(top: 6, right: 8),
+            decoration: BoxDecoration(
+              color: Constants.ctaColorLight,
+              shape: BoxShape.circle,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              comment,
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: Colors.black87,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showAddReviewDialog() {
     bool _isSubmitting = false;
@@ -561,6 +994,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                       _animationController.reset();
                       _animationController.forward();
                     });
+                    // Load orders when Order tab is selected
+                    _loadOrdersFromAPI();
                   },
                   child: AnimatedContainer(
                     duration: Duration(milliseconds: 300),
@@ -724,12 +1159,12 @@ class _TransactionDashboardState extends State<TransactionDashboard>
       if (GlobalVariables.combinedRequest.autoSparesRequest.isNotEmpty) {
         final autoSpareCards = GlobalVariables.combinedRequest.autoSparesRequest
             .map((spare) {
-          if (spare.status == "Waiting") {
-            return _buildWaitingRequestCard(spare);
-          } else {
-            return _buildActiveRequestCard(spare);
-          }
-        })
+              if (spare.status == "Waiting") {
+                return _buildWaitingRequestCard(spare);
+              } else {
+                return _buildActiveRequestCard(spare);
+              }
+            })
             .toList();
 
         cards.addAll(autoSpareCards);
@@ -739,7 +1174,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
       // Rim Tyre Requests
       if (GlobalVariables.combinedRequest.rimTyreRequest.isNotEmpty) {
         final rimTyreCards = GlobalVariables.combinedRequest.rimTyreRequest.map(
-              (tyre) {
+          (tyre) {
             if (tyre == "Waiting") {
               return _buildWaitingRequestCard(tyre);
             } else {
@@ -761,12 +1196,12 @@ class _TransactionDashboardState extends State<TransactionDashboard>
             .combinedRequest
             .consumerElectronicsRequest
             .map((electronics) {
-          if (electronics.status == "Waiting") {
-            return _buildWaitingRequestCard(electronics);
-          } else {
-            return _buildActiveRequestCard(electronics);
-          }
-        })
+              if (electronics.status == "Waiting") {
+                return _buildWaitingRequestCard(electronics);
+              } else {
+                return _buildActiveRequestCard(electronics);
+              }
+            })
             .toList();
 
         cards.addAll(electronicsCards);
@@ -847,11 +1282,11 @@ class _TransactionDashboardState extends State<TransactionDashboard>
   }
 
   Widget _buildNavItem(
-      VoidCallback voidCallBack,
-      IconData icon,
-      String title,
-      bool isActive,
-      ) {
+    VoidCallback voidCallBack,
+    IconData icon,
+    String title,
+    bool isActive,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1365,6 +1800,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                         request.sellerOffers.isNotEmpty) ...[
                       ...request.sellerOffers
                           .take(2)
+                          .where((bid) => bid is Seller)
+                          .cast<Seller>()
                           .map((bid) => _buildSellerBid(bid, request)),
                       SizedBox(height: 16),
                       // View All Bids button
@@ -1609,140 +2046,95 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                       ),
                       Spacer(),
                       OutlinedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => GroupChatScreen(
-                                groupChat: GroupChat(
-                                  uuid: request.id.toString(),
-                                  request: ProductRequest(
-                                    description: _getRequestDescription(
-                                      request,
-                                    ),
-                                  ),
-                                  messages: [
-                                    Message(
-                                      sender: User(
-                                        name: Constants.myDisplayname,
-                                        role: "Buyer",
-                                      ),
-                                      content:
-                                      "Hello, I need a quote for a fuel filter for my Toyota Corolla 2015. Please provide availability and details.",
-                                      timestamp: DateTime.now().subtract(
-                                        Duration(minutes: 10),
+                        onPressed: () async {
+                          // Show loading indicator while creating/getting conversation
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => Center(
+                              child: Container(
+                                padding: EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Constants.ctaColorLight,
                                       ),
                                     ),
-                                    Message(
-                                      sender: User(
-                                        name: "Seller 1",
-                                        role: "Seller",
+                                    SizedBox(height: 16),
+                                    Text(
+                                      'Loading conversation...',
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
                                       ),
-                                      content:
-                                      "Understood! We have options available that match your vehicle model. Would you like delivery, or pick-up from a nearby location?",
-                                      timestamp: DateTime.now().subtract(
-                                        Duration(minutes: 4),
-                                      ),
-                                      isReply: true,
-                                    ),
-                                    Message(
-                                      sender: User(
-                                        name: Constants.myDisplayname,
-                                        role: "Buyer",
-                                      ),
-                                      content:
-                                      "I prefer an OEM part, but I'm open to aftermarket options if they meet quality standards.",
-                                      timestamp: DateTime.now().subtract(
-                                        Duration(minutes: 8),
-                                      ),
-                                    ),
-                                    Message(
-                                      sender: User(
-                                        name: "Seller 1",
-                                        role: "Seller",
-                                      ),
-                                      content:
-                                      "Hi John, are you specifically looking for an OEM fuel filter, or would you consider a high-quality aftermarket option?",
-                                      timestamp: DateTime.now().subtract(
-                                        Duration(minutes: 9),
-                                      ),
-                                      isReply: true,
-                                      replies: [
-                                        Message(
-                                          sender: User(
-                                            name: "Seller 1",
-                                            role: "Seller",
-                                          ),
-                                          content:
-                                          "Do you want OEM or aftermarket?",
-                                          timestamp: DateTime.now(),
-                                          isReply: true,
-                                        ),
-                                        Message(
-                                          sender: User(
-                                            name: "Seller 2",
-                                            role: "Seller",
-                                          ),
-                                          content:
-                                          "We have both options in stock.",
-                                          timestamp: DateTime.now(),
-                                          isReply: true,
-                                        ),
-                                      ],
-                                    ),
-                                    Message(
-                                      sender: User(
-                                        name: Constants.myDisplayname,
-                                        role: "Buyer",
-                                      ),
-                                      content:
-                                      "Just the filter for now, but I'd like to know if installation is an option.",
-                                      timestamp: DateTime.now().subtract(
-                                        Duration(minutes: 5),
-                                      ),
-                                    ),
-                                    Message(
-                                      sender: User(
-                                        name: "Seller 2",
-                                        role: "Seller",
-                                      ),
-                                      content:
-                                      "Thanks for reaching out! Do you need only the filter, or are you also interested in an installation service?",
-                                      timestamp: DateTime.now().subtract(
-                                        Duration(minutes: 7),
-                                      ),
-                                      isReply: true,
-                                    ),
-                                    Message(
-                                      sender: User(
-                                        name: Constants.myDisplayname,
-                                        role: "Buyer",
-                                      ),
-                                      content:
-                                      "I only need the filter for now, but I appreciate the suggestion. Please share the details so I can compare my options.",
-                                      timestamp: DateTime.now().subtract(
-                                        Duration(minutes: 3),
-                                      ),
-                                    ),
-
-                                    Message(
-                                      sender: User(
-                                        name: "Seller 2",
-                                        role: "Seller",
-                                      ),
-                                      content:
-                                      "We have a compatible filter in stock. Could you confirm if you need any additional parts, like a seal or gasket, to ensure a proper fit?",
-                                      timestamp: DateTime.now().subtract(
-                                        Duration(minutes: 2),
-                                      ),
-                                      isReply: true,
                                     ),
                                   ],
                                 ),
                               ),
                             ),
                           );
-                          setState(() {});
+
+                          try {
+                            // Create or get conversation for this request
+                            final conversationData =
+                                await ChatService.createOrGetConversationForRequest(
+                                  request.id.toString(),
+                                );
+
+                            // Close loading dialog
+                            Navigator.of(context).pop();
+
+                            if (conversationData != null) {
+                              // Navigate to GroupChat with backend integration
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => GroupChatScreen(
+                                    groupChat: GroupChat(
+                                      uuid: request.id.toString(),
+                                      request: ProductRequest(
+                                        description: _getRequestDescription(
+                                          request,
+                                        ),
+                                      ),
+                                      messages:
+                                          [], // Empty - will be loaded from backend
+                                    ),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              // Show error if backend returns null
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Unable to create conversation. Please try again.',
+                                  ),
+                                  backgroundColor: Colors.red,
+                                  duration: Duration(seconds: 3),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            // Close loading dialog and show error
+                            Navigator.of(context).pop();
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Failed to load conversation. Please try again.',
+                                ),
+                                backgroundColor: Colors.red,
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+                          }
                         },
                         icon: Icon(
                           HugeIcons.strokeRoundedBubbleChat,
@@ -1874,12 +2266,122 @@ class _TransactionDashboardState extends State<TransactionDashboard>
     );
   }
 
+  // Payment processing and order creation
+  Future<void> _processPaymentAndCreateOrder(Seller seller) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(
+          child: Container(
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Constants.ctaColorLight,
+                  ),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Processing Payment...',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      // Create order data
+      final orderData = {
+        'seller_id': seller.id,
+        'buyer_id': 1, // You should replace this with actual buyer ID
+        'total_amount': seller.bid,
+        'status': 'ONGOING',
+        'status_display': 'Ongoing',
+        'payment_status': 'PAID',
+        'payment_status_display': 'Paid',
+        'payment_method': 'CARD', // Or based on user selection
+        'currency': 'ZAR',
+        'delivery_cost': 0.0,
+        'installation_cost': 0.0,
+        'quote_total': seller.bid,
+        'request_title': 'New Order from Payment',
+        'request_category': 'VEHICLE_SPARES',
+        'payment_date': DateTime.now().toIso8601String(),
+        'is_active': true,
+        'can_cancel': true,
+        'created_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
+      };
+
+      // Submit to backend
+      final response = await http.post(
+        Uri.parse('${Constants.bidrBaseUrl}api/v1/product-requests/orders/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode(orderData),
+      );
+
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print('Order created successfully: ${response.body}');
+
+        // Navigate to Transaction Management > Order tab > Ongoing tab
+        setState(() {
+          _selectedTopTab = 1; // Order tab
+          _selectedTab = 0; // Ongoing tab
+        });
+
+        // Refresh orders to show the new one
+        await _loadOrdersFromAPI();
+
+        // Show success dialog
+        _showPaymentSuccessfulDialog(context);
+      } else {
+        throw Exception(
+          'Failed to create order: ${response.statusCode} - ${response.body}',
+        );
+      }
+    } catch (e) {
+      // Close loading dialog if still open
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+
+      print('Error processing payment: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Payment failed: ${e.toString()}'),
+          backgroundColor: Colors.red[600],
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
   void _showPaymentSuccessfulDialog(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -2162,10 +2664,10 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                       ],
                     ),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.of(context).pop();
-                        // Handle payment completion
-                        _showPaymentSuccessfulDialog(context);
+                        // Handle payment completion and order creation
+                        await _processPaymentAndCreateOrder(seller);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Constants.ctaColorLight,
@@ -2263,6 +2765,73 @@ class _TransactionDashboardState extends State<TransactionDashboard>
   }
 
   Widget _buildContent() {
+    // Show loading state
+    if (_isLoadingOrders) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Constants.ctaColorLight,
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              "Loading orders...",
+              style: GoogleFonts.manrope(fontSize: 16, color: Colors.grey[600]),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show error state
+    if (_orderLoadingError != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 64, color: Colors.red[400]),
+            SizedBox(height: 16),
+            Text(
+              "Failed to load orders",
+              style: GoogleFonts.manrope(
+                fontSize: 16,
+                color: Colors.red[600],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              _orderLoadingError!,
+              style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadOrdersFromAPI,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Constants.ctaColorLight,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                "Retry",
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     List<Order> orders;
     switch (_selectedTab) {
       case 0:
@@ -2295,6 +2864,18 @@ class _TransactionDashboardState extends State<TransactionDashboard>
             Text(
               "No orders found",
               style: GoogleFonts.manrope(fontSize: 16, color: Colors.grey[500]),
+            ),
+            SizedBox(height: 8),
+            TextButton(
+              onPressed: _loadOrdersFromAPI,
+              child: Text(
+                "Refresh",
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  color: Constants.ctaColorLight,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
           ],
         ),
@@ -2728,7 +3309,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                       ),
                       TextButton(
                         onPressed: () {
-                          // Handle view details
+                          _showOrderDetailsDialog(order);
                         },
                         child: Text(
                           "View Details",
@@ -3013,178 +3594,6 @@ class _TransactionDashboardState extends State<TransactionDashboard>
           );
   }
 
-  String _formatDate(DateTime? date) {
-    if (date == null) return "Date unavailable";
-    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
-  }
-
-  String _getRequestDescription(dynamic request) {
-    try {
-      if (request?.category == null) return "No description available";
-
-      switch (request.category) {
-        case "Vehicle Spares":
-          if (request?.autoSpares?.partDetails?.partName != null &&
-              request?.autoSpares?.vehicleDetails?.makeModel != null &&
-              request?.autoSpares?.vehicleDetails?.year != null) {
-            return "${request.autoSpares.partDetails.partName}, ${request.autoSpares.vehicleDetails.makeModel}, ${request.autoSpares.vehicleDetails.year}";
-          }
-          return "Vehicle Spares Request";
-
-        case "Vehicle Tyres and Rims":
-          if (request?.rimTyre?.productDetails != null) {
-            final productDetails = request.rimTyre.productDetails;
-            return "${productDetails.tyreType ?? 'Tyre'} ${productDetails.tyreWidthMm ?? ''}/${productDetails.sidewallProfile ?? ''} R${productDetails.wheelRimDiameterInches ?? ''} (Qty: ${productDetails.quantity ?? 1})";
-          }
-          return "Vehicle Tyres and Rims Request";
-
-        case "Consumer Electronics":
-          if (request?.consumerElectronics?.productDetails != null) {
-            final productDetails = request.consumerElectronics.productDetails;
-            return "${productDetails.typeOfElectronics ?? 'Electronics'} ${productDetails.brandPreference ?? ''} ${productDetails.modelSeries ?? ''} (Qty: ${productDetails.quantityNeeded ?? 1})";
-          }
-          return "Consumer Electronics Request";
-
-        default:
-          return "Request details not available";
-      }
-    } catch (e) {
-      print('Error getting request description: $e');
-      return "Error loading description";
-    }
-  }
-
-  String _getElapsedTime(DateTime? createdAt, String unit) {
-    if (createdAt == null) return "0";
-
-    final difference = DateTime.now().difference(createdAt);
-
-    switch (unit) {
-      case 'days':
-        return difference.inDays.toString();
-      case 'hours':
-        return difference.inHours.toString();
-      case 'minutes':
-        return difference.inMinutes.toString();
-      case 'seconds':
-        return difference.inSeconds.toString();
-      default:
-        return "0";
-    }
-  }
-
-  Widget _buildStatusDot(String letter, String time) {
-    return Column(
-      children: [
-        Container(
-          width: 30,
-          height: 30,
-          decoration: BoxDecoration(
-            color: Constants.ftaColorLight.withOpacity(0.1),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Constants.ftaColorLight.withOpacity(0.4),
-              width: 1,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              letter,
-              style: GoogleFonts.manrope(
-                color: Constants.ftaColorLight,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        SizedBox(height: 4),
-        Text(
-          time,
-          style: GoogleFonts.manrope(
-            color: Colors.grey[600],
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSellerBid(dynamic bid, dynamic request) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                bid.name ?? 'Unknown Seller',
-                style: GoogleFonts.manrope(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Constants.ftaColorLight,
-                ),
-              ),
-              Text(
-                "R${bid.bid?.toInt() ?? 0}",
-                style: GoogleFonts.manrope(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Constants.ctaColorLight,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 4),
-          Row(
-            children: [
-              Icon(Icons.star, color: Colors.amber, size: 14),
-              SizedBox(width: 4),
-              Text(
-                "${bid.rating ?? 0}/${bid.maxRating ?? 5}",
-                style: GoogleFonts.manrope(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
-              ),
-              SizedBox(width: 12),
-              Icon(Icons.location_on, color: Colors.grey[500], size: 14),
-              SizedBox(width: 4),
-              Text(
-                "${bid.radius?.toInt() ?? 0}km",
-                style: GoogleFonts.manrope(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
-          if (bid.comment != null && bid.comment.isNotEmpty) ...[
-            SizedBox(height: 8),
-            Text(
-              bid.comment,
-              style: GoogleFonts.manrope(
-                fontSize: 12,
-                color: Colors.grey[700],
-                fontStyle: FontStyle.italic,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ],
-      ),
-    );
-  }
   Widget _buildDetailRow(String label, String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,

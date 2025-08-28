@@ -15,7 +15,7 @@ import '../constants/Constants.dart';
 import '../customWdget/appbar.dart';
 import '../customWdget/customCard.dart';
 import '../customWdget/custom_input2.dart';
-import '../services/api_service.dart';
+import '../services/products_management_api_service.dart';
 import '../notifier/my_notifier.dart';
 import 'buyer_dashboard.dart';
 import 'buyer/blog.dart';
@@ -1762,20 +1762,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     });
 
     try {
-      // Get JWT token first
-      final token = await ApiService.getAuthToken();
-      if (token == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to authenticate. Please try again.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
       final result = await ApiService.submitVehicleRequest(
-        accessToken: token,
         selectedManufacturer: _selectedManufacturer,
         selectedMakeModel: _selectedMakeModel,
         selectedYear: _selectedYear,
@@ -1798,22 +1785,11 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         locationLat: _selectedLocation?.latitude,
         locationLng: _selectedLocation?.longitude,
       );
+      print("sdhdshj ${result}");
 
       if (result['success']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Vehicle quote request submitted successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // Reset form after successful submission
-        _resetForm();
-
-        // Navigate to dashboard
-        if (mounted) {
-          context.go('/dashboard');
-        }
+        // Show success dialog
+        await _showVehicleRequestSuccessDialog();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1834,6 +1810,134 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         _isSubmitting = false;
       });
     }
+  }
+
+  /// Show styled success dialog for vehicle request submission
+  Future<void> _showVehicleRequestSuccessDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to dismiss
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 10,
+          child: Container(
+            width: 400,
+            padding: EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Success Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 50,
+                  ),
+                ),
+                SizedBox(height: 24),
+                
+                // Success Title
+                Text(
+                  'Request Submitted Successfully!',
+                  style: GoogleFonts.manrope(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Constants.ftaColorLight,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 16),
+                
+                // Success Message
+                Text(
+                  'Your vehicle spare parts request has been submitted successfully. You will receive quotes from suppliers soon.',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16,
+                    color: Colors.grey[700],
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 32),
+                
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          // Reset form
+                          _resetForm();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: Constants.ftaColorLight),
+                          ),
+                        ),
+                        child: Text(
+                          'Submit Another',
+                          style: GoogleFonts.manrope(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Constants.ftaColorLight,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          // Reset form
+                          _resetForm();
+                          // Navigate to dashboard
+                          if (mounted) {
+                            context.go('/dashboard');
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Constants.ftaColorLight,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 2,
+                        ),
+                        child: Text(
+                          'View Requests',
+                          style: GoogleFonts.manrope(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   bool _validateForm() {
@@ -3126,7 +3230,6 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
       }
 
       final result = await ApiService.submitElectronicsRequest(
-        accessToken: token,
         electronicsType: _typeController.text,
         brandPreference: _brandController.text,
         modelSeries: _modelController.text,
@@ -3143,15 +3246,8 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
       );
 
       if (result['success']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Electronics request submitted successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // Reset form after successful submission
-        _resetElectronicsForm();
+        // Show success dialog
+        await _showElectronicsRequestSuccessDialog();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -3172,6 +3268,134 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
         _isSubmitting = false;
       });
     }
+  }
+
+  /// Show styled success dialog for electronics request submission
+  Future<void> _showElectronicsRequestSuccessDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 10,
+          child: Container(
+            width: 400,
+            padding: EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Success Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 50,
+                  ),
+                ),
+                SizedBox(height: 24),
+                
+                // Success Title
+                Text(
+                  'Electronics Request Submitted!',
+                  style: GoogleFonts.manrope(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Constants.ftaColorLight,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 16),
+                
+                // Success Message
+                Text(
+                  'Your electronics request has been submitted successfully. Suppliers will contact you with their best offers.',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16,
+                    color: Colors.grey[700],
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 32),
+                
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          // Reset form
+                          _resetElectronicsForm();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: Constants.ftaColorLight),
+                          ),
+                        ),
+                        child: Text(
+                          'Submit Another',
+                          style: GoogleFonts.manrope(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Constants.ftaColorLight,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          // Reset form
+                          _resetElectronicsForm();
+                          // Navigate to dashboard
+                          if (mounted) {
+                            context.go('/dashboard');
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Constants.ftaColorLight,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 2,
+                        ),
+                        child: Text(
+                          'View Requests',
+                          style: GoogleFonts.manrope(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   bool _validateElectronicsForm() {
@@ -3927,7 +4151,6 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
       }
 
       final result = await ApiService.submitTyresRimsRequest(
-        accessToken: token,
         tyreWidth: _tyreWidthController.text,
         sidewallProfile: _selectedSidewallProfile ?? '55',
         wheelRimDiameter: _selectedWheelRimDiameter ?? '16',
@@ -3946,15 +4169,8 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
       );
 
       if (result['success']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Tyres/Rims request submitted successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // Reset form after successful submission
-        _resetTyresRimsForm();
+        // Show success dialog
+        await _showTyresRimsRequestSuccessDialog();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -3975,6 +4191,134 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
         _isSubmitting = false;
       });
     }
+  }
+
+  /// Show styled success dialog for tyres/rims request submission
+  Future<void> _showTyresRimsRequestSuccessDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 10,
+          child: Container(
+            width: 400,
+            padding: EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Success Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 50,
+                  ),
+                ),
+                SizedBox(height: 24),
+                
+                // Success Title
+                Text(
+                  'Tyres & Rims Request Submitted!',
+                  style: GoogleFonts.manrope(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Constants.ftaColorLight,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 16),
+                
+                // Success Message
+                Text(
+                  'Your tyres and rims request has been submitted successfully. Suppliers will provide you with competitive quotes soon.',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16,
+                    color: Colors.grey[700],
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 32),
+                
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          // Reset form
+                          _resetTyresRimsForm();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: Constants.ftaColorLight),
+                          ),
+                        ),
+                        child: Text(
+                          'Submit Another',
+                          style: GoogleFonts.manrope(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Constants.ftaColorLight,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          // Reset form
+                          _resetTyresRimsForm();
+                          // Navigate to dashboard
+                          if (mounted) {
+                            context.go('/dashboard');
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Constants.ftaColorLight,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 2,
+                        ),
+                        child: Text(
+                          'View Requests',
+                          style: GoogleFonts.manrope(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   bool _validateTyresRimsForm() {

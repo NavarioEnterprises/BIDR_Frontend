@@ -1,17 +1,16 @@
 import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/pages/buyer_home.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 import '../models/request_models.dart';
+import '../services/chat_service.dart';
 
 class GroupChatScreen extends StatefulWidget {
   final GroupChat groupChat;
 
-  const GroupChatScreen({
-    Key? key,
-    required this.groupChat,
-  }) : super(key: key);
+  const GroupChatScreen({Key? key, required this.groupChat}) : super(key: key);
 
   @override
   State<GroupChatScreen> createState() => _GroupChatScreenState();
@@ -23,6 +22,18 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   final FocusNode _messageFocusNode = FocusNode();
   Message? _replyingTo;
 
+  // Backend integration
+  ChatConversation? _backendConversation;
+  List<ChatMessage> _backendMessages = [];
+  bool _isLoading = false;
+  bool _useBackend = true; // Toggle between backend and local messages
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeChat();
+  }
+
   @override
   void dispose() {
     _messageController.dispose();
@@ -31,33 +42,127 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     super.dispose();
   }
 
-  void _sendMessage() {
-    if (_messageController.text.trim().isEmpty) return;
-
-    final newMessage = Message(
-      sender: User(
-        name: Constants.myDisplayname, // Current user name
-        role: "Buyer", // Current user role
-        profileImageUrl: null,
-      ),
-      content: _messageController.text.trim(),
-      timestamp: DateTime.now(),
-      isReply: _replyingTo != null,
-    );
+  Future<void> _initializeChat() async {
+    if (!_useBackend) return;
 
     setState(() {
-      if (_replyingTo != null) {
-        // Add as a reply to the specific message
-        _replyingTo!.replies.add(newMessage);
-        _replyingTo = null;
-      } else {
-        // Add as a new top-level message
-        widget.groupChat.messages.add(newMessage);
-      }
+      _isLoading = true;
     });
 
+    try {
+      // Create or get conversation for this request
+      final conversationData =
+          await ChatService.createOrGetConversationForRequest(
+            widget.groupChat.uuid,
+          );
+
+      if (conversationData != null) {
+        _backendConversation = ChatConversation.fromJson(conversationData);
+
+        // Load existing messages
+        await _loadMessages();
+      }
+    } catch (e) {
+      print('Error initializing chat: $e');
+      // Fallback to local messages
+      setState(() {
+        _useBackend = false;
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadMessages() async {
+    if (_backendConversation == null) return;
+
+    try {
+      final messagesData = await ChatService.getMessages(
+        _backendConversation!.id,
+      );
+
+      if (messagesData != null) {
+        setState(() {
+          _backendMessages = messagesData
+              .map(
+                (json) => ChatMessage.fromJson(json, Constants.myDisplayname),
+              )
+              .toList();
+        });
+        _scrollToBottom();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error loading messages: $e');
+      }
+    }
+  }
+
+  Future<void> _sendMessage() async {
+    if (_messageController.text.trim().isEmpty) return;
+
+    final content = _messageController.text.trim();
     _messageController.clear();
-    _scrollToBottom();
+
+    if (_useBackend && _backendConversation != null) {
+      // Send message through backend
+      try {
+        final messageData = await ChatService.sendMessage(
+          _backendConversation!.id,
+          content,
+        );
+
+        if (messageData != null) {
+          // Reload messages to get the latest
+          await _loadMessages();
+        } else {
+          // Failed to send - add back to text field
+          _messageController.text = content;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to send message. Please try again.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        print('Error sending message: $e');
+        _messageController.text = content;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to send message. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } else {
+      // Fallback to local messages
+      final newMessage = Message(
+        sender: User(
+          name: Constants.myDisplayname, // Current user name
+          role: "Buyer", // Current user role
+          profileImageUrl: null,
+        ),
+        content: content,
+        timestamp: DateTime.now(),
+        isReply: _replyingTo != null,
+      );
+
+      setState(() {
+        if (_replyingTo != null) {
+          // Add as a reply to the specific message
+          _replyingTo!.replies.add(newMessage);
+          _replyingTo = null;
+        } else {
+          // Add as a new top-level message
+          widget.groupChat.messages.add(newMessage);
+        }
+      });
+
+      _scrollToBottom();
+    }
   }
 
   void _scrollToBottom() {
@@ -118,14 +223,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       curve: Curves.easeOut,
-      margin: EdgeInsets.only(
-        bottom: 8,
-        left: isReply ? 48 : 0,
-      ),
+      margin: EdgeInsets.only(bottom: 8, left: isReply ? 48 : 0),
       child: Container(
         padding: EdgeInsets.all(8),
-        decoration: isReply ? BoxDecoration(
-        ) : null,
+        decoration: isReply ? BoxDecoration() : null,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -139,14 +240,14 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               ),
               child: message.sender.profileImageUrl != null
                   ? ClipOval(
-                child: Image.network(
-                  message.sender.profileImageUrl!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return _buildAvatarFallback(message.sender, isReply);
-                  },
-                ),
-              )
+                      child: Image.network(
+                        message.sender.profileImageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return _buildAvatarFallback(message.sender, isReply);
+                        },
+                      ),
+                    )
                   : _buildAvatarFallback(message.sender, isReply),
             ),
             SizedBox(width: 12),
@@ -170,8 +271,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       SizedBox(width: 8),
                       Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: isReply ? 6 : 8,
-                            vertical: 2
+                          horizontal: isReply ? 6 : 8,
+                          vertical: 2,
                         ),
                         decoration: BoxDecoration(
                           color: message.sender.role.contains("Seller")
@@ -210,7 +311,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       color: isCurrentUser ? Colors.blue[100] : Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isCurrentUser ? Colors.blue[200]! : Colors.grey[200]!,
+                        color: isCurrentUser
+                            ? Colors.blue[200]!
+                            : Colors.grey[200]!,
                         width: 1,
                       ),
                     ),
@@ -230,7 +333,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                     TextButton(
                       onPressed: () => _handleReply(message),
                       style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         minimumSize: Size(0, 0),
                       ),
                       child: Text(
@@ -247,8 +353,127 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                   // Replies
                   if (message.replies.isNotEmpty) ...[
                     SizedBox(height: 8),
-                    ...message.replies.map((reply) => _buildMessageItem(reply, isReply: true)),
+                    ...message.replies.map(
+                      (reply) => _buildMessageItem(reply, isReply: true),
+                    ),
                   ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackendMessageItem(ChatMessage message, {bool isReply = false}) {
+    final isCurrentUser = message.senderName == Constants.myDisplayname;
+
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+      margin: EdgeInsets.only(bottom: 8, left: isReply ? 48 : 0),
+      child: Container(
+        padding: EdgeInsets.all(8),
+        decoration: isReply ? BoxDecoration() : null,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Avatar
+            Container(
+              width: isReply ? 28 : 36,
+              height: isReply ? 28 : 36,
+              decoration: BoxDecoration(
+                color: _getUserColor(message.senderRole),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  message.senderName.isNotEmpty ? message.senderName[0].toUpperCase() : "?",
+                  style: GoogleFonts.manrope(
+                    color: Colors.white,
+                    fontSize: isReply ? 12 : 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 12),
+
+            // Message Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Sender Info
+                  Row(
+                    children: [
+                      Text(
+                        message.senderName,
+                        style: GoogleFonts.manrope(
+                          color: _getUserTextColor(message.senderRole),
+                          fontSize: isReply ? 12 : 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isReply ? 6 : 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: message.senderRole.contains("Seller")
+                              ? Constants.ctaColorLight
+                              : Constants.ftaColorLight,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          message.senderRole,
+                          style: GoogleFonts.manrope(
+                            color: Colors.white,
+                            fontSize: isReply ? 8 : 10,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                        _formatTime(message.timestamp),
+                        style: GoogleFonts.manrope(
+                          color: Colors.grey[500],
+                          fontSize: isReply ? 9 : 11,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 6),
+
+                  // Message Bubble
+                  AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                    padding: EdgeInsets.all(isReply ? 8 : 12),
+                    decoration: BoxDecoration(
+                      color: isCurrentUser ? Colors.blue[100] : Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isCurrentUser
+                            ? Colors.blue[200]!
+                            : Colors.grey[200]!,
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      message.content,
+                      style: GoogleFonts.manrope(
+                        color: Colors.black87,
+                        fontSize: isReply ? 12 : 14,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -274,21 +499,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             child: Row(
               children: [
                 IconButton(
-                    onPressed: (){
-                      Navigator.pop(context);
-                      setState(() {
-
-                      });
-                    }, icon: Icon(Icons.arrow_back_ios_new, size: 20,)
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {});
+                  },
+                  icon: Icon(Icons.arrow_back_ios_new, size: 20),
                 ),
-                SizedBox(width: 16,),
+                SizedBox(width: 16),
                 Text(
                   'Request ',
                   style: GoogleFonts.manrope(color: Colors.white, fontSize: 16),
                 ),
                 Text(
                   'Information',
-                  style: GoogleFonts.manrope(color: Constants.ftaColorLight, fontSize: 16),
+                  style: GoogleFonts.manrope(
+                    color: Constants.ftaColorLight,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),
@@ -361,19 +588,28 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       width: double.infinity,
                       height: 500,
                       constraints: BoxConstraints(maxWidth: 1400),
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: widget.groupChat.messages.length,
-                        physics: ScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          final message = widget.groupChat.messages[index];
-                          return _buildMessageItem(message);
-                        },
-                      ),
+                      child: _isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : ListView.builder(
+                            controller: _scrollController,
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: _useBackend 
+                              ? _backendMessages.length 
+                              : widget.groupChat.messages.length,
+                            physics: ScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              if (_useBackend) {
+                                final backendMessage = _backendMessages[index];
+                                return _buildBackendMessageItem(backendMessage);
+                              } else {
+                                final message = widget.groupChat.messages[index];
+                                return _buildMessageItem(message);
+                              }
+                            },
+                          ),
                     ),
                   ),
-                  SizedBox(height: 24,),
+                  SizedBox(height: 24),
                   Padding(
                     padding: const EdgeInsets.only(left: 24, right: 24),
                     child: Container(
@@ -382,7 +618,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Constants.ftaColorLight, width: 2),
+                        border: Border.all(
+                          color: Constants.ftaColorLight,
+                          width: 2,
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -404,7 +643,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                               decoration: BoxDecoration(
                                 color: Colors.grey[100],
                                 borderRadius: BorderRadius.circular(25),
-                                border: Border.all(color: Colors.grey[300]!, width: 1),
+                                border: Border.all(
+                                  color: Colors.grey[300]!,
+                                  width: 1,
+                                ),
                               ),
                               child: TextField(
                                 controller: _messageController,
@@ -457,15 +699,14 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 24,),
-                  FooterSection(logo: "lib/assets/images/bidr_logo2.png")
+                  SizedBox(height: 24),
+                  FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
                 ],
               ),
             ),
           ),
 
           // Message Input
-          
         ],
       ),
     );
@@ -476,7 +717,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       child: Text(
         user.name.isNotEmpty ? user.name[0].toUpperCase() : "?",
         style: GoogleFonts.manrope(
-          color: user.role.contains("Seller")?Constants.ctaColorLight:Constants.ftaColorLight,
+          color: user.role.contains("Seller")
+              ? Constants.ctaColorLight
+              : Constants.ftaColorLight,
           fontSize: isReply ? 12 : 16,
           fontWeight: FontWeight.w500,
         ),
@@ -499,6 +742,3 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     }
   }
 }
-
-
-

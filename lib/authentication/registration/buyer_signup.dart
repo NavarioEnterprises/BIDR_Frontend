@@ -1,4 +1,4 @@
-import 'package:bidr/authentication/auth_api_service.dart';
+import 'package:bidr/services/auth_api_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,7 +22,10 @@ class BuyerSignUpPage extends StatefulWidget {
   State<BuyerSignUpPage> createState() => _BuyerSignUpPageState();
 }
 
-void handleRegistrationErrors(BuildContext context, Map<String, dynamic> result) {
+void handleRegistrationErrors(
+  BuildContext context,
+  Map<String, dynamic> result,
+) {
   String errorMessage = 'Registration failed. ';
 
   // Handle different types of errors
@@ -98,7 +101,6 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 
-
   void _handleSignUp() async {
     if (!_validateForm()) return;
 
@@ -151,7 +153,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
           }
         } else {
           // Handle errors
-          handleRegistrationErrors(context,result);
+          handleRegistrationErrors(context, result);
         }
       } else {
         // Handle null response
@@ -173,8 +175,6 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
       );
     }
   }
-
-
 
   // Improved password validation based on server requirements
   bool _validateForm() {
@@ -292,7 +292,8 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              border: Border.all(color: Constants.gtaColorLight,width: 20)),
+            border: Border.all(color: Constants.gtaColorLight, width: 20),
+          ),
           child: Row(
             children: [
               Expanded(
@@ -309,25 +310,24 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 24),
                         child: OutlinedButton.icon(
-                            onPressed: (){
-                              context.go('/register');
-                            },
+                          onPressed: () {
+                            context.go('/register');
+                          },
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Constants.ctaColorLight,
-                            foregroundColor: Constants.ftaColorLight
+                            foregroundColor: Constants.ftaColorLight,
                           ),
                           icon: Icon(CupertinoIcons.back),
                           label: Text(
-                          'Back',
-                          style: GoogleFonts.manrope(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-
+                            'Back',
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                        ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -395,11 +395,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
 
                           // Full Name input
                           SizedBox(
-                            width:
-                            MediaQuery.of(context).size.width * 0.5,
+                            width: MediaQuery.of(context).size.width * 0.5,
                             child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
                                   padding: EdgeInsets.only(left: 8),
@@ -432,11 +430,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
 
                           // Mobile Number input
                           SizedBox(
-                            width:
-                            MediaQuery.of(context).size.width * 0.5,
+                            width: MediaQuery.of(context).size.width * 0.5,
                             child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(left: 8),
@@ -470,11 +466,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
 
                           // Email input
                           SizedBox(
-                            width:
-                            MediaQuery.of(context).size.width * 0.5,
+                            width: MediaQuery.of(context).size.width * 0.5,
                             child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(left: 8),
@@ -507,11 +501,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
 
                           // Password input
                           SizedBox(
-                            width:
-                            MediaQuery.of(context).size.width * 0.5,
+                            width: MediaQuery.of(context).size.width * 0.5,
                             child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(left: 8),
@@ -534,8 +526,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                                   isPasswordField: true,
                                   onChanged: (value) {},
                                   onSubmitted: (value) {
-                                    _confirmPasswordFocusNode
-                                        .requestFocus();
+                                    _confirmPasswordFocusNode.requestFocus();
                                   },
                                 ),
                               ],
@@ -545,11 +536,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
 
                           // Confirm Password input
                           SizedBox(
-                            width:
-                            MediaQuery.of(context).size.width * 0.5,
+                            width: MediaQuery.of(context).size.width * 0.5,
                             child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(left: 8),
@@ -582,13 +571,10 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
 
                           // Sign up button
                           SizedBox(
-                            width:
-                            MediaQuery.of(context).size.width * 0.5,
+                            width: MediaQuery.of(context).size.width * 0.5,
                             height: 50,
                             child: ElevatedButton(
-                              onPressed: _isLoading
-                                  ? null
-                                  : _handleSignUp,
+                              onPressed: _isLoading ? null : _handleSignUp,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Constants.ctaColorLight,
                                 shape: RoundedRectangleBorder(
@@ -598,33 +584,32 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                               ),
                               child: _isLoading
                                   ? SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor:
-                                  AlwaysStoppedAnimation<Color>(
-                                    Constants.ftaColorLight,
-                                  ),
-                                ),
-                              )
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Constants.ftaColorLight,
+                                            ),
+                                      ),
+                                    )
                                   : Text(
-                                'Sign Up',
-                                style: GoogleFonts.manrope(
-                                  fontSize: 14,
+                                      'Sign Up',
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 14,
 
-                                  fontWeight: FontWeight.w300,
-                                  color: Colors.white,
-                                ),
-                              ),
+                                        fontWeight: FontWeight.w300,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                             ),
                           ),
                           const SizedBox(height: 12),
 
                           // Sign in link
                           SizedBox(
-                            width:
-                            MediaQuery.of(context).size.width * 0.5,
+                            width: MediaQuery.of(context).size.width * 0.5,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -654,8 +639,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                                   style: OutlinedButton.styleFrom(
                                     backgroundColor: Colors.white,
                                     side: BorderSide.none,
-                                    foregroundColor:
-                                    Constants.ftaColorLight,
+                                    foregroundColor: Constants.ftaColorLight,
                                   ),
                                   child: Text(
                                     'Sign in',
