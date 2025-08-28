@@ -537,7 +537,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                   Expanded(
                                     child: CustomVideoPlayerWidget(
                                       videoUrl:
-                                          'https://videocdn.cdnpk.net/videos/83f87a00-c832-4e39-811f-df9ddde83898/horizontal/previews/clear/large.mp4?token=exp=1755697238~hmac=5202134e7d9eb8da3a24a10b5798bab437686787321e18dc3b710fc8aa4b6199',
+                                          'assets/videos/4058080-sd_426_226_25fps.mp4',
                                       autoPlay: false,
                                       looping: true,
                                       placeholder: 'Loading awesome video...',
@@ -547,7 +547,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                   Expanded(
                                     child: CustomVideoPlayerWidget(
                                       videoUrl:
-                                          'https://videocdn.cdnpk.net/videos/1023b72a-f207-5513-9046-9e86aff44a23/horizontal/previews/clear/large.mp4?token=exp=1755697314~hmac=f8602bae3e1a7957fdf7bb67f723a230d3802e4d3542b8518e0d673fc34175d3',
+                                          'assets/videos/5585948-hd_1920_1080_25fps.mp4',
                                       autoPlay: false,
                                       looping: true,
                                       placeholder: 'Loading awesome video...',
@@ -567,7 +567,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                   Expanded(
                                     child: CustomVideoPlayerWidget(
                                       videoUrl:
-                                          'https://videocdn.cdnpk.net/videos/45d47465-c3a1-54ef-aa83-466722d851ad/horizontal/previews/clear/large.mp4?token=exp=1755697358~hmac=426a8baec13e32ba767cbd9a89368f19f1af446166d941db9ac11d5662dc61f1',
+                                          'assets/videos/6353353-hd_1080_1920_30fps.mp4',
                                       autoPlay: false,
                                       looping: true,
                                       placeholder: 'Loading awesome video...',
@@ -585,7 +585,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                   AnimatedContainer(
                     duration: Duration(milliseconds: 300),
                     padding: EdgeInsets.only(left: 12, right: 12),
-                    height: 65,
+                    height: 55,
                     width: MediaQuery.of(context).size.width * 0.35,
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -605,80 +605,89 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                           child: Text(
                             buttonTitle,
                             style: GoogleFonts.manrope(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
                               color: Constants.ftaColorLight,
                             ),
                           ),
                         ),
                         SizedBox(width: 12),
-                        AnimatedContainer(
-                          duration: Duration(milliseconds: 200),
-                          child: IconButton(
-                            onPressed: () {
-                              if (title == "How It Works") {
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (
-                                          context,
-                                          animation,
-                                          secondaryAnimation,
-                                        ) => BusinessLandingPage(),
-                                    transitionsBuilder:
-                                        (
-                                          context,
-                                          animation,
-                                          secondaryAnimation,
-                                          child,
-                                        ) {
-                                          return SlideTransition(
-                                            position: Tween<Offset>(
-                                              begin: Offset(1.0, 0.0),
-                                              end: Offset.zero,
-                                            ).animate(animation),
-                                            child: child,
-                                          );
-                                        },
+                        Container(
+                          height: 20,
+                          width: 20,
+                          child: Center(
+                            child: AnimatedContainer(
+                              duration: Duration(milliseconds: 200),
+                              child: IconButton(
+                                onPressed: () {
+                                  if (title == "How It Works") {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder:
+                                            (
+                                              context,
+                                              animation,
+                                              secondaryAnimation,
+                                            ) => BusinessLandingPage(),
+                                        transitionsBuilder:
+                                            (
+                                              context,
+                                              animation,
+                                              secondaryAnimation,
+                                              child,
+                                            ) {
+                                              return SlideTransition(
+                                                position: Tween<Offset>(
+                                                  begin: Offset(1.0, 0.0),
+                                                  end: Offset.zero,
+                                                ).animate(animation),
+                                                child: child,
+                                              );
+                                            },
+                                      ),
+                                    );
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder:
+                                            (
+                                              context,
+                                              animation,
+                                              secondaryAnimation,
+                                            ) => BuyerLandingPage(),
+                                        transitionsBuilder:
+                                            (
+                                              context,
+                                              animation,
+                                              secondaryAnimation,
+                                              child,
+                                            ) {
+                                              return SlideTransition(
+                                                position: Tween<Offset>(
+                                                  begin: Offset(1.0, 0.0),
+                                                  end: Offset.zero,
+                                                ).animate(animation),
+                                                child: child,
+                                              );
+                                            },
+                                      ),
+                                    );
+                                  }
+                                  setState(() {});
+                                },
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Constants.ftaColorLight,
+                                ),
+                                icon: Center(
+                                  child: Icon(
+                                    size: 12,
+                                    Icons.arrow_forward,
+                                    color: Colors.white,
                                   ),
-                                );
-                              } else {
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (
-                                          context,
-                                          animation,
-                                          secondaryAnimation,
-                                        ) => BuyerLandingPage(),
-                                    transitionsBuilder:
-                                        (
-                                          context,
-                                          animation,
-                                          secondaryAnimation,
-                                          child,
-                                        ) {
-                                          return SlideTransition(
-                                            position: Tween<Offset>(
-                                              begin: Offset(1.0, 0.0),
-                                              end: Offset.zero,
-                                            ).animate(animation),
-                                            child: child,
-                                          );
-                                        },
-                                  ),
-                                );
-                              }
-                              setState(() {});
-                            },
-                            style: IconButton.styleFrom(
-                              backgroundColor: Constants.ftaColorLight,
-                            ),
-                            icon: Icon(
-                              Icons.arrow_forward,
-                              color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -761,7 +770,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                   child: Text(
                     'Shop by Categories',
                     style: GoogleFonts.manrope(
-                      fontSize: 32,
+                      fontSize: 34,
                       fontWeight: FontWeight.bold,
                       color: Constants.ftaColorLight,
                     ),
@@ -770,7 +779,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
               );
             },
           ),
-          SizedBox(height: 10),
+          SizedBox(height: 6),
           TweenAnimationBuilder<double>(
             tween: Tween<double>(begin: 0.0, end: 1.0),
             duration: Duration(milliseconds: 800),
@@ -780,9 +789,9 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                 child: Text(
                   'Please click on one of the categories to begin',
                   style: GoogleFonts.manrope(
-                    fontSize: 16,
+                    fontSize: 13.5,
                     color: Colors.grey.shade500,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               );
@@ -854,24 +863,19 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                 duration: Duration(milliseconds: 300),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(360),
-                  border: Border.all(
-                    color: isSelected
-                        ? Constants.ftaColorLight
-                        : Colors.transparent,
-                    width: isSelected ? 3 : 0,
-                  ),
+
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: Constants.ftaColorLight.withOpacity(0.1),
-                            blurRadius: 12,
-                            offset: Offset(0, 3),
+                            color: Colors.grey.withOpacity(0.05),
+                            blurRadius: 6,
+                            offset: Offset(0, 1),
                           ),
                         ]
                       : [],
                 ),
                 child: AnimatedScale(
-                  scale: isSelected ? 0.91 : 0.8,
+                  scale: isSelected ? 0.82 : 0.8,
                   duration: Duration(milliseconds: 200),
                   child: Image.asset(iconImage, fit: BoxFit.contain),
                 ),
@@ -886,7 +890,11 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                   fontSize: isSelected ? 24 : 20,
                   fontWeight: FontWeight.bold,
                 ),
-                child: Text(name),
+                child: Text(
+                  name,
+                  style: TextStyle(),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ],
           ),
@@ -939,6 +947,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
 
   // Range slider value
   double _maxDistance = 50.0;
+  final TextEditingController _maxDistanceController = TextEditingController();
+  final FocusNode _maxDistanceFocus = FocusNode();
 
   // Checkbox values
   bool _agreeToTerms = false;
@@ -957,6 +967,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   void initState() {
     super.initState();
     // Set initial values
+    _maxDistanceController.text = _maxDistance.round().toString();
   }
 
   @override
@@ -968,6 +979,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     _descriptionController.dispose();
     _partNumberController.dispose();
     _mileageController.dispose();
+    _maxDistanceController.dispose();
 
     // Dispose focus nodes
     _vinFocus.dispose();
@@ -976,8 +988,39 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     _descriptionFocus.dispose();
     _partNumberFocus.dispose();
     _mileageFocus.dispose();
+    _maxDistanceFocus.dispose();
 
     super.dispose();
+  }
+
+  // Helper function to create labels with red asterisk for required fields
+  Widget _buildFormLabel(String label) {
+    final isRequired = label.contains('*');
+    final cleanLabel = label.replaceAll('*', '');
+
+    return RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: cleanLabel,
+            style: GoogleFonts.manrope(
+              color: Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.w300,
+            ),
+          ),
+          if (isRequired)
+            TextSpan(
+              text: '*',
+              style: GoogleFonts.manrope(
+                color: Colors.red,
+                fontSize: 14,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   Widget _buildCustomTextField(
@@ -987,38 +1030,22 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     FocusNode? nextFocusNode, {
     Widget? suffixIcon,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            hintText,
-            style: GoogleFonts.manrope(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
-            ),
-          ),
-        ),
-        SizedBox(height: 8),
-        CustomInputTransparent4(
-          hintText: hintText,
-          controller: controller,
-          focusNode: focusNode,
-          textInputAction: nextFocusNode != null
-              ? TextInputAction.next
-              : TextInputAction.done,
-          isPasswordField: false,
-          suffix: suffixIcon,
-          onChanged: (value) {},
-          onSubmitted: (value) {
-            if (nextFocusNode != null) {
-              nextFocusNode.requestFocus();
-            }
-          },
-        ),
-      ],
+    return CustomInputTransparent4(
+      hintText: hintText.replaceAll('*', ''),
+      labelText: hintText,
+      controller: controller,
+      focusNode: focusNode,
+      textInputAction: nextFocusNode != null
+          ? TextInputAction.next
+          : TextInputAction.done,
+      isPasswordField: false,
+      suffix: suffixIcon,
+      onChanged: (value) {},
+      onSubmitted: (value) {
+        if (nextFocusNode != null) {
+          nextFocusNode.requestFocus();
+        }
+      },
     );
   }
 
@@ -1028,64 +1055,61 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     List<String> items,
     Function(String?) onChanged,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            label,
-            style: GoogleFonts.manrope(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
-            ),
+    return Container(
+      width: double.infinity,
+      height: 48,
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'YuGothic',
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Constants.ftaColorLight),
+            borderRadius: BorderRadius.circular(36),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Constants.ctaColorLight),
+            borderRadius: BorderRadius.circular(36),
           ),
         ),
-        SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          height: 48,
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            border: Border.all(color: Constants.ftaColorLight),
-            borderRadius: BorderRadius.circular(360),
-            color: Colors.white,
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              menuMaxHeight: 200,
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              value: value,
-              hint: Text(
-                label,
-                style: GoogleFonts.manrope(
-                  color: Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w300,
-                ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            menuMaxHeight: 200,
+            dropdownColor: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            value: value,
+            hint: Text(
+              label.replaceAll('*', ''),
+              style: GoogleFonts.manrope(
+                color: Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.w300,
               ),
-              isExpanded: true,
-              icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
-              items: items.map((String item) {
-                return DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(
-                    item,
-                    style: GoogleFonts.manrope(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                );
-              }).toList(),
-              onChanged: onChanged,
             ),
+            isExpanded: true,
+            icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
+            items: items.map((String item) {
+              return DropdownMenuItem<String>(
+                value: item,
+                child: Text(
+                  item,
+                  style: GoogleFonts.manrope(
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: onChanged,
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -1096,66 +1120,78 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     double max,
     Function(double) onChanged,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            label,
-            style: GoogleFonts.manrope(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
+        // Left side: Text field
+        Expanded(
+          child: TextFormField(
+            controller: _maxDistanceController,
+            focusNode: _maxDistanceFocus,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: label,
+              hintText: "Enter range",
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(36),
+                borderSide: BorderSide(color: Colors.transparent),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(36),
+                borderSide: BorderSide(color: Colors.black),
+              ),
             ),
+            onChanged: (text) {
+              if (text.isNotEmpty) {
+                final parsedValue = double.tryParse(text);
+                if (parsedValue != null && parsedValue >= min && parsedValue <= max) {
+                  onChanged(parsedValue);
+                }
+              }
+            },
           ),
         ),
-        SizedBox(height: 8),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            border: Border.all(color: Constants.ftaColorLight),
-            borderRadius: BorderRadius.circular(16),
-            color: Colors.white,
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'Enter Range',
-                    style: GoogleFonts.manrope(
-                      color: Colors.grey[500],
-                      fontSize: 14,
-                    ),
+        // 16px spacing
+        SizedBox(width: 16),
+        // Right side: Container with slider
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              border: Border.all(color: Constants.ftaColorLight),
+              borderRadius: BorderRadius.circular(16),
+              color: Colors.white,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  '${value.round()} km',
+                  style: GoogleFonts.manrope(
+                    color: Colors.grey[800],
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
-                  Spacer(),
-                  Text(
-                    '${value.round()} km',
-                    style: GoogleFonts.manrope(
-                      color: Colors.grey[800],
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
+                ),
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: Constants.ctaColorLight,
+                    inactiveTrackColor: Colors.grey[300],
+                    thumbColor: Constants.ftaColorLight,
+                    overlayColor: Constants.ctaColorLight.withOpacity(0.2),
+                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10),
                   ),
-                ],
-              ),
-              SliderTheme(
-                data: SliderTheme.of(context).copyWith(
-                  activeTrackColor: Constants.ctaColorLight,
-                  inactiveTrackColor: Colors.grey[300],
-                  thumbColor: Constants.ftaColorLight,
-                  overlayColor: Constants.ctaColorLight.withOpacity(0.2),
-                  thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10),
+                  child: Slider(
+                    value: value,
+                    min: min,
+                    max: max,
+                    onChanged: (newValue) {
+                      // Update both slider value and text field controller
+                      onChanged(newValue);
+                      _maxDistanceController.text = newValue.round().toString();
+                    },
+                  ),
                 ),
-                child: Slider(
-                  value: value,
-                  min: min,
-                  max: max,
-                  onChanged: onChanged,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -1168,14 +1204,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            'Upload Images Of The Product You Require',
-            style: GoogleFonts.manrope(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
-            ),
-          ),
+          child: _buildFormLabel('Upload Images Of The Product You Require'),
         ),
 
         SizedBox(height: 8),
@@ -1660,6 +1689,9 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                     onChanged: (value) =>
                         setState(() => _agreeToTerms = value ?? false),
                     activeColor: Constants.ctaColorLight,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                   Expanded(
                     child: Text(
@@ -1679,6 +1711,9 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                     onChanged: (value) =>
                         setState(() => _consentToContact = value ?? false),
                     activeColor: Constants.ctaColorLight,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                   Expanded(
                     child: Text(
@@ -1848,7 +1883,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   ),
                 ),
                 SizedBox(height: 24),
-                
+
                 // Success Title
                 Text(
                   'Request Submitted Successfully!',
@@ -1860,7 +1895,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 16),
-                
+
                 // Success Message
                 Text(
                   'Your vehicle spare parts request has been submitted successfully. You will receive quotes from suppliers soon.',
@@ -1872,7 +1907,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 32),
-                
+
                 // Action Buttons
                 Row(
                   children: [
@@ -2055,184 +2090,174 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   }
 
   Widget _buildLocationField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            'Your Location*',
-            style: GoogleFonts.manrope(
+    return GestureDetector(
+      onTap: _showLocationPicker,
+      child: Container(
+        height: 55,
+        child: TextField(
+          controller: _locationController,
+          focusNode: _locationFocus,
+          enabled: false,
+          decoration: InputDecoration(
+            labelText: 'Your Location*',
+            labelStyle: TextStyle(
               color: Colors.black,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'YuGothic',
+            ),
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+            hintText: 'Tap to select location',
+            hintStyle: GoogleFonts.manrope(
+              color: Colors.grey.shade500,
               fontSize: 14,
-              fontWeight: FontWeight.w600,
             ),
-          ),
-        ),
-        SizedBox(height: 8),
-        GestureDetector(
-          onTap: _showLocationPicker,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.white,
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black),
+              borderRadius: BorderRadius.circular(36),
             ),
-            child: TextField(
-              controller: _locationController,
-              focusNode: _locationFocus,
-              enabled: false,
-              decoration: InputDecoration(
-                hintText: 'Tap to select location',
-                hintStyle: GoogleFonts.manrope(
-                  color: Colors.grey.shade500,
-                  fontSize: 14,
-                ),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                suffixIcon: Container(
-                  margin: EdgeInsets.all(8),
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Color(0xFF2C3E50),
-                    borderRadius: BorderRadius.circular(360),
+            disabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black),
+              borderRadius: BorderRadius.circular(36),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black),
+              borderRadius: BorderRadius.circular(36),
+            ),
+            suffixIcon: Container(
+              margin: EdgeInsets.all(8),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Color(0xFF2C3E50),
+                borderRadius: BorderRadius.circular(360),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.location_on, color: Colors.white, size: 16),
+                  SizedBox(width: 6),
+                  Text(
+                    'Select Location',
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.location_on, color: Colors.white, size: 16),
-                      SizedBox(width: 6),
-                      Text(
-                        'Select Location',
-                        style: GoogleFonts.manrope(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                ],
               ),
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 
   Widget _buildVinField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            'VIN (Vehicle Identification Number)*',
-            style: GoogleFonts.manrope(
+    return GestureDetector(
+      onTap: _pickVinImages,
+      child: Container(
+        height: 55,
+        child: TextField(
+          controller: _vinController,
+          focusNode: _vinFocus,
+          enabled: false,
+          decoration: InputDecoration(
+            labelText: 'VIN (Vehicle Identification Number)*',
+            labelStyle: TextStyle(
               color: Colors.black,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'YuGothic',
+            ),
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+            hintText: 'Click to upload images or use upload button',
+            hintStyle: GoogleFonts.manrope(
+              color: Colors.grey.shade500,
               fontSize: 14,
-              fontWeight: FontWeight.w600,
             ),
-          ),
-        ),
-        SizedBox(height: 8),
-        GestureDetector(
-          onTap: _pickVinImages,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.grey.shade50,
+            filled: true,
+            fillColor: Colors.grey.shade50,
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black),
+              borderRadius: BorderRadius.circular(36),
             ),
-            child: TextField(
-              controller: _vinController,
-              focusNode: _vinFocus,
-              enabled: false,
-              decoration: InputDecoration(
-                hintText: 'Click to upload images or use upload button',
-                hintStyle: GoogleFonts.manrope(
-                  color: Colors.grey.shade500,
-                  fontSize: 14,
-                ),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                prefixIcon: _vinImages.isNotEmpty
-                    ? Container(
-                        margin: EdgeInsets.all(8),
-                        padding: EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade50,
-                          borderRadius: BorderRadius.circular(360),
-                          border: Border.all(color: Colors.green.shade300),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.check_circle,
-                              color: Colors.green,
-                              size: 16,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              '${_vinImages.length} image${_vinImages.length > 1 ? 's' : ''}',
-                              style: GoogleFonts.manrope(
-                                color: Colors.green.shade700,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(width: 4),
-                            GestureDetector(
-                              onTap: _showVinImages,
-                              child: Icon(
-                                Icons.visibility,
-                                color: Colors.green.shade700,
-                                size: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : null,
-                suffixIcon: GestureDetector(
-                  onTap: _pickVinImages,
-                  child: Container(
+            disabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black),
+              borderRadius: BorderRadius.circular(36),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black),
+              borderRadius: BorderRadius.circular(36),
+            ),
+            prefixIcon: _vinImages.isNotEmpty
+                ? Container(
                     margin: EdgeInsets.all(8),
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: Color(0xFF2C3E50),
+                      color: Colors.green.shade50,
                       borderRadius: BorderRadius.circular(360),
+                      border: Border.all(color: Colors.green.shade300),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.camera_alt, color: Colors.white, size: 16),
-                        SizedBox(width: 6),
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
                         Text(
-                          'Upload Photo',
+                          '${_vinImages.length} image${_vinImages.length > 1 ? 's' : ''}',
                           style: GoogleFonts.manrope(
-                            color: Colors.white,
+                            color: Colors.green.shade700,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
+                        SizedBox(width: 4),
+                        GestureDetector(
+                          onTap: _showVinImages,
+                          child: Icon(
+                            Icons.visibility,
+                            color: Colors.green.shade700,
+                            size: 16,
+                          ),
+                        ),
                       ],
                     ),
-                  ),
+                  )
+                : null,
+            suffixIcon: GestureDetector(
+              onTap: _pickVinImages,
+              child: Container(
+                margin: EdgeInsets.all(8),
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Color(0xFF2C3E50),
+                  borderRadius: BorderRadius.circular(360),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.camera_alt, color: Colors.white, size: 16),
+                    SizedBox(width: 6),
+                    Text(
+                      'Upload Photo',
+                      style: GoogleFonts.manrope(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -2242,14 +2267,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            label,
-            style: GoogleFonts.manrope(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
-            ),
-          ),
+          child: _buildFormLabel(label),
         ),
         SizedBox(height: 8),
         GestureDetector(
@@ -2747,38 +2765,22 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
     FocusNode? nextFocusNode, {
     Widget? suffixIcon,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            hintText,
-            style: GoogleFonts.manrope(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
-            ),
-          ),
-        ),
-        SizedBox(height: 8),
-        CustomInputTransparent4(
-          hintText: hintText,
-          controller: controller,
-          focusNode: focusNode,
-          textInputAction: nextFocusNode != null
-              ? TextInputAction.next
-              : TextInputAction.done,
-          isPasswordField: false,
-          suffix: suffixIcon,
-          onChanged: (value) {},
-          onSubmitted: (value) {
-            if (nextFocusNode != null) {
-              nextFocusNode.requestFocus();
-            }
-          },
-        ),
-      ],
+    return CustomInputTransparent4(
+      hintText: hintText.replaceAll('*', ''),
+      labelText: hintText,
+      controller: controller,
+      focusNode: focusNode,
+      textInputAction: nextFocusNode != null
+          ? TextInputAction.next
+          : TextInputAction.done,
+      isPasswordField: false,
+      suffix: suffixIcon,
+      onChanged: (value) {},
+      onSubmitted: (value) {
+        if (nextFocusNode != null) {
+          nextFocusNode.requestFocus();
+        }
+      },
     );
   }
 
@@ -2788,64 +2790,61 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
     List<String> items,
     Function(String?) onChanged,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            label,
-            style: GoogleFonts.manrope(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
-            ),
+    return Container(
+      width: double.infinity,
+      height: 48,
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'YuGothic',
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Constants.ftaColorLight),
+            borderRadius: BorderRadius.circular(36),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Constants.ctaColorLight),
+            borderRadius: BorderRadius.circular(36),
           ),
         ),
-        SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          height: 48,
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            border: Border.all(color: Constants.ftaColorLight),
-            borderRadius: BorderRadius.circular(360),
-            color: Colors.white,
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              menuMaxHeight: 200,
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              value: value,
-              hint: Text(
-                label,
-                style: GoogleFonts.manrope(
-                  color: Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w300,
-                ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            menuMaxHeight: 200,
+            dropdownColor: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            value: value,
+            hint: Text(
+              label.replaceAll('*', ''),
+              style: GoogleFonts.manrope(
+                color: Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.w300,
               ),
-              isExpanded: true,
-              icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
-              items: items.map((String item) {
-                return DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(
-                    item,
-                    style: GoogleFonts.manrope(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                );
-              }).toList(),
-              onChanged: onChanged,
             ),
+            isExpanded: true,
+            icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
+            items: items.map((String item) {
+              return DropdownMenuItem<String>(
+                value: item,
+                child: Text(
+                  item,
+                  style: GoogleFonts.manrope(
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: onChanged,
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -3118,6 +3117,9 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                     onChanged: (value) =>
                         setState(() => _agreeToTerms = value ?? false),
                     activeColor: Constants.ctaColorLight,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
                   Expanded(
                     child: Text(
@@ -3137,6 +3139,9 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                     onChanged: (value) =>
                         setState(() => _consentToContact = value ?? false),
                     activeColor: Constants.ctaColorLight,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
                   Expanded(
                     child: Text(
@@ -3306,7 +3311,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                   ),
                 ),
                 SizedBox(height: 24),
-                
+
                 // Success Title
                 Text(
                   'Electronics Request Submitted!',
@@ -3318,7 +3323,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 16),
-                
+
                 // Success Message
                 Text(
                   'Your electronics request has been submitted successfully. Suppliers will contact you with their best offers.',
@@ -3330,7 +3335,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 32),
-                
+
                 // Action Buttons
                 Row(
                   children: [
@@ -3451,6 +3456,10 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
   }
 }
 
+Widget? _buildFormLabel(String hintText) {
+  return Text(hintText);
+}
+
 class TireProductQuoteForm extends StatefulWidget {
   @override
   _TireProductQuoteFormState createState() => _TireProductQuoteFormState();
@@ -3523,38 +3532,22 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     FocusNode? nextFocusNode, {
     Widget? suffixIcon,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            hintText,
-            style: GoogleFonts.manrope(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
-            ),
-          ),
-        ),
-        SizedBox(height: 8),
-        CustomInputTransparent4(
-          hintText: hintText,
-          controller: controller,
-          focusNode: focusNode,
-          textInputAction: nextFocusNode != null
-              ? TextInputAction.next
-              : TextInputAction.done,
-          isPasswordField: false,
-          suffix: suffixIcon,
-          onChanged: (value) {},
-          onSubmitted: (value) {
-            if (nextFocusNode != null) {
-              nextFocusNode.requestFocus();
-            }
-          },
-        ),
-      ],
+    return CustomInputTransparent4(
+      hintText: hintText.replaceAll('*', ''),
+      labelText: hintText,
+      controller: controller,
+      focusNode: focusNode,
+      textInputAction: nextFocusNode != null
+          ? TextInputAction.next
+          : TextInputAction.done,
+      isPasswordField: false,
+      suffix: suffixIcon,
+      onChanged: (value) {},
+      onSubmitted: (value) {
+        if (nextFocusNode != null) {
+          nextFocusNode.requestFocus();
+        }
+      },
     );
   }
 
@@ -3564,64 +3557,61 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     List<String> items,
     Function(String?) onChanged,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            label,
-            style: GoogleFonts.manrope(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
-            ),
+    return Container(
+      width: double.infinity,
+      height: 48,
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'YuGothic',
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Constants.ftaColorLight),
+            borderRadius: BorderRadius.circular(36),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Constants.ctaColorLight),
+            borderRadius: BorderRadius.circular(36),
           ),
         ),
-        SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          height: 48,
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            border: Border.all(color: Constants.ftaColorLight),
-            borderRadius: BorderRadius.circular(360),
-            color: Colors.white,
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              menuMaxHeight: 200,
-              dropdownColor: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              value: value,
-              hint: Text(
-                label,
-                style: GoogleFonts.manrope(
-                  color: Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w300,
-                ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            menuMaxHeight: 200,
+            dropdownColor: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            value: value,
+            hint: Text(
+              label.replaceAll('*', ''),
+              style: GoogleFonts.manrope(
+                color: Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.w300,
               ),
-              isExpanded: true,
-              icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
-              items: items.map((String item) {
-                return DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(
-                    item,
-                    style: GoogleFonts.manrope(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                );
-              }).toList(),
-              onChanged: onChanged,
             ),
+            isExpanded: true,
+            icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
+            items: items.map((String item) {
+              return DropdownMenuItem<String>(
+                value: item,
+                child: Text(
+                  item,
+                  style: GoogleFonts.manrope(
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: onChanged,
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -4039,6 +4029,9 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                     onChanged: (value) =>
                         setState(() => _agreeToTerms = value ?? false),
                     activeColor: Constants.ctaColorLight,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                   Expanded(
                     child: Text(
@@ -4058,6 +4051,9 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                     onChanged: (value) =>
                         setState(() => _consentToContact = value ?? false),
                     activeColor: Constants.ctaColorLight,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                   Expanded(
                     child: Text(
@@ -4229,7 +4225,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                   ),
                 ),
                 SizedBox(height: 24),
-                
+
                 // Success Title
                 Text(
                   'Tyres & Rims Request Submitted!',
@@ -4241,7 +4237,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 16),
-                
+
                 // Success Message
                 Text(
                   'Your tyres and rims request has been submitted successfully. Suppliers will provide you with competitive quotes soon.',
@@ -4253,7 +4249,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 32),
-                
+
                 // Action Buttons
                 Row(
                   children: [

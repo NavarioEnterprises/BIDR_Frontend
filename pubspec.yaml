@@ -155,6 +155,9 @@ flutter:
     - lib/assets/svgs/bidr_logo_with_text.svg
     - lib/assets/covers/Group 1171275363.png
     - lib/assets/images/bidr_logo_with_text.png
+    - assets/videos/4058080-sd_426_226_25fps.mp4
+    - assets/videos/5585948-hd_1920_1080_25fps.mp4
+    - assets/videos/6353353-hd_1080_1920_30fps.mp4
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

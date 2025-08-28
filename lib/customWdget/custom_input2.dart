@@ -1065,6 +1065,7 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
           border: InputBorder.none,
           hintText: widget.hintText,
           labelText: widget.labelText,
+          floatingLabelBehavior: FloatingLabelBehavior.always,
           prefixIcon: widget.prefix,
           suffixIcon: widget.suffix != null
               ? widget.suffix
