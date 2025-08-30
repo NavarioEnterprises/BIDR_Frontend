@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../customWdget/custom_input2.dart';
 import '../buyer_home.dart';
+import '../../models/contact_submission.dart';
+import '../../services/contact_api_service.dart';
 
 class ContactFormScreen extends StatefulWidget {
   @override
@@ -12,16 +14,23 @@ class ContactFormScreen extends StatefulWidget {
 
 class _ContactFormScreenState extends State<ContactFormScreen> with TickerProviderStateMixin {
   // Controllers
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
-  final TextEditingController subjectController = TextEditingController();
+  final TextEditingController companyController = TextEditingController();
   final TextEditingController messageController = TextEditingController();
 
   // Focus Nodes
+  final FocusNode nameFocusNode = FocusNode();
   final FocusNode emailFocusNode = FocusNode();
   final FocusNode mobileFocusNode = FocusNode();
-  final FocusNode subjectFocusNode = FocusNode();
+  final FocusNode companyFocusNode = FocusNode();
   final FocusNode messageFocusNode = FocusNode();
+
+  // API Service and form state
+  final ContactApiService _contactApiService = ContactApiService();
+  String _selectedSubject = ContactSubjectChoices.general;
+  bool _isSubmitting = false;
 
   // Animation Controllers
   late AnimationController _fadeController;
@@ -63,33 +72,96 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
 
   @override
   void dispose() {
+    nameController.dispose();
     emailController.dispose();
     mobileController.dispose();
-    subjectController.dispose();
+    companyController.dispose();
     messageController.dispose();
+    nameFocusNode.dispose();
     emailFocusNode.dispose();
     mobileFocusNode.dispose();
-    subjectFocusNode.dispose();
+    companyFocusNode.dispose();
     messageFocusNode.dispose();
     _fadeController.dispose();
     _slideController.dispose();
     super.dispose();
   }
 
-  void handleSubmit() {
-    // Handle form submission
-    print('Email: ${emailController.text}');
-    print('Mobile: ${mobileController.text}');
-    print('Subject: ${subjectController.text}');
-    print('Message: ${messageController.text}');
+  Future<void> handleSubmit() async {
+    // Basic validation
+    if (nameController.text.trim().isEmpty ||
+        emailController.text.trim().isEmpty ||
+        messageController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill in all required fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
-    // You can add your submission logic here
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Message sent successfully!'),
-        backgroundColor: Color(0xFFF5A623),
-      ),
-    );
+    // Email validation
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(emailController.text.trim())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please enter a valid email address'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final submission = ContactSubmission(
+        name: nameController.text.trim(),
+        email: emailController.text.trim(),
+        phone: mobileController.text.trim().isEmpty ? null : mobileController.text.trim(),
+        company: companyController.text.trim().isEmpty ? null : companyController.text.trim(),
+        subject: _selectedSubject,
+        message: messageController.text.trim(),
+      );
+
+      final result = await _contactApiService.submitContactForm(submission);
+
+      if (result['success']) {
+        // Show success dialog
+        _showSuccessDialog();
+        
+        // Clear form on success
+        nameController.clear();
+        emailController.clear();
+        mobileController.clear();
+        companyController.clear();
+        messageController.clear();
+        setState(() {
+          _selectedSubject = ContactSubjectChoices.general;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message'] ?? 'Failed to submit contact form'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
   }
 
   @override
@@ -186,10 +258,24 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                             ),
                             SizedBox(height: 40),
 
+                            // Name Field
+                            _buildAnimatedTextField(
+                              label: 'Full Name *',
+                              hintText: 'Enter your full name',
+                              controller: nameController,
+                              focusNode: nameFocusNode,
+                              textInputAction: TextInputAction.next,
+                              delay: 100,
+                              onSubmitted: (value) {
+                                FocusScope.of(context).requestFocus(emailFocusNode);
+                              },
+                            ),
+                            SizedBox(height: 20),
+
                             // Email Field
                             _buildAnimatedTextField(
-                              label: 'Email',
-                              hintText: 'Enter Email',
+                              label: 'Email Address *',
+                              hintText: 'Enter your email address',
                               controller: emailController,
                               focusNode: emailFocusNode,
                               textInputAction: TextInputAction.next,
@@ -202,39 +288,46 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
 
                             // Mobile Number Field
                             _buildAnimatedTextField(
-                              label: 'Mobile Number',
-                              hintText: 'Enter Mobile Number',
+                              label: 'Phone Number',
+                              hintText: 'Enter your phone number (optional)',
                               controller: mobileController,
                               focusNode: mobileFocusNode,
                               textInputAction: TextInputAction.next,
-                              delay: 400,
+                              delay: 300,
                               onSubmitted: (value) {
-                                FocusScope.of(context).requestFocus(subjectFocusNode);
+                                FocusScope.of(context).requestFocus(companyFocusNode);
                               },
                             ),
                             SizedBox(height: 20),
 
-                            // Subject Field
+                            // Company Field
                             _buildAnimatedTextField(
-                              label: 'Subject',
-                              hintText: 'Enter Subject',
-                              controller: subjectController,
-                              focusNode: subjectFocusNode,
+                              label: 'Company',
+                              hintText: 'Enter your company name (optional)',
+                              controller: companyController,
+                              focusNode: companyFocusNode,
                               textInputAction: TextInputAction.next,
-                              delay: 600,
+                              delay: 400,
                               onSubmitted: (value) {
+                                // Move focus to message field since subject is now a dropdown
                                 FocusScope.of(context).requestFocus(messageFocusNode);
                               },
                             ),
                             SizedBox(height: 20),
 
+                            // Subject Dropdown
+                            _buildAnimatedSubjectDropdown(
+                              delay: 500,
+                            ),
+                            SizedBox(height: 20),
+
                             // Message Field
                             _buildAnimatedMessageField(
-                              label: 'Message',
-                              hintText: 'Enter Message',
+                              label: 'Message *',
+                              hintText: 'Enter your message',
                               controller: messageController,
                               focusNode: messageFocusNode,
-                              delay: 800,
+                              delay: 600,
                             ),
                             SizedBox(height: 40),
 
@@ -404,26 +497,120 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
     );
   }
 
+  Widget _buildAnimatedSubjectDropdown({required int delay}) {
+    return TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 800 + delay),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(30 * (1 - value), 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Text(
+                    'Subject *',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Constants.ftaColorLight),
+                  ),
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedSubject,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Color(0xFFF5A623), width: 2),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      fillColor: Colors.white,
+                      filled: true,
+                    ),
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      color: Colors.black87,
+                    ),
+                    items: ContactSubjectChoices.choices.entries.map((entry) {
+                      return DropdownMenuItem<String>(
+                        value: entry.key,
+                        child: Text(entry.value),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          _selectedSubject = newValue;
+                        });
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildSubmitButton() {
     return Container(
       height: 50,
       child: ElevatedButton(
-        onPressed: handleSubmit,
+        onPressed: _isSubmitting ? null : handleSubmit,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFFF5A623),
+          backgroundColor: _isSubmitting ? Colors.grey : Color(0xFFF5A623),
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
           ),
         ),
-        child: Text(
-          'Submit',
-          style: GoogleFonts.manrope(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        child: _isSubmitting
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    'Submitting...',
+                    style: GoogleFonts.manrope(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              )
+            : Text(
+                'Submit',
+                style: GoogleFonts.manrope(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
       ),
     );
   }
@@ -435,6 +622,128 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
       child: CustomPaint(
         painter: ContactIllustrationPainter(),
       ),
+    );
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            constraints: BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10.0,
+                  offset: const Offset(0.0, 10.0),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.only(top: 20),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: Duration(milliseconds: 600),
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: value,
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF5A623).withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Color(0xFFF5A623),
+                            size: 50,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 20, left: 20, right: 20),
+                  child: Text(
+                    'Thank You!',
+                    style: GoogleFonts.manrope(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 10, left: 20, right: 20),
+                  child: Text(
+                    'Your message has been sent successfully.',
+                    style: GoogleFonts.manrope(
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 5, left: 20, right: 20, bottom: 20),
+                  child: Text(
+                    'We\'ll get back to you soon!',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      color: Colors.grey[500],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(bottom: 20, left: 20, right: 20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFF5A623),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'OK',
+                        style: GoogleFonts.manrope(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

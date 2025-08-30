@@ -13,6 +13,7 @@ import '../../customWdget/appbar.dart';
 import '../../customWdget/customCard.dart';
 import '../../global_values.dart';
 import '../../models/blog.dart';
+import '../../services/blog_api_service.dart';
 import '../buyer_home.dart';
 
 import 'package:google_fonts/google_fonts.dart';
@@ -25,62 +26,11 @@ class BlogCardsScreen extends StatefulWidget {
 class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
-
-  final List<BlogItem> blogItems = [
-    BlogItem(
-      id: 1,
-      title: 'Auto Spares',
-      description: 'Essential Auto Spares for a Smooth Ride Quality parts keep your car safe and running longer. Find top spares on Bid!',
-      content: '''Is your car not performing at its best? It might be time for a parts upgrade. From brake pads to spark plugs, replacing key components at the right time can save you from costly breakdowns.
-
-This guide covers must-have auto spares, signs of wear, and how to find top-quality parts without overspending. With BidR, making competitive pricing convenient, you get the best deals on reliable auto spares... shop smarter today!
-
-Section 110.32 of "De Finibus Bonorum et Malorum"
-
-"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt."
-
-The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 110.32 and 110.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.''',
-      image: 'lib/assets/images/auto_spares.png',
-      section: 'auto_transport',
-      sectionDisplay: 'Auto & Transport',
-      tagsList: ['auto', 'spares', 'car', 'maintenance'],
-      likes: 7,
-      views: 125,
-      commentsCount: 6,
-      createdAt: '2024-01-15T10:00:00Z',
-      publishedAt: '2024-01-15T10:00:00Z',
-    ),
-    BlogItem(
-      id: 2,
-      title: 'Tyres and Rims',
-      description: 'Upgrade Your Tyres & Rims Today Better performance starts with the right fit. Get top deals on Bid!',
-      content: 'Detailed content about tyres and rims...',
-      image: 'lib/assets/images/rims_and_tyre.png',
-      section: 'auto_transport',
-      sectionDisplay: 'Auto & Transport',
-      tagsList: ['tyres', 'rims', 'wheels', 'upgrade'],
-      likes: 254,
-      views: 890,
-      commentsCount: 32,
-      createdAt: '2024-06-02T10:00:00Z',
-      publishedAt: '2024-06-02T10:00:00Z',
-    ),
-    BlogItem(
-      id: 3,
-      title: 'Consumer Electronics',
-      description: 'Stay Ahead with Top Electronics From gadgets to home tech, find the best deals on Bid now!',
-      content: 'Detailed content about consumer electronics...',
-      image: 'lib/assets/images/electronics_com.png',
-      section: 'electronics',
-      sectionDisplay: 'Electronics',
-      tagsList: ['electronics', 'gadgets', 'tech', 'deals'],
-      likes: 156,
-      views: 720,
-      commentsCount: 285,
-      createdAt: '2024-08-29T10:00:00Z',
-      publishedAt: '2024-08-29T10:00:00Z',
-    ),
-  ];
+  
+  final BlogApiService _blogApiService = BlogApiService();
+  List<BlogItem> blogItems = [];
+  bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
@@ -98,13 +48,199 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
       curve: Curves.easeInOut,
     ));
 
+    _loadBlogs();
     _controller.forward();
+  }
+
+  Future<void> _loadBlogs() async {
+    try {
+      final blogs = await _blogApiService.fetchBlogs();
+      setState(() {
+        blogItems = blogs;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Widget _buildBlogContent() {
+    if (_isLoading) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              color: Constants.ctaColorLight,
+              strokeWidth: 3,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Loading blog posts...',
+              style: GoogleFonts.manrope(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red[400],
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Failed to load blog posts',
+              style: GoogleFonts.manrope(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              _error!.replaceAll('Exception: ', ''),
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _isLoading = true;
+                  _error = null;
+                });
+                _loadBlogs();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Constants.ctaColorLight,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+              child: Text(
+                'Retry',
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (blogItems.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              HugeIcons.strokeRoundedFileNotFound,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            SizedBox(height: 16),
+            Text(
+              'No blog posts available',
+              style: GoogleFonts.manrope(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Check back later for new content!',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 5,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        //childAspectRatio: 0.4,
+      ),
+      itemCount: blogItems.length,
+      padding: EdgeInsets.all(24),
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index) {
+        return TweenAnimationBuilder<double>(
+          duration: Duration(milliseconds: 800 + (index * 200)),
+          tween: Tween(begin: 0.0, end: 1.0),
+          builder: (context, value, child) {
+            return Opacity(
+              opacity: value,
+              child: Transform.translate(
+                offset: Offset(0, 30 * (1 - value)),
+                child: Transform.scale(
+                  scale: 0.8 + (0.2 * value),
+                  child: BlogCard(
+                    blogItem: blogItems[index],
+                    onTap: () {
+                      // Increment view count when opening blog
+                      _blogApiService.incrementBlogViews(blogItems[index].id);
+                      
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation, secondaryAnimation) => BlogDetailScreen(
+                            blogItem: blogItems[index],
+                            relatedItems: blogItems.where((item) => item != blogItems[index]).toList(),
+                          ),
+                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                            return SlideTransition(
+                              position: Tween<Offset>(
+                                begin: Offset(1.0, 0.0),
+                                end: Offset.zero,
+                              ).animate(CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.easeInOut,
+                              )),
+                              child: child,
+                            );
+                          },
+                          transitionDuration: Duration(milliseconds: 400),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -141,61 +277,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                       width: MediaQuery.of(context).size.width,
                       height: 400,
                       constraints: BoxConstraints(maxWidth: 1600),
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 5,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          //childAspectRatio: 0.4,
-                        ),
-                        itemCount: blogItems.length,
-                        padding: EdgeInsets.all(24),
-                        physics: NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return TweenAnimationBuilder<double>(
-                            duration: Duration(milliseconds: 800 + (index * 200)),
-                            tween: Tween(begin: 0.0, end: 1.0),
-                            builder: (context, value, child) {
-                              return Opacity(
-                                opacity: value,
-                                child: Transform.translate(
-                                  offset: Offset(0, 30 * (1 - value)),
-                                  child: Transform.scale(
-                                    scale: 0.8 + (0.2 * value),
-                                    child: BlogCard(
-                                      blogItem: blogItems[index],
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation, secondaryAnimation) => BlogDetailScreen(
-                                              blogItem: blogItems[index],
-                                              relatedItems: blogItems.where((item) => item != blogItems[index]).toList(),
-                                            ),
-                                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                              return SlideTransition(
-                                                position: Tween<Offset>(
-                                                  begin: Offset(1.0, 0.0),
-                                                  end: Offset.zero,
-                                                ).animate(CurvedAnimation(
-                                                  parent: animation,
-                                                  curve: Curves.easeInOut,
-                                                )),
-                                                child: child,
-                                              );
-                                            },
-                                            transitionDuration: Duration(milliseconds: 400),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                      child: _buildBlogContent(),
                     ),
                   ),
                   SizedBox(height: 24),

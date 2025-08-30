@@ -8,10 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:motion_toast/motion_toast.dart';
 
 import '../../constants/Constants.dart';
 import '../../customWdget/custom_input2.dart';
 import '../../models/ticket.dart';
+import '../../services/ticket_api_service.dart';
 
 
 import 'package:google_fonts/google_fonts.dart';
@@ -39,9 +41,19 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
   late Animation<Offset> _leftSlideAnimation;
   late Animation<Offset> _rightSlideAnimation;
 
+  // API Service and State
+  final TicketApiService _ticketApiService = TicketApiService();
+  List<Ticket> tickets = [];
+  bool _isLoadingTickets = true;
+  bool _isCreatingTicket = false;
+  String? _authUserUid = Constants.myUid.isNotEmpty ? Constants.myUid : null;
+
   @override
   void initState() {
     super.initState();
+    // Update auth user UID from Constants
+    _authUserUid = Constants.myUid.isNotEmpty ? Constants.myUid : null;
+    
     _fadeController = AnimationController(
       duration: Duration(milliseconds: 1000),
       vsync: this,
@@ -77,6 +89,9 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
 
     _fadeController.forward();
     _slideController.forward();
+    
+    // Load tickets from API
+    _loadTickets();
   }
 
   @override
@@ -92,32 +107,123 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  final List<Ticket> tickets = [
-    Ticket(
-      id: 1,
-      ticketId: 'BAF000223',
-      authUserUid: 'user123',
-      subject: 'Orders Refunds Issue',
-      description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.',
-      status: 'Pending',
-      priority: 'High',
-      assignee: {'name': 'Mark Jones', 'email': 'mark@bidr.com'},
-      createdAt: '2021-06-12T10:00:00Z',
-      updatedAt: '2021-06-12T10:00:00Z',
-    ),
-    Ticket(
-      id: 2,
-      ticketId: 'BAF000225',
-      authUserUid: 'user123',
-      subject: 'Login Is Not Worked',
-      description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.',
-      status: 'Resolved',
-      priority: 'Medium',
-      assignee: {'name': 'Mark Jones', 'email': 'mark@bidr.com'},
-      createdAt: '2021-06-12T10:00:00Z',
-      updatedAt: '2021-06-12T10:00:00Z',
-    ),
-  ];
+  /// Load tickets from API
+  Future<void> _loadTickets() async {
+    // If user is not authenticated, don't try to load tickets
+    if (_authUserUid == null || _authUserUid!.isEmpty) {
+      setState(() {
+        _isLoadingTickets = false;
+        tickets = [];
+      });
+      return;
+    }
+    
+    setState(() {
+      _isLoadingTickets = true;
+    });
+
+    try {
+      final fetchedTickets = await _ticketApiService.fetchUserTickets(_authUserUid!);
+      if (fetchedTickets != null && mounted) {
+        setState(() {
+          tickets = fetchedTickets;
+          _isLoadingTickets = false;
+        });
+      } else if (mounted) {
+        setState(() {
+          _isLoadingTickets = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading tickets: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingTickets = false;
+        });
+      }
+    }
+  }
+
+  /// Create a new ticket
+  Future<void> _createTicket() async {
+    // Check if user is logged in
+    if (_authUserUid == null || _authUserUid!.isEmpty) {
+      MotionToast.error(
+        title: Text("Authentication Required",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        description: Text("Please login first",
+            style: TextStyle(color: Colors.white)),
+        toastDuration: Duration(seconds: 3),
+        barrierColor: Colors.black.withOpacity(0.3),
+        displayBorder: false,
+      ).show(context);
+      return;
+    }
+    
+    if (_subjectController.text.trim().isEmpty || 
+        _descriptionController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill in all fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isCreatingTicket = true;
+    });
+
+    try {
+      final result = await _ticketApiService.createTicket(
+        authUserUid: _authUserUid!,
+        subject: _subjectController.text.trim(),
+        description: _descriptionController.text.trim(),
+        priority: 'medium',
+      );
+
+      if (mounted) {
+        setState(() {
+          _isCreatingTicket = false;
+        });
+
+        if (result != null && result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Ticket created successfully!'),
+              backgroundColor: Constants.ctaColorLight,
+            ),
+          );
+          _subjectController.clear();
+          _descriptionController.clear();
+          
+          // Reload tickets to show the new one
+          _loadTickets();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result?['error'] ?? 'Failed to create ticket'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error creating ticket: $e');
+      if (mounted) {
+        setState(() {
+          _isCreatingTicket = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Network error occurred'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -208,9 +314,49 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                   ),
                                   SizedBox(height: 24),
                                   Expanded(
-                                    child: ListView.builder(
-                                      itemCount: tickets.length,
-                                      itemBuilder: (context, index) {
+                                    child: _isLoadingTickets
+                                        ? Center(
+                                            child: CircularProgressIndicator(
+                                              color: Constants.ftaColorLight,
+                                            ),
+                                          )
+                                        : tickets.isEmpty
+                                            ? Center(
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.inbox_outlined,
+                                                      size: 48,
+                                                      color: Colors.grey[400],
+                                                    ),
+                                                    SizedBox(height: 16),
+                                                    Text(
+                                                      (_authUserUid == null || _authUserUid!.isEmpty) 
+                                                          ? 'Please login to view tickets'
+                                                          : 'No tickets yet',
+                                                      style: GoogleFonts.manrope(
+                                                        fontSize: 16,
+                                                        color: Colors.grey[600],
+                                                        fontWeight: FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 8),
+                                                    Text(
+                                                      (_authUserUid == null || _authUserUid!.isEmpty)
+                                                          ? 'Login to access support'
+                                                          : 'Create your first support ticket',
+                                                      style: GoogleFonts.manrope(
+                                                        fontSize: 14,
+                                                        color: Colors.grey[500],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            : ListView.builder(
+                                                itemCount: tickets.length,
+                                                itemBuilder: (context, index) {
                                         final ticket = tickets[index];
                                         return TweenAnimationBuilder<double>(
                                           duration: Duration(milliseconds: 1000 + (index * 200)),
@@ -450,20 +596,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                               child: AnimatedContainer(
                                                 duration: Duration(milliseconds: 200),
                                                 child: ElevatedButton(
-                                                  onPressed: () {
-                                                    // Handle ticket creation
-                                                    if (_subjectController.text.isNotEmpty &&
-                                                        _descriptionController.text.isNotEmpty) {
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(
-                                                          content: Text('Ticket created successfully!'),
-                                                          backgroundColor: Constants.ctaColorLight,
-                                                        ),
-                                                      );
-                                                      _subjectController.clear();
-                                                      _descriptionController.clear();
-                                                    }
-                                                  },
+                                                  onPressed: _isCreatingTicket ? null : _createTicket,
                                                   style: ElevatedButton.styleFrom(
                                                     backgroundColor: Constants.ctaColorLight,
                                                     shape: RoundedRectangleBorder(
@@ -472,14 +605,37 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                                     elevation: 2,
                                                     shadowColor: Constants.ctaColorLight.withOpacity(0.3),
                                                   ),
-                                                  child: Text(
-                                                    'Raise a Ticket',
-                                                    style: GoogleFonts.manrope(
-                                                      color: Colors.white,
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w300,
-                                                    ),
-                                                  ),
+                                                  child: _isCreatingTicket
+                                                      ? Row(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            SizedBox(
+                                                              width: 16,
+                                                              height: 16,
+                                                              child: CircularProgressIndicator(
+                                                                color: Colors.white,
+                                                                strokeWidth: 2,
+                                                              ),
+                                                            ),
+                                                            SizedBox(width: 8),
+                                                            Text(
+                                                              'Creating...',
+                                                              style: GoogleFonts.manrope(
+                                                                color: Colors.white,
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.w300,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        )
+                                                      : Text(
+                                                          'Raise a Ticket',
+                                                          style: GoogleFonts.manrope(
+                                                            color: Colors.white,
+                                                            fontSize: 14,
+                                                            fontWeight: FontWeight.w300,
+                                                          ),
+                                                        ),
                                                 ),
                                               ),
                                             ),

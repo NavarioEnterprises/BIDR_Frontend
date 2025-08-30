@@ -1996,8 +1996,12 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                 child: Column(
                   children: [
                     if (bidsToShow.isNotEmpty) ...[
-                      ...bidsToShow.map(
-                        (bid) => _buildModernSellerBid(bid, request),
+                      ...bidsToShow.asMap().entries.map(
+                        (entry) => _buildModernSellerBid(
+                          entry.value,
+                          request,
+                          entry.key + 1,
+                        ),
                       ),
                       if (hasMoreThanTwoBids) ...[
                         SizedBox(height: 16),
@@ -2108,8 +2112,14 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   }
 
   // Modern seller bid card matching screenshot
-  Widget _buildModernSellerBid(dynamic bid, dynamic request) {
-    String sellerName = _getSellerName(bid);
+  Widget _buildModernSellerBid(
+    dynamic bid,
+    dynamic request, [
+    int? sellerIndex,
+  ]) {
+    String sellerName = sellerIndex != null
+        ? "Seller #$sellerIndex"
+        : _getSellerName(bid);
     double bidAmount = _getBidAmount(bid);
     DateTime bidTime = _getBidTime(bid);
     double rating = _getBidRating(bid);

@@ -58,10 +58,11 @@ class _ShareWidgetState extends State<ShareWidget> {
   void _shareLink() async {
     try {
       // Create the referral link and message
-      String appUrl = 'https://your-app-url.com'; // Replace with your actual app URL
+      String appUrl = 'https://bidr.co.za';
       String referralUrl = '$appUrl/referral?code=$referralCode';
 
-      String shareMessage = '''
+      String shareMessage =
+          '''
 🎉 Join me on this amazing app and earn rewards!
 
 Use my referral code: $referralCode
@@ -102,7 +103,7 @@ Let's grow together and enjoy exclusive benefits! 💰
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width*0.35,
+      width: MediaQuery.of(context).size.width * 0.35,
       height: 400,
       padding: EdgeInsets.all(24),
       color: Colors.white,
@@ -136,10 +137,7 @@ Let's grow together and enjoy exclusive benefits! 💰
 
           Text(
             'Share the benefits and grow together.',
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
 
@@ -164,7 +162,7 @@ Let's grow together and enjoy exclusive benefits! 💰
                     style: GoogleFonts.manrope(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color:Constants.ftaColorLight,
+                      color: Constants.ftaColorLight,
                       letterSpacing: 1.2,
                     ),
                   ),
@@ -192,7 +190,7 @@ Let's grow together and enjoy exclusive benefits! 💰
 
           // Share Link Button
           SizedBox(
-            width: MediaQuery.of(context).size.width*0.3,
+            width: MediaQuery.of(context).size.width * 0.3,
             child: ElevatedButton(
               onPressed: _shareLink,
               style: ElevatedButton.styleFrom(
@@ -233,5 +231,3 @@ Let's grow together and enjoy exclusive benefits! 💰
     );
   }
 }
-
-

@@ -490,54 +490,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                     ),
                   ),
                 ),
-                if (tabActiveIndex == 0) ...[
-                  // DEBUG: This should print when dashboard tab is active
-                  // print('Rendering dashboard content, tabActiveIndex: $tabActiveIndex'),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 64, right: 64),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      constraints: BoxConstraints(maxWidth: 1600),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 12,
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Container(
-                              padding: EdgeInsets.only(top: 8, bottom: 8),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue.shade50,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      'Dashboard Content Loading...',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                  SizedBox(height: 16),
-                                  FadeTransition(
-                                    opacity: _fadeAnimation,
-                                    child: SlideTransition(
-                                      position: _slideAnimation,
-                                      child: buildLeadsRequestsWidget(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ] else if (tabActiveIndex == 1) ...[
+                if (tabActiveIndex == 0)
+                  ...[]
+                else if (tabActiveIndex == 1) ...[
                   Padding(
                     padding: const EdgeInsets.only(left: 64, right: 64),
                     child: Container(
@@ -1384,7 +1339,11 @@ class _SellerDashboardState extends State<SellerDashboard>
         child: Center(
           child: Column(
             children: [
-              Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey.shade400),
+              Icon(
+                Icons.receipt_long_outlined,
+                size: 48,
+                color: Colors.grey.shade400,
+              ),
               SizedBox(height: 16),
               Text(
                 'No ${type.replaceAll('bids', 'bids')} found',
@@ -1851,13 +1810,18 @@ class _SellerDashboardState extends State<SellerDashboard>
     final status = quote['status'] ?? 'PENDING';
     final createdAt = quote['created_at'] ?? '';
     final quoteId = quote['quote_id'] ?? 'N/A';
-    final estimatedDeliveryDays = quote['estimated_delivery_days']?.toString() ?? 'N/A';
+    final estimatedDeliveryDays =
+        quote['estimated_delivery_days']?.toString() ?? 'N/A';
     final sellerNotes = quote['seller_notes'] ?? '';
-    
+
     // Get request info if available
     final requestInfo = quote['request_id'] ?? {};
-    final requestTitle = requestInfo is Map ? (requestInfo['title'] ?? 'Request') : 'Request';
-    final requestId = requestInfo is Map ? (requestInfo['request_id'] ?? 'N/A') : 'N/A';
+    final requestTitle = requestInfo is Map
+        ? (requestInfo['title'] ?? 'Request')
+        : 'Request';
+    final requestId = requestInfo is Map
+        ? (requestInfo['request_id'] ?? 'N/A')
+        : 'N/A';
 
     return Container(
       width: 280,
@@ -1893,8 +1857,11 @@ class _SellerDashboardState extends State<SellerDashboard>
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: status == 'ACCEPTED' ? Colors.green[100] : 
-                           status == 'REJECTED' ? Colors.red[100] : Colors.orange[100],
+                    color: status == 'ACCEPTED'
+                        ? Colors.green[100]
+                        : status == 'REJECTED'
+                        ? Colors.red[100]
+                        : Colors.orange[100],
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -1902,15 +1869,18 @@ class _SellerDashboardState extends State<SellerDashboard>
                     style: GoogleFonts.manrope(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: status == 'ACCEPTED' ? Colors.green[700] : 
-                             status == 'REJECTED' ? Colors.red[700] : Colors.orange[700],
+                      color: status == 'ACCEPTED'
+                          ? Colors.green[700]
+                          : status == 'REJECTED'
+                          ? Colors.red[700]
+                          : Colors.orange[700],
                     ),
                   ),
                 ),
               ],
             ),
             SizedBox(height: 8),
-            
+
             // Request title
             Text(
               requestTitle,
@@ -1923,7 +1893,7 @@ class _SellerDashboardState extends State<SellerDashboard>
               overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: 8),
-            
+
             // Date and quote ID
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1946,7 +1916,7 @@ class _SellerDashboardState extends State<SellerDashboard>
               ],
             ),
             SizedBox(height: 12),
-            
+
             // Bid amount
             Row(
               children: [
@@ -1969,7 +1939,7 @@ class _SellerDashboardState extends State<SellerDashboard>
               ],
             ),
             SizedBox(height: 6),
-            
+
             // Delivery time
             Row(
               children: [
@@ -1991,7 +1961,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                 ),
               ],
             ),
-            
+
             if (sellerNotes.isNotEmpty) ...[
               SizedBox(height: 12),
               Column(
@@ -2019,9 +1989,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                 ],
               ),
             ],
-            
+
             SizedBox(height: 16),
-            
+
             // View Details button
             SizedBox(
               width: double.infinity,
@@ -2235,7 +2205,10 @@ class _SellerDashboardState extends State<SellerDashboard>
     );
   }
 
-  Future<void> _handleSubmitBid(BuildContext context, Map<String, dynamic> request) async {
+  Future<void> _handleSubmitBid(
+    BuildContext context,
+    Map<String, dynamic> request,
+  ) async {
     // Validate inputs
     final priceText = _priceController.text.trim();
     if (priceText.isEmpty) {
@@ -2297,7 +2270,9 @@ class _SellerDashboardState extends State<SellerDashboard>
         requestId: requestId,
         totalAmount: totalAmount,
         estimatedDeliveryDays: 7, // Default to 7 days
-        sellerNotes: _commentsController.text.trim().isNotEmpty ? _commentsController.text.trim() : null,
+        sellerNotes: _commentsController.text.trim().isNotEmpty
+            ? _commentsController.text.trim()
+            : null,
       );
 
       // Close loading dialog
@@ -2306,7 +2281,7 @@ class _SellerDashboardState extends State<SellerDashboard>
       if (result['success'] == true) {
         // Close bid dialog
         Navigator.of(context).pop();
-        
+
         // Clear form
         _priceController.clear();
         _commentsController.clear();
@@ -2322,7 +2297,7 @@ class _SellerDashboardState extends State<SellerDashboard>
         // Refresh data to show new bid in "My Bids"
         await _fetchRequestsData();
         await _fetchQuotesData();
-        
+
         // Switch to "My Bids" tab
         setState(() {
           selectedRequestTab = 1;
@@ -2339,7 +2314,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     } catch (e) {
       // Close loading dialog
       Navigator.of(context).pop();
-      
+
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
