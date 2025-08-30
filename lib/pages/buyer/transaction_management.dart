@@ -1378,7 +1378,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
               builder: (context) => SparesDetailScreen(
                 request: request,
                 autoSpare: request.autoSpare,
-                bids: request.sellerOffers ?? [],
+                bids: request.sellerOffers ?? [], index: 1,
               ),
             ),
           );
@@ -1391,7 +1391,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
               builder: (context) => RimTyreDetailScreen(
                 request: request,
                 rimTyre: request.rimTyre,
-                bids: request.sellerOffers ?? [],
+                bids: request.sellerOffers ?? [], index: 1,
               ),
             ),
           );
@@ -1404,7 +1404,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
               builder: (context) => ConsumerElectronicsDetailScreen(
                 request: request,
                 consumerElectronics: request.consumerElectronics,
-                bids: request.sellerOffers ?? [],
+                bids: request.sellerOffers ?? [], index: 1,
               ),
             ),
           );

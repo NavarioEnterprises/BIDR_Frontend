@@ -869,6 +869,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                 duration: Duration(milliseconds: 300),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(360),
+
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
