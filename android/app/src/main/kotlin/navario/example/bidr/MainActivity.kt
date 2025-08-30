@@ -1,0 +1,5 @@
+package navario.example.bidr
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()
