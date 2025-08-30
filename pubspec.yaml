@@ -129,7 +129,9 @@ flutter:
     - lib/assets/images/buyer.png
     - lib/assets/images/business.png
     - lib/assets/images/auto_spares.png
+    - lib/assets/images/vehicle_light.png
     - lib/assets/images/electronics_com.png
+    - lib/assets/images/ele_light.png
     - lib/assets/images/rims_and_tyre.png
     - lib/assets/images/contact.png
     - lib/assets/images/bag_logo.png
@@ -161,6 +163,7 @@ flutter:
     - assets/videos/6353353-hd_1080_1920_30fps.mp4
     - lib/assets/svgs/Layer 1.svg
     - lib/assets/svgs/Vector.svg
+    - lib/assets/images/rim&type.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

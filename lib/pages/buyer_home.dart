@@ -149,10 +149,10 @@ class _BuyerHomePageState extends State<BuyerHomePage>
   }
 
   final List<Map<String, String>> categories = [
-    {"icon": "lib/assets/images/spares1.png", "name": "Vehicle\nSpares"},
-    {"icon": "lib/assets/images/rims.png", "name": "Vehicle Tyres\nand Rims"},
+    {"icon": "lib/assets/images/spares1.png", "icon2": "lib/assets/images/vehicle_light.png","name": "Vehicle\nSpares"},
+    {"icon": "lib/assets/images/rim&type.png","icon2": "lib/assets/images/rims.png", "name": "Vehicle Tyres\nand Rims"},
     {
-      "icon": "lib/assets/images/consumer.png",
+      "icon": "lib/assets/images/consumer.png","icon2": "lib/assets/images/ele_light.png",
       "name": "Consumer \nElectronics",
     },
   ];
@@ -821,6 +821,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                             (MediaQuery.of(context).size.width - 48 - 48) / 6.8,
                         child: _categoryCard(
                           category["icon"]!,
+                          category["icon2"]!,
                           category["name"]!,
                           index,
                           selectedIndex,
@@ -841,6 +842,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
 
   Widget _categoryCard(
     String iconImage,
+      String iconImage2,
     String name,
     int index,
     int selectedIndex,
@@ -867,11 +869,10 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                 duration: Duration(milliseconds: 300),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(360),
-
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.05),
+                            color: Colors.orange.withOpacity(0.05),
                             blurRadius: 6,
                             offset: Offset(0, 1),
                           ),
@@ -881,7 +882,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                 child: AnimatedScale(
                   scale: isSelected ? 0.82 : 0.8,
                   duration: Duration(milliseconds: 200),
-                  child: Image.asset(iconImage, fit: BoxFit.contain),
+                  child: Image.asset(isSelected?iconImage:iconImage2, fit: BoxFit.contain),
                 ),
               ),
               SizedBox(height: 16),
@@ -1523,7 +1524,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             ],
           ),
         ]),
-        SizedBox(height: 20),
+        SizedBox(height: 24),
 
         // Part Details Section
         _buildSection('Part Details', [
@@ -2126,6 +2127,12 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                           // Navigate to dashboard
                           if (mounted) {
                             context.go('/dashboard');
+                            Constants.buyerAppBarValue = 6;
+                            appBarValueNotifier.value++;
+                            buyerHomeValueNotifier.value++;
+                            setState(() {
+
+                            });
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -2717,10 +2724,10 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
   final FocusNode _locationFocus = FocusNode();
 
   // Dropdown values
-  String? _selectedTimeframe = 'Within a week';
-  String? _selectedInstallation = 'Yes';
-  String? _selectedCondition = 'New / Refurbished';
-  String? _selectedPurpose = 'Home Use';
+  String? _selectedTimeframe;
+  String? _selectedInstallation;
+  String? _selectedCondition;
+  String? _selectedPurpose;
 
   // Checkbox values
   bool _agreeToTerms = false;
@@ -3099,7 +3106,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
               ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           Row(
             children: [
               Expanded(
@@ -3121,10 +3128,10 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
               ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           _buildLocationField(),
         ]),
-        SizedBox(height: 20),
+        SizedBox(height: 24),
 
         // Budget And Timeline Section
         _buildSection('Budget And Timeline', [
@@ -3149,7 +3156,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
               ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           Row(
             children: [
               Expanded(
@@ -3178,7 +3185,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
             ],
           ),
         ]),
-        SizedBox(height: 20),
+        SizedBox(height: 24),
 
         // Features and Specifications Section
         _buildSection('Features and Specifications', [
@@ -3215,7 +3222,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
               ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           Row(
             children: [
               Expanded(
@@ -3247,9 +3254,9 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
               ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           _buildImageUploadSection(),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -3284,7 +3291,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
             ],
           ),
         ]),
-        SizedBox(height: 20),
+        SizedBox(height: 24),
 
         // Checkboxes
         Container(
@@ -3559,6 +3566,12 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                           // Navigate to dashboard
                           if (mounted) {
                             context.go('/dashboard');
+                            Constants.buyerAppBarValue = 6;
+                            appBarValueNotifier.value++;
+                            buyerHomeValueNotifier.value++;
+                            setState(() {
+
+                            });
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -3768,16 +3781,16 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
   final FocusNode _locationFocus = FocusNode();
 
   // Dropdown values
-  String? _selectedSidewallProfile = '55';
-  String? _selectedWheelRimDiameter = '16';
-  String? _selectedTyresRims = 'Tyres';
-  String? _selectedQuantity = '1';
-  String? _selectedTimeframe = '12 Hours';
-  String? _selectedVehicleType = 'Passenger Car';
-  String? _selectedTyreConstruction = 'Radial';
-  String? _selectedFitmentRequired = 'Yes';
-  String? _selectedBalancingRequired = 'Yes';
-  String? _selectedTyreRotation = 'No';
+  String? _selectedSidewallProfile;
+  String? _selectedWheelRimDiameter;
+  String? _selectedTyresRims;
+  String? _selectedQuantity;
+  String? _selectedTimeframe ;
+  String? _selectedVehicleType;
+  String? _selectedTyreConstruction;
+  String? _selectedFitmentRequired ;
+  String? _selectedBalancingRequired;
+  String? _selectedTyreRotation;
 
   // Checkbox values
   bool _agreeToTerms = false;
@@ -3842,11 +3855,11 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
   }
 
   Widget _buildCustomDropdown(
-    String label,
-    String? value,
-    List<String> items,
-    Function(String?) onChanged,
-  ) {
+      String label,
+      String? value,
+      List<String> items,
+      Function(String?) onChanged,
+      ) {
     return Container(
       width: double.infinity,
       height: 48,
@@ -4164,7 +4177,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
               ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           Row(
             children: [
               Expanded(
@@ -4203,7 +4216,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
             ],
           ),
         ]),
-        SizedBox(height: 20),
+        SizedBox(height: 24),
 
         // More Fields Section
         _buildSection('More Fields', [
@@ -4303,7 +4316,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
             ],
           ),
         ]),
-        SizedBox(height: 20),
+        SizedBox(height: 24),
 
         // Checkboxes
         Container(
@@ -4580,6 +4593,12 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                           // Navigate to dashboard
                           if (mounted) {
                             context.go('/dashboard');
+                            Constants.buyerAppBarValue = 6;
+                            appBarValueNotifier.value++;
+                            buyerHomeValueNotifier.value++;
+                            setState(() {
+
+                            });
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -4921,6 +4940,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
   LatLng _selectedLocation = const LatLng(-26.2041, 28.0473);
   String _selectedAddress = '';
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode searchFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -5063,97 +5083,54 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
         child: Column(
           children: [
             // Header
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Constants.ctaColorLight,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
+            Padding(
+              padding: const EdgeInsets.only(),
+              child: Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Constants.ctaColorLight,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
                 ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.location_on, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text(
-                        'Select Location',
-                        style: GoogleFonts.manrope(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.location_on, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text(
+                          'Select Location',
+                          style: GoogleFonts.manrope(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(Icons.close, color: Colors.white),
-                  ),
-                ],
+                      ],
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(Icons.close, color: Colors.white),
+                    ),
+                  ],
+                ),
               ),
             ),
 
             // Search bar
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.white),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search for a location...',
-                  hintStyle: GoogleFonts.manrope(
-                    color: Colors.grey[500],
-                    fontSize: 14,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: Constants.ctaColorLight,
-                  ),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: Icon(Icons.clear, color: Colors.grey),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() {});
-                          },
-                        )
-                      : null,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Constants.ctaColorLight,
-                      width: 2,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[50],
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                ),
-                style: GoogleFonts.manrope(fontSize: 14, color: Colors.black),
-                onSubmitted: (value) {
-                  if (value.isNotEmpty) {
-                    _searchLocation(value);
-                  }
+            Padding(
+                padding: const EdgeInsets.all(16),
+              child: _buildCustomTextField("Search for a location...",_searchController,searchFocusNode,_searchController.text.isNotEmpty?
+                IconButton(
+                icon: Icon(Icons.clear, color: Colors.grey),
+                onPressed: () {
+                  _searchController.clear();
+                  setState(() {});
                 },
-                onChanged: (value) {
-                  setState(() {}); // To show/hide clear button
-                },
-              ),
+              ):null),
             ),
 
             // Map
@@ -5283,10 +5260,10 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                     child: TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(color: Colors.grey[300]!),
+                          borderRadius: BorderRadius.circular(360),
+                          side: BorderSide(color: Constants.ftaColorLight),
                         ),
                       ),
                       child: Text(
@@ -5298,7 +5275,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 12),
+                  SizedBox(width: 22),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -5311,9 +5288,10 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Constants.ctaColorLight,
                         foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 12),
+
+                        padding: EdgeInsets.symmetric(vertical: 18,),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(360),
                         ),
                       ),
                       child: Text(
@@ -5330,7 +5308,30 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
       ),
     );
   }
-
+  Widget _buildCustomTextField(
+      String hintText,
+      TextEditingController controller,
+      FocusNode focusNode,
+        Widget? suffixIcon,
+      ) {
+    return CustomInputTransparent4(
+      hintText: hintText.replaceAll('*', ''),
+      labelText: hintText,
+      controller: controller,
+      focusNode: focusNode,
+      textInputAction: TextInputAction.next,
+      isPasswordField: false,
+      suffix: suffixIcon,
+      onSubmitted: (value) {
+        if (value.isNotEmpty) {
+          _searchLocation(value);
+        }
+      },
+      onChanged: (value) {
+        setState(() {}); // To show/hide clear button
+      },
+    );
+  }
   @override
   void dispose() {
     _searchController.dispose();

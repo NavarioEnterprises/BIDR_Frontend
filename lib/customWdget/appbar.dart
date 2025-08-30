@@ -128,62 +128,46 @@ class _HeaderSectionState extends State<HeaderSection> {
       // User is logged in - show appropriate dashboard based on role
       switch (userRole.toLowerCase()) {
         case 'seller':
-          return Row(
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  Constants.buyerAppBarValue = 7;
-                  appBarValueNotifier.value++;
-                  buyerHomeValueNotifier.value++;
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Constants.ftaColorLight,
-                  elevation: 3,
-                  side: BorderSide(color: Constants.ftaColorLight, width: 1.4),
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                child: Text(
-                  'Seller Dashboard',
-                  style: GoogleFonts.manrope(fontSize: 14),
-                ),
-              ),
-              SizedBox(width: 12),
-              _buildLogoutButton(),
-            ],
+          return ElevatedButton(
+            onPressed: () {
+              Constants.buyerAppBarValue = 7;
+              appBarValueNotifier.value++;
+              buyerHomeValueNotifier.value++;
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Constants.ctaColorLight,
+              foregroundColor: Colors.white,
+              elevation: 3,
+              //side: BorderSide(color: Constants.ftaColorLight, width: 1.4),
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+            ),
+            child: Text(
+              Constants.myDisplayname,
+              style: GoogleFonts.manrope(fontSize: 14),
+            ),
           );
         case 'buyer':
-          return Row(
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  if (mounted) {
-                    Constants.buyerAppBarValue = 6;
-                    appBarValueNotifier.value++;
-                    buyerHomeValueNotifier.value++;
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Constants.ftaColorLight,
-                  elevation: 3,
-                  side: BorderSide(color: Constants.ftaColorLight, width: 1.4),
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                child: Text(
-                  'Buyer Dashboard',
-                  style: GoogleFonts.manrope(fontSize: 14),
-                ),
-              ),
-              SizedBox(width: 12),
-              _buildLogoutButton(),
-            ],
+          return  ElevatedButton(
+            onPressed: () {
+              if (mounted) {
+                Constants.buyerAppBarValue = 6;
+                appBarValueNotifier.value++;
+                buyerHomeValueNotifier.value++;
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Constants.ctaColorLight,
+              foregroundColor: Colors.white,
+              elevation: 3,
+              //side: BorderSide(color: Constants.ftaColorLight, width: 1.4),
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+            ),
+            child: Text(
+              Constants.myDisplayname,
+              style: GoogleFonts.manrope(fontSize: 14),
+            ),
           );
         default:
           return _buildLoginButton();
