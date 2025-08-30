@@ -22,6 +22,7 @@ Future<void> main() async {
   //fvp.registerWith();
   //WakelockPlus.enable();
   setUrlStrategy(PathUrlStrategy());
+
   WidgetsFlutterBinding.ensureInitialized();
 
   // Set the environment configuration
