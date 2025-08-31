@@ -125,7 +125,7 @@ class ApiService {
         'product_specifications': jsonEncode(vehicleSparesData),
         'terms_accepted': 'true',
         'contact_consent': 'true',
-        'buyer_id': '2', // Use testuser ID for now
+        'buyer_id': Constants.myUid,
         'auth_user_uid': Constants.myUid,
       });
 
@@ -281,7 +281,7 @@ class ApiService {
       case '12 Hours':
         return '12_HOURS';
       case '24 Hours':
-        return '24_HOURS'; // Use 24_HOURS as valid option
+        return '12_HOURS'; // Map to 12_HOURS since 24_HOURS is not valid
       case '2-3 Days':
         return '1_WEEK';
       case '1 Week':
@@ -358,8 +358,6 @@ class ApiService {
         'brand_preference': brandPreference,
         'model_series': modelSeries,
         'quantity_needed': int.tryParse(quantityNeeded) ?? 1,
-        'min_price': minPrice.isNotEmpty ? double.tryParse(minPrice) : null,
-        'max_price': maxPrice.isNotEmpty ? double.tryParse(maxPrice) : null,
         'currency': 'ZAR',
         'urgency': _mapElectronicsTimeframe(timeframe),
         'installation_required': installationRequired == 'Yes' ? 'YES' : 'NO',
@@ -367,12 +365,25 @@ class ApiService {
         'condition_preference': _mapElectronicsCondition(conditionPreference),
         'purpose_of_purchase': _mapPurposeOfPurchase(purposeOfPurchase),
         'additional_comments': additionalComments,
-        'product_images': null,
-        'delivery_location': null,
         'warranty_required': 'YES',
         'warranty_duration': '1 year',
         'energy_efficiency_required': 'NO',
       };
+
+      // Add optional fields only if they have values
+      if (minPrice.isNotEmpty) {
+        final minPriceValue = double.tryParse(minPrice);
+        if (minPriceValue != null) {
+          electronicsData['min_price'] = minPriceValue;
+        }
+      }
+
+      if (maxPrice.isNotEmpty) {
+        final maxPriceValue = double.tryParse(maxPrice);
+        if (maxPriceValue != null) {
+          electronicsData['max_price'] = maxPriceValue;
+        }
+      }
 
       request.fields.addAll({
         'category': 'ELECTRONICS',
@@ -386,7 +397,7 @@ class ApiService {
           'lng': locationLng ?? 28.0473,
         }),
         'condition_preference': _mapElectronicsCondition(conditionPreference),
-        'quantity': quantityNeeded,
+        'quantity': (int.tryParse(quantityNeeded) ?? 1).toString(),
         'urgency_timeline': _mapElectronicsTimeframe(timeframe),
         'max_travel_distance': '50',
         'product_specifications': jsonEncode(electronicsData),
@@ -476,7 +487,7 @@ class ApiService {
       //   request.headers['Authorization'] = 'Bearer $accessToken';
       // }
 
-      // Prepare tyres/rims data
+      // Prepare tyres/rims data (remove null values to prevent JSON parsing issues)
       Map<String, dynamic> tyresRimsData = {
         'tyre_width': int.tryParse(tyreWidth) ?? 195,
         'sidewall_profile': int.tryParse(sidewallProfile) ?? 55,
@@ -492,9 +503,7 @@ class ApiService {
         'fitment_required': fitmentRequired == 'Yes' ? 'YES' : 'NO',
         'balancing_required': balancingRequired == 'Yes' ? 'YES' : 'NO',
         'tyre_rotation_required': tyreRotation == 'Yes' ? 'YES' : 'NO',
-        'delivery_location': null,
         'currency': 'ZAR',
-        'max_budget': null,
       };
 
       request.fields.addAll({
@@ -587,17 +596,21 @@ class ApiService {
   static String _mapElectronicsTimeframe(String timeframe) {
     switch (timeframe.toLowerCase()) {
       case 'within a week':
-        return 'WITHIN_WEEK';
+        return '1_WEEK';
       case 'within 2 weeks':
-        return 'WITHIN_WEEK';
+        return '1_WEEK';
       case 'within a month':
-        return 'WITHIN_MONTH';
+        return '1_MONTH';
       case 'within 3 months':
-        return 'WITHIN_MONTH';
+        return '1_MONTH';
       case 'no rush':
-        return 'FLEXIBLE';
+        return '1_MONTH';
+      case 'asap':
+        return 'ASAP';
+      case '12 hours':
+        return '12_HOURS';
       default:
-        return 'WITHIN_WEEK';
+        return '1_WEEK';
     }
   }
 
@@ -714,6 +727,9 @@ class ApiService {
           'error': 'Location data is null',
         };
       }
+      print(
+        "Fetching requests for seller UID: $uid at location ($myLat, $myLng) ${'${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/by_seller/?auth_user_uid=$uid&lat=$myLat&lng=$myLng'}",
+      );
 
       final uri = Uri.parse(
         '${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/by_seller/?auth_user_uid=$uid&lat=$myLat&lng=$myLng',
@@ -727,7 +743,7 @@ class ApiService {
       );
 
       print('Get requests response status: ${response.statusCode}');
-      print('Get requests response body: ${response.body}');
+      print('Get requests response body2: ${response.body}');
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final data = jsonDecode(response.body);
@@ -758,15 +774,16 @@ class ApiService {
     String? warrantyInfo,
     String? currency = 'ZAR',
   }) async {
-    print('Submitting quote for request: $requestId');
+    if (kDebugMode) {
+      print('Submitting quote for request: $requestId');
+    }
 
     try {
       final url = '${GlobalVariables.productsServiceUrl}api/v1/quotes/quotes/';
 
       final quoteData = {
         'request_id': requestId,
-        'seller_id':
-            Constants.currentUser!.uid, // Use current user ID or default
+        'seller_id': Constants.currentUser!.uid,
         'total_amount': totalAmount.toString(),
         'currency': currency,
         'estimated_delivery_days': estimatedDeliveryDays,
@@ -784,7 +801,9 @@ class ApiService {
         quoteData['warranty_info'] = warrantyInfo;
       }
 
-      print('Quote data: $quoteData');
+      if (kDebugMode) {
+        print('Quote data: $quoteData');
+      }
 
       final response = await http.post(
         Uri.parse(url),
@@ -792,8 +811,10 @@ class ApiService {
         body: json.encode(quoteData),
       );
 
-      print('Submit quote response status: ${response.statusCode}');
-      print('Submit quote response body: ${response.body}');
+      if (kDebugMode) {
+        print('Submit quote response status: ${response.statusCode}');
+        print('Submit quote response body: ${response.body}');
+      }
 
       if (response.statusCode == 201) {
         final responseData = json.decode(response.body);
@@ -811,7 +832,9 @@ class ApiService {
         };
       }
     } catch (e) {
-      print('Submit quote error: $e');
+      if (kDebugMode) {
+        print('Submit quote error: $e');
+      }
       return {
         'success': false,
         'message': 'Failed to submit quote',
@@ -822,8 +845,10 @@ class ApiService {
 
   /// Get quotes submitted by the current seller
   static Future<Map<String, dynamic>> getQuotesBySeller() async {
-    print('Fetching quotes by seller');
-    
+    if (kDebugMode) {
+      print('Fetching quotes by seller');
+    }
+
     try {
       if (Constants.currentUser?.uid == null) {
         return {
@@ -833,23 +858,26 @@ class ApiService {
         };
       }
 
-      final url = '${GlobalVariables.productsServiceUrl}api/v1/quotes/quotes/by_seller/?auth_user_uid=${Constants.currentUser!.uid}';
-      
-      print('Get quotes by seller URL: $url');
+      final url =
+          '${GlobalVariables.productsServiceUrl}api/v1/quotes/quotes/by_seller/?auth_user_uid=${Constants.currentUser!.uid}';
+
+      if (kDebugMode) {
+        print('Get quotes by seller URL: $url');
+      }
 
       final response = await http.get(
         Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
       );
 
-      print('Get quotes by seller response status: ${response.statusCode}');
-      print('Get quotes by seller response body: ${response.body}');
+      if (kDebugMode) {
+        print('Get quotes by seller response status: ${response.statusCode}');
+        print('Get quotes by seller response body: ${response.body}');
+      }
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        
+
         // Handle paginated response
         List<dynamic> quotes = [];
         if (responseData is Map && responseData.containsKey('results')) {
@@ -862,7 +890,9 @@ class ApiService {
           'success': true,
           'message': 'Quotes fetched successfully',
           'quotes': quotes,
-          'total_count': responseData is Map ? (responseData['count'] ?? quotes.length) : quotes.length,
+          'total_count': responseData is Map
+              ? (responseData['count'] ?? quotes.length)
+              : quotes.length,
         };
       } else {
         final errorData = json.decode(response.body);
@@ -877,6 +907,51 @@ class ApiService {
       return {
         'success': false,
         'message': 'Network error occurred',
+        'error': e.toString(),
+      };
+    }
+  }
+
+  /// Update order status after successful order creation
+  static Future<Map<String, dynamic>> updateOrderStatus({
+    required String orderId,
+    required String status,
+  }) async {
+    print('Updating order status for order: $orderId to status: $status');
+
+    try {
+      final url =
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/$orderId/update_status/';
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'status': status}),
+      );
+
+      print('Update order status response status: ${response.statusCode}');
+      print('Update order status response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        return {
+          'success': true,
+          'message': 'Order status updated successfully',
+          'data': responseData,
+        };
+      } else {
+        final errorData = json.decode(response.body);
+        return {
+          'success': false,
+          'message': 'Failed to update order status: ${response.statusCode}',
+          'error': errorData,
+        };
+      }
+    } catch (e) {
+      print('Update order status error: $e');
+      return {
+        'success': false,
+        'message': 'Failed to update order status',
         'error': e.toString(),
       };
     }

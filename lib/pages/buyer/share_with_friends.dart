@@ -1,10 +1,13 @@
 import 'package:bidr/constants/Constants.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math';
 
 import 'package:share_plus/share_plus.dart';
+import '../../services/rewards_service.dart';
+import '../../models/rewards/rewards_models.dart';
 
 class ShareWidget extends StatefulWidget {
   @override
@@ -12,26 +15,66 @@ class ShareWidget extends StatefulWidget {
 }
 
 class _ShareWidgetState extends State<ShareWidget> {
-  String referralCode = '';
+  final RewardsService _rewardsService = RewardsService();
+  ReferralCode? _referralCode;
   bool isCodeCopied = false;
+  bool isLoading = false;
+  String? _errorMessage;
+
+  final String userUuid = Constants.currentUser!.uid;
 
   @override
   void initState() {
     super.initState();
-    _generateReferralCode();
+    _loadReferralCode();
   }
 
-  void _generateReferralCode() {
-    // Generate random 8-digit number
-    Random random = Random();
-    int randomNumber = random.nextInt(90000000) + 10000000; // Ensures 8 digits
+  Future<void> _loadReferralCode() async {
     setState(() {
-      referralCode = 'BIDR$randomNumber';
+      isLoading = true;
+      _errorMessage = null;
     });
+
+    try {
+      final code = await _rewardsService.getMyReferralCode(userUuid);
+      setState(() {
+        _referralCode = code;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to load referral code. Please try again.';
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _generateNewReferralCode() async {
+    setState(() {
+      isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final code = await _rewardsService.getMyReferralCode(userUuid);
+      if (kDebugMode) {
+        print("Generated new referral code: ${code.code}");
+      }
+      setState(() {
+        _referralCode = code;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to generate new code. Please try again.';
+        isLoading = false;
+      });
+    }
   }
 
   void _copyToClipboard() async {
-    await Clipboard.setData(ClipboardData(text: referralCode));
+    if (_referralCode == null) return;
+    await Clipboard.setData(ClipboardData(text: _referralCode!.code));
     setState(() {
       isCodeCopied = true;
     });
@@ -57,15 +100,16 @@ class _ShareWidgetState extends State<ShareWidget> {
 
   void _shareLink() async {
     try {
+      if (_referralCode == null) return;
+
       // Create the referral link and message
-      String appUrl = 'https://bidr.co.za';
-      String referralUrl = '$appUrl/referral?code=$referralCode';
+      String referralUrl = _referralCode!.referralUrl;
 
       String shareMessage =
           '''
 🎉 Join me on this amazing app and earn rewards!
 
-Use my referral code: $referralCode
+Use my referral code: ${_referralCode!.code}
 
 Download the app: $referralUrl
 
@@ -75,7 +119,7 @@ Let's grow together and enjoy exclusive benefits! 💰
       // Share the content
       final result = await Share.shareWithResult(
         shareMessage,
-        subject: 'Join me and earn rewards with $referralCode',
+        subject: 'Join me and earn rewards with ${_referralCode!.code}',
       );
 
       // Handle the share result
@@ -104,7 +148,7 @@ Let's grow together and enjoy exclusive benefits! 💰
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.35,
-      height: 400,
+      height: 450,
       padding: EdgeInsets.all(24),
       color: Colors.white,
       child: Column(
@@ -124,7 +168,7 @@ Let's grow together and enjoy exclusive benefits! 💰
 
           // Title and Description
           Text(
-            'Earn rewards by referring friends to our business!',
+            'Earn ${_referralCode?.referrerRewardAmount ?? 50} points for each friend you refer!',
             style: GoogleFonts.manrope(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -136,7 +180,7 @@ Let's grow together and enjoy exclusive benefits! 💰
           SizedBox(height: 8),
 
           Text(
-            'Share the benefits and grow together.',
+            'Your friends will earn ${_referralCode?.refereeRewardAmount ?? 25} points when they join!',
             style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
@@ -157,15 +201,26 @@ Let's grow together and enjoy exclusive benefits! 💰
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    referralCode,
-                    style: GoogleFonts.manrope(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Constants.ftaColorLight,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
+                  child: isLoading
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Constants.ftaColorLight,
+                            ),
+                          ),
+                        )
+                      : Text(
+                          _referralCode?.code ?? 'Loading...',
+                          style: GoogleFonts.manrope(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Constants.ftaColorLight,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
                 ),
                 GestureDetector(
                   onTap: _copyToClipboard,
@@ -216,7 +271,7 @@ Let's grow together and enjoy exclusive benefits! 💰
 
           // Generate New Code Button (Optional)
           TextButton(
-            onPressed: _generateReferralCode,
+            onPressed: _generateNewReferralCode,
             child: Text(
               'Generate New Code',
               style: GoogleFonts.manrope(

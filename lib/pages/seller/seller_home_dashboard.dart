@@ -278,16 +278,29 @@ class _SellerDashboardState extends State<SellerDashboard>
       if (response['success'] == true) {
         final data = response['data'];
         setState(() {
-          newRequests = data['new_requests'] ?? [];
-          processedRequests = data['processed_requests'] ?? [];
-          totalNewRequests = data['total_new_requests'] ?? 0;
-          totalProcessedRequests = data['total_processed_requests'] ?? 0;
+          // Get all results from the API
+          final List<dynamic> allRequests = data['results'] ?? [];
+          
+          // Filter new requests (no quotes yet) and processed requests (has quotes)
+          newRequests = allRequests.where((dynamic request) {
+            final List<dynamic> quotes = request['quotes'] as List<dynamic>? ?? [];
+            return quotes.isEmpty;
+          }).toList();
+          
+          processedRequests = allRequests.where((dynamic request) {
+            final List<dynamic> quotes = request['quotes'] as List<dynamic>? ?? [];
+            return quotes.isNotEmpty;
+          }).toList();
+          
+          totalNewRequests = newRequests.length;
+          totalProcessedRequests = processedRequests.length;
           sellerLocation = data['seller_location'];
           isLoadingRequests = false;
         });
 
         print('New requests: ${newRequests.length}');
         print('Processed requests: ${processedRequests.length}');
+        print('Total requests from API: ${(data['results'] ?? []).length}');
       } else {
         setState(() {
           requestsError = response['message'] ?? 'Failed to load requests';
@@ -490,9 +503,21 @@ class _SellerDashboardState extends State<SellerDashboard>
                     ),
                   ),
                 ),
-                if (tabActiveIndex == 0)
-                  ...[]
-                else if (tabActiveIndex == 1) ...[
+                if (tabActiveIndex == 0) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 64, right: 64),
+                    child: Container(
+                      height: 900,
+                      width: MediaQuery.of(context).size.width,
+                      constraints: BoxConstraints(maxWidth: 1600),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 0,
+                        vertical: 12,
+                      ),
+                      child: buildLeadsRequestsWidget(),
+                    ),
+                  ),
+                ] else if (tabActiveIndex == 1) ...[
                   Padding(
                     padding: const EdgeInsets.only(left: 64, right: 64),
                     child: Container(
@@ -1225,6 +1250,10 @@ class _SellerDashboardState extends State<SellerDashboard>
             currentPage = 1; // Reset to first page when switching tabs
           });
           print('Selected tab is now: $selectedRequestTab');
+
+          // Reload data when switching tabs
+          _fetchRequestsData();
+          _fetchQuotesData();
         },
         child: AnimatedContainer(
           duration: Duration(milliseconds: 200),
@@ -1250,6 +1279,62 @@ class _SellerDashboardState extends State<SellerDashboard>
   // Content area for selected tab
   Widget _buildRequestContent(List<dynamic> requests, String type) {
     print('Building request content for $type with ${requests.length} items');
+
+    // Show loading indicator
+    if (isLoadingRequests) {
+      return Container(
+        padding: EdgeInsets.all(64),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Constants.ftaColorLight),
+          ),
+        ),
+      );
+    }
+
+    // Show error if any
+    if (requestsError != null) {
+      return Container(
+        padding: EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.red.shade50,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Center(
+          child: Column(
+            children: [
+              Icon(Icons.error_outline, size: 48, color: Colors.red.shade400),
+              SizedBox(height: 16),
+              Text(
+                'Error loading requests',
+                style: GoogleFonts.manrope(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.red.shade700,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                requestsError!,
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  color: Colors.red.shade600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _fetchRequestsData,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ftaColorLight,
+                ),
+                child: Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     if (requests.isEmpty) {
       return Container(
@@ -1328,6 +1413,62 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   Widget _buildQuotesContent(List<dynamic> quotes, String type) {
     print('Building quotes content for $type with ${quotes.length} items');
+
+    // Show loading indicator
+    if (isLoadingQuotes) {
+      return Container(
+        padding: EdgeInsets.all(64),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Constants.ftaColorLight),
+          ),
+        ),
+      );
+    }
+
+    // Show error if any
+    if (quotesError != null) {
+      return Container(
+        padding: EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.red.shade50,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Center(
+          child: Column(
+            children: [
+              Icon(Icons.error_outline, size: 48, color: Colors.red.shade400),
+              SizedBox(height: 16),
+              Text(
+                'Error loading bids',
+                style: GoogleFonts.manrope(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.red.shade700,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                quotesError!,
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  color: Colors.red.shade600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _fetchQuotesData,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ftaColorLight,
+                ),
+                child: Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     if (quotes.isEmpty) {
       return Container(
@@ -1520,7 +1661,7 @@ class _SellerDashboardState extends State<SellerDashboard>
             SizedBox(height: 12),
 
             // Purchase price
-            Row(
+            /* Row(
               children: [
                 Text(
                   'Purchased Price: ',
@@ -1540,7 +1681,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                 ),
               ],
             ),
-            SizedBox(height: 6),
+            SizedBox(height: 6),*/
 
             // Rating
             Row(

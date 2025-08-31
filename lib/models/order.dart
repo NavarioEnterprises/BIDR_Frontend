@@ -27,15 +27,27 @@ class Order {
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
-    // Extract seller information from seller_id object
-    final sellerData = json['seller_id'] as Map<String, dynamic>?;
-    final sellerName = sellerData != null 
-        ? '${sellerData['first_name'] ?? ''} ${sellerData['last_name'] ?? ''}'.trim()
-        : 'Unknown Vendor';
-    final vendorName = sellerName.isNotEmpty ? sellerName : (sellerData?['username'] ?? 'Unknown Vendor');
+    // Extract seller information from seller_id (can be either string or object)
+    String vendorName = 'Unknown Vendor';
     
-    // Extract buyer information from buyer_id object
-    final buyerData = json['buyer_id'] as Map<String, dynamic>?;
+    final sellerId = json['seller_id'];
+    if (sellerId != null) {
+      if (sellerId is Map<String, dynamic>) {
+        // Handle case where seller_id is an object
+        final sellerName = '${sellerId['first_name'] ?? ''} ${sellerId['last_name'] ?? ''}'.trim();
+        vendorName = sellerName.isNotEmpty ? sellerName : (sellerId['username'] ?? 'Unknown Vendor');
+      } else if (sellerId is String) {
+        // Handle case where seller_id is just a string UID
+        vendorName = 'Seller ${sellerId.substring(0, 8)}...';
+      }
+    }
+    
+    // Extract buyer information from buyer_id (can be either string or object)
+    final buyerId = json['buyer_id'];
+    Map<String, dynamic>? buyerData;
+    if (buyerId != null && buyerId is Map<String, dynamic>) {
+      buyerData = buyerId;
+    }
     
     return Order(
       vendorName: vendorName,
@@ -90,7 +102,12 @@ class Order {
   
   static String _extractLocation(Map<String, dynamic> json) {
     // Try to extract location from seller data or other fields
-    final sellerData = json['seller_id'] as Map<String, dynamic>?;
+    final sellerId = json['seller_id'];
+    if (sellerId != null && sellerId is Map<String, dynamic>) {
+      // If we have seller data object, try to extract location from it
+      final location = sellerId['location'] ?? sellerId['address'];
+      if (location != null) return location.toString();
+    }
     return json['location'] ?? 'Location not specified';
   }
   

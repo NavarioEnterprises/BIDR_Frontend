@@ -38,12 +38,13 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   String _sortBy = 'newest';
   SortOption? _currentSort;
 
-
-
   @override
   void initState() {
     super.initState();
     _fetchProductRequests();
+    print(
+      "Buyer Dashboard Initialized ${Constants.myUid} xx ${Constants.currentUser!.uid}",
+    );
   }
 
   @override
@@ -364,8 +365,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     double cardWidth,
     double horizontalSpacing,
     double verticalSpacing,
-  )
-  {
+  ) {
     List<Widget> rows = [];
 
     for (int i = 0; i < requests.length; i += cardsPerRow) {
@@ -1760,7 +1760,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: (){},
+              onPressed: () {},
               child: Text(
                 "View Details",
                 style: GoogleFonts.manrope(
@@ -1775,7 +1775,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       ),
     );
   }
-
 
   Widget _buildActiveRequestCard(dynamic request, int index) {
     // This version is for compatibility - redirects to the height-specific version
@@ -1798,8 +1797,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     dynamic request,
     double fixedHeight,
     int index,
-  )
-  {
+  ) {
     final bids = _getSortedBids(request);
     final hasMoreThanTwoBids = bids.length > 2;
     final bidsToShow = bids
@@ -1830,7 +1828,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // View Details link
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1859,9 +1856,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                 ),
                 Row(
                   children: [
-                    if (!_cancelledRequests.contains(
-                      _getRequestId(request),
-                    ))
+                    if (!_cancelledRequests.contains(_getRequestId(request)))
                       InkWell(
                         onTap: () {
                           _showCancelRequestDialog(request);
@@ -1896,10 +1891,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                         print('Sort changed to: $option');
                       },
                     ),
-
                   ],
                 ),
-
               ],
             ),
             SizedBox(height: 6),
@@ -1912,12 +1905,12 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
               child: Row(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(right: 8,top: 4,bottom: 4),
+                    padding: EdgeInsets.only(right: 8, top: 4, bottom: 4),
                     child: Container(
                       width: 4,
                       decoration: BoxDecoration(
-                          color: Constants.ctaColorLight,
-                          borderRadius: BorderRadius.circular(36)
+                        color: Constants.ctaColorLight,
+                        borderRadius: BorderRadius.circular(36),
                       ),
                     ),
                   ),
@@ -1928,7 +1921,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-
                             Text(
                               "Description -",
                               style: GoogleFonts.manrope(
@@ -1938,7 +1930,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                             ),
                             Spacer(),
                             GestureDetector(
-                              onTap: () => _navigateToDetailScreen(request, index),
+                              onTap: () =>
+                                  _navigateToDetailScreen(request, index),
                               child: Text(
                                 "View Details",
                                 style: GoogleFonts.manrope(
@@ -2084,52 +2077,53 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
     return Column(
       children: [
-      Container(
-      width: 25,
-      height: 25,
-      child: Stack(
-        children: [
-          // Circular progress indicator
-          CircularProgressIndicator(
-            value: progress,
-            strokeWidth: 2,
-            backgroundColor: label=="D"?Colors.grey.shade600:Colors.orange.shade50,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              Colors.orange.shade600.withOpacity(opacity),
-            ),
-          ),
-          // Center text
-          Center(
-            child: Text(
-              value,
-              style: GoogleFonts.manrope(
-                fontSize: 12.5,
-                fontWeight: FontWeight.bold,
-                color: currentValue == 0
-                    ? Colors.grey.withOpacity(0.55)
-                    : Colors.orange.shade600,
+        Container(
+          width: 25,
+          height: 25,
+          child: Stack(
+            children: [
+              // Circular progress indicator
+              CircularProgressIndicator(
+                value: progress,
+                strokeWidth: 2,
+                backgroundColor: label == "D"
+                    ? Colors.grey.shade600
+                    : Colors.orange.shade50,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Colors.orange.shade600.withOpacity(opacity),
+                ),
               ),
-            ),
+              // Center text
+              Center(
+                child: Text(
+                  value,
+                  style: GoogleFonts.manrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.bold,
+                    color: currentValue == 0
+                        ? Colors.grey.withOpacity(0.55)
+                        : Colors.orange.shade600,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ),
-    SizedBox(height: 4),
-    Text(
-    label,
-    style: GoogleFonts.manrope(
-    fontSize: 10,
-    color: Colors.grey.shade600,
-    fontWeight: FontWeight.w500,
-    ),
-    ),
-   ],
+        ),
+        SizedBox(height: 4),
+        Text(
+          label,
+          style: GoogleFonts.manrope(
+            fontSize: 10,
+            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
-    }
-
+  }
 
   // Modern seller bid card matching screenshot
-  Widget _buildModernSellerBid(dynamic bid, dynamic request,int? sellerIndex,) {
+  Widget _buildModernSellerBid(dynamic bid, dynamic request, int? sellerIndex) {
     String sellerName = sellerIndex != null
         ? "Seller $sellerIndex"
         : _getSellerName(bid);
@@ -2138,244 +2132,244 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     double rating = _getBidRating(bid);
 
     return Container(
-        margin: EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
-        child: Column(
-            children: [
-              // Seller info and bid details
-              Container(
-                padding: EdgeInsets.all(16),
-                child: Column(
+      margin: EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          // Seller info and bid details
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Header with seller name, timestamp, and accept button
+                Row(
                   children: [
-                    // Header with seller name, timestamp, and accept button
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "${sellerName} $sellerIndex",
-                                style: GoogleFonts.manrope(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              SizedBox(height: 2),
-                              Text(
-                                _formatDateTime(bidTime),
-                                style: GoogleFonts.manrope(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Constants.ftaColorLight.withOpacity(0.9),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        // Expand/Collapse icon
-                        Icon(
-                          Icons.keyboard_arrow_down,
-                          color: Colors.grey.shade500,
-                          size: 20,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 12),
-                    // Bid amount and accept button
-                    Row(
-                      children: [
-                        Text(
-                          'Bid: ',
-                          style: GoogleFonts.manrope(
-                            fontSize: 14,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                        Text(
-                          'R${bidAmount.toInt()}',
-                          style: GoogleFonts.manrope(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        Spacer(),
-                        InkWell(
-                          onTap: () {
-                            _showConfirmationDialog(context, bid, request);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green.shade500,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              'Accept',
-                              style: GoogleFonts.manrope(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              // Rating and Group Chat section
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Constants.ftaColorLight, // Dark orange background
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      'Rating: ${rating.toStringAsFixed(1)}/5',
-                      style: GoogleFonts.manrope(
-                        color: Colors.white54,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    Spacer(),
-                    InkWell(
-                      onTap: () async {
-                        // Show loading indicator while creating/getting conversation
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (context) => Center(
-                            child: Container(
-                              padding: EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Constants.ctaColorLight,
-                                    ),
-                                  ),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    'Loading conversation...',
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 14,
-                                      color: Colors.grey[700],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-
-                        try {
-                          // Create or get conversation for this request (without auth)
-                          final conversationData =
-                          await ChatService.createOrGetConversationForRequest(
-                            _getRequestId(request),
-                          );
-
-                          // Close loading dialog
-                          Navigator.of(context).pop();
-
-                          if (conversationData != null) {
-                            // Navigate to GroupChat with backend integration
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => GroupChatScreen(
-                                  groupChat: GroupChat(
-                                    uuid: _getRequestId(request),
-                                    request: ProductRequest(
-                                      description: _getRequestDescription(request),
-                                    ),
-                                    messages:
-                                    [], // Empty - will be loaded from backend
-                                  ),
-                                ),
-                              ),
-                            );
-                          } else {
-                            // Show error if backend returns null
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Unable to create conversation. Please try again.',
-                                ),
-                                backgroundColor: Colors.red,
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          // Close loading dialog and show error
-                          Navigator.of(context).pop();
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Failed to load conversation. Please try again.',
-                              ),
-                              backgroundColor: Colors.red,
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                        }
-                      },
-                      child: Row(
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            CupertinoIcons.chat_bubble_2_fill,
-                            color: Constants.ctaColorLight,
-                            size: 16,
-                          ),
-                          SizedBox(width: 6),
                           Text(
-                            'Group Chat',
+                            "${sellerName} $sellerIndex",
                             style: GoogleFonts.manrope(
-                              color: Constants.ctaColorLight,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            _formatDateTime(bidTime),
+                            style: GoogleFonts.manrope(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
+                              color: Constants.ftaColorLight.withOpacity(0.9),
                             ),
                           ),
                         ],
                       ),
                     ),
+                    // Expand/Collapse icon
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.grey.shade500,
+                      size: 20,
+                    ),
                   ],
                 ),
+                SizedBox(height: 12),
+                // Bid amount and accept button
+                Row(
+                  children: [
+                    Text(
+                      'Bid: ',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                    Text(
+                      'R${bidAmount.toInt()}',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Spacer(),
+                    InkWell(
+                      onTap: () {
+                        _showConfirmationDialog(context, bid, request);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade500,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          'Accept',
+                          style: GoogleFonts.manrope(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Rating and Group Chat section
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Constants.ftaColorLight, // Dark orange background
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16),
               ),
-            ],
-        ),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  'Rating: ${rating.toStringAsFixed(1)}/5',
+                  style: GoogleFonts.manrope(
+                    color: Colors.white54,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                Spacer(),
+                InkWell(
+                  onTap: () async {
+                    // Show loading indicator while creating/getting conversation
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => Center(
+                        child: Container(
+                          padding: EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Constants.ctaColorLight,
+                                ),
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'Loading conversation...',
+                                style: GoogleFonts.manrope(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+
+                    try {
+                      // Create or get conversation for this request (without auth)
+                      final conversationData =
+                          await ChatService.createOrGetConversationForRequest(
+                            _getRequestId(request),
+                          );
+
+                      // Close loading dialog
+                      Navigator.of(context).pop();
+
+                      if (conversationData != null) {
+                        // Navigate to GroupChat with backend integration
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GroupChatScreen(
+                              groupChat: GroupChat(
+                                uuid: _getRequestId(request),
+                                request: ProductRequest(
+                                  description: _getRequestDescription(request),
+                                ),
+                                messages:
+                                    [], // Empty - will be loaded from backend
+                              ),
+                            ),
+                          ),
+                        );
+                      } else {
+                        // Show error if backend returns null
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Unable to create conversation. Please try again.',
+                            ),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      // Close loading dialog and show error
+                      Navigator.of(context).pop();
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Failed to load conversation. Please try again.',
+                          ),
+                          backgroundColor: Colors.red,
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                  },
+                  child: Row(
+                    children: [
+                      Icon(
+                        CupertinoIcons.chat_bubble_2_fill,
+                        color: Constants.ctaColorLight,
+                        size: 16,
+                      ),
+                      SizedBox(width: 6),
+                      Text(
+                        'Group Chat',
+                        style: GoogleFonts.manrope(
+                          color: Constants.ctaColorLight,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-/*  Widget _buildModernSellerBid(
+  /*  Widget _buildModernSellerBid(
     dynamic bid,
     dynamic request, [
     int? sellerIndex,
-  ]) 
+  ])
   {
     String sellerName = sellerIndex != null
         ? "Seller #$sellerIndex"
@@ -3254,19 +3248,33 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
           ),
         ),
       );
+      // Extract UID from username by removing 'seller_' prefix
+      final sellerUid = seller.sellerId.username.startsWith('seller_')
+          ? seller.sellerId.username.substring(7)
+          : seller.sellerId.username;
+
+      print("Processing payment for seller: $sellerUid");
 
       // Create order data required by backend
       final orderData = {
         'request_id': _getRequestId(request),
         'quote_id': _getQuoteId(seller),
+        'seller_id': sellerUid,
+        'buyer_id': Constants.currentUser!.uid,
         // Optionals
         'delivery_address': null,
         'special_instructions': null,
       };
+      print('Order Data: $orderData');
+      print(
+        'Submitting order to: ${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/',
+      );
 
       // Submit to backend
       final response = await http.post(
-        Uri.parse('${Constants.bidrBaseUrl}api/v1/product-requests/orders/'),
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/',
+        ),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -3298,7 +3306,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
         Navigator.of(context).pop();
       }
 
-      print('Error processing payment: $e');
+      print('Error processing payment1: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Payment failed: ${e.toString()}'),
@@ -3320,6 +3328,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -3425,6 +3434,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -4631,13 +4641,15 @@ class SparesDetailScreen extends StatefulWidget {
     Key? key,
     required this.request,
     required this.autoSpare,
-    required this.bids, required this.index,
+    required this.bids,
+    required this.index,
   }) : super(key: key);
 
   @override
   State<SparesDetailScreen> createState() => _SparesDetailScreenState();
-  
-  static void showAsDialog(BuildContext context, {
+
+  static void showAsDialog(
+    BuildContext context, {
     required int index,
     required AutoSparesRequest request,
     required AutoSpares autoSpare,
@@ -4679,6 +4691,7 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
       return 'Unknown';
     }
   }
+
   SortOption? _currentSort;
   final Set<String> _cancelledRequests = {};
 
@@ -4741,7 +4754,9 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
               CircularProgressIndicator(
                 value: progress,
                 strokeWidth: 2,
-                backgroundColor: label=="D"?Colors.grey.shade600:Colors.orange.shade50,
+                backgroundColor: label == "D"
+                    ? Colors.grey.shade600
+                    : Colors.orange.shade50,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   Colors.orange.shade600.withOpacity(opacity),
                 ),
@@ -4774,6 +4789,7 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
       ],
     );
   }
+
   String _getElapsedTime(DateTime? createdAt, String unit) {
     if (createdAt == null) return "0";
 
@@ -4832,339 +4848,359 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
           ),
           Expanded(
             child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: 32),
-              Padding(
-                padding: EdgeInsets.only(left: 64, right: 64),
-                child: Center(
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(24),
-                    constraints: BoxConstraints(maxWidth: 1600),
-                    decoration: BoxDecoration(
-                      color: Constants.dtaColorLight.withOpacity(0.55),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Constants.ctaColorLight,
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _formatDate(widget.request.createdAt),
-                                  style: GoogleFonts.manrope(
-                                    color: Colors.grey.shade600,
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  "REQUEST #${widget.index}",
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                if (!_cancelledRequests.contains(
-                                  _getRequestId(widget.request),
-                                ))
-                                  InkWell(
-                                    onTap: () {
-                                      _showCancelRequestDialog();
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.red.shade300),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        "Cancel",
-                                        style: GoogleFonts.manrope(
-                                          color: Colors.red.shade500,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                SizedBox(width: 12),
-
-                                SortDropdownMenu(
-                                  initialValue: _currentSort,
-                                  onSortChanged: (option) {
-                                    setState(() {
-                                      _currentSort = option;
-                                    });
-                                    print('Sort changed to: $option');
-                                  },
-                                ),
-
-                              ],
-                            ),
-
-                          ],
+              child: Column(
+                children: [
+                  SizedBox(height: 32),
+                  Padding(
+                    padding: EdgeInsets.only(left: 64, right: 64),
+                    child: Center(
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(24),
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        decoration: BoxDecoration(
+                          color: Constants.dtaColorLight.withOpacity(0.55),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Constants.ctaColorLight,
+                            width: 1,
+                          ),
                         ),
-                        SizedBox(height: 6),
-                        IntrinsicHeight(
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(right: 8,top: 4,bottom: 4),
-                                child: Container(
-                                  width: 4,
-                                  decoration: BoxDecoration(
-                                      color: Constants.ctaColorLight,
-                                      borderRadius: BorderRadius.circular(36)
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-
-                                        Text(
-                                          "Description -",
-                                          style: GoogleFonts.manrope(
-                                            color: Colors.grey.shade600,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        Spacer(),
-                                        GestureDetector(
-                                          onTap: (){},
-                                          child: Text(
-                                            "View Details",
-                                            style: GoogleFonts.manrope(
-                                              color: Constants.ftaColorLight,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              decoration: TextDecoration.underline,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 8),
                                     Text(
-                                      _getRequestDescription(widget.request,widget.autoSpare),
+                                      _formatDate(widget.request.createdAt),
                                       style: GoogleFonts.manrope(
-                                        fontSize: 13,
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey.shade600,
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    SizedBox(height: 4),
-
-                                    // Category
                                     Text(
-                                      _getCategoryDisplayName(widget.request.category),
+                                      "REQUEST #${widget.index}",
                                       style: GoogleFonts.manrope(
-                                        color: Colors.orange.shade600,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
                                       ),
                                     ),
                                   ],
                                 ),
+                                Row(
+                                  children: [
+                                    if (!_cancelledRequests.contains(
+                                      _getRequestId(widget.request),
+                                    ))
+                                      InkWell(
+                                        onTap: () {
+                                          _showCancelRequestDialog();
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Colors.red.shade300,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            "Cancel",
+                                            style: GoogleFonts.manrope(
+                                              color: Colors.red.shade500,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    SizedBox(width: 12),
+
+                                    SortDropdownMenu(
+                                      initialValue: _currentSort,
+                                      onSortChanged: (option) {
+                                        setState(() {
+                                          _currentSort = option;
+                                        });
+                                        print('Sort changed to: $option');
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 6),
+                            IntrinsicHeight(
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      right: 8,
+                                      top: 4,
+                                      bottom: 4,
+                                    ),
+                                    child: Container(
+                                      width: 4,
+                                      decoration: BoxDecoration(
+                                        color: Constants.ctaColorLight,
+                                        borderRadius: BorderRadius.circular(36),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Description -",
+                                              style: GoogleFonts.manrope(
+                                                color: Colors.grey.shade600,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            GestureDetector(
+                                              onTap: () {},
+                                              child: Text(
+                                                "View Details",
+                                                style: GoogleFonts.manrope(
+                                                  color:
+                                                      Constants.ftaColorLight,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          _getRequestDescription(
+                                            widget.request,
+                                            widget.autoSpare,
+                                          ),
+                                          style: GoogleFonts.manrope(
+                                            fontSize: 13,
+                                            color: Colors.black87,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        SizedBox(height: 4),
+
+                                        // Category
+                                        Text(
+                                          _getCategoryDisplayName(
+                                            widget.request.category,
+                                          ),
+                                          style: GoogleFonts.manrope(
+                                            color: Colors.orange.shade600,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 16),
+                            // Status dots - showing elapsed time
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildTimerCircle("0", "D"),
+                                SizedBox(width: 12),
+                                _buildTimerCircle(
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'hours',
+                                  ),
+                                  "H",
+                                ),
+                                SizedBox(width: 12),
+                                _buildTimerCircle(
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'minutes',
+                                  ),
+                                  "M",
+                                ),
+                                SizedBox(width: 12),
+                                _buildTimerCircle(
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'seconds',
+                                  ),
+                                  "S",
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 24),
+                          ],
                         ),
-                        SizedBox(height: 16),
-                        // Status dots - showing elapsed time
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 32),
+
+                  Padding(
+                    padding: EdgeInsets.only(left: 64, right: 64),
+                    child: Center(
+                      child: Container(
+                        width: double.infinity,
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildTimerCircle("0", "D"),
-                            SizedBox(width: 12),
-                            _buildTimerCircle(
-                              _getElapsedTime(widget.request.createdAt, 'hours'),
-                              "H",
+                            // Vehicle Details Card
+                            Expanded(
+                              child: _buildDetailCard(
+                                "Vehicle Details",
+                                Constants.ctaColorLight,
+                                [
+                                  _buildDetailItem(
+                                    "VIN Number",
+                                    widget.autoSpare.vehicleDetails.vin,
+                                    showImage: true,
+                                  ),
+                                  _buildDetailItem(
+                                    "Manufacturer",
+                                    widget
+                                        .autoSpare
+                                        .vehicleDetails
+                                        .manufacturer,
+                                  ),
+                                  _buildDetailItem(
+                                    "Makes & Models",
+                                    widget.autoSpare.vehicleDetails.makeModel,
+                                  ),
+                                  _buildDetailItem(
+                                    "Year",
+                                    widget.autoSpare.vehicleDetails.year,
+                                  ),
+                                  _buildDetailItem(
+                                    "Type",
+                                    widget.autoSpare.vehicleDetails.type,
+                                  ),
+                                  _buildDetailItem(
+                                    "Vehicle",
+                                    "${widget.autoSpare.vehicleDetails.makeModel} ${widget.autoSpare.vehicleDetails.year}",
+                                  ),
+                                  _buildDetailItem(
+                                    "New/Used Part",
+                                    widget.autoSpare.vehicleDetails.condition,
+                                  ),
+                                ],
+                              ),
                             ),
-                            SizedBox(width: 12),
-                            _buildTimerCircle(
-                              _getElapsedTime(widget.request.createdAt, 'minutes'),
-                              "M",
+                            SizedBox(width: 16),
+                            // Part Details Card
+                            Expanded(
+                              child: _buildDetailCard(
+                                "Part Details",
+                                Colors.orange,
+                                [
+                                  _buildDetailItem(
+                                    "Part Name/Description",
+                                    widget.autoSpare.partDetails.partName,
+                                  ),
+                                  _buildDetailItem(
+                                    "Quantity",
+                                    widget.autoSpare.partDetails.quantity
+                                        .toString(),
+                                  ),
+                                  _buildDetailItem(
+                                    "Your Location",
+                                    widget.autoSpare.partDetails.location,
+                                  ),
+                                  _buildDetailItem(
+                                    "Max Distance You Want to Travel (km)",
+                                    widget.autoSpare.partDetails.maxDistanceKm
+                                        .toString(),
+                                  ),
+                                  _buildDetailItem(
+                                    "How soon do you need to buy this product?",
+                                    widget.autoSpare.partDetails.urgency,
+                                  ),
+                                  _buildDetailItem(
+                                    "Description of the Product",
+                                    widget
+                                        .autoSpare
+                                        .partDetails
+                                        .productDescription,
+                                  ),
+                                  _buildDetailItem(
+                                    "Product Images",
+                                    "",
+                                    isProductImages: true,
+                                  ),
+                                ],
+                              ),
                             ),
-                            SizedBox(width: 12),
-                            _buildTimerCircle(
-                              _getElapsedTime(widget.request.createdAt, 'seconds'),
-                              "S",
+                            SizedBox(width: 16),
+                            // More Details Card
+                            Expanded(
+                              child: _buildDetailCard(
+                                "More Details",
+                                Colors.orange,
+                                [
+                                  _buildDetailItem(
+                                    "Part Number",
+                                    widget.autoSpare.moreFields.partNumber,
+                                  ),
+                                  _buildDetailItem(
+                                    "Transmission Type",
+                                    widget
+                                        .autoSpare
+                                        .moreFields
+                                        .transmissionType,
+                                  ),
+                                  _buildDetailItem(
+                                    "Mileage of Vehicle",
+                                    widget.autoSpare.moreFields.mileage,
+                                  ),
+                                  _buildDetailItem(
+                                    "Fuel Type",
+                                    widget.autoSpare.moreFields.fuelType,
+                                  ),
+                                  _buildDetailItem(
+                                    "Body Type",
+                                    widget.autoSpare.moreFields.bodyType,
+                                  ),
+                                  _buildDetailItem("Enquiry Time", "24 Hours"),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 24),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                  SizedBox(height: 32),
+                ],
               ),
-              SizedBox(height: 32),
-
-              Padding(
-                padding: EdgeInsets.only(left: 64, right: 64),
-                child: Center(
-                  child: Container(
-                    width: double.infinity,
-                    constraints: BoxConstraints(maxWidth: 1600),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Vehicle Details Card
-                        Expanded(
-                          child: _buildDetailCard(
-                            "Vehicle Details",
-                            Constants.ctaColorLight,
-                            [
-                              _buildDetailItem(
-                                "VIN Number",
-                                widget.autoSpare.vehicleDetails.vin,
-                                showImage: true,
-                              ),
-                              _buildDetailItem(
-                                "Manufacturer",
-                                widget
-                                    .autoSpare
-                                    .vehicleDetails
-                                    .manufacturer,
-                              ),
-                              _buildDetailItem(
-                                "Makes & Models",
-                                widget.autoSpare.vehicleDetails.makeModel,
-                              ),
-                              _buildDetailItem(
-                                "Year",
-                                widget.autoSpare.vehicleDetails.year,
-                              ),
-                              _buildDetailItem(
-                                "Type",
-                                widget.autoSpare.vehicleDetails.type,
-                              ),
-                              _buildDetailItem(
-                                "Vehicle",
-                                "${widget.autoSpare.vehicleDetails.makeModel} ${widget.autoSpare.vehicleDetails.year}",
-                              ),
-                              _buildDetailItem(
-                                "New/Used Part",
-                                widget.autoSpare.vehicleDetails.condition,
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        // Part Details Card
-                        Expanded(
-                          child: _buildDetailCard(
-                            "Part Details",
-                            Colors.orange,
-                            [
-                              _buildDetailItem(
-                                "Part Name/Description",
-                                widget.autoSpare.partDetails.partName,
-                              ),
-                              _buildDetailItem(
-                                "Quantity",
-                                widget.autoSpare.partDetails.quantity
-                                    .toString(),
-                              ),
-                              _buildDetailItem(
-                                "Your Location",
-                                widget.autoSpare.partDetails.location,
-                              ),
-                              _buildDetailItem(
-                                "Max Distance You Want to Travel (km)",
-                                widget.autoSpare.partDetails.maxDistanceKm
-                                    .toString(),
-                              ),
-                              _buildDetailItem(
-                                "How soon do you need to buy this product?",
-                                widget.autoSpare.partDetails.urgency,
-                              ),
-                              _buildDetailItem(
-                                "Description of the Product",
-                                widget
-                                    .autoSpare
-                                    .partDetails
-                                    .productDescription,
-                              ),
-                              _buildDetailItem(
-                                "Product Images",
-                                "",
-                                isProductImages: true,
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        // More Details Card
-                        Expanded(
-                          child: _buildDetailCard(
-                            "More Details",
-                            Colors.orange,
-                            [
-                              _buildDetailItem(
-                                "Part Number",
-                                widget.autoSpare.moreFields.partNumber,
-                              ),
-                              _buildDetailItem(
-                                "Transmission Type",
-                                widget
-                                    .autoSpare
-                                    .moreFields
-                                    .transmissionType,
-                              ),
-                              _buildDetailItem(
-                                "Mileage of Vehicle",
-                                widget.autoSpare.moreFields.mileage,
-                              ),
-                              _buildDetailItem(
-                                "Fuel Type",
-                                widget.autoSpare.moreFields.fuelType,
-                              ),
-                              _buildDetailItem(
-                                "Body Type",
-                                widget.autoSpare.moreFields.bodyType,
-                              ),
-                              _buildDetailItem(
-                                "Enquiry Time",
-                                "24 Hours",
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 32),
-            ],
-          ),
             ),
           ),
         ],
@@ -5221,7 +5257,6 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
     if (date == null) return "Date unavailable";
     return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
   }
-
 
   Widget _buildDetailCard(
     String title,
@@ -5575,14 +5610,16 @@ class ConsumerElectronicsDetailScreen extends StatefulWidget {
     super.key,
     required this.request,
     required this.consumerElectronics,
-    required this.bids, required this.index,
+    required this.bids,
+    required this.index,
   });
 
   @override
   State<ConsumerElectronicsDetailScreen> createState() =>
       _ConsumerElectronicsDetailScreenState();
-  
-  static void showAsDialog(BuildContext context, {
+
+  static void showAsDialog(
+    BuildContext context, {
     required int index,
     required ConsumerElectronicsRequest request,
     required ConsumerElectronics consumerElectronics,
@@ -5625,6 +5662,7 @@ class _ConsumerElectronicsDetailScreenState
       return 'Unknown';
     }
   }
+
   SortOption? _currentSort;
   Set<String> _cancelledRequests = {};
 
@@ -5687,7 +5725,9 @@ class _ConsumerElectronicsDetailScreenState
               CircularProgressIndicator(
                 value: progress,
                 strokeWidth: 2,
-                backgroundColor: label=="D"?Colors.grey.shade600:Colors.orange.shade50,
+                backgroundColor: label == "D"
+                    ? Colors.grey.shade600
+                    : Colors.orange.shade50,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   Colors.orange.shade600.withOpacity(opacity),
                 ),
@@ -5720,6 +5760,7 @@ class _ConsumerElectronicsDetailScreenState
       ],
     );
   }
+
   String _getElapsedTime(DateTime? createdAt, String unit) {
     if (createdAt == null) return "0";
 
@@ -5782,346 +5823,369 @@ class _ConsumerElectronicsDetailScreenState
                 children: [
                   SizedBox(height: 32),
                   Padding(
-                padding: EdgeInsets.only(left: 64, right: 64),
-                child: Center(
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(24),
-                    constraints: BoxConstraints(maxWidth: 1600),
-                    decoration: BoxDecoration(
-                      color: Constants.dtaColorLight.withOpacity(0.55),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Constants.ctaColorLight,
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _formatDate(widget.request.createdAt),
-                                  style: GoogleFonts.manrope(
-                                    color: Colors.grey.shade600,
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  "REQUEST #${widget.index}",
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                if (!_cancelledRequests.contains(
-                                  _getRequestId(widget.request),
-                                ))
-                                  InkWell(
-                                    onTap: () {
-                                      _showCancelRequestDialog();
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.red.shade300),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        "Cancel",
-                                        style: GoogleFonts.manrope(
-                                          color: Colors.red.shade500,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                SizedBox(width: 12),
-        
-                                SortDropdownMenu(
-                                  initialValue: _currentSort,
-                                  onSortChanged: (option) {
-                                    setState(() {
-                                      _currentSort = option;
-                                    });
-                                    print('Sort changed to: $option');
-                                  },
-                                ),
-        
-                              ],
-                            ),
-        
-                          ],
+                    padding: EdgeInsets.only(left: 64, right: 64),
+                    child: Center(
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(24),
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        decoration: BoxDecoration(
+                          color: Constants.dtaColorLight.withOpacity(0.55),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Constants.ctaColorLight,
+                            width: 1,
+                          ),
                         ),
-                        SizedBox(height: 6),
-                        IntrinsicHeight(
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(right: 8,top: 4,bottom: 4),
-                                child: Container(
-                                  width: 4,
-                                  decoration: BoxDecoration(
-                                      color: Constants.ctaColorLight,
-                                      borderRadius: BorderRadius.circular(36)
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-        
-                                        Text(
-                                          "Description -",
-                                          style: GoogleFonts.manrope(
-                                            color: Colors.grey.shade600,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        Spacer(),
-                                        GestureDetector(
-                                          onTap: (){},
-                                          child: Text(
-                                            "View Details",
-                                            style: GoogleFonts.manrope(
-                                              color: Constants.ftaColorLight,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              decoration: TextDecoration.underline,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 8),
                                     Text(
-                                      _getRequestDescription(widget.request,widget.consumerElectronics),
+                                      _formatDate(widget.request.createdAt),
                                       style: GoogleFonts.manrope(
-                                        fontSize: 13,
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey.shade600,
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    SizedBox(height: 4),
-        
-                                    // Category
                                     Text(
-                                      _getCategoryDisplayName(widget.request.category),
+                                      "REQUEST #${widget.index}",
                                       style: GoogleFonts.manrope(
-                                        color: Colors.orange.shade600,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
                                       ),
                                     ),
                                   ],
                                 ),
+                                Row(
+                                  children: [
+                                    if (!_cancelledRequests.contains(
+                                      _getRequestId(widget.request),
+                                    ))
+                                      InkWell(
+                                        onTap: () {
+                                          _showCancelRequestDialog();
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Colors.red.shade300,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            "Cancel",
+                                            style: GoogleFonts.manrope(
+                                              color: Colors.red.shade500,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    SizedBox(width: 12),
+
+                                    SortDropdownMenu(
+                                      initialValue: _currentSort,
+                                      onSortChanged: (option) {
+                                        setState(() {
+                                          _currentSort = option;
+                                        });
+                                        print('Sort changed to: $option');
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 6),
+                            IntrinsicHeight(
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      right: 8,
+                                      top: 4,
+                                      bottom: 4,
+                                    ),
+                                    child: Container(
+                                      width: 4,
+                                      decoration: BoxDecoration(
+                                        color: Constants.ctaColorLight,
+                                        borderRadius: BorderRadius.circular(36),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Description -",
+                                              style: GoogleFonts.manrope(
+                                                color: Colors.grey.shade600,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            GestureDetector(
+                                              onTap: () {},
+                                              child: Text(
+                                                "View Details",
+                                                style: GoogleFonts.manrope(
+                                                  color:
+                                                      Constants.ftaColorLight,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          _getRequestDescription(
+                                            widget.request,
+                                            widget.consumerElectronics,
+                                          ),
+                                          style: GoogleFonts.manrope(
+                                            fontSize: 13,
+                                            color: Colors.black87,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        SizedBox(height: 4),
+
+                                        // Category
+                                        Text(
+                                          _getCategoryDisplayName(
+                                            widget.request.category,
+                                          ),
+                                          style: GoogleFonts.manrope(
+                                            color: Colors.orange.shade600,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 16),
+                            // Status dots - showing elapsed time
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildTimerCircle("0", "D"),
+                                SizedBox(width: 12),
+                                _buildTimerCircle(
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'hours',
+                                  ),
+                                  "H",
+                                ),
+                                SizedBox(width: 12),
+                                _buildTimerCircle(
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'minutes',
+                                  ),
+                                  "M",
+                                ),
+                                SizedBox(width: 12),
+                                _buildTimerCircle(
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'seconds',
+                                  ),
+                                  "S",
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 24),
+                          ],
                         ),
-                        SizedBox(height: 16),
-                        // Status dots - showing elapsed time
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 32),
+                  Padding(
+                    padding: EdgeInsets.only(left: 64, right: 64),
+                    child: Center(
+                      child: Container(
+                        width: double.infinity,
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildTimerCircle("0", "D"),
-                            SizedBox(width: 12),
-                            _buildTimerCircle(
-                              _getElapsedTime(widget.request.createdAt, 'hours'),
-                              "H",
+                            // Product Details Card
+                            Expanded(
+                              child: _buildDetailCard(
+                                "Product Details",
+                                Constants.ctaColorLight,
+                                [
+                                  _buildDetailItem(
+                                    "Type of Electronics",
+                                    widget
+                                        .consumerElectronics
+                                        .productDetails
+                                        .typeOfElectronics,
+                                  ),
+                                  _buildDetailItem(
+                                    "Brand Preference",
+                                    widget
+                                        .consumerElectronics
+                                        .productDetails
+                                        .brandPreference,
+                                  ),
+                                  _buildDetailItem(
+                                    "Model Series",
+                                    widget
+                                            .consumerElectronics
+                                            .productDetails
+                                            .modelSeries ??
+                                        "-",
+                                  ),
+                                  _buildDetailItem(
+                                    "Quantity Needed",
+                                    widget
+                                        .consumerElectronics
+                                        .productDetails
+                                        .quantityNeeded
+                                        .toString(),
+                                  ),
+                                  _buildDetailItem(
+                                    "Purpose",
+                                    widget
+                                        .consumerElectronics
+                                        .featuresAndSpecs
+                                        .purpose,
+                                  ),
+                                  _buildDetailItem(
+                                    "Condition Preference",
+                                    widget
+                                        .consumerElectronics
+                                        .featuresAndSpecs
+                                        .conditionPreference,
+                                  ),
+                                ],
+                              ),
                             ),
-                            SizedBox(width: 12),
-                            _buildTimerCircle(
-                              _getElapsedTime(widget.request.createdAt, 'minutes'),
-                              "M",
+                            SizedBox(width: 16),
+                            // Budget & Timeline Card
+                            Expanded(
+                              child: _buildDetailCard(
+                                "Budget & Timeline",
+                                Colors.orange,
+                                [
+                                  _buildDetailItem(
+                                    "Min Price",
+                                    widget
+                                                .consumerElectronics
+                                                .budgetTimeline
+                                                .minPrice !=
+                                            null
+                                        ? "\$${widget.consumerElectronics.budgetTimeline.minPrice!.toStringAsFixed(2)}"
+                                        : "-",
+                                  ),
+                                  _buildDetailItem(
+                                    "Max Price",
+                                    widget
+                                                .consumerElectronics
+                                                .budgetTimeline
+                                                .maxPrice !=
+                                            null
+                                        ? "\$${widget.consumerElectronics.budgetTimeline.maxPrice!.toStringAsFixed(2)}"
+                                        : "-",
+                                  ),
+                                  _buildDetailItem(
+                                    "Urgency",
+                                    widget
+                                        .consumerElectronics
+                                        .budgetTimeline
+                                        .urgency,
+                                  ),
+                                  _buildDetailItem(
+                                    "Needs Installation",
+                                    widget
+                                            .consumerElectronics
+                                            .budgetTimeline
+                                            .needsInstallation
+                                        ? "Yes"
+                                        : "No",
+                                  ),
+                                ],
+                              ),
                             ),
-                            SizedBox(width: 12),
-                            _buildTimerCircle(
-                              _getElapsedTime(widget.request.createdAt, 'seconds'),
-                              "S",
+                            SizedBox(width: 16),
+                            // Features & Specifications Card
+                            Expanded(
+                              child: _buildDetailCard(
+                                "Features & Specifications",
+                                Colors.orange,
+                                [
+                                  _buildDetailItem(
+                                    "Required Features",
+                                    widget
+                                            .consumerElectronics
+                                            .featuresAndSpecs
+                                            .requiredFeatures ??
+                                        "-",
+                                  ),
+                                  _buildDetailItem(
+                                    "Additional Comments",
+                                    widget
+                                            .consumerElectronics
+                                            .featuresAndSpecs
+                                            .additionalComments ??
+                                        "-",
+                                  ),
+                                  _buildDetailItem(
+                                    "Documents/Images",
+                                    "",
+                                    isProductImages: true,
+                                    imageList: widget
+                                        .consumerElectronics
+                                        .featuresAndSpecs
+                                        .documentsOrImages,
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 24),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-              SizedBox(height: 32),
-              Padding(
-                padding: EdgeInsets.only(left: 64, right: 64),
-                child: Center(
-                  child: Container(
-                    width: double.infinity,
-                    constraints: BoxConstraints(maxWidth: 1600),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Product Details Card
-                        Expanded(
-                          child: _buildDetailCard(
-                            "Product Details",
-                            Constants.ctaColorLight,
-                            [
-                              _buildDetailItem(
-                                "Type of Electronics",
-                                widget
-                                    .consumerElectronics
-                                    .productDetails
-                                    .typeOfElectronics,
-                              ),
-                              _buildDetailItem(
-                                "Brand Preference",
-                                widget
-                                    .consumerElectronics
-                                    .productDetails
-                                    .brandPreference,
-                              ),
-                              _buildDetailItem(
-                                "Model Series",
-                                widget
-                                        .consumerElectronics
-                                        .productDetails
-                                        .modelSeries ??
-                                    "-",
-                              ),
-                              _buildDetailItem(
-                                "Quantity Needed",
-                                widget
-                                    .consumerElectronics
-                                    .productDetails
-                                    .quantityNeeded
-                                    .toString(),
-                              ),
-                              _buildDetailItem(
-                                "Purpose",
-                                widget
-                                    .consumerElectronics
-                                    .featuresAndSpecs
-                                    .purpose,
-                              ),
-                              _buildDetailItem(
-                                "Condition Preference",
-                                widget
-                                    .consumerElectronics
-                                    .featuresAndSpecs
-                                    .conditionPreference,
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        // Budget & Timeline Card
-                        Expanded(
-                          child: _buildDetailCard(
-                            "Budget & Timeline",
-                            Colors.orange,
-                            [
-                              _buildDetailItem(
-                                "Min Price",
-                                widget
-                                            .consumerElectronics
-                                            .budgetTimeline
-                                            .minPrice !=
-                                        null
-                                    ? "\$${widget.consumerElectronics.budgetTimeline.minPrice!.toStringAsFixed(2)}"
-                                    : "-",
-                              ),
-                              _buildDetailItem(
-                                "Max Price",
-                                widget
-                                            .consumerElectronics
-                                            .budgetTimeline
-                                            .maxPrice !=
-                                        null
-                                    ? "\$${widget.consumerElectronics.budgetTimeline.maxPrice!.toStringAsFixed(2)}"
-                                    : "-",
-                              ),
-                              _buildDetailItem(
-                                "Urgency",
-                                widget
-                                    .consumerElectronics
-                                    .budgetTimeline
-                                    .urgency,
-                              ),
-                              _buildDetailItem(
-                                "Needs Installation",
-                                widget
-                                        .consumerElectronics
-                                        .budgetTimeline
-                                        .needsInstallation
-                                    ? "Yes"
-                                    : "No",
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        // Features & Specifications Card
-                        Expanded(
-                          child: _buildDetailCard(
-                            "Features & Specifications",
-                            Colors.orange,
-                            [
-                              _buildDetailItem(
-                                "Required Features",
-                                widget
-                                        .consumerElectronics
-                                        .featuresAndSpecs
-                                        .requiredFeatures ??
-                                    "-",
-                              ),
-                              _buildDetailItem(
-                                "Additional Comments",
-                                widget
-                                        .consumerElectronics
-                                        .featuresAndSpecs
-                                        .additionalComments ??
-                                    "-",
-                              ),
-                              _buildDetailItem(
-                                "Documents/Images",
-                                "",
-                                isProductImages: true,
-                                imageList: widget
-                                    .consumerElectronics
-                                    .featuresAndSpecs
-                                    .documentsOrImages,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
                   SizedBox(height: 32),
-            ],
-          ),
+                ],
+              ),
             ),
           ),
         ],
@@ -6592,13 +6656,15 @@ class RimTyreDetailScreen extends StatefulWidget {
     Key? key,
     required this.request,
     required this.rimTyre,
-    required this.bids, required this.index,
+    required this.bids,
+    required this.index,
   }) : super(key: key);
 
   @override
   State<RimTyreDetailScreen> createState() => _RimTyreDetailScreenState();
-  
-  static void showAsDialog(BuildContext context, {
+
+  static void showAsDialog(
+    BuildContext context, {
     required int index,
     required RimTyreRequest request,
     required RimTyre rimTyre,
@@ -6640,6 +6706,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
       return 'Unknown';
     }
   }
+
   SortOption? _currentSort;
   Set<String> _cancelledRequests = {};
 
@@ -6702,7 +6769,9 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
               CircularProgressIndicator(
                 value: progress,
                 strokeWidth: 2,
-                backgroundColor: label=="D"?Colors.grey.shade600:Colors.orange.shade50,
+                backgroundColor: label == "D"
+                    ? Colors.grey.shade600
+                    : Colors.orange.shade50,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   Colors.orange.shade600.withOpacity(opacity),
                 ),
@@ -6735,6 +6804,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
       ],
     );
   }
+
   String _getElapsedTime(DateTime? createdAt, String unit) {
     if (createdAt == null) return "0";
 
@@ -6756,7 +6826,6 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -6798,333 +6867,353 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                 children: [
                   SizedBox(height: 32),
                   Padding(
-                padding: EdgeInsets.only(left: 64, right: 64),
-                child: Center(
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(24),
-                    constraints: BoxConstraints(maxWidth: 1600),
-                    decoration: BoxDecoration(
-                      color: Constants.dtaColorLight.withOpacity(0.55),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Constants.ctaColorLight,
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _formatDate(widget.request.createdAt),
-                                  style: GoogleFonts.manrope(
-                                    color: Colors.grey.shade600,
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  "REQUEST #${widget.index}",
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                if (!_cancelledRequests.contains(
-                                  _getRequestId(widget.request),
-                                ))
-                                  InkWell(
-                                    onTap: () {
-                                      _showCancelRequestDialog();
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.red.shade300),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        "Cancel",
-                                        style: GoogleFonts.manrope(
-                                          color: Colors.red.shade500,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                SizedBox(width: 12),
-        
-                                SortDropdownMenu(
-                                  initialValue: _currentSort,
-                                  onSortChanged: (option) {
-                                    setState(() {
-                                      _currentSort = option;
-                                    });
-                                    print('Sort changed to: $option');
-                                  },
-                                ),
-        
-                              ],
-                            ),
-        
-                          ],
+                    padding: EdgeInsets.only(left: 64, right: 64),
+                    child: Center(
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(24),
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        decoration: BoxDecoration(
+                          color: Constants.dtaColorLight.withOpacity(0.55),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Constants.ctaColorLight,
+                            width: 1,
+                          ),
                         ),
-                        SizedBox(height: 6),
-                        IntrinsicHeight(
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(right: 8,top: 4,bottom: 4),
-                                child: Container(
-                                  width: 4,
-                                  decoration: BoxDecoration(
-                                      color: Constants.ctaColorLight,
-                                      borderRadius: BorderRadius.circular(36)
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-        
-                                        Text(
-                                          "Description -",
-                                          style: GoogleFonts.manrope(
-                                            color: Colors.grey.shade600,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        Spacer(),
-                                        GestureDetector(
-                                          onTap: (){},
-                                          child: Text(
-                                            "View Details",
-                                            style: GoogleFonts.manrope(
-                                              color: Constants.ftaColorLight,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              decoration: TextDecoration.underline,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 8),
                                     Text(
-                                      _getRequestDescription(widget.request,widget.rimTyre),
+                                      _formatDate(widget.request.createdAt),
                                       style: GoogleFonts.manrope(
-                                        fontSize: 13,
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey.shade600,
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    SizedBox(height: 4),
-        
-                                    // Category
                                     Text(
-                                      _getCategoryDisplayName(widget.request.category),
+                                      "REQUEST #${widget.index}",
                                       style: GoogleFonts.manrope(
-                                        color: Colors.orange.shade600,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
                                       ),
                                     ),
                                   ],
                                 ),
+                                Row(
+                                  children: [
+                                    if (!_cancelledRequests.contains(
+                                      _getRequestId(widget.request),
+                                    ))
+                                      InkWell(
+                                        onTap: () {
+                                          _showCancelRequestDialog();
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Colors.red.shade300,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            "Cancel",
+                                            style: GoogleFonts.manrope(
+                                              color: Colors.red.shade500,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    SizedBox(width: 12),
+
+                                    SortDropdownMenu(
+                                      initialValue: _currentSort,
+                                      onSortChanged: (option) {
+                                        setState(() {
+                                          _currentSort = option;
+                                        });
+                                        print('Sort changed to: $option');
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 6),
+                            IntrinsicHeight(
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      right: 8,
+                                      top: 4,
+                                      bottom: 4,
+                                    ),
+                                    child: Container(
+                                      width: 4,
+                                      decoration: BoxDecoration(
+                                        color: Constants.ctaColorLight,
+                                        borderRadius: BorderRadius.circular(36),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Description -",
+                                              style: GoogleFonts.manrope(
+                                                color: Colors.grey.shade600,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            GestureDetector(
+                                              onTap: () {},
+                                              child: Text(
+                                                "View Details",
+                                                style: GoogleFonts.manrope(
+                                                  color:
+                                                      Constants.ftaColorLight,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          _getRequestDescription(
+                                            widget.request,
+                                            widget.rimTyre,
+                                          ),
+                                          style: GoogleFonts.manrope(
+                                            fontSize: 13,
+                                            color: Colors.black87,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        SizedBox(height: 4),
+
+                                        // Category
+                                        Text(
+                                          _getCategoryDisplayName(
+                                            widget.request.category,
+                                          ),
+                                          style: GoogleFonts.manrope(
+                                            color: Colors.orange.shade600,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 16),
+                            // Status dots - showing elapsed time
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildTimerCircle("0", "D"),
+                                SizedBox(width: 12),
+                                _buildTimerCircle(
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'hours',
+                                  ),
+                                  "H",
+                                ),
+                                SizedBox(width: 12),
+                                _buildTimerCircle(
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'minutes',
+                                  ),
+                                  "M",
+                                ),
+                                SizedBox(width: 12),
+                                _buildTimerCircle(
+                                  _getElapsedTime(
+                                    widget.request.createdAt,
+                                    'seconds',
+                                  ),
+                                  "S",
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 24),
+                          ],
                         ),
-                        SizedBox(height: 16),
-                        // Status dots - showing elapsed time
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 32),
+                  Padding(
+                    padding: EdgeInsets.only(left: 64, right: 64),
+                    child: Center(
+                      child: Container(
+                        width: double.infinity,
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildTimerCircle("0", "D"),
-                            SizedBox(width: 12),
-                            _buildTimerCircle(
-                              _getElapsedTime(widget.request.createdAt, 'hours'),
-                              "H",
+                            // Product Details Card
+                            Expanded(
+                              child: _buildDetailCard(
+                                "Product Details",
+                                Constants.ctaColorLight,
+                                [
+                                  _buildDetailItem(
+                                    "Tyre Width (mm)",
+                                    widget.rimTyre.productDetails.tyreWidthMm
+                                        .toString(),
+                                  ),
+                                  _buildDetailItem(
+                                    "Sidewall Profile",
+                                    widget
+                                        .rimTyre
+                                        .productDetails
+                                        .sidewallProfile,
+                                  ),
+                                  _buildDetailItem(
+                                    "Wheel Rim Diameter (inches)",
+                                    widget
+                                        .rimTyre
+                                        .productDetails
+                                        .wheelRimDiameterInches,
+                                  ),
+                                  _buildDetailItem(
+                                    "Tyre Type",
+                                    widget.rimTyre.productDetails.tyreType,
+                                  ),
+                                  _buildDetailItem(
+                                    "Quantity",
+                                    widget.rimTyre.productDetails.quantity
+                                        .toString(),
+                                  ),
+                                  _buildDetailItem(
+                                    "Urgency",
+                                    widget.rimTyre.productDetails.urgency,
+                                  ),
+                                  _buildDetailItem(
+                                    "Tyre Size",
+                                    "${widget.rimTyre.productDetails.tyreWidthMm}/${widget.rimTyre.productDetails.sidewallProfile}R${widget.rimTyre.productDetails.wheelRimDiameterInches}",
+                                  ),
+                                ],
+                              ),
                             ),
-                            SizedBox(width: 12),
-                            _buildTimerCircle(
-                              _getElapsedTime(widget.request.createdAt, 'minutes'),
-                              "M",
+                            SizedBox(width: 32),
+                            // Vehicle & Brand Details Card
+                            Expanded(
+                              child: _buildDetailCard(
+                                "Vehicle & Brand Details",
+                                Colors.orange,
+                                [
+                                  _buildDetailItem(
+                                    "Vehicle Type",
+                                    widget.rimTyre.moreFields.vehicleType,
+                                  ),
+                                  _buildDetailItem(
+                                    "Preferred Brand",
+                                    widget.rimTyre.moreFields.preferredBrand,
+                                  ),
+                                  _buildDetailItem(
+                                    "Pitch Circle Diameter",
+                                    widget
+                                        .rimTyre
+                                        .moreFields
+                                        .pitchCircleDiameter,
+                                  ),
+                                  _buildDetailItem(
+                                    "Tyre Construction Type",
+                                    widget
+                                        .rimTyre
+                                        .moreFields
+                                        .tyreConstructionType,
+                                  ),
+                                  _buildDetailItem(
+                                    "Description",
+                                    widget.rimTyre.moreFields.description,
+                                  ),
+                                ],
+                              ),
                             ),
-                            SizedBox(width: 12),
-                            _buildTimerCircle(
-                              _getElapsedTime(widget.request.createdAt, 'seconds'),
-                              "S",
+                            SizedBox(width: 32),
+                            Expanded(
+                              child: _buildDetailCard(
+                                "Service Requirements",
+                                Colors.orange,
+                                [
+                                  _buildDetailItem(
+                                    "Fitment Required",
+                                    widget.rimTyre.moreFields.fitmentRequired
+                                        ? "Yes"
+                                        : "No",
+                                  ),
+                                  _buildDetailItem(
+                                    "Balancing Required",
+                                    widget.rimTyre.moreFields.balancingRequired
+                                        ? "Yes"
+                                        : "No",
+                                  ),
+                                  _buildDetailItem(
+                                    "Tyre Rotation Required",
+                                    widget
+                                            .rimTyre
+                                            .moreFields
+                                            .tyreRotationRequired
+                                        ? "Yes"
+                                        : "No",
+                                  ),
+                                  _buildDetailItem(
+                                    "Product Images",
+                                    "",
+                                    isProductImages: true,
+                                    imageList:
+                                        widget.rimTyre.moreFields.imageUrls,
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 24),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-              SizedBox(height: 32),
-              Padding(
-                padding: EdgeInsets.only(left: 64, right: 64),
-                child: Center(
-                  child: Container(
-                    width: double.infinity,
-                    constraints: BoxConstraints(maxWidth: 1600),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Product Details Card
-                        Expanded(
-                          child: _buildDetailCard(
-                            "Product Details",
-                            Constants.ctaColorLight,
-                            [
-                              _buildDetailItem(
-                                "Tyre Width (mm)",
-                                widget.rimTyre.productDetails.tyreWidthMm
-                                    .toString(),
-                              ),
-                              _buildDetailItem(
-                                "Sidewall Profile",
-                                widget
-                                    .rimTyre
-                                    .productDetails
-                                    .sidewallProfile,
-                              ),
-                              _buildDetailItem(
-                                "Wheel Rim Diameter (inches)",
-                                widget
-                                    .rimTyre
-                                    .productDetails
-                                    .wheelRimDiameterInches,
-                              ),
-                              _buildDetailItem(
-                                "Tyre Type",
-                                widget.rimTyre.productDetails.tyreType,
-                              ),
-                              _buildDetailItem(
-                                "Quantity",
-                                widget.rimTyre.productDetails.quantity
-                                    .toString(),
-                              ),
-                              _buildDetailItem(
-                                "Urgency",
-                                widget.rimTyre.productDetails.urgency,
-                              ),
-                              _buildDetailItem(
-                                "Tyre Size",
-                                "${widget.rimTyre.productDetails.tyreWidthMm}/${widget.rimTyre.productDetails.sidewallProfile}R${widget.rimTyre.productDetails.wheelRimDiameterInches}",
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 32),
-                        // Vehicle & Brand Details Card
-                        Expanded(
-                          child: _buildDetailCard(
-                            "Vehicle & Brand Details",
-                            Colors.orange,
-                            [
-                              _buildDetailItem(
-                                "Vehicle Type",
-                                widget.rimTyre.moreFields.vehicleType,
-                              ),
-                              _buildDetailItem(
-                                "Preferred Brand",
-                                widget.rimTyre.moreFields.preferredBrand,
-                              ),
-                              _buildDetailItem(
-                                "Pitch Circle Diameter",
-                                widget
-                                    .rimTyre
-                                    .moreFields
-                                    .pitchCircleDiameter,
-                              ),
-                              _buildDetailItem(
-                                "Tyre Construction Type",
-                                widget
-                                    .rimTyre
-                                    .moreFields
-                                    .tyreConstructionType,
-                              ),
-                              _buildDetailItem(
-                                "Description",
-                                widget.rimTyre.moreFields.description,
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 32),
-                        Expanded(
-                          child: _buildDetailCard(
-                            "Service Requirements",
-                            Colors.orange,
-                            [
-                              _buildDetailItem(
-                                "Fitment Required",
-                                widget.rimTyre.moreFields.fitmentRequired
-                                    ? "Yes"
-                                    : "No",
-                              ),
-                              _buildDetailItem(
-                                "Balancing Required",
-                                widget
-                                        .rimTyre
-                                        .moreFields
-                                        .balancingRequired
-                                    ? "Yes"
-                                    : "No",
-                              ),
-                              _buildDetailItem(
-                                "Tyre Rotation Required",
-                                widget
-                                        .rimTyre
-                                        .moreFields
-                                        .tyreRotationRequired
-                                    ? "Yes"
-                                    : "No",
-                              ),
-                              _buildDetailItem(
-                                "Product Images",
-                                "",
-                                isProductImages: true,
-                                imageList:
-                                    widget.rimTyre.moreFields.imageUrls,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
                   SizedBox(height: 32),
-            ],
-          ),
+                ],
+              ),
             ),
           ),
         ],

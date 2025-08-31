@@ -84,7 +84,9 @@ class ProductRequestItem {
   factory ProductRequestItem.fromJson(Map<String, dynamic> json) {
     return ProductRequestItem(
       requestId: json['request_id'] ?? '',
-      buyerId: json['buyer_id'] != null ? ApiUser.fromJson(json['buyer_id']) : null,
+      buyerId: json['buyer_id'] != null && json['buyer_id'] is Map<String, dynamic> 
+          ? ApiUser.fromJson(json['buyer_id']) 
+          : null,
       category: json['category'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
