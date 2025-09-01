@@ -1,0 +1,308 @@
+name: UAT Deployment
+
+on:
+  push:
+    branches:
+      - uat
+  pull_request:
+    branches:
+      - uat
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      deploy_infrastructure:
+        description: 'Deploy infrastructure with Terraform'
+        required: false
+        default: false
+        type: boolean
+      force_rebuild:
+        description: 'Force rebuild all images'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  ENVIRONMENT: uat
+  RESOURCE_GROUP: bidr-uat-k8s
+  AKS_CLUSTER: BIDR-uat-aks-cluster
+  ACR_NAME: BIDRcontainerregistry
+
+jobs:
+  terraform:
+    if: github.event.inputs.deploy_infrastructure == 'true' || contains(github.event.head_commit.message, '[deploy-infra]')
+    runs-on: ubuntu-latest
+    environment: uat
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.6.0
+        
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS_UAT }}
+        
+    - name: Terraform Init
+      working-directory: ./terraform
+      run: terraform init
+      
+    - name: Terraform Plan
+      working-directory: ./terraform
+      run: |
+        terraform plan \
+          -var-file="uat.tfvars" \
+          -var="email_host_user=${{ secrets.EMAIL_HOST_USER }}" \
+          -var="email_host_password=${{ secrets.EMAIL_HOST_PASSWORD }}" \
+          -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
+          -out="uat.tfplan"
+          
+    - name: Terraform Apply
+      working-directory: ./terraform
+      run: terraform apply -auto-approve "uat.tfplan"
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: [terraform]
+    if: always() && (needs.terraform.result == 'success' || needs.terraform.result == 'skipped')
+    environment: uat
+    
+    strategy:
+      matrix:
+        service:
+          - authentication_service
+          - chat_service
+          - notifications_service
+          - payment_service
+          - product_management_service
+          - resolution_service
+          - reviews_and_ratings
+          - transactions_service
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS_UAT }}
+        
+    - name: Login to Azure Container Registry
+      run: az acr login --name ${{ env.ACR_NAME }}
+      
+    - name: Check for changes in service
+      id: changes
+      run: |
+        if [ "${{ github.event.inputs.force_rebuild }}" == "true" ]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+        elif git diff --quiet ${{ github.event.before }} ${{ github.sha }} -- ${{ matrix.service }}/; then
+          echo "changed=false" >> $GITHUB_OUTPUT
+        else
+          echo "changed=true" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Build and push Docker image
+      if: steps.changes.outputs.changed == 'true'
+      run: |
+        SERVICE_NAME=${{ matrix.service }}
+        IMAGE_NAME="bidr-${SERVICE_NAME//_/-}"
+        FULL_IMAGE_NAME="${{ env.ACR_NAME }}.azurecr.io/${IMAGE_NAME}"
+        
+        echo "Building ${IMAGE_NAME} from ${SERVICE_NAME}/"
+        
+        docker build \
+          --build-arg ENVIRONMENT=uat \
+          --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+          --build-arg VCS_REF=${{ github.sha }} \
+          -t ${FULL_IMAGE_NAME}:${{ github.sha }} \
+          -t ${FULL_IMAGE_NAME}:latest \
+          ${SERVICE_NAME}/
+          
+        docker push ${FULL_IMAGE_NAME}:${{ github.sha }}
+        docker push ${FULL_IMAGE_NAME}:latest
+        
+        echo "Successfully built and pushed ${FULL_IMAGE_NAME}"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build-and-deploy]
+    if: always() && needs.build-and-deploy.result == 'success'
+    environment: uat
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS_UAT }}
+        
+    - name: Get AKS credentials
+      run: |
+        az aks get-credentials \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.AKS_CLUSTER }} \
+          --overwrite-existing
+          
+    - name: Update Kustomization with new image tags
+      run: |
+        cd k8s/overlays/uat
+        
+        # Update image tags to use the commit SHA
+        services=("authentication-service" "chat-service" "notifications-service" "payment-service" 
+                 "product-management-service" "resolution-service" "reviews-and-ratings" "transactions-service")
+        
+        for service in "${services[@]}"; do
+          # Convert service name format
+          service_underscore=${service//-/_}
+          image_name="bidr-${service}"
+          full_image="${{ env.ACR_NAME }}.azurecr.io/${image_name}"
+          
+          # Update the kustomization.yaml file
+          if grep -q "${full_image}" kustomization.yaml; then
+            sed -i "s|newTag:.*|newTag: ${{ github.sha }}|g" kustomization.yaml
+          fi
+        done
+        
+    - name: Deploy to UAT
+      run: |
+        echo "🚀 Deploying to UAT environment..."
+        
+        # Apply UAT configuration
+        kubectl apply -k k8s/overlays/uat/
+        
+        # Wait for deployments to be ready
+        echo "⏳ Waiting for deployments to be ready..."
+        
+        services=("bidr-authentication-service" "bidr-chat-service" "bidr-notifications-service" 
+                 "bidr-payment-service" "bidr-product-management-service" "bidr-resolution-service" 
+                 "bidr-reviews-and-ratings" "bidr-transactions-service" "nginx-load-balancer")
+        
+        for service in "${services[@]}"; do
+          echo "Waiting for $service..."
+          kubectl wait --for=condition=available --timeout=300s deployment/$service -n bidr || echo "⚠️ $service timeout"
+        done
+        
+    - name: Get deployment status
+      run: |
+        echo "📋 UAT Deployment Status:"
+        echo "========================"
+        
+        kubectl get namespace bidr
+        echo ""
+        
+        echo "Pods:"
+        kubectl get pods -n bidr
+        echo ""
+        
+        echo "Services:"
+        kubectl get services -n bidr
+        echo ""
+        
+        echo "Deployments:"
+        kubectl get deployments -n bidr
+        
+    - name: Get Load Balancer IP
+      id: lb-ip
+      run: |
+        echo "🌐 Getting Load Balancer IP..."
+        
+        # Wait for load balancer IP
+        for i in {1..30}; do
+          LB_IP=$(kubectl get service bidr-load-balancer -n bidr -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+          if [ -n "$LB_IP" ] && [ "$LB_IP" != "null" ] && [ "$LB_IP" != "<pending>" ]; then
+            echo "load_balancer_ip=${LB_IP}" >> $GITHUB_OUTPUT
+            echo "✅ Load Balancer IP: $LB_IP"
+            break
+          fi
+          echo "Waiting for Load Balancer IP... (attempt $i/30)"
+          sleep 30
+        done
+        
+        if [ -z "$LB_IP" ] || [ "$LB_IP" == "null" ] || [ "$LB_IP" == "<pending>" ]; then
+          echo "⚠️ Load Balancer IP not assigned yet"
+          echo "load_balancer_ip=pending" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Health Check
+      if: steps.lb-ip.outputs.load_balancer_ip != 'pending'
+      run: |
+        LB_IP="${{ steps.lb-ip.outputs.load_balancer_ip }}"
+        
+        echo "🏥 Performing health checks on http://$LB_IP"
+        
+        # Test main health endpoint
+        if curl -f -s "http://$LB_IP/health"; then
+          echo "✅ Main health check passed"
+        else
+          echo "❌ Main health check failed"
+        fi
+        
+        # Test environment endpoint
+        if curl -f -s "http://$LB_IP/env"; then
+          echo "✅ Environment endpoint accessible"
+          curl -s "http://$LB_IP/env" | jq .
+        else
+          echo "❌ Environment endpoint failed"
+        fi
+        
+        # Test service endpoints
+        services=("auth" "chat" "payment" "product" "notifications" "resolution" "transactions" "reviews")
+        
+        for service in "${services[@]}"; do
+          if curl -f -s -o /dev/null "http://$LB_IP/$service/"; then
+            echo "✅ $service service accessible"
+          else
+            echo "⚠️ $service service not accessible"
+          fi
+        done
+        
+    - name: Deployment Summary
+      run: |
+        echo "🎉 UAT Deployment Summary"
+        echo "========================"
+        echo "Environment: UAT"
+        echo "Commit SHA: ${{ github.sha }}"
+        echo "Branch: ${{ github.ref_name }}"
+        
+        LB_IP="${{ steps.lb-ip.outputs.load_balancer_ip }}"
+        if [ "$LB_IP" != "pending" ]; then
+          echo ""
+          echo "🌐 Application URLs:"
+          echo "Main Application: http://$LB_IP"
+          echo "Environment Info: http://$LB_IP/env"
+          echo "Health Check: http://$LB_IP/health"
+          echo ""
+          echo "📋 Service Endpoints:"
+          echo "Auth Service: http://$LB_IP/auth/"
+          echo "Chat Service: http://$LB_IP/chat/"
+          echo "Payment Service: http://$LB_IP/payment/"
+          echo "Product Service: http://$LB_IP/product/"
+          echo "Notifications: http://$LB_IP/notifications/"
+          echo "Resolution: http://$LB_IP/resolution/"
+          echo "Transactions: http://$LB_IP/transactions/"
+          echo "Reviews: http://$LB_IP/reviews/"
+        else
+          echo "⚠️ Load Balancer IP still pending. Check manually with:"
+          echo "kubectl get service bidr-load-balancer -n bidr"
+        fi
+        
+    - name: Notify on failure
+      if: failure()
+      run: |
+        echo "❌ UAT deployment failed!"
+        echo "Check the logs above for details."
+        echo "Common issues:"
+        echo "- Container registry authentication"
+        echo "- Kubernetes resource limits"
+        echo "- Database connectivity"
+        echo "- Image build failures"

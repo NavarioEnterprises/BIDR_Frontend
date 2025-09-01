@@ -20,7 +20,7 @@ class SellerAdmin(admin.ModelAdmin):
         'created_at', 'is_deleted'
     ]
     search_fields = [
-        'user__email', 'user__fullname', 'registered_company_name',
+        'user__email', 'user__first_name', 'user__last_name', 'registered_company_name',
         'trading_name', 'registration_number', 'vat_number'
     ]
     readonly_fields = ['created_at', 'updated_at']
@@ -98,7 +98,7 @@ class SellerVettingLogAdmin(admin.ModelAdmin):
         'created_at', 'is_deleted'
     ]
     search_fields = [
-        'seller__user__email', 'seller__user__fullname',
+        'seller__user__email', 'seller__user__first_name', 'seller__user__last_name',
         'seller__registered_company_name', 'seller__trading_name'
     ]
     readonly_fields = ['created_at', 'updated_at']
@@ -305,8 +305,9 @@ class SellersAddressDetailsAdmin(admin.ModelAdmin):
         """Display whether location coordinates are set"""
         if obj.latitude and obj.longitude:
             return format_html(
-                '<span style="color: green;">✓ ({:.4f}, {:.4f})</span>',
-                float(obj.latitude), float(obj.longitude)
+                '<span style="color: green;">✓ ({}, {})</span>',
+                f"{float(obj.latitude):.4f}",
+                f"{float(obj.longitude):.4f}"
             )
         return format_html(
             '<span style="color: red;">✗ No coordinates</span>'
@@ -374,7 +375,7 @@ class SellerBankAccountAdmin(admin.ModelAdmin):
         'bank_name', 'bank_account_type', 'created_at', 'is_deleted'
     ]
     search_fields = [
-        'user__email', 'user__fullname', 'bank_name',
+        'user__email', 'user__first_name', 'user__last_name', 'bank_name',
         'bank_account_number', 'bank_branch_code'
     ]
     readonly_fields = ['created_at', 'updated_at']

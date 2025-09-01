@@ -247,6 +247,10 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
+# Google Maps API Configuration
+# Add your Google Maps API key to environment variables or .env file
+GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY', default=None)
+
 # CORS methods
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -262,9 +266,28 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@example.com')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@bidr.com')
+
+# For development: disable SSL certificate verification for email (not recommended for production)
+if DEBUG:
+    EMAIL_SSL_CERTFILE = None
+    EMAIL_SSL_KEYFILE = None
+    import ssl
+    EMAIL_SSL_CONTEXT = ssl.create_default_context()
+    EMAIL_SSL_CONTEXT.check_hostname = False
+    EMAIL_SSL_CONTEXT.verify_mode = ssl.CERT_NONE
+
+# SMS Portal Configuration
+SMS_PORTAL_API_URL = config('SMS_PORTAL_API_URL', default='https://rest.smsportal.com/v1')
+SMS_PORTAL_API_KEY = config('SMS_PORTAL_API_KEY', default='')
+SMS_PORTAL_API_SECRET = config('SMS_PORTAL_API_SECRET', default='')
+SMS_PORTAL_SENDER_ID = config('SMS_PORTAL_SENDER_ID', default='BIDR')
+
+# Notification Service Configuration
+NOTIFICATION_SERVICE_URL = config('NOTIFICATION_SERVICE_URL', default='http://localhost:8006')
 
 # Logging configuration
 LOGGING = {

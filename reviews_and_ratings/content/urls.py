@@ -15,3 +15,5 @@ router.register(r'newsletter', NewsletterSubscriptionViewSet)
 urlpatterns = [
     path('api/', include(router.urls)),
 ]
+
+

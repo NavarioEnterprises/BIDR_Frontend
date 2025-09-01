@@ -26,11 +26,11 @@ class RequestSpecificationInline(admin.TabularInline):
 class RequestMessageInline(admin.TabularInline):
     model = RequestMessage
     extra = 0
-    fields = ['sender', 'message_type', 'subject', 'message', 'is_internal']
+    fields = ['sender_id', 'message_type', 'subject', 'message', 'is_internal']
     readonly_fields = ['created_at']
     
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('sender')
+        return super().get_queryset(request)
 
 
 @admin.register(ConsumerElectronics)
@@ -287,8 +287,7 @@ class ProductRequestAdmin(admin.ModelAdmin, CoreAdminMixin):
         'terms_accepted', 'contact_consent', 'created_at'
     ]
     search_fields = [
-        'request_id', 'title', 'description', 'buyer_id__username', 
-        'buyer_id__email'
+        'request_id', 'title', 'description'
     ]
     readonly_fields = [
         'request_id', 'created_at_display', 'updated_at_display', 
@@ -386,7 +385,7 @@ class ProductRequestAdmin(admin.ModelAdmin, CoreAdminMixin):
     status_display.admin_order_field = 'status'
     
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('buyer_id', 'vehicle_tyres_rims', 'vehicle_spares', 'consumer_electronics')
+        return super().get_queryset(request).select_related('vehicle_tyres_rims', 'vehicle_spares', 'consumer_electronics')
 
 
 @admin.register(RequestImage)
@@ -428,21 +427,21 @@ class RequestSpecificationAdmin(admin.ModelAdmin, CoreAdminMixin):
 @admin.register(RequestMessage)
 class RequestMessageAdmin(admin.ModelAdmin, CoreAdminMixin):
     list_display = [
-        'request_short', 'sender', 'message_type', 'subject', 
+        'request_short', 'sender_id', 'message_type', 'subject', 
         'is_internal', 'is_read_display', 'created_at_display'
     ]
     list_filter = [
         'message_type', 'is_internal', 'read_at', 'created_at', 'request__category'
     ]
     search_fields = [
-        'request__title', 'sender__username', 'subject', 'message'
+        'request__title', 'subject', 'message'
     ]
     readonly_fields = ['created_at_display', 'read_at', 'is_read_display']
     date_hierarchy = 'created_at'
     
     fieldsets = (
         ('Message Information', {
-            'fields': ('request', 'sender', 'message_type', 'subject', 'message')
+            'fields': ('request', 'sender_id', 'message_type', 'subject', 'message')
         }),
         ('Settings', {
             'fields': ('is_internal',)
@@ -468,25 +467,25 @@ class RequestMessageAdmin(admin.ModelAdmin, CoreAdminMixin):
     is_read_display.short_description = 'Read Status'
     
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('request', 'sender')
+        return super().get_queryset(request).select_related('request')
 
 
 @admin.register(RequestWatchlist)
 class RequestWatchlistAdmin(admin.ModelAdmin, CoreAdminMixin):
     list_display = [
-        'user', 'request_short', 'notify_on_quotes', 
+        'user_id', 'request_short', 'notify_on_quotes', 
         'notify_on_updates', 'notify_on_messages', 'created_at_display'
     ]
     list_filter = [
         'notify_on_quotes', 'notify_on_updates', 'notify_on_messages',
         'created_at', 'request__category'
     ]
-    search_fields = ['user__username', 'request__title']
+    search_fields = ['request__title']
     readonly_fields = ['created_at_display']
     
     fieldsets = (
         ('Watchlist Information', {
-            'fields': ('request', 'user')
+            'fields': ('request', 'user_id')
         }),
         ('Notification Preferences', {
             'fields': ('notify_on_quotes', 'notify_on_updates', 'notify_on_messages')
@@ -502,7 +501,7 @@ class RequestWatchlistAdmin(admin.ModelAdmin, CoreAdminMixin):
     request_short.short_description = 'Request'
     
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('user', 'request')
+        return super().get_queryset(request).select_related('request')
 
 
 @admin.register(Order)
@@ -516,8 +515,7 @@ class OrderAdmin(admin.ModelAdmin, CoreAdminMixin):
         'created_at', 'payment_date', 'estimated_delivery_date'
     ]
     search_fields = [
-        'order_number', 'order_id', 'buyer_id__username', 'seller_id__username',
-        'payment_reference', 'tracking_number'
+        'order_number', 'order_id', 'payment_reference', 'tracking_number'
     ]
     readonly_fields = [
         'order_id', 'order_number', 'created_at_display', 'updated_at_display',
@@ -614,7 +612,7 @@ class OrderAdmin(admin.ModelAdmin, CoreAdminMixin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
-            'request_id', 'quote_id', 'buyer_id', 'seller_id'
+            'request_id', 'quote_id'
         )
     
     actions = ['mark_as_paid', 'mark_as_shipped', 'mark_as_delivered', 'cancel_selected_orders']

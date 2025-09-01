@@ -17,6 +17,9 @@ urlpatterns = [
     # Document upload
     path('document-upload/', views.SellerDocumentUploadView.as_view(), name='seller-document-upload'),
     
+    # Location services
+    path('geocode/', views.LocationGeocodeView.as_view(), name='location-geocode'),
+    
     # Admin vetting endpoints
     path('admin/document-vetting/', views.DocumentVettingView.as_view(), name='document-vetting-list'),
     path('admin/document-vetting/<int:vetting_id>/', views.DocumentVettingView.as_view(), name='document-vetting-update'),

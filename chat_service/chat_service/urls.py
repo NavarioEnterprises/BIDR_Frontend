@@ -28,7 +28,7 @@ from django.conf.urls.static import static
 from django.http import JsonResponse
 from django.views.generic import TemplateView
 from django.utils import timezone
-from rest_framework.authtoken.views import obtain_auth_token
+# from rest_framework.authtoken.views import obtain_auth_token  # Authentication disabled
 from django_prometheus.exports import ExportToDjangoView
 
 # Health check endpoint
@@ -47,7 +47,6 @@ def api_root(request):
         'version': '1.0.0',
         'status': 'active',
         'endpoints': {
-            'auth': '/api/auth/token/',
             'profiles': '/api/v1/core/profiles/',
             'config': '/api/v1/core/config/',
             'conversations': '/api/v1/chat/conversations/',
@@ -76,8 +75,8 @@ urlpatterns = [
     path('', api_root, name='api-root'),
     path('api/', api_root, name='api-root-v1'),
     
-    # Authentication
-    path('api/auth/token/', obtain_auth_token, name='api_token_auth'),
+    # Authentication - Disabled
+    # path('api/auth/token/', obtain_auth_token, name='api_token_auth'),
     
     # API endpoints - Version 1
     path('', include('chat_core.urls')),

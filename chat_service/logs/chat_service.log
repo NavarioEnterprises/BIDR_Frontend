@@ -309,3 +309,223 @@ INFO 2025-08-27 10:15:10,415 basehttp 12944 6131871744 "POST /api/v1/chat/conver
 INFO 2025-08-27 10:15:10,535 basehttp 12944 6131871744 "GET /api/v1/chat/conversations/725ec1fc-f48a-4fca-a981-6887aea21493/messages/ HTTP/1.1" 200 817
 INFO 2025-08-27 10:15:23,365 basehttp 12944 6131871744 "POST /api/v1/chat/conversations/725ec1fc-f48a-4fca-a981-6887aea21493/send_message/ HTTP/1.1" 201 172
 INFO 2025-08-27 10:15:23,424 basehttp 12944 6131871744 "GET /api/v1/chat/conversations/725ec1fc-f48a-4fca-a981-6887aea21493/messages/ HTTP/1.1" 200 1632
+INFO 2025-08-28 15:21:31,886 autoreload 93206 8530314688 Watching for file changes with StatReloader
+INFO 2025-08-28 19:02:23,384 basehttp 93206 6136770560 "GET / HTTP/1.1" 200 478
+WARNING 2025-08-28 19:03:58,897 log 93206 6136770560 Not Found: /api/sms-portal/send/otp/
+WARNING 2025-08-28 19:03:58,899 basehttp 93206 6136770560 "POST /api/sms-portal/send/otp/ HTTP/1.1" 404 3248
+INFO 2025-08-29 15:28:46,051 autoreload 26252 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 15:31:10,611 autoreload 27137 8272463296 Watching for file changes with StatReloader
+WARNING 2025-08-29 15:47:13,029 log 33574 8272463296 Method Not Allowed: /api/v1/chat/conversations/create_for_request/
+INFO 2025-08-29 15:48:38,337 autoreload 34246 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 15:50:28,573 autoreload 35359 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 15:50:35,917 basehttp 35359 6199111680 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 201 551
+INFO 2025-08-29 15:57:48,411 autoreload 35359 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 15:57:48,500 autoreload 26252 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 15:57:48,501 autoreload 27137 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 15:57:48,788 autoreload 37421 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 15:57:48,788 autoreload 37422 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 15:57:48,788 autoreload 37423 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 15:58:33,197 autoreload 37422 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 15:58:33,198 autoreload 37423 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 15:58:33,533 autoreload 37421 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 15:58:33,569 autoreload 37651 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 15:58:33,569 autoreload 37650 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 15:58:33,761 autoreload 37655 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 15:59:27,518 autoreload 37946 8272463296 Watching for file changes with StatReloader
+WARNING 2025-08-29 15:59:31,914 log 37946 6121746432 Method Not Allowed: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-29 15:59:31,915 basehttp 37946 6121746432 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 405 41
+WARNING 2025-08-29 15:59:35,060 log 37946 6121746432 Method Not Allowed: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-29 15:59:35,061 basehttp 37946 6121746432 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 405 41
+INFO 2025-08-29 16:05:37,188 autoreload 37650 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/settings.py changed, reloading.
+INFO 2025-08-29 16:05:37,195 autoreload 37655 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/settings.py changed, reloading.
+INFO 2025-08-29 16:05:37,196 autoreload 37946 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/settings.py changed, reloading.
+INFO 2025-08-29 16:05:37,594 autoreload 39662 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:05:37,594 autoreload 39663 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:05:37,594 autoreload 39661 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:05:37,615 autoreload 37651 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/settings.py changed, reloading.
+INFO 2025-08-29 16:05:37,876 autoreload 39666 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:06:12,919 autoreload 39666 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:06:12,926 autoreload 39663 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:06:12,943 autoreload 39662 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:06:12,946 autoreload 39661 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:06:13,293 autoreload 39847 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:06:13,293 autoreload 39844 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:06:13,293 autoreload 39846 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:06:13,293 autoreload 39845 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:06:36,139 autoreload 39844 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/settings.py changed, reloading.
+INFO 2025-08-29 16:06:36,148 autoreload 39845 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/settings.py changed, reloading.
+INFO 2025-08-29 16:06:36,173 autoreload 39846 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/settings.py changed, reloading.
+INFO 2025-08-29 16:06:36,177 autoreload 39847 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/settings.py changed, reloading.
+INFO 2025-08-29 16:06:36,513 autoreload 39969 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:06:36,513 autoreload 39970 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:06:36,513 autoreload 39971 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:06:36,513 autoreload 39972 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:06:44,973 autoreload 39969 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/urls.py changed, reloading.
+INFO 2025-08-29 16:06:44,973 autoreload 39971 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/urls.py changed, reloading.
+INFO 2025-08-29 16:06:44,973 autoreload 39972 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/urls.py changed, reloading.
+INFO 2025-08-29 16:06:44,974 autoreload 39970 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/urls.py changed, reloading.
+INFO 2025-08-29 16:06:45,236 autoreload 40017 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:06:45,236 autoreload 40016 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:06:45,236 autoreload 40014 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:06:45,236 autoreload 40015 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:07:12,267 autoreload 40015 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/urls.py changed, reloading.
+INFO 2025-08-29 16:07:12,591 autoreload 40162 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:07:13,142 autoreload 40017 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/urls.py changed, reloading.
+INFO 2025-08-29 16:07:13,147 autoreload 40016 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/urls.py changed, reloading.
+INFO 2025-08-29 16:07:13,291 autoreload 40014 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_service/urls.py changed, reloading.
+INFO 2025-08-29 16:07:13,460 autoreload 40165 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:07:13,467 autoreload 40166 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:07:13,632 autoreload 40167 8272463296 Watching for file changes with StatReloader
+WARNING 2025-08-29 16:07:25,272 log 40167 6170767360 Bad Request: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-29 16:07:25,273 basehttp 40167 6170767360 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 400 66
+WARNING 2025-08-29 16:07:26,793 log 40167 6170767360 Bad Request: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-29 16:07:26,794 basehttp 40167 6170767360 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 400 66
+INFO 2025-08-29 16:07:34,782 autoreload 40303 8272463296 Watching for file changes with StatReloader
+WARNING 2025-08-29 16:07:37,724 log 40303 6163312640 Bad Request: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-29 16:07:37,724 basehttp 40303 6163312640 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 400 66
+INFO 2025-08-29 16:08:12,222 autoreload 40165 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:08:12,225 autoreload 40166 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:08:12,452 autoreload 40303 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:08:12,689 autoreload 40482 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:08:12,689 autoreload 40483 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:08:12,824 autoreload 40487 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:08:12,853 autoreload 40162 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:08:13,073 autoreload 40493 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:09:37,131 autoreload 40482 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:09:37,133 autoreload 40483 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:09:37,244 autoreload 40487 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:09:37,434 autoreload 40493 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:09:37,534 autoreload 40916 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:09:37,534 autoreload 40915 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:09:37,534 autoreload 40917 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:09:37,698 autoreload 40918 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:17:02,830 autoreload 43100 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:17:18,250 autoreload 43182 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:18:34,538 autoreload 43766 8272463296 Watching for file changes with StatReloader
+WARNING 2025-08-29 16:20:33,050 log 43766 6212448256 Bad Request: /api/v1/chat/conversations/create_for_request/
+WARNING 2025-08-29 16:20:33,052 basehttp 43766 6212448256 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 400 66
+INFO 2025-08-29 16:20:37,994 autoreload 40916 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:20:38,186 autoreload 40918 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:20:38,356 autoreload 44332 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:20:38,391 autoreload 44333 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:20:38,570 autoreload 43766 8272463296 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/chat_service/chat_conversations/views.py changed, reloading.
+INFO 2025-08-29 16:20:39,122 autoreload 44334 8272463296 Watching for file changes with StatReloader
+INFO 2025-08-29 16:20:53,460 basehttp 44334 6215036928 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 201 598
+INFO 2025-08-29 16:20:54,907 basehttp 44334 6215036928 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 598
+INFO 2025-08-29 16:20:54,911 basehttp 44334 6215036928 "OPTIONS /api/v1/chat/conversations/52d8fde6-c042-4cfb-a138-44e5b2a46958/messages/ HTTP/1.1" 200 0
+INFO 2025-08-29 16:20:54,921 basehttp 44334 6215036928 "GET /api/v1/chat/conversations/52d8fde6-c042-4cfb-a138-44e5b2a46958/messages/ HTTP/1.1" 200 2
+INFO 2025-08-29 16:29:02,166 basehttp 44334 6215036928 "OPTIONS /api/v1/chat/conversations/52d8fde6-c042-4cfb-a138-44e5b2a46958/send_message/ HTTP/1.1" 200 0
+INFO 2025-08-29 16:29:02,193 basehttp 44334 6215036928 "POST /api/v1/chat/conversations/52d8fde6-c042-4cfb-a138-44e5b2a46958/send_message/ HTTP/1.1" 201 173
+INFO 2025-08-29 16:29:02,221 basehttp 44334 6215036928 "GET /api/v1/chat/conversations/52d8fde6-c042-4cfb-a138-44e5b2a46958/messages/ HTTP/1.1" 200 817
+INFO 2025-08-29 16:29:20,038 basehttp 44334 6215036928 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 623
+INFO 2025-08-29 16:29:20,799 basehttp 44334 6215036928 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 623
+INFO 2025-08-29 16:29:20,822 basehttp 44334 6215036928 "GET /api/v1/chat/conversations/52d8fde6-c042-4cfb-a138-44e5b2a46958/messages/ HTTP/1.1" 200 817
+INFO 2025-08-30 00:32:33,044 basehttp 44334 6215036928 "OPTIONS /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+INFO 2025-08-30 00:32:36,094 basehttp 44334 6215036928 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 623
+INFO 2025-08-30 01:31:43,976 basehttp 44334 6215036928 - Broken pipe from ('127.0.0.1', 62649)
+INFO 2025-08-30 06:02:58,508 basehttp 44332 6166310912 "OPTIONS /login/ HTTP/1.1" 200 0
+WARNING 2025-08-30 06:02:58,549 log 44332 6166310912 Not Found: /login/
+WARNING 2025-08-30 06:02:58,549 basehttp 44332 6166310912 "POST /login/ HTTP/1.1" 404 3541
+WARNING 2025-08-30 06:03:12,489 log 44332 6166310912 Not Found: /login/
+WARNING 2025-08-30 06:03:12,489 basehttp 44332 6166310912 "POST /login/ HTTP/1.1" 404 3541
+WARNING 2025-08-30 06:03:29,184 log 44332 6166310912 Not Found: /login/
+WARNING 2025-08-30 06:03:29,185 basehttp 44332 6166310912 "POST /login/ HTTP/1.1" 404 3541
+INFO 2025-08-30 15:54:34,508 autoreload 33696 8333493696 Watching for file changes with StatReloader
+INFO 2025-08-30 15:54:39,350 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+INFO 2025-08-30 15:54:39,369 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 201 598
+INFO 2025-08-30 15:54:39,625 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 598
+INFO 2025-08-30 15:54:39,672 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/messages/ HTTP/1.1" 200 0
+INFO 2025-08-30 15:54:39,684 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/messages/ HTTP/1.1" 200 2
+INFO 2025-08-30 15:55:12,658 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 623
+INFO 2025-08-30 15:55:12,887 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 623
+INFO 2025-08-30 15:55:12,935 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/52d8fde6-c042-4cfb-a138-44e5b2a46958/messages/ HTTP/1.1" 200 0
+INFO 2025-08-30 15:55:12,941 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/52d8fde6-c042-4cfb-a138-44e5b2a46958/messages/ HTTP/1.1" 200 817
+INFO 2025-08-30 15:55:25,215 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/52d8fde6-c042-4cfb-a138-44e5b2a46958/send_message/ HTTP/1.1" 200 0
+INFO 2025-08-30 15:55:25,233 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/52d8fde6-c042-4cfb-a138-44e5b2a46958/send_message/ HTTP/1.1" 201 174
+INFO 2025-08-30 15:55:25,263 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/52d8fde6-c042-4cfb-a138-44e5b2a46958/messages/ HTTP/1.1" 200 1634
+INFO 2025-08-30 16:35:19,684 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 598
+INFO 2025-08-30 16:35:19,770 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 598
+INFO 2025-08-30 16:35:19,803 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/messages/ HTTP/1.1" 200 2
+INFO 2025-08-30 16:35:27,861 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/send_message/ HTTP/1.1" 200 0
+INFO 2025-08-30 16:35:27,872 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/send_message/ HTTP/1.1" 201 179
+INFO 2025-08-30 16:35:27,891 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/messages/ HTTP/1.1" 200 823
+INFO 2025-08-30 16:49:58,581 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+INFO 2025-08-30 16:49:58,592 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 623
+INFO 2025-08-30 16:49:58,670 basehttp 33696 6159921152 "OPTIONS /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 200 0
+WARNING 2025-08-30 16:49:58,683 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-08-30 16:49:58,683 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+INFO 2025-08-30 16:49:58,704 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 623
+INFO 2025-08-30 16:49:58,719 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/messages/ HTTP/1.1" 200 0
+INFO 2025-08-30 16:49:58,726 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/messages/ HTTP/1.1" 200 823
+INFO 2025-08-30 16:49:58,740 basehttp 33696 6159921152 "OPTIONS /api/v1/moderation/users/thulanik%20aaa/warnings/?limit=50&offset=0 HTTP/1.1" 200 0
+WARNING 2025-08-30 16:49:58,745 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/warnings/
+WARNING 2025-08-30 16:49:58,745 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/warnings/?limit=50&offset=0 HTTP/1.1" 404 3199
+WARNING 2025-08-30 16:50:11,677 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-08-30 16:50:11,678 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+INFO 2025-08-30 16:50:11,695 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/send_message/ HTTP/1.1" 200 0
+INFO 2025-08-30 16:50:11,704 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/send_message/ HTTP/1.1" 201 179
+INFO 2025-08-30 16:50:11,722 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/messages/ HTTP/1.1" 200 1645
+WARNING 2025-08-30 16:50:11,745 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-08-30 16:50:11,745 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+WARNING 2025-08-30 16:50:11,779 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/warnings/
+WARNING 2025-08-30 16:50:11,779 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/warnings/?limit=50&offset=0 HTTP/1.1" 404 3199
+WARNING 2025-08-30 16:52:50,479 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-08-30 16:52:50,480 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+INFO 2025-08-30 16:52:50,505 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/send_message/ HTTP/1.1" 201 173
+INFO 2025-08-30 16:52:50,522 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/37b7d493-e6f8-4d52-bb8a-e738c34ed468/messages/ HTTP/1.1" 200 2461
+WARNING 2025-08-30 16:52:50,538 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-08-30 16:52:50,538 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+WARNING 2025-08-30 16:52:50,579 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/warnings/
+WARNING 2025-08-30 16:52:50,579 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/warnings/?limit=50&offset=0 HTTP/1.1" 404 3199
+INFO 2025-08-30 17:01:32,942 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 201 598
+WARNING 2025-08-30 17:01:33,136 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-08-30 17:01:33,136 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+INFO 2025-08-30 17:01:33,166 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 598
+INFO 2025-08-30 17:01:33,180 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/822f42d7-3888-47dc-aff5-b373ce425f98/messages/ HTTP/1.1" 200 0
+INFO 2025-08-30 17:01:33,185 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/822f42d7-3888-47dc-aff5-b373ce425f98/messages/ HTTP/1.1" 200 2
+WARNING 2025-08-30 17:01:33,201 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/warnings/
+WARNING 2025-08-30 17:01:33,201 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/warnings/?limit=50&offset=0 HTTP/1.1" 404 3199
+INFO 2025-08-31 20:14:47,678 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+INFO 2025-08-31 20:14:47,735 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 201 598
+INFO 2025-08-31 20:14:47,826 basehttp 33696 6159921152 "OPTIONS /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 200 0
+WARNING 2025-08-31 20:14:47,838 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-08-31 20:14:47,838 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+INFO 2025-08-31 20:14:47,868 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 598
+INFO 2025-08-31 20:14:47,889 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/0e186af0-23e3-464b-9a12-592dc6589506/messages/ HTTP/1.1" 200 0
+INFO 2025-08-31 20:14:47,900 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/0e186af0-23e3-464b-9a12-592dc6589506/messages/ HTTP/1.1" 200 2
+INFO 2025-08-31 20:14:47,922 basehttp 33696 6159921152 "OPTIONS /api/v1/moderation/users/thulanik%20aaa/warnings/?limit=50&offset=0 HTTP/1.1" 200 0
+WARNING 2025-08-31 20:14:47,924 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/warnings/
+WARNING 2025-08-31 20:14:47,925 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/warnings/?limit=50&offset=0 HTTP/1.1" 404 3199
+WARNING 2025-08-31 20:15:19,083 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-08-31 20:15:19,084 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+INFO 2025-08-31 20:15:19,092 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/0e186af0-23e3-464b-9a12-592dc6589506/send_message/ HTTP/1.1" 200 0
+INFO 2025-08-31 20:15:19,118 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/0e186af0-23e3-464b-9a12-592dc6589506/send_message/ HTTP/1.1" 201 171
+INFO 2025-08-31 20:15:19,143 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/0e186af0-23e3-464b-9a12-592dc6589506/messages/ HTTP/1.1" 200 815
+WARNING 2025-08-31 20:15:19,155 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-08-31 20:15:19,155 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+WARNING 2025-08-31 20:15:19,187 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/warnings/
+WARNING 2025-08-31 20:15:19,188 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/warnings/?limit=50&offset=0 HTTP/1.1" 404 3199
+WARNING 2025-08-31 20:15:40,400 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-08-31 20:15:40,401 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+INFO 2025-08-31 20:15:40,459 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/0e186af0-23e3-464b-9a12-592dc6589506/send_message/ HTTP/1.1" 201 197
+INFO 2025-08-31 20:15:40,479 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/0e186af0-23e3-464b-9a12-592dc6589506/messages/ HTTP/1.1" 200 1655
+WARNING 2025-08-31 20:15:40,491 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-08-31 20:15:40,491 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+WARNING 2025-08-31 20:15:40,527 log 33696 6159921152 Not Found: /api/v1/moderation/users/thulanik aaa/warnings/
+WARNING 2025-08-31 20:15:40,527 basehttp 33696 6159921152 "GET /api/v1/moderation/users/thulanik%20aaa/warnings/?limit=50&offset=0 HTTP/1.1" 404 3199
+INFO 2025-08-31 20:44:45,952 basehttp 33696 6159921152 "GET / HTTP/1.1" 200 450
+WARNING 2025-08-31 20:44:46,002 log 33696 6159921152 Not Found: /favicon.ico
+WARNING 2025-08-31 20:44:46,002 basehttp 33696 6159921152 "GET /favicon.ico HTTP/1.1" 404 3070
+WARNING 2025-08-31 20:44:56,587 log 33696 6159921152 Not Found: /swagger/
+WARNING 2025-08-31 20:44:56,588 basehttp 33696 6159921152 "GET /swagger/ HTTP/1.1" 404 3061
+INFO 2025-08-31 22:33:52,268 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+INFO 2025-08-31 22:33:52,351 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 201 598
+INFO 2025-08-31 22:33:52,703 basehttp 33696 6159921152 "OPTIONS /api/v1/moderation/users/Thulani%20Keith/status/ HTTP/1.1" 200 0
+WARNING 2025-08-31 22:33:52,711 log 33696 6159921152 Not Found: /api/v1/moderation/users/Thulani Keith/status/
+WARNING 2025-08-31 22:33:52,711 basehttp 33696 6159921152 "GET /api/v1/moderation/users/Thulani%20Keith/status/ HTTP/1.1" 404 3174
+INFO 2025-08-31 22:33:52,785 basehttp 33696 6159921152 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 598
+INFO 2025-08-31 22:33:52,803 basehttp 33696 6159921152 "OPTIONS /api/v1/chat/conversations/2d70aa2e-8c08-4037-8dfe-b4bace03797d/messages/ HTTP/1.1" 200 0
+INFO 2025-08-31 22:33:52,813 basehttp 33696 6159921152 "GET /api/v1/chat/conversations/2d70aa2e-8c08-4037-8dfe-b4bace03797d/messages/ HTTP/1.1" 200 2
+INFO 2025-08-31 22:33:52,832 basehttp 33696 6159921152 "OPTIONS /api/v1/moderation/users/Thulani%20Keith/warnings/?limit=50&offset=0 HTTP/1.1" 200 0
+WARNING 2025-08-31 22:33:52,839 log 33696 6159921152 Not Found: /api/v1/moderation/users/Thulani Keith/warnings/
+WARNING 2025-08-31 22:33:52,839 basehttp 33696 6159921152 "GET /api/v1/moderation/users/Thulani%20Keith/warnings/?limit=50&offset=0 HTTP/1.1" 404 3202

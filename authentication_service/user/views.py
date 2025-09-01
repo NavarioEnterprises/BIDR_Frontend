@@ -9,6 +9,10 @@ from django.conf import settings
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.utils import timezone
+import requests
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 from .models import AppUser, Address
@@ -33,6 +37,7 @@ class UserLoginView(APIView):
             # Check if user is verified
             if not user.email_verified:
                 return Response({
+                    'success': False,
                     'error': 'Please verify your email before logging in.'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -45,13 +50,17 @@ class UserLoginView(APIView):
             user.save(update_fields=['last_login'])
 
             return Response({
+                'success': True,
                 'message': 'Login successful',
                 'access_token': str(access_token),
                 'refresh_token': str(refresh),
                 'user': UserBasicInfoSerializer(user).data
             }, status=status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'success': False,
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasswordResetRequestView(APIView):
@@ -82,14 +91,19 @@ class PasswordResetRequestView(APIView):
                 )
             except Exception as e:
                 return Response({
+                    'success': False,
                     'error': 'Failed to send reset email'
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response({
+                'success': True,
                 'message': 'Password reset link sent to your email'
             }, status=status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'success': False,
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasswordResetView(APIView):
@@ -116,19 +130,25 @@ class PasswordResetView(APIView):
                     user.save()
 
                     return Response({
+                        'success': True,
                         'message': 'Password reset successful'
                     }, status=status.HTTP_200_OK)
                 else:
                     return Response({
+                        'success': False,
                         'error': 'Invalid or expired token'
                     }, status=status.HTTP_400_BAD_REQUEST)
 
             except (TypeError, ValueError, OverflowError, AppUser.DoesNotExist):
                 return Response({
+                    'success': False,
                     'error': 'Invalid token'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'success': False,
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLogoutView(APIView):
@@ -146,11 +166,13 @@ class UserLogoutView(APIView):
 
             logout(request)
             return Response({
+                'success': True,
                 'message': 'Logout successful'
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({
+                'success': False,
                 'error': 'Invalid token'
             }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -185,32 +207,90 @@ class UserRegistrationView(APIView):
             otp_code = "".join(random.choices(string.digits, k=6))
             otp_instance = OTP.objects.create(user=user, otp=otp_code)
             
-            # Send OTP via email (in production)
-            try:
-                send_mail(
-                    'Welcome to BIDR - Verify Your Account',
-                    f'Your verification code is: {otp_code}',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [user.email],
-                    fail_silently=False,
-                )
-            except Exception as e:
+            # Get delivery method preference (default to SMS)
+            delivery_method = request.data.get('delivery_method', 'sms')
+            
+            # Send OTP via email and SMS
+            email_sent = False
+            sms_sent = False
+            
+            # Try to send via SMS first (if SMS is selected or default)
+            decrypted_phone = user.get_decrypted_phone_number() if hasattr(user, 'get_decrypted_phone_number') else None
+            if delivery_method in ['sms', 'both'] and decrypted_phone:
+                try:
+                    # Call notifications service to send SMS
+                    notification_service_url = getattr(settings, 'NOTIFICATION_SERVICE_URL', 'http://localhost:8006')
+                    sms_endpoint = f"{notification_service_url}/api/v1/sms/send/otp/"
+                    
+                    sms_payload = {
+                        'phone_number': decrypted_phone,
+                        'otp_code': otp_code,
+                        'template_name': 'otp_verification'
+                    }
+                    
+                    response = requests.post(sms_endpoint, json=sms_payload, timeout=5)
+                    if response.status_code == 200:
+                        sms_sent = True
+                        logger.info(f"SMS OTP sent successfully to {decrypted_phone}")
+                    else:
+                        logger.error(f"Failed to send SMS OTP: {response.text}")
+                except Exception as e:
+                    logger.error(f"Failed to send SMS OTP: {str(e)}")
+            
+            # Try to send via email (if email is selected or both)
+            if delivery_method in ['email', 'both']:
+                try:
+                    send_mail(
+                        'Welcome to BIDR - Verify Your Account',
+                        f'Your verification code is: {otp_code}',
+                        settings.DEFAULT_FROM_EMAIL,
+                        [user.email],
+                        fail_silently=False,
+                    )
+                    email_sent = True
+                    logger.info(f"Email OTP sent successfully to {user.email}")
+                except Exception as e:
+                    logger.error(f"Failed to send email OTP: {str(e)}")
+            
+            # Determine response based on what was sent
+            if not email_sent and not sms_sent:
                 # For demo purposes, return OTP code in response (remove in production)
                 return Response({
-                    'message': 'User registered successfully. Please verify your email.',
-                    'user_id': user.id,
-                    'email': user.email,
+                    'success': True,
+                    'message': 'User registered successfully. Please verify your account.',
+                    'user': UserBasicInfoSerializer(user).data,
                     'otp_code': otp_code,  # Remove in production
-                    'note': 'OTP code included for testing purposes'
+                    'note': 'OTP code included for testing purposes (neither email nor SMS could be sent)',
+                    'delivery_channels': {
+                        'email': email_sent,
+                        'sms': sms_sent
+                    }
                 }, status=status.HTTP_201_CREATED)
             
+            # Build response message based on what was sent
+            if email_sent and sms_sent:
+                message = 'User registered successfully. Please check your email and SMS for verification code.'
+            elif email_sent:
+                message = 'User registered successfully. Please check your email for verification code.'
+            elif sms_sent:
+                message = 'User registered successfully. Please check your SMS for verification code.'
+            else:
+                message = 'User registered successfully. Please verify your account.'
+            
             return Response({
-                'message': 'User registered successfully. Please check your email for verification code.',
-                'user_id': user.id,
-                'email': user.email
+                'success': True,
+                'message': message,
+                'user': UserBasicInfoSerializer(user).data,
+                'delivery_channels': {
+                    'email': email_sent,
+                    'sms': sms_sent
+                }
             }, status=status.HTTP_201_CREATED)
             
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'success': False,
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class RoleSelectionView(APIView):
@@ -223,8 +303,11 @@ class RoleSelectionView(APIView):
         serializer = RoleSelectionSerializer(data=request.data)
         if serializer.is_valid():
             role = serializer.validated_data["role"]
-            return Response({"message": f"Role \'{role}\' selected. Proceed to registration.", "role": role}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"success": True, "message": f"Role \'{role}\' selected. Proceed to registration.", "role": role}, status=status.HTTP_200_OK)
+        return Response({
+            'success': False,
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ComprehensiveUserProfileView(generics.RetrieveAPIView):
@@ -274,6 +357,7 @@ class UserProfileUpdateView(generics.UpdateAPIView):
         
         # Return comprehensive profile data
         return Response({
+            'success': True,
             'message': 'Profile updated successfully',
             'profile': ComprehensiveUserProfileSerializer(instance).data
         }, status=status.HTTP_200_OK)
@@ -314,6 +398,7 @@ class AddressListCreateView(generics.ListCreateAPIView):
         address = serializer.save()
         
         return Response({
+            'success': True,
             'message': 'Address created successfully',
             'address': address.get_decrypted_data()
         }, status=status.HTTP_201_CREATED)
@@ -346,6 +431,7 @@ class AddressDetailView(generics.RetrieveUpdateDestroyAPIView):
         address = serializer.save()
         
         return Response({
+            'success': True,
             'message': 'Address updated successfully',
             'address': address.get_decrypted_data()
         }, status=status.HTTP_200_OK)
@@ -357,6 +443,7 @@ class AddressDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
         return Response({
+            'success': True,
             'message': 'Address deleted successfully'
         }, status=status.HTTP_200_OK)
 
@@ -379,12 +466,14 @@ class AddressSetPrimaryView(APIView):
             address.set_as_primary()
             
             return Response({
+                'success': True,
                 'message': 'Address set as primary successfully',
                 'address': address.get_decrypted_data()
             }, status=status.HTTP_200_OK)
             
         except Address.DoesNotExist:
             return Response({
+                'success': False,
                 'error': 'Address not found'
             }, status=status.HTTP_404_NOT_FOUND)
 
@@ -426,11 +515,13 @@ class UserPrimaryAddressView(generics.RetrieveAPIView):
         instance = self.get_object()
         if instance is None:
             return Response({
+                'success': True,
                 'message': 'No primary address found',
                 'address': None
             }, status=status.HTTP_200_OK)
         
         return Response({
+            'success': True,
             'message': 'Primary address retrieved successfully',
             'address': instance.get_decrypted_data()
         }, status=status.HTTP_200_OK)
@@ -474,6 +565,7 @@ class ProfileCompletionView(APIView):
             suggestions.append('Add at least one address for deliveries')
         
         return Response({
+            'success': True,
             'completion_percentage': completion_percentage,
             'profile_status': user.profile_status,
             'missing_fields': missing_fields,

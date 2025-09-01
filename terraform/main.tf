@@ -721,3 +721,89 @@ resource "azurerm_linux_virtual_machine" "nginx_proxy" {
     ManagedBy   = "Terraform"
   }
 }
+
+# Create Azure Load Balancer Public IP
+resource "azurerm_public_ip" "load_balancer" {
+  name                = "${var.aks_cluster_name}-lb-ip"
+  location            = azurerm_resource_group.bidr.location
+  resource_group_name = azurerm_resource_group.bidr.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+
+  tags = {
+    Environment = var.environment
+    Project     = "BIDR"
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Create Azure Load Balancer
+resource "azurerm_lb" "bidr" {
+  name                = "${var.aks_cluster_name}-lb"
+  location            = azurerm_resource_group.bidr.location
+  resource_group_name = azurerm_resource_group.bidr.name
+  sku                 = "Standard"
+
+  frontend_ip_configuration {
+    name                 = "LoadBalancerFrontend"
+    public_ip_address_id = azurerm_public_ip.load_balancer.id
+  }
+
+  tags = {
+    Environment = var.environment
+    Project     = "BIDR"
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Load Balancer Backend Pool
+resource "azurerm_lb_backend_address_pool" "bidr" {
+  loadbalancer_id = azurerm_lb.bidr.id
+  name            = "BackendPool"
+}
+
+# Load Balancer Health Probe for HTTP
+resource "azurerm_lb_probe" "http" {
+  loadbalancer_id = azurerm_lb.bidr.id
+  name            = "http-probe"
+  port            = 80
+  protocol        = "Http"
+  request_path    = "/health"
+}
+
+# Load Balancer Health Probe for HTTPS
+resource "azurerm_lb_probe" "https" {
+  loadbalancer_id = azurerm_lb.bidr.id
+  name            = "https-probe"
+  port            = 443
+  protocol        = "Https"
+  request_path    = "/health"
+}
+
+# Load Balancer Rule for HTTP
+resource "azurerm_lb_rule" "http" {
+  loadbalancer_id                = azurerm_lb.bidr.id
+  name                           = "HTTP"
+  protocol                       = "Tcp"
+  frontend_port                  = 80
+  backend_port                   = 80
+  frontend_ip_configuration_name = "LoadBalancerFrontend"
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.bidr.id]
+  probe_id                       = azurerm_lb_probe.http.id
+  enable_floating_ip             = false
+  idle_timeout_in_minutes        = 15
+}
+
+# Load Balancer Rule for HTTPS
+resource "azurerm_lb_rule" "https" {
+  loadbalancer_id                = azurerm_lb.bidr.id
+  name                           = "HTTPS"
+  protocol                       = "Tcp"
+  frontend_port                  = 443
+  backend_port                   = 443
+  frontend_ip_configuration_name = "LoadBalancerFrontend"
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.bidr.id]
+  probe_id                       = azurerm_lb_probe.https.id
+  enable_floating_ip             = false
+  idle_timeout_in_minutes        = 15
+}

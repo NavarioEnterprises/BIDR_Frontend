@@ -2,6 +2,7 @@
 Security utilities for encryption/decryption and password management
 """
 import base64
+import binascii
 import hashlib
 import secrets
 from typing import Optional, Union
@@ -100,9 +101,17 @@ class EncryptionManager:
             decrypted_data = fernet.decrypt(decoded_data)
             return decrypted_data.decode()
             
+        except binascii.Error as e:
+            logger.error(f"Failed to decrypt PII - Invalid base64 encoding: {str(e)}")
+            raise ValueError(f"Invalid base64 encoding: {str(e)}")
         except Exception as e:
-            logger.error(f"Failed to decrypt PII: {str(e)}")
-            raise ValueError("Decryption failed")
+            error_msg = str(e)
+            if "Incorrect padding" in error_msg:
+                logger.error(f"Failed to decrypt PII - Incorrect padding (corrupted data): {error_msg}")
+                raise ValueError(f"Corrupted encrypted data: {error_msg}")
+            else:
+                logger.error(f"Failed to decrypt PII - Decryption error: {error_msg}")
+                raise ValueError(f"Decryption failed: {error_msg}")
     
     def encrypt_if_needed(self, data: Optional[str]) -> Optional[str]:
         """

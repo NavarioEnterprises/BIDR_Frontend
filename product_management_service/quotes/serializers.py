@@ -91,20 +91,20 @@ class QuoteListSerializer(serializers.ModelSerializer):
     Simplified serializer for quote listings.
     """
     seller_details = UserMinimalSerializer(source='seller_id', read_only=True)
-    request_id_details = serializers.CharField(source='request_id.id', read_only=True)
+    request_id_details = serializers.CharField(source='request_id.request_id', read_only=True)
     is_expired = serializers.ReadOnlyField()
     is_valid = serializers.ReadOnlyField()
     
     class Meta:
         model = Quote
         fields = [
-            'id', 'request_id', 'request_id_details', 'seller_id', 'seller_details',
+            'quote_id', 'request_id', 'request_id_details', 'seller_id', 'seller_details',
             'total_amount', 'currency', 'delivery_cost', 'installation_cost',
             'estimated_delivery_days', 'status', 'valid_until', 
             'is_expired', 'is_valid', 'created_at', 'updated_at'
         ]
         read_only_fields = [
-            'id', 'seller_details', 'request_id_details',
+            'quote_id', 'seller_details', 'request_id_details',
             'is_expired', 'is_valid', 'created_at', 'updated_at'
         ]
 
@@ -126,14 +126,14 @@ class QuoteDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quote
         fields = [
-            'id', 'request_id', 'request_details', 'seller_id', 'seller_details',
+            'quote_id', 'request_id', 'request_details', 'seller_id', 'seller_details',
             'total_amount', 'currency', 'delivery_cost', 'installation_cost',
             'estimated_delivery_days', 'terms_conditions', 'seller_notes',
             'warranty_info', 'status', 'valid_until', 'is_expired', 'is_valid',
             'items', 'attachments', 'messages', 'created_at', 'updated_at'
         ]
         read_only_fields = [
-            'id', 'seller_details', 'request_details', 'is_expired', 'is_valid',
+            'quote_id', 'seller_details', 'request_details', 'is_expired', 'is_valid',
             'items', 'attachments', 'messages', 'created_at', 'updated_at'
         ]
     
@@ -141,7 +141,7 @@ class QuoteDetailSerializer(serializers.ModelSerializer):
         """Get basic request details."""
         if obj.request_id:
             return {
-                'id': obj.request_id.id,
+                'id': obj.request_id.request_id,
                 'title': getattr(obj.request_id, 'title', 'Product Request')
             }
         return None

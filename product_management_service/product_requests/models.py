@@ -6,7 +6,6 @@ This module handles customer requests for products, including RFQs (Request for 
 import uuid
 
 from django.db import models
-from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from decimal import Decimal
@@ -746,10 +745,12 @@ class ProductRequest(models.Model):
         default=uuid.uuid4,
         editable=False
     )
-    buyer_id = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='product_requests'
+    buyer_id = models.UUIDField(
+        help_text="UUID of the buyer from authentication service"
+    )
+    auth_user_uid = models.UUIDField(
+        default=uuid.uuid4,
+        help_text="Authentication user UUID for filtering user-specific requests"
     )
 
     # Category and basic info
@@ -879,6 +880,17 @@ class ProductRequest(models.Model):
         default=0,
         help_text="Number of views by sellers"
     )
+    
+    # Flag fields
+    is_flagged = models.BooleanField(
+        default=False,
+        help_text="Whether this request has been flagged by sellers"
+    )
+    flags = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="List of flags with uid, reason, and timestamp"
+    )
 
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -891,6 +903,7 @@ class ProductRequest(models.Model):
             models.Index(fields=['status', 'category']),
             models.Index(fields=['buyer_id', 'status']),
             models.Index(fields=['category', 'status']),
+            models.Index(fields=['auth_user_uid']),
             models.Index(fields=['expiry_date']),
             models.Index(fields=['urgency_timeline']),
             models.Index(fields=['created_at']),
@@ -1486,10 +1499,9 @@ class RequestMessage(models.Model):
         on_delete=models.CASCADE,
         related_name='messages'
     )
-    sender = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='sent_request_messages'
+    sender_id = models.UUIDField(
+        help_text="UUID of the message sender from authentication service",
+        default=uuid.uuid4
     )
     message_type = models.CharField(max_length=20, choices=MESSAGE_TYPES, default='inquiry')
     subject = models.CharField(max_length=200, blank=True)
@@ -1505,11 +1517,11 @@ class RequestMessage(models.Model):
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['request', 'created_at']),
-            models.Index(fields=['sender']),
+            models.Index(fields=['sender_id']),
         ]
     
     def __str__(self):
-        return f"{self.request.request_id} - {self.sender.username}: {self.subject or 'Message'}"
+        return f"{self.request.request_id} - User {self.sender_id}: {self.subject or 'Message'}"
     
     @property
     def is_read(self):
@@ -1532,10 +1544,9 @@ class RequestWatchlist(models.Model):
         on_delete=models.CASCADE,
         related_name='watchers'
     )
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='watched_requests'
+    user_id = models.UUIDField(
+        help_text="UUID of the user from authentication service",
+        default=uuid.uuid4
     )
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -1545,13 +1556,13 @@ class RequestWatchlist(models.Model):
     notify_on_messages = models.BooleanField(default=False)
     
     class Meta:
-        unique_together = ['request', 'user']
+        unique_together = ['request', 'user_id']
         indexes = [
-            models.Index(fields=['user', 'created_at']),
+            models.Index(fields=['user_id', 'created_at']),
         ]
     
     def __str__(self):
-        return f"{self.user.username} watching {self.request.request_id}"
+        return f"User {self.user_id} watching {self.request.request_id}"
 
 
 class Order(models.Model):
@@ -1599,17 +1610,11 @@ class Order(models.Model):
         related_name='orders',
         help_text="Reference to the accepted quote"
     )
-    buyer_id = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='orders_as_buyer',
-        help_text="Buyer who created the order"
+    buyer_id = models.UUIDField(
+        help_text="UUID of the buyer from authentication service"
     )
-    seller_id = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='orders_as_seller',
-        help_text="Seller fulfilling the order"
+    seller_id = models.UUIDField(
+        help_text="UUID of the seller from authentication service"
     )
     
     # Order details
@@ -1725,7 +1730,7 @@ class Order(models.Model):
         ]
     
     def __str__(self):
-        return f"Order {self.order_number} - {self.buyer_id.username}"
+        return f"Order {self.order_number} - Buyer {self.buyer_id}"
     
     def save(self, *args, **kwargs):
         # Auto-generate order number if not provided

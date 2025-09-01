@@ -296,6 +296,14 @@ CACHES = {
     }
 }
 
+# Authentication Service Configuration
+AUTHENTICATION_SERVICE_URL = os.getenv(
+    'AUTHENTICATION_SERVICE_URL', 
+    'http://localhost:8001'  # Default to local authentication service
+)
+AUTH_SERVICE_TIMEOUT = int(os.getenv('AUTH_SERVICE_TIMEOUT', '10'))  # 10 seconds
+AUTH_SERVICE_CACHE_TIMEOUT = int(os.getenv('AUTH_SERVICE_CACHE_TIMEOUT', '300'))  # 5 minutes
+
 # Logging Configuration
 LOGGING = {
     'version': 1,

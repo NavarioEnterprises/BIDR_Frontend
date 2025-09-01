@@ -37,12 +37,14 @@ class CategoryAdmin(MPTTModelAdmin, CoreAdminMixin):
     )
     
     def product_count(self, obj):
-        return obj.products.count()
-    product_count.short_description = 'Products'
-    product_count.admin_order_field = 'products__count'
+        # Use the method from the model that returns 0 as placeholder
+        return obj.get_product_count()
+    product_count.short_description = 'Product Requests'
+    product_count.admin_order_field = None
     
     def get_queryset(self, request):
-        return super().get_queryset(request).prefetch_related('products')
+        # No products relationship exists, just return the base queryset
+        return super().get_queryset(request)
 
 
 @admin.register(CategorySpecification)

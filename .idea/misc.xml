@@ -3,7 +3,7 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.12 (imbewu_backend)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.13 (BIDR_Backend)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10 virtualenv at ~/MEGA downloads/new downloads/BIDR_Backend/chat_service/venv" project-jdk-type="Python SDK" />
   <component name="PythonCompatibilityInspectionAdvertiser">
     <option name="version" value="3" />
   </component>

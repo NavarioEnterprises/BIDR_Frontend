@@ -17,5 +17,6 @@ resources:
 - transactions-service.yaml
 - reviews-service.yaml
 - nginx-proxy.yaml
+- load-balancer.yaml
 - ingress.yaml
 - network-policy.yaml

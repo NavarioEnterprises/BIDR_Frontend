@@ -20,6 +20,9 @@ class JSONStringField(serializers.JSONField):
     Also handles when data is already a dictionary."""
     
     def to_internal_value(self, data):
+        # Debug logging to see what we're receiving
+        print(f"JSONStringField received data: {repr(data)} (type: {type(data)})")
+        
         # If it's already a dict, use it directly
         if isinstance(data, dict):
             return data
@@ -30,9 +33,27 @@ class JSONStringField(serializers.JSONField):
                 # Handle empty JSON objects
                 if data.strip() in ['{}', '']:
                     return {}
-                return json.loads(data)
+                
+                # First try to parse as regular JSON
+                try:
+                    parsed_data = json.loads(data)
+                    print(f"Successfully parsed JSON: {parsed_data}")
+                    return parsed_data
+                except json.JSONDecodeError:
+                    # If that fails, try to fix single quotes by replacing them with double quotes
+                    # This is a simple fix for Python dict strings sent from Flutter
+                    fixed_data = data.replace("'", '"')
+                    print(f"Attempting to fix single quotes: {repr(fixed_data)}")
+                    parsed_data = json.loads(fixed_data)
+                    print(f"Successfully parsed fixed JSON: {parsed_data}")
+                    return parsed_data
+                    
             except (json.JSONDecodeError, ValueError) as e:
+                print(f"JSON parsing failed for data: {repr(data)}")
+                print(f"Error: {str(e)}")
                 self.fail('invalid', message=f'Invalid JSON format: {str(e)}')
+        
+        print(f"Falling back to super() for data: {repr(data)}")
         return super().to_internal_value(data)
 
 
@@ -107,14 +128,23 @@ class QuoteListSerializer(serializers.ModelSerializer):
 class ProductRequestListSerializer(serializers.ModelSerializer):
     """Serializer for listing ProductRequest with basic information."""
     
-    buyer_id = UserSerializer(read_only=True)
-    quotes = QuoteListSerializer(many=True, read_only=True)
+    # Since buyer_id is a UUID field, serialize it as UUID
+    buyer_id = serializers.UUIDField(read_only=True)
+    quotes = serializers.SerializerMethodField()
     is_expired = serializers.ReadOnlyField()
     is_urgent = serializers.ReadOnlyField()
     tyres_rims_summary = serializers.ReadOnlyField()
     vehicle_spares_summary = serializers.ReadOnlyField()
     consumer_electronics_summary = serializers.ReadOnlyField()
     
+    def get_quotes(self, obj):
+        """Return only valid (non-expired) quotes from non-closed requests."""
+        valid_quotes = [
+            quote for quote in obj.quotes.all() 
+            if quote.is_valid and not quote.is_expired and obj.status != 'CLOSED'
+        ]
+        return QuoteListSerializer(valid_quotes, many=True).data
+
     class Meta:
         model = ProductRequest
         fields = [
@@ -122,17 +152,19 @@ class ProductRequestListSerializer(serializers.ModelSerializer):
             'quantity', 'condition_preference', 'max_budget', 'currency',
             'urgency_timeline', 'status', 'view_count', 'is_expired', 'is_urgent',
             'tyres_rims_summary', 'vehicle_spares_summary', 'consumer_electronics_summary',
-            'quotes', 'created_at', 'updated_at'
+            'quotes', 'is_flagged', 'flags', 'created_at', 'updated_at'
         ]
 
 
 class ProductRequestDetailSerializer(serializers.ModelSerializer):
     """Detailed serializer for ProductRequest with all nested data."""
     
-    buyer_id = UserSerializer(read_only=True)
+    # Since buyer_id is a UUID field, serialize it as UUID
+    buyer_id = serializers.UUIDField(read_only=True)
     consumer_electronics = ConsumerElectronicsSerializer(read_only=True)
     vehicle_spares = VehicleSparesSerializer(read_only=True)
     vehicle_tyres_rims = VehicleTyresRimsSerializer(read_only=True)
+    quotes = serializers.SerializerMethodField()
     
     # Read-only computed properties
     is_expired = serializers.ReadOnlyField()
@@ -141,19 +173,27 @@ class ProductRequestDetailSerializer(serializers.ModelSerializer):
     vehicle_spares_summary = serializers.ReadOnlyField()
     consumer_electronics_summary = serializers.ReadOnlyField()
     
+    def get_quotes(self, obj):
+        """Return only valid (non-expired) quotes from non-closed requests."""
+        valid_quotes = [
+            quote for quote in obj.quotes.all() 
+            if quote.is_valid and not quote.is_expired and obj.status != 'CLOSED'
+        ]
+        return QuoteListSerializer(valid_quotes, many=True).data
+    
     class Meta:
         model = ProductRequest
         fields = '__all__'
-        read_only_fields = ['request_id', 'created_at', 'updated_at', 'view_count', 'expiry_date']
+        read_only_fields = ['request_id', 'created_at', 'updated_at', 'view_count', 'expiry_date', 'is_flagged', 'flags']
 
 
 class ProductRequestCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating new ProductRequest with nested category data."""
     
-    # Optional nested data for creating related models
-    consumer_electronics_data = ConsumerElectronicsSerializer(required=False, write_only=True)
-    vehicle_spares_data = VehicleSparesSerializer(required=False, write_only=True)
-    vehicle_tyres_rims_data = VehicleTyresRimsSerializer(required=False, write_only=True)
+    # Optional nested data for creating related models - handled as JSON strings from multipart form
+    consumer_electronics_data = JSONStringField(required=False, write_only=True)
+    vehicle_spares_data = JSONStringField(required=False, write_only=True)
+    vehicle_tyres_rims_data = JSONStringField(required=False, write_only=True)
     
     # Override JSON fields to handle strings from multipart form data
     product_specifications = JSONStringField()
@@ -162,11 +202,12 @@ class ProductRequestCreateSerializer(serializers.ModelSerializer):
     
     # User ID field for setting the buyer
     buyer_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    auth_user_uid = serializers.UUIDField(required=True)
     
     class Meta:
         model = ProductRequest
         fields = [
-            'buyer_id', 'category', 'title', 'description', 'product_specifications',
+            'buyer_id', 'auth_user_uid', 'category', 'title', 'description', 'product_specifications',
             'quantity', 'condition_preference', 'max_budget', 'currency',
             'buyer_location', 'max_travel_distance', 'urgency_timeline',
             'product_images', 'vin_photo_url', 'terms_accepted', 'contact_consent',
@@ -254,11 +295,37 @@ class ProductRequestCreateSerializer(serializers.ModelSerializer):
             product_request.consumer_electronics = consumer_electronics
             
         elif vehicle_spares_data:
-            vehicle_spares = VehicleSpares.objects.create(**vehicle_spares_data)
+            # Filter only fields that exist in VehicleSpares model
+            vehicle_spares_fields = {
+                'vehicle_make', 'vehicle_model', 'vehicle_year', 'vehicle_type',
+                'engine_size', 'vin_number', 'part_name', 'part_category', 'part_number',
+                'quantity', 'condition_preference', 'urgency', 'description',
+                'compatible_models', 'preferred_brand', 'avoid_brands',
+                'installation_required', 'warranty_required', 'max_budget', 'currency',
+                'product_images', 'vin_photo', 'location_info'
+            }
+            filtered_vehicle_data = {
+                k: v for k, v in vehicle_spares_data.items() 
+                if k in vehicle_spares_fields
+            }
+            print(f"Filtered vehicle spares data: {filtered_vehicle_data}")
+            vehicle_spares = VehicleSpares.objects.create(**filtered_vehicle_data)
             product_request.vehicle_spares = vehicle_spares
             
         elif vehicle_tyres_rims_data:
-            vehicle_tyres_rims = VehicleTyresRims.objects.create(**vehicle_tyres_rims_data)
+            # Filter to only include fields that exist in the VehicleTyresRims model
+            vehicle_tyres_rims_fields = {
+                'tyre_width', 'sidewall_profile', 'wheel_rim_diameter', 'select_tyres_rims',
+                'quantity', 'urgency', 'description', 'vehicle_type', 'pitch_circle_diameter',
+                'preferred_brand', 'tyre_construction_type', 'balancing_required',
+                'tyre_rotation_required', 'fitment_required', 'product_images'
+            }
+            filtered_tyres_rims_data = {
+                k: v for k, v in vehicle_tyres_rims_data.items() 
+                if k in vehicle_tyres_rims_fields
+            }
+            print(f"Filtered vehicle tyres/rims data: {filtered_tyres_rims_data}")
+            vehicle_tyres_rims = VehicleTyresRims.objects.create(**filtered_tyres_rims_data)
             product_request.vehicle_tyres_rims = vehicle_tyres_rims
         
         # Save the product request with the linked category model
@@ -320,8 +387,9 @@ class RequestWatchlistSerializer(serializers.ModelSerializer):
 class OrderListSerializer(serializers.ModelSerializer):
     """Serializer for listing orders with basic information."""
     
-    buyer_id = UserSerializer(read_only=True)
-    seller_id = UserSerializer(read_only=True)
+    # Since buyer_id and seller_id are UUID fields, serialize them as UUIDs
+    buyer_id = serializers.UUIDField(read_only=True)
+    seller_id = serializers.UUIDField(read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     payment_status_display = serializers.CharField(source='get_payment_status_display', read_only=True)
     is_completed = serializers.ReadOnlyField()
@@ -349,8 +417,9 @@ class OrderListSerializer(serializers.ModelSerializer):
 class OrderDetailSerializer(serializers.ModelSerializer):
     """Detailed serializer for individual order retrieval."""
     
-    buyer_id = UserSerializer(read_only=True)
-    seller_id = UserSerializer(read_only=True)
+    # Since buyer_id and seller_id are UUID fields, serialize them as UUIDs
+    buyer_id = serializers.UUIDField(read_only=True)
+    seller_id = serializers.UUIDField(read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     payment_status_display = serializers.CharField(source='get_payment_status_display', read_only=True)
     is_completed = serializers.ReadOnlyField()
@@ -419,67 +488,89 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             'request_id', 'quote_id', 'delivery_address',
             'special_instructions'
         ]
-    
+
     def validate(self, attrs):
         """Validate order creation data."""
         request_obj = attrs['request_id']
         quote_obj = attrs['quote_id']
-        
+
         # Verify the quote belongs to the request
         if quote_obj.request_id != request_obj:
             raise serializers.ValidationError(
                 "The quote does not belong to the specified request."
             )
-        
+
         # Verify the quote is still valid
         if not quote_obj.is_valid:
             raise serializers.ValidationError(
                 "The quote is no longer valid or has expired."
             )
-        
-        # Verify the request is still active
-        if not request_obj.can_receive_quotes():
+
+        # Verify the request allows order creation
+        if request_obj.status not in ['ACTIVE', 'PENDING']:
             raise serializers.ValidationError(
-                "The request is no longer active."
+                f"Cannot create order for request with status: {request_obj.status}"
             )
-        
+
+        # Check if an order already exists for this request
+        if Order.objects.filter(request_id=request_obj).exists():
+            raise serializers.ValidationError(
+                "An order has already been created for this request."
+            )
+
         return attrs
-    
+
     def create(self, validated_data):
         """Create a new order from validated data."""
+        print("=== DEBUG CREATE ORDER ===")
+        print(f"validated_data keys: {list(validated_data.keys())}")
+        print(f"validated_data: {validated_data}")
+        print("=== END DEBUG ===")
+
         request_obj = validated_data['request_id']
         quote_obj = validated_data['quote_id']
-        
-        # Get buyer and seller from the request context
-        buyer = self.context['request'].user
-        seller = quote_obj.seller_id
-        
-        # Create the order with data from the quote
+
+        # Get buyer and seller from the related objects, not from validated_data
+        buyer_id = request_obj.buyer_id or request_obj.auth_user_uid  # Get buyer from the ProductRequest, fallback to auth_user_uid
+        # Extract UUID from seller User object
+        # If it's a placeholder user with pattern "seller_{uuid}", extract the UUID
+        if hasattr(quote_obj.seller_id, 'username') and quote_obj.seller_id.username.startswith('seller_'):
+            seller_id = quote_obj.seller_id.username.replace('seller_', '')
+        elif hasattr(quote_obj.seller_id, 'id'):
+            seller_id = quote_obj.seller_id.id
+        else:
+            seller_id = quote_obj.seller_id
+
+        print(f"buyer_id from request: {buyer_id}")
+        print(f"buyer_id from auth_user_uid: {request_obj.auth_user_uid}")
+        print(f"seller_id from quote: {seller_id}")
+        print(f"seller_id username: {getattr(quote_obj.seller_id, 'username', 'N/A')}")
+
+        # Create the order
         order = Order.objects.create(
             request_id=request_obj,
             quote_id=quote_obj,
-            buyer_id=buyer,
-            seller_id=seller,
+            buyer_id=buyer_id,
+            seller_id=seller_id,
             total_amount=quote_obj.total_amount,
-            delivery_cost=quote_obj.delivery_cost,
-            installation_cost=quote_obj.installation_cost,
+            delivery_cost=quote_obj.delivery_cost or 0,
+            installation_cost=quote_obj.installation_cost or 0,
             currency=quote_obj.currency,
             delivery_address=validated_data.get('delivery_address'),
             special_instructions=validated_data.get('special_instructions'),
-            # Calculate estimated delivery date
             estimated_delivery_date=(
-                timezone.now() + 
-                timezone.timedelta(days=quote_obj.estimated_delivery_days or 7)
+                    timezone.now() +
+                    timezone.timedelta(days=quote_obj.estimated_delivery_days or 7)
             ) if quote_obj.estimated_delivery_days else None
         )
-        
+
         # Update quote status to accepted
         quote_obj.status = 'ACCEPTED'
         quote_obj.save(update_fields=['status'])
-        
+
         # Close the request to prevent more quotes
         request_obj.close_request()
-        
+
         return order
 
 

@@ -12,3 +12,4 @@ INFO 2025-08-10 03:18:48,819 autoreload 77592 8771748224 /Users/thulanimoyo/MEGA
 INFO 2025-08-10 03:18:49,073 autoreload 79275 8771748224 Watching for file changes with StatReloader
 INFO 2025-08-10 03:18:57,403 autoreload 79275 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/resolution_service/resolution_service/settings.py changed, reloading.
 INFO 2025-08-10 03:18:57,605 autoreload 79287 8771748224 Watching for file changes with StatReloader
+INFO 2025-08-29 12:35:00,661 autoreload 61258 8272463296 Watching for file changes with StatReloader

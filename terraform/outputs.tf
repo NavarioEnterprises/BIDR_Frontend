@@ -156,3 +156,34 @@ output "database_subnet_id" {
   description = "ID of the database subnet"
   value       = azurerm_subnet.database.id
 }
+
+# Load Balancer Outputs
+output "load_balancer_public_ip" {
+  description = "Public IP address of the load balancer - This is the main entry point for all services"
+  value       = azurerm_public_ip.load_balancer.ip_address
+}
+
+output "load_balancer_fqdn" {
+  description = "FQDN of the load balancer"
+  value       = azurerm_public_ip.load_balancer.fqdn
+}
+
+output "load_balancer_name" {
+  description = "Name of the Azure Load Balancer"
+  value       = azurerm_lb.bidr.name
+}
+
+output "service_urls" {
+  description = "Main service URLs accessible through the load balancer"
+  value = {
+    main_app         = "http://${azurerm_public_ip.load_balancer.ip_address}"
+    auth_service     = "http://${azurerm_public_ip.load_balancer.ip_address}/auth"
+    chat_service     = "http://${azurerm_public_ip.load_balancer.ip_address}/chat"
+    payment_service  = "http://${azurerm_public_ip.load_balancer.ip_address}/payment"
+    product_service  = "http://${azurerm_public_ip.load_balancer.ip_address}/product"
+    notification_service = "http://${azurerm_public_ip.load_balancer.ip_address}/notifications"
+    resolution_service = "http://${azurerm_public_ip.load_balancer.ip_address}/resolution"
+    transaction_service = "http://${azurerm_public_ip.load_balancer.ip_address}/transactions"
+    reviews_service = "http://${azurerm_public_ip.load_balancer.ip_address}/reviews"
+  }
+}

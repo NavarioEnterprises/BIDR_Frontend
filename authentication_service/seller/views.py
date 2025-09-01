@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, permissions, filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.core.mail import send_mail
@@ -22,10 +22,12 @@ from import_helper import setup_imports
 setup_imports()
 
 # Now we can import from any app in the project
+from user.models import AppUser
 from otp.models import OTP
+from auth_logs.models import AuthenticationLog, SecurityEvent, AuditTrail
 from .models import (
     Seller, SellerProfile, SellerVettingLog, CompanyInfo, 
-    CompanyContactInfo, BankingInfo, BusinessRegistration
+    CompanyContactInfo, BankingInfo, BusinessRegistration, SellersAddressDetails
 )
 
 from .serializers import (
@@ -34,10 +36,9 @@ from .serializers import (
     CompanyInfoSerializer, CompanyContactInfoSerializer, BankingInfoSerializer, BusinessRegistrationSerializer
 )
 
-# Import required models
-from api_management.models import APIRequest, RateLimitBucket
-from auth_logs.models import AuditTrail, SecurityEvent
+# Import required models and utilities
 from security.utils import SecurityUtils
+from .utils import reverse_geocode, format_location_with_address
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -75,7 +76,7 @@ class SellerProfileViewSet(viewsets.ModelViewSet):
     queryset = SellerProfile.objects.filter(is_active=True)
     serializer_class = SellerProfileSerializer
     pagination_class = StandardResultsSetPagination
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter]
     search_fields = ['seller__trading_name', 'seller__registered_company_name', 'vendor_id']
     filterset_fields = ['approval_status', 'background_check_passed']
@@ -93,23 +94,27 @@ class SellerProfileViewSet(viewsets.ModelViewSet):
         
         queryset = super().get_queryset().select_related('seller__user')
 
-        # Non-admin user can only see approved sellers or their own profile
-        if not self.request.user.is_staff:
-            queryset = queryset.filter(
-                Q(approval_status='approved') |
-                Q(seller__user=self.request.user)
-            )
+        # Non-admin users: anonymous users only see approved sellers; authenticated users can also see their own
+        user = getattr(self.request, 'user', None)
+        if user and not user.is_staff:
+            if getattr(user, 'is_authenticated', False):
+                queryset = queryset.filter(
+                    Q(approval_status='approved') |
+                    Q(seller__user=user)
+                )
+            else:
+                queryset = queryset.filter(approval_status='approved')
 
         return queryset
 
     def get_permissions(self):
         """Set permissions based on action."""
         if self.action in ['create', 'update', 'partial_update']:
-            permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+            permission_classes = [AllowAny, IsOwnerOrReadOnly]
         elif self.action in ['approve_seller', 'reject_seller', 'bulk_approval']:
             permission_classes = [IsAdminUser]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [AllowAny]
 
         return [permission() for permission in permission_classes]
         
@@ -201,6 +206,231 @@ class SellerProfileViewSet(viewsets.ModelViewSet):
 
         return Response(metrics)
 
+    @action(detail=False, methods=['get'], url_path='by-auth-user-uid/(?P<auth_user_uid>[^/.]+)')
+    def by_auth_user_uid(self, request, auth_user_uid=None):
+        """Get seller information by auth_user_uid (AppUser UID)."""
+        try:
+            # Find the AppUser by UID
+            app_user = AppUser.objects.get(uid=auth_user_uid)
+            
+            # Get the seller by the linked AppUser
+            seller = Seller.objects.select_related('user').get(user=app_user)
+            
+            # Try to get seller's address details if they exist
+            address_details = None
+            try:
+                # Get the primary address or any address for the seller
+                address_details = seller.sellers_address_details.filter(is_primary=True).first()
+                if not address_details:
+                    address_details = seller.sellers_address_details.first()
+            except Exception:
+                pass
+            
+            # Build response data with decrypted names and full AppUser info
+            seller_data = {
+                # AppUser information (decrypted)
+                'auth_user_uid': str(app_user.uid),
+                'email': app_user.email,
+                'first_name': app_user.get_decrypted_first_name(),
+                'last_name': app_user.get_decrypted_last_name(),
+                'middle_name': app_user.get_decrypted_middle_name(),
+                'phone_number': app_user.get_decrypted_phone_number(),
+                'alternative_phone': app_user.get_decrypted_alternative_phone(),
+                'alternative_email': app_user.alternative_email,
+                'date_of_birth': app_user.get_decrypted_date_of_birth(),
+                'gender': app_user.gender,
+                'nationality': app_user.nationality,
+                'occupation': app_user.occupation,
+                'company_name': app_user.company_name,
+                'profile_picture': str(app_user.profile_picture) if app_user.profile_picture else None,
+                'bio': app_user.bio,
+                'website': app_user.website,
+                'linkedin_profile': app_user.linkedin_profile,
+                'preferred_language': app_user.preferred_language,
+                'user_timezone': app_user.user_timezone,
+                'currency_preference': app_user.currency_preference,
+                'email_notifications': app_user.email_notifications,
+                'sms_notifications': app_user.sms_notifications,
+                'push_notifications': app_user.push_notifications,
+                'marketing_emails': app_user.marketing_emails,
+                'profile_visibility': app_user.profile_visibility,
+                'show_email': app_user.show_email,
+                'show_phone': app_user.show_phone,
+                'email_verified': app_user.email_verified,
+                'phone_verified': app_user.phone_verified,
+                'profile_status': app_user.profile_status,
+                'role': app_user.role,
+                'otp_type': app_user.otp_type,
+                'is_staff': app_user.is_staff,
+                'is_superuser': app_user.is_superuser,
+                'is_active': app_user.is_active,
+                'is_verified': app_user.is_verified,
+                'is_suspended': app_user.is_suspended,
+                'date_joined': app_user.date_joined,
+                'user_created_at': app_user.created_at,
+                'user_updated_at': app_user.updated_at,
+                
+                # Seller information
+                'registered_company_name': seller.registered_company_name,
+                'trading_name': seller.trading_name,
+                'registration_number': seller.registration_number,
+                'vat_number': seller.vat_number,
+                'website_url': seller.website_url,
+                'product_category': seller.product_category,
+                'product_subcategory': seller.product_subcategory,
+                'seller_created_at': seller.created_at,
+                'seller_updated_at': seller.updated_at,
+            }
+            
+            # Add address details if available
+            if address_details:
+                seller_data.update({
+                    'postal_address': address_details.postal_address,
+                    'physical_address': address_details.physical_address,
+                    'contact_person_name': address_details.contact_person_name,
+                    'contact_person_telephone': address_details.contact_person_telephone,
+                    'contact_person_email': address_details.contact_person_email_address,
+                    'platform_workflow_email': address_details.platform_workflow_email_address,
+                    'latitude': address_details.latitude,
+                    'longitude': address_details.longitude,
+                    'city': address_details.city,
+                    'province': address_details.province,
+                    'postal_code': address_details.postal_code,
+                    'country': address_details.country,
+                })
+            
+            # Try to get seller profile if it exists
+            try:
+                seller_profile = SellerProfile.objects.get(seller=seller)
+                seller_data.update({
+                    'approval_status': seller_profile.approval_status,
+                    'vendor_id': seller_profile.vendor_id,
+                    'average_rating': seller_profile.average_rating,
+                    'total_quotes_submitted': seller_profile.total_quotes_submitted,
+                    'total_deals_won': seller_profile.total_deals_won,
+                    'total_deals_completed': seller_profile.total_deals_completed,
+                    'response_rate_percentage': seller_profile.response_rate_percentage,
+                })
+            except SellerProfile.DoesNotExist:
+                # Add default values if no profile exists
+                seller_data.update({
+                    'approval_status': 'pending',
+                    'vendor_id': None,
+                    'average_rating': None,
+                    'total_quotes_submitted': 0,
+                    'total_deals_won': 0,
+                    'total_deals_completed': 0,
+                    'response_rate_percentage': 0.0,
+                })
+            
+            return Response(seller_data, status=status.HTTP_200_OK)
+            
+        except AppUser.DoesNotExist:
+            return Response({
+                'error': 'AppUser with the given auth_user_uid not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Seller.DoesNotExist:
+            return Response({
+                'error': 'Seller profile not found for the given auth_user_uid'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'error': f'An error occurred: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    @action(detail=False, methods=['patch'], url_path='update-by-auth-user-uid/(?P<auth_user_uid>[^/.]+)')
+    def update_by_auth_user_uid(self, request, auth_user_uid=None):
+        """Update seller information by auth_user_uid."""
+        try:
+            # Find the AppUser by UID
+            app_user = AppUser.objects.get(uid=auth_user_uid)
+            
+            # Get the seller by the linked AppUser
+            seller = Seller.objects.select_related('user').get(user=app_user)
+            
+            # Update seller basic information
+            data = request.data
+            
+            # Update seller fields if provided
+            if 'registered_company_name' in data:
+                seller.registered_company_name = data['registered_company_name']
+            if 'trading_name' in data:
+                seller.trading_name = data['trading_name']
+            if 'registration_number' in data:
+                seller.registration_number = data['registration_number']
+            if 'vat_number' in data:
+                seller.vat_number = data['vat_number']
+            if 'website_url' in data:
+                seller.website_url = data['website_url']
+            if 'product_category' in data:
+                seller.product_category = data['product_category']
+            if 'product_subcategory' in data:
+                seller.product_subcategory = data['product_subcategory']
+            
+            seller.save()
+            
+            # Update AppUser fields if provided
+            user_updated = False
+            if 'first_name' in data:
+                app_user.first_name = data['first_name']
+                user_updated = True
+            if 'last_name' in data:
+                app_user.last_name = data['last_name']
+                user_updated = True
+            if 'email' in data:
+                app_user.email = data['email']
+                user_updated = True
+            if 'phone_number' in data:
+                app_user.phone_number = data['phone_number']
+                user_updated = True
+                
+            if user_updated:
+                app_user.save()
+            
+            # Update or create address details if provided
+            address_data = {}
+            if 'postal_address' in data:
+                address_data['postal_address'] = data['postal_address']
+            if 'physical_address' in data:
+                address_data['physical_address'] = data['physical_address']
+            if 'contact_person_name' in data:
+                address_data['contact_person_name'] = data['contact_person_name']
+            if 'contact_person_telephone' in data:
+                address_data['contact_person_telephone'] = data['contact_person_telephone']
+            if 'contact_person_email' in data:
+                address_data['contact_person_email_address'] = data['contact_person_email']
+            if 'platform_workflow_email' in data:
+                address_data['platform_workflow_email_address'] = data['platform_workflow_email']
+            
+            if address_data:
+                address_details, created = SellersAddressDetails.objects.get_or_create(
+                    user=seller,  # The field name is 'user' but it references Seller model
+                    defaults={**address_data, 'is_primary': True}
+                )
+                if not created:
+                    for key, value in address_data.items():
+                        setattr(address_details, key, value)
+                    address_details.save()
+            
+            # Return success response
+            return Response({
+                'message': 'Seller information updated successfully',
+                'updated_fields': list(data.keys())
+            }, status=status.HTTP_200_OK)
+            
+        except AppUser.DoesNotExist:
+            return Response({
+                'error': 'AppUser with the given auth_user_uid not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Seller.DoesNotExist:
+            return Response({
+                'error': 'Seller profile not found for the given auth_user_uid'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'error': f'An error occurred: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class SellerRegistrationView(APIView):
     """
@@ -253,53 +483,44 @@ class SellerBusinessRegistrationView(APIView):
     """
     Multi-step seller business registration
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     
     # Initialize security utils
     security_utils = SecurityUtils()
 
     @transaction.atomic
     def post(self, request):
-        user = request.user
+        app_user_id = request.data.get('auth_user_id', {})
+        if not app_user_id:
+            return Response({
+                'error': 'Authentication user not provided'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = AppUser.objects.get(uid=app_user_id)
+        except AppUser.DoesNotExist:
+            return Response({
+                'error': 'Invalid user ID'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         ip_address = request.META.get('REMOTE_ADDR', '')
         
-        # Log the API request
-        api_request = APIRequest.objects.create(
-            user=user,
-            endpoint=request.path,
-            method=request.method,
+        # Log the business registration attempt
+        auth_log = AuthenticationLog.objects.create(
+            user_email=user.email,
+            user_id=user.id,
+            user_type='business_seller',
+            action='seller_verification',
+            status='pending',
             ip_address=ip_address,
             user_agent=request.META.get('HTTP_USER_AGENT', ''),
-            request_data=str(request.data) if hasattr(request, 'data') else '',
-            status_code=200  # Will be updated in the response
+            endpoint=request.path,
+            method=request.method,
+            response_code=200  # Will be updated later
         )
         
-        # Check for rate limiting
-        rate_limit_bucket, created = RateLimitBucket.objects.get_or_create(
-            ip_address=ip_address,
-            defaults={'request_count': 0}
-        )
-        
-        if rate_limit_bucket.is_rate_limited(20):  # Limit for business registration
-            # Log the rate limiting event
-            SecurityEvent.objects.create(
-                user_email=user.email,
-                event_type='api_abuse',
-                title='Business Registration Rate Limit Exceeded',
-                description=f"Business registration rate limit exceeded for user: {user.email}"
-            )
-            
-            # Update API request status
-            api_request.status_code = status.HTTP_429_TOO_MANY_REQUESTS
-            api_request.response_data = "Rate limit exceeded for business registration"
-            api_request.save()
-            
-            return Response({
-                "error": "Too many registration attempts. Please try again later."
-            }, status=status.HTTP_429_TOO_MANY_REQUESTS)
-            
-        # Add request to rate limit bucket
-        rate_limit_bucket.add_request()
+        # Basic rate limiting can be implemented here if needed
+        # For now, we'll skip complex rate limiting and rely on Django's built-in protections
 
         # Ensure user has seller role
         if user.role != 'seller':
@@ -308,35 +529,54 @@ class SellerBusinessRegistrationView(APIView):
                 user_email=user.email,
                 event_type='privilege_escalation',
                 title='Unauthorized Business Registration Attempt',
-                description=f"Non-seller user attempted business registration: {user.email}"
+                description=f"Non-seller user attempted business registration: {user.email}",
+                ip_address=ip_address,
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                severity='medium'
             )
             
-            # Update API request status
-            api_request.status_code = status.HTTP_403_FORBIDDEN
-            api_request.response_data = "Only sellers can register business details"
-            api_request.save()
+            # Update auth log status
+            auth_log.status = 'failed'
+            auth_log.response_code = status.HTTP_403_FORBIDDEN
+            auth_log.error_message = "Only sellers can register business details"
+            auth_log.save()
             
             return Response({
                 'error': 'Only sellers can register business details'
             }, status=status.HTTP_403_FORBIDDEN)
 
-        # Create audit trail for business registration attempt
-        AuditTrail.objects.create(
-            admin_email=user.email,
-            action='user_created',
-            ip_address=ip_address,
-            user_agent=request.META.get('HTTP_USER_AGENT', ''),
-            description=f"Business registration process started"
-        )
+        # Log successful authorization
+        auth_log.details = {'step': 'authorization_passed', 'user_role': user.role}
 
-        # Step 1: Company Details
-        company_data = request.data.get('company_details', {})
-        if company_data:
-            # Secure sensitive company data
-            secured_company_data = self.security_utils.secure_user_data(company_data)
+        # Step 1: Seller Details
+        seller_data = request.data.get('seller', {})
+        if seller_data:
+            # Transform product_subcategory display value to choice key
+            if 'product_subcategory' in seller_data:
+                display_to_key = {
+                    'Engine Parts': 'engine_parts',
+                    'Engines Parts': 'engine_parts',  # Handle both variants
+                    'Body Parts': 'body_parts', 
+                    'Suspension Parts': 'suspension_parts',
+                    'Transmission Parts': 'transmission_parts',
+                    'Batteries': 'batteries'
+                }
+                subcategory = seller_data['product_subcategory']
+                if subcategory in display_to_key:
+                    seller_data['product_subcategory'] = display_to_key[subcategory]
+            
+            # Handle invalid website URL by setting to None if not a valid URL
+            if 'website_url' in seller_data and seller_data['website_url']:
+                url = seller_data['website_url']
+                if not url.startswith(('http://', 'https://')):
+                    # Invalid URL format, set to None
+                    seller_data['website_url'] = None
+            
+            # Secure sensitive seller data
+            secured_seller_data = self.security_utils.secure_user_data(seller_data)
             
             seller, created = Seller.objects.get_or_create(user=user)
-            company_serializer = SellerBusinessRegistrationSerializer(seller, data=secured_company_data, partial=True)
+            company_serializer = SellerBusinessRegistrationSerializer(seller, data=secured_seller_data, partial=True)
             if company_serializer.is_valid():
                 company_serializer.save()
                 
@@ -357,16 +597,39 @@ class SellerBusinessRegistrationView(APIView):
                     description=f"Company details validation error: {company_serializer.errors}"
                 )
                 
-                # Update API request status
-                api_request.status_code = status.HTTP_400_BAD_REQUEST
-                api_request.response_data = str(company_serializer.errors)
-                api_request.save()
+                # Update auth log status
+                auth_log.status = 'failed'
+                auth_log.response_code = status.HTTP_400_BAD_REQUEST
+                auth_log.error_message = str(company_serializer.errors)
+                auth_log.save()
                 
                 return Response(company_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Step 2: Address Details
-        address_data = request.data.get('address_details', {})
+        # Ensure seller exists (fallback if not created in Step 1)
+        if 'seller' not in locals():
+            seller, created = Seller.objects.get_or_create(user=user)
+
+        # Step 2: Contact/Address Details  
+        address_data = request.data.get('contact_info', {})
         if address_data:
+            # Map field names to match model expectations
+            if 'contact_person_email' in address_data:
+                address_data['contact_person_email_address'] = address_data.pop('contact_person_email')
+            if 'platform_workflow_email' in address_data:
+                address_data['platform_workflow_email_address'] = address_data.pop('platform_workflow_email')
+            
+            # Convert coordinates to address if coordinates are provided but no physical address
+            if (address_data.get('latitude') and address_data.get('longitude') and 
+                not address_data.get('physical_address')):
+                try:
+                    lat = float(address_data['latitude'])
+                    lng = float(address_data['longitude'])
+                    formatted_address = reverse_geocode(lat, lng)
+                    address_data['physical_address'] = formatted_address
+                    address_data['location_address'] = formatted_address
+                except (ValueError, TypeError):
+                    pass
+            
             # Secure sensitive address data
             secured_address_data = self.security_utils.secure_user_data(address_data)
             
@@ -391,15 +654,16 @@ class SellerBusinessRegistrationView(APIView):
                     description=f"Address details validation error: {address_serializer.errors}"
                 )
                 
-                # Update API request status
-                api_request.status_code = status.HTTP_400_BAD_REQUEST
-                api_request.response_data = str(address_serializer.errors)
-                api_request.save()
+                # Update auth log status
+                auth_log.status = 'failed'
+                auth_log.response_code = status.HTTP_400_BAD_REQUEST
+                auth_log.error_message = str(address_serializer.errors)
+                auth_log.save()
                 
                 return Response(address_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         # Step 3: Bank Account Details
-        bank_data = request.data.get('bank_details', {})
+        bank_data = request.data.get('banking_info', {})
         if bank_data:
             # Secure sensitive bank data
             secured_bank_data = self.security_utils.secure_user_data(bank_data)
@@ -425,12 +689,47 @@ class SellerBusinessRegistrationView(APIView):
                     description=f"Bank details validation error: {bank_serializer.errors}"
                 )
                 
-                # Update API request status
-                api_request.status_code = status.HTTP_400_BAD_REQUEST
-                api_request.response_data = str(bank_serializer.errors)
-                api_request.save()
+                # Update auth log status
+                auth_log.status = 'failed'
+                auth_log.response_code = status.HTTP_400_BAD_REQUEST
+                auth_log.error_message = str(bank_serializer.errors)
+                auth_log.save()
                 
                 return Response(bank_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # Final fallback: Ensure seller record exists
+        if 'seller' not in locals():
+            seller, created = Seller.objects.get_or_create(user=user)
+            if created:
+                # If we had to create the seller here, populate with any available data
+                seller_data = request.data.get('seller', {})
+                if seller_data:
+                    seller.registered_company_name = seller_data.get('registered_company_name')
+                    seller.trading_name = seller_data.get('trading_name')
+                    seller.registration_number = seller_data.get('registration_number')
+                    seller.vat_number = seller_data.get('vat_number')
+                    
+                    # Handle website URL validation
+                    website_url = seller_data.get('website_url')
+                    if website_url and website_url.startswith(('http://', 'https://')):
+                        seller.website_url = website_url
+                    
+                    seller.product_category = seller_data.get('product_category')
+                    
+                    # Handle product_subcategory transformation
+                    subcategory = seller_data.get('product_subcategory')
+                    if subcategory:
+                        display_to_key = {
+                            'Engine Parts': 'engine_parts',
+                            'Engines Parts': 'engine_parts',  # Handle both variants
+                            'Body Parts': 'body_parts', 
+                            'Suspension Parts': 'suspension_parts',
+                            'Transmission Parts': 'transmission_parts',
+                            'Batteries': 'batteries'
+                        }
+                        seller.product_subcategory = display_to_key.get(subcategory, subcategory)
+                    
+                    seller.save()
 
         # Log successful business registration
         AuditTrail.objects.create(
@@ -441,10 +740,11 @@ class SellerBusinessRegistrationView(APIView):
             description=f"Business registration completed successfully for seller: {user.email}"
         )
         
-        # Update API request status
-        api_request.status_code = status.HTTP_201_CREATED
-        api_request.response_data = "Business registration completed successfully"
-        api_request.save()
+        # Update auth log status
+        auth_log.status = 'success'
+        auth_log.response_code = status.HTTP_201_CREATED
+        auth_log.details = {'message': 'Business registration completed successfully'}
+        auth_log.save()
 
         return Response({
             'message': 'Business registration completed successfully'
@@ -455,13 +755,19 @@ class SellerDocumentUploadView(APIView):
     """
     Seller document upload for vetting
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     
     # Initialize security utils
     security_utils = SecurityUtils()
 
     def post(self, request):
-        user = request.user
+        app_user_id = request.data.get('auth_user_id', {})
+        if not user:
+            return Response({
+                'error': 'Authentication user not provided'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        user = AppUser.objects.get(uid=app_user_id) if app_user_id else None
+
         ip_address = request.META.get('REMOTE_ADDR', '')
         
         # Log the API request
@@ -632,11 +938,93 @@ class SellerDocumentUploadView(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
+class LocationGeocodeView(APIView):
+    """
+    API endpoint to convert coordinates to human-readable addresses
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        """
+        Convert latitude/longitude to formatted address
+        
+        Request body:
+        {
+            "latitude": -17.8292,
+            "longitude": 31.0522
+        }
+        
+        Response:
+        {
+            "formatted_address": "123 Main Street, Harare, Zimbabwe",
+            "latitude": -17.8292,
+            "longitude": 31.0522,
+            "display_text": "123 Main Street, Harare, Zimbabwe"
+        }
+        """
+        latitude = request.data.get('latitude')
+        longitude = request.data.get('longitude')
+        
+        if not latitude or not longitude:
+            return Response({
+                'error': 'Both latitude and longitude are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            lat = float(latitude)
+            lng = float(longitude)
+        except (ValueError, TypeError):
+            return Response({
+                'error': 'Invalid latitude or longitude format'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate coordinate ranges
+        if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
+            return Response({
+                'error': 'Invalid coordinate values. Latitude must be between -90 and 90, longitude between -180 and 180'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        location_data = format_location_with_address(lat, lng)
+        
+        return Response(location_data, status=status.HTTP_200_OK)
+    
+    def get(self, request):
+        """
+        Convert coordinates from query parameters
+        
+        Usage: /api/geocode/?lat=-17.8292&lng=31.0522
+        """
+        latitude = request.query_params.get('lat')
+        longitude = request.query_params.get('lng') or request.query_params.get('lon')
+        
+        if not latitude or not longitude:
+            return Response({
+                'error': 'Both lat and lng query parameters are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            lat = float(latitude)
+            lng = float(longitude)
+        except (ValueError, TypeError):
+            return Response({
+                'error': 'Invalid latitude or longitude format'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
+            return Response({
+                'error': 'Invalid coordinate values'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        location_data = format_location_with_address(lat, lng)
+        
+        return Response(location_data, status=status.HTTP_200_OK)
+
+
 class DocumentVettingView(APIView):
     """
     Admin endpoint for document vetting
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get_permissions(self):
         """

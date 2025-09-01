@@ -1,3 +1,4 @@
+from django.db.models.functions import TruncDate
 from django.shortcuts import render
 from django.db.models import Q, Sum, Avg, Count
 from django.utils import timezone
@@ -5,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from datetime import datetime, timedelta
 
 from .models import (
@@ -310,7 +311,7 @@ class AnalyticsDashboardViewSet(viewsets.ViewSet):
     """
     Combined analytics dashboard endpoints.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     @action(detail=False, methods=['get'])
     def overview(self, request):
@@ -387,8 +388,8 @@ class AnalyticsDashboardViewSet(viewsets.ViewSet):
         # Get daily request counts
         daily_requests = ProductRequest.objects.filter(
             created_at__date__range=[start_date, end_date]
-        ).extra(
-            select={'day': 'date(created_at)'}
+        ).annotate(
+            day=TruncDate('created_at')
         ).values('day').annotate(
             count=Count('id')
         ).order_by('day')
@@ -409,4 +410,170 @@ class AnalyticsDashboardViewSet(viewsets.ViewSet):
             },
             'daily_requests': list(daily_requests),
             'daily_analytics': list(daily_analytics)
+        })
+    
+    @action(detail=False, methods=['get'])
+    def seller_orders_summary(self, request):
+        """Get orders summary for a specific seller."""
+        auth_user_uid = request.query_params.get('auth_user_uid')
+        timeframe = request.query_params.get('timeframe', 'monthly')
+        
+        if not auth_user_uid:
+            return Response(
+                {'error': 'auth_user_uid parameter is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Import here to avoid circular imports
+        from product_requests.models import Order
+        
+        # Calculate date range
+        end_date = timezone.now().date()
+        if timeframe == 'daily':
+            start_date = end_date - timedelta(days=1)
+        elif timeframe == 'weekly':
+            start_date = end_date - timedelta(weeks=1)
+        elif timeframe == 'monthly':
+            start_date = end_date - timedelta(days=30)
+        elif timeframe == 'yearly':
+            start_date = end_date - timedelta(days=365)
+        else:
+            start_date = end_date - timedelta(days=30)
+        
+        # Get seller orders in the timeframe
+        seller_orders = Order.objects.filter(
+            seller_id=auth_user_uid,
+            created_at__date__range=[start_date, end_date]
+        )
+        
+        # Calculate metrics
+        total_orders = seller_orders.count()
+        total_revenue = seller_orders.aggregate(
+            revenue=Sum('total_amount')
+        )['revenue'] or 0
+        
+        # Get orders by status
+        orders_by_status = seller_orders.values('status').annotate(
+            count=Count('order_id'),
+            revenue=Sum('total_amount')
+        ).order_by('status')
+        
+        # Get chart data based on timeframe
+        chart_data = []
+        chart_end_date = timezone.now().date()
+        
+        if timeframe == 'daily':
+            # Show all days of current month
+            from calendar import monthrange
+            year = chart_end_date.year
+            month = chart_end_date.month
+            days_in_month = monthrange(year, month)[1]
+            chart_start_date = chart_end_date.replace(day=1)
+            
+            daily_revenue = seller_orders.filter(
+                created_at__date__range=[chart_start_date, chart_end_date]
+            ).annotate(
+                day=TruncDate('created_at')
+            ).values('day').annotate(
+                revenue=Sum('total_amount')
+            ).order_by('day')
+            
+            daily_revenue_dict = {item['day'].strftime('%Y-%m-%d'): float(item['revenue']) for item in daily_revenue}
+            
+            for day in range(1, days_in_month + 1):
+                date = chart_end_date.replace(day=day)
+                date_str = date.strftime('%Y-%m-%d')
+                chart_data.append({
+                    'period': str(day),
+                    'period_name': str(day),
+                    'revenue': daily_revenue_dict.get(date_str, 0)
+                })
+                
+        elif timeframe == 'weekly':
+            # Show 4 weeks
+            chart_start_date = chart_end_date - timedelta(weeks=3)  # 4 weeks including current week
+            
+            weekly_revenue = seller_orders.filter(
+                created_at__date__range=[chart_start_date, chart_end_date]
+            ).annotate(
+                week=TruncDate('created_at', lookup='week')
+            ).values('week').annotate(
+                revenue=Sum('total_amount')
+            ).order_by('week')
+            
+            weekly_revenue_dict = {item['week'].strftime('%Y-%m-%d'): float(item['revenue']) for item in weekly_revenue}
+            
+            for week in range(4):
+                week_start = chart_start_date + timedelta(weeks=week)
+                # Adjust to start of week (Monday)
+                week_start = week_start - timedelta(days=week_start.weekday())
+                week_str = week_start.strftime('%Y-%m-%d')
+                chart_data.append({
+                    'period': f'W{week + 1}',
+                    'period_name': f'Week {week + 1}',
+                    'revenue': weekly_revenue_dict.get(week_str, 0)
+                })
+                
+        elif timeframe == 'yearly':
+            # Show multiple years if needed, for now just current year by months
+            chart_start_date = chart_end_date.replace(month=1, day=1)
+            
+            monthly_revenue = seller_orders.filter(
+                created_at__date__range=[chart_start_date, chart_end_date]
+            ).annotate(
+                month=TruncDate('created_at', lookup='month')
+            ).values('month').annotate(
+                revenue=Sum('total_amount')
+            ).order_by('month')
+            
+            monthly_revenue_dict = {item['month'].strftime('%Y-%m'): float(item['revenue']) for item in monthly_revenue}
+            
+            for month in range(1, 13):  # 12 months
+                date = chart_end_date.replace(month=month, day=1)
+                month_str = date.strftime('%Y-%m')
+                chart_data.append({
+                    'period': date.strftime('%b'),
+                    'period_name': date.strftime('%B'),
+                    'revenue': monthly_revenue_dict.get(month_str, 0)
+                })
+                
+        else:  # monthly (default)
+            # Show 12 months of current year
+            chart_start_date = chart_end_date.replace(month=1, day=1)
+            
+            monthly_revenue = seller_orders.filter(
+                created_at__date__range=[chart_start_date, chart_end_date]
+            ).annotate(
+                month=TruncDate('created_at', lookup='month')
+            ).values('month').annotate(
+                revenue=Sum('total_amount')
+            ).order_by('month')
+            
+            monthly_revenue_dict = {item['month'].strftime('%Y-%m'): float(item['revenue']) for item in monthly_revenue}
+            
+            for month in range(1, 13):  # 12 months
+                date = chart_end_date.replace(month=month, day=1)
+                month_str = date.strftime('%Y-%m')
+                chart_data.append({
+                    'period': date.strftime('%b'),
+                    'period_name': date.strftime('%B'),
+                    'revenue': monthly_revenue_dict.get(month_str, 0)
+                })
+        
+        # Average order value
+        avg_order_value = float(total_revenue / total_orders) if total_orders > 0 else 0
+        
+        return Response({
+            'timeframe': timeframe,
+            'date_range': {
+                'start': start_date,
+                'end': end_date
+            },
+            'summary': {
+                'total_orders': total_orders,
+                'total_revenue': float(total_revenue),
+                'average_order_value': round(avg_order_value, 2),
+                'orders_by_status': list(orders_by_status),
+                'chart_data': chart_data
+            }
         })

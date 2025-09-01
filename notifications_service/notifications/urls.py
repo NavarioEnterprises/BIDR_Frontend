@@ -40,6 +40,7 @@ urlpatterns = [
     path('api/v1/logs/', include('notification_logs.urls')),
     path('api/v1/analytics/', include('notification_analytics.urls')),
     path('api/v1/health/', include('health_monitor.urls')),
+    path('api/v1/sms/', include('sms_portal.urls')),
     # Webhook endpoints
     path('webhooks/payment/', payment_webhook, name='payment-webhook'),
     path('webhooks/resolution/', resolution_webhook, name='resolution-webhook'),

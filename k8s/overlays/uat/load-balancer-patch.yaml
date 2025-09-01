@@ -1,0 +1,263 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bidr-load-balancer
+  namespace: bidr
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-tcp-idle-timeout: "30"
+    service.beta.kubernetes.io/azure-dns-label-name: "bidr-uat"
+spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges: []  # Allow all IPs for UAT testing
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-load-balancer-config
+  namespace: bidr
+data:
+  nginx.conf: |
+    # UAT Environment Load Balancer Configuration
+    
+    upstream auth_service {
+        server bidr-auth-service.bidr.svc.cluster.local:80;
+    }
+    
+    upstream chat_service {
+        server bidr-chat-service.bidr.svc.cluster.local:80;
+    }
+    
+    upstream payment_service {
+        server bidr-payment-service.bidr.svc.cluster.local:80;
+    }
+    
+    upstream product_service {
+        server bidr-product-management-service.bidr.svc.cluster.local:80;
+    }
+    
+    upstream notification_service {
+        server bidr-notifications-service.bidr.svc.cluster.local:80;
+    }
+    
+    upstream resolution_service {
+        server bidr-resolution-service.bidr.svc.cluster.local:80;
+    }
+    
+    upstream transaction_service {
+        server bidr-transactions-service.bidr.svc.cluster.local:80;
+    }
+    
+    upstream reviews_service {
+        server bidr-reviews-and-ratings.bidr.svc.cluster.local:80;
+    }
+
+    # Health check endpoint
+    server {
+        listen 80;
+        server_name health;
+        
+        location /health {
+            access_log off;
+            return 200 "BIDR UAT Environment - healthy\n";
+            add_header Content-Type text/plain;
+        }
+    }
+
+    # Main UAT load balancer configuration
+    server {
+        listen 80 default_server;
+        server_name _;
+
+        # UAT Environment header
+        add_header 'X-Environment' 'UAT' always;
+        
+        # Enable CORS for UAT testing
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH' always;
+        add_header 'Access-Control-Allow-Headers' 'Accept, Authorization, Content-Type, X-Requested-With, X-CSRF-Token, X-Environment' always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+
+        # Handle preflight OPTIONS requests
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PATCH';
+            add_header 'Access-Control-Allow-Headers' 'Accept, Authorization, Content-Type, X-Requested-With, X-CSRF-Token, X-Environment';
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain; charset=utf-8';
+            add_header 'Content-Length' 0;
+            add_header 'X-Environment' 'UAT';
+            return 204;
+        }
+
+        # Health check
+        location /health {
+            access_log off;
+            return 200 "BIDR UAT Environment - healthy\n";
+            add_header Content-Type text/plain;
+            add_header X-Environment 'UAT';
+        }
+
+        # UAT environment info endpoint
+        location /env {
+            access_log off;
+            return 200 '{"environment": "UAT", "version": "latest", "status": "active"}';
+            add_header Content-Type application/json;
+            add_header X-Environment 'UAT';
+        }
+
+        # Auth service routes
+        location /auth/ {
+            proxy_pass http://auth_service/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Environment 'UAT';
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # Chat service routes
+        location /chat/ {
+            proxy_pass http://chat_service/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Environment 'UAT';
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+            
+            # WebSocket support
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+        }
+
+        # Payment service routes
+        location /payment/ {
+            proxy_pass http://payment_service/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Environment 'UAT';
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # Product service routes  
+        location /product/ {
+            proxy_pass http://product_service/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Environment 'UAT';
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # Notification service routes
+        location /notifications/ {
+            proxy_pass http://notification_service/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Environment 'UAT';
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # Resolution service routes
+        location /resolution/ {
+            proxy_pass http://resolution_service/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Environment 'UAT';
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # Transaction service routes
+        location /transactions/ {
+            proxy_pass http://transaction_service/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Environment 'UAT';
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # Reviews service routes
+        location /reviews/ {
+            proxy_pass http://reviews_service/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Environment 'UAT';
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # Default route - auth service
+        location / {
+            proxy_pass http://auth_service/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Environment 'UAT';
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # Error pages
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+            root /usr/share/nginx/html;
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-load-balancer
+  namespace: bidr
+spec:
+  replicas: 1  # Single replica for UAT
+  template:
+    metadata:
+      labels:
+        app: nginx-proxy
+        component: load-balancer
+        environment: uat
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        env:
+        - name: ENVIRONMENT
+          value: "UAT"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi

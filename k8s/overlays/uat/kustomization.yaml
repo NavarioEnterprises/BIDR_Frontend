@@ -1,6 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+bases:
+- ../../base
+
 resources:
 - secret.yaml
 - configmap.yaml
@@ -29,6 +32,18 @@ patches:
   target:
     kind: ConfigMap
     name: nginx-proxy-config
+- path: load-balancer-patch.yaml
+  target:
+    kind: ConfigMap
+    name: nginx-load-balancer-config
+- path: load-balancer-patch.yaml
+  target:
+    kind: Service
+    name: bidr-load-balancer
+- path: load-balancer-patch.yaml
+  target:
+    kind: Deployment
+    name: nginx-load-balancer
 
 replicas:
 - name: auth-service

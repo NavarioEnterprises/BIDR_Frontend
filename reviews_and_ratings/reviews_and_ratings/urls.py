@@ -35,8 +35,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     # App URLs
-    path('', include('reviews.urls')),
+    path('api/reviews/', include('reviews.urls')),
+    path('api/ratings/', include('ratings.urls')),
     path('', include('content.urls')),
+    path('', include('rewards.urls')),
     
     # Health check
     # Metrics endpoint for Prometheus

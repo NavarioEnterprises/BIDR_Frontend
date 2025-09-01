@@ -1,0 +1,201 @@
+INFO 2025-08-28 19:04:04,906 autoreload 66625 8530314688 Watching for file changes with StatReloader
+WARNING 2025-08-28 19:04:11,684 log 66625 6133346304 Not Found: /
+WARNING 2025-08-28 19:04:11,684 basehttp 66625 6133346304 "GET / HTTP/1.1" 404 3842
+WARNING 2025-08-28 19:04:16,782 log 66625 6133346304 Not Found: /sms_portal/send/otp/
+WARNING 2025-08-28 19:04:16,782 basehttp 66625 6133346304 "POST /sms_portal/send/otp/ HTTP/1.1" 404 3921
+WARNING 2025-08-28 19:04:22,524 log 66625 6133346304 Unauthorized: /api/v1/sms/send/otp/
+WARNING 2025-08-28 19:04:22,524 basehttp 66625 6133346304 "POST /api/v1/sms/send/otp/ HTTP/1.1" 401 58
+INFO 2025-08-29 03:43:21,205 autoreload 15400 8530314688 Watching for file changes with StatReloader
+WARNING 2025-08-29 03:44:36,900 log 15400 6125613056 Unauthorized: /api/v1/sms/send/otp/
+WARNING 2025-08-29 03:44:36,901 basehttp 15400 6125613056 "POST /api/v1/sms/send/otp/ HTTP/1.1" 401 58
+INFO 2025-08-29 03:49:21,992 autoreload 15400 8530314688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/sms_portal/views.py changed, reloading.
+INFO 2025-08-29 03:49:22,359 autoreload 18001 8530314688 Watching for file changes with StatReloader
+INFO 2025-08-29 03:49:22,465 autoreload 66625 8530314688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/sms_portal/views.py changed, reloading.
+INFO 2025-08-29 03:49:22,754 autoreload 18002 8530314688 Watching for file changes with StatReloader
+INFO 2025-08-29 03:49:30,322 basehttp 18002 6135394304 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+WARNING 2025-08-29 03:59:00,943 log 18001 6188904448 Bad Request: /api/v1/sms/send/otp/
+WARNING 2025-08-29 03:59:00,944 basehttp 18001 6188904448 "POST /api/v1/sms/send/otp/ HTTP/1.1" 400 70
+INFO 2025-08-29 04:04:24,590 autoreload 18002 8530314688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/sms_portal/serializers.py changed, reloading.
+INFO 2025-08-29 04:04:24,633 autoreload 18001 8530314688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/sms_portal/serializers.py changed, reloading.
+INFO 2025-08-29 04:04:24,983 autoreload 25571 8530314688 Watching for file changes with StatReloader
+INFO 2025-08-29 04:04:24,983 autoreload 25572 8530314688 Watching for file changes with StatReloader
+INFO 2025-08-29 04:04:41,687 autoreload 25571 8530314688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/sms_portal/serializers.py changed, reloading.
+INFO 2025-08-29 04:04:42,029 autoreload 25754 8530314688 Watching for file changes with StatReloader
+INFO 2025-08-29 04:04:42,519 autoreload 25572 8530314688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/sms_portal/serializers.py changed, reloading.
+INFO 2025-08-29 04:04:42,734 autoreload 25761 8530314688 Watching for file changes with StatReloader
+INFO 2025-08-29 04:05:00,811 autoreload 25754 8530314688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/sms_portal/serializers.py changed, reloading.
+INFO 2025-08-29 04:05:01,175 autoreload 25921 8530314688 Watching for file changes with StatReloader
+INFO 2025-08-29 04:05:01,223 autoreload 25761 8530314688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/sms_portal/serializers.py changed, reloading.
+INFO 2025-08-29 04:05:01,422 autoreload 25922 8530314688 Watching for file changes with StatReloader
+INFO 2025-08-29 04:05:17,872 autoreload 25921 8530314688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/sms_portal/views.py changed, reloading.
+INFO 2025-08-29 04:05:17,937 autoreload 25922 8530314688 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/sms_portal/views.py changed, reloading.
+INFO 2025-08-29 04:05:18,238 autoreload 26074 8530314688 Watching for file changes with StatReloader
+INFO 2025-08-29 04:05:18,240 autoreload 26073 8530314688 Watching for file changes with StatReloader
+INFO 2025-08-29 04:05:38,147 basehttp 26074 6130216960 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+WARNING 2025-08-29 04:16:44,899 log 26074 6130216960 Bad Request: /api/v1/sms/send/otp/
+WARNING 2025-08-29 04:16:44,901 basehttp 26074 6130216960 "POST /api/v1/sms/send/otp/ HTTP/1.1" 400 127
+WARNING 2025-08-29 04:22:15,312 log 26074 6130216960 Unauthorized: /api/v1/notifications/send/otp/
+WARNING 2025-08-29 04:22:15,313 basehttp 26074 6130216960 "POST /api/v1/notifications/send/otp/ HTTP/1.1" 401 58
+INFO 2025-08-29 04:25:54,383 basehttp 26074 6130216960 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 12:35:00,651 autoreload 61259 8272463296 Watching for file changes with StatReloader
+WARNING 2025-08-29 12:55:22,915 log 61259 6205009920 Bad Request: /api/v1/sms/send/otp/
+WARNING 2025-08-29 12:55:22,916 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 400 127
+WARNING 2025-08-29 13:00:55,818 log 61259 6205009920 Not Found: /
+WARNING 2025-08-29 13:00:55,819 basehttp 61259 6205009920 "GET / HTTP/1.1" 404 3842
+WARNING 2025-08-29 13:00:55,846 log 61259 6205009920 Not Found: /favicon.ico
+WARNING 2025-08-29 13:00:55,847 basehttp 61259 6205009920 "GET /favicon.ico HTTP/1.1" 404 3893
+INFO 2025-08-29 13:01:02,117 basehttp 61259 6205009920 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-29 13:01:02,140 basehttp 61259 6205009920 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4160
+INFO 2025-08-29 13:01:02,177 basehttp 61259 6238662656 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2025-08-29 13:01:02,177 basehttp 61259 6221836288 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2804
+INFO 2025-08-29 13:01:02,178 basehttp 61259 6272315392 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17972
+INFO 2025-08-29 13:01:02,178 basehttp 61259 6255489024 "GET /static/admin/css/login.css HTTP/1.1" 200 951
+INFO 2025-08-29 13:01:02,178 basehttp 61259 6289141760 "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+INFO 2025-08-29 13:01:02,179 basehttp 61259 6205009920 "GET /static/admin/css/base.css HTTP/1.1" 200 22092
+INFO 2025-08-29 13:01:02,179 basehttp 61259 6255489024 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-08-29 13:01:15,282 basehttp 61259 6205009920 "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2025-08-29 13:01:15,294 basehttp 61259 6205009920 "GET /admin/ HTTP/1.1" 200 19833
+INFO 2025-08-29 13:01:15,298 basehttp 61259 6205009920 "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+INFO 2025-08-29 13:01:15,301 basehttp 61259 6205009920 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2025-08-29 13:01:15,301 basehttp 61259 6221836288 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+INFO 2025-08-29 13:01:18,899 basehttp 61259 6205009920 "GET /admin/sms_portal/smsmessage/ HTTP/1.1" 200 28979
+INFO 2025-08-29 13:01:18,908 basehttp 61259 6205009920 "GET /static/admin/css/changelists.css HTTP/1.1" 200 6878
+INFO 2025-08-29 13:01:18,908 basehttp 61259 6255489024 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2025-08-29 13:01:18,909 basehttp 61259 6272315392 "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+INFO 2025-08-29 13:01:18,910 basehttp 61259 6289141760 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9097
+INFO 2025-08-29 13:01:18,911 basehttp 61259 6205009920 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2025-08-29 13:01:18,912 basehttp 61259 6255489024 "GET /static/admin/js/actions.js HTTP/1.1" 200 8076
+INFO 2025-08-29 13:01:18,912 basehttp 61259 6272315392 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2025-08-29 13:01:18,913 basehttp 61259 6221836288 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:01:18,914 basehttp 61259 6205009920 "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+INFO 2025-08-29 13:01:18,916 basehttp 61259 6238662656 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2025-08-29 13:01:18,916 basehttp 61259 6289141760 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2025-08-29 13:01:18,919 basehttp 61259 6289141760 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2025-08-29 13:01:18,930 basehttp 61259 6289141760 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2025-08-29 13:01:18,930 basehttp 61259 6205009920 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+INFO 2025-08-29 13:01:18,930 basehttp 61259 6238662656 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+INFO 2025-08-29 13:01:25,508 basehttp 61259 6205009920 "GET /admin/sms_portal/smstemplate/ HTTP/1.1" 200 30486
+INFO 2025-08-29 13:01:25,516 basehttp 61259 6221836288 "GET /static/admin/img/icon-yes.svg HTTP/1.1" 200 436
+INFO 2025-08-29 13:01:25,517 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:01:31,699 basehttp 61259 6205009920 "GET /admin/sms_portal/smstemplate/f4661aeb-ca9f-47fd-9262-473e959018fb/change/ HTTP/1.1" 200 25154
+INFO 2025-08-29 13:01:31,705 basehttp 61259 6205009920 "GET /static/admin/css/forms.css HTTP/1.1" 200 8794
+INFO 2025-08-29 13:01:31,705 basehttp 61259 6238662656 "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 586
+INFO 2025-08-29 13:01:31,707 basehttp 61259 6221836288 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:01:31,708 basehttp 61259 6205009920 "GET /static/admin/css/widgets.css HTTP/1.1" 200 11564
+INFO 2025-08-29 13:01:31,709 basehttp 61259 6221836288 "GET /static/admin/js/change_form.js HTTP/1.1" 200 606
+INFO 2025-08-29 13:01:47,880 basehttp 61259 6205009920 "GET /admin/sms_portal/smsmessage/ HTTP/1.1" 200 28979
+INFO 2025-08-29 13:01:47,888 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:01:50,194 basehttp 61259 6205009920 "GET /admin/system_notifications/notificationbatch/ HTTP/1.1" 200 18955
+INFO 2025-08-29 13:01:50,202 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:01:51,383 basehttp 61259 6205009920 "GET /admin/sms_portal/smsmessage/ HTTP/1.1" 200 28979
+INFO 2025-08-29 13:01:51,389 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:01:52,100 basehttp 61259 6205009920 "GET /admin/sms_portal/smsportalconfig/ HTTP/1.1" 200 21557
+INFO 2025-08-29 13:01:52,106 basehttp 61259 6221836288 "GET /static/admin/img/icon-no.svg HTTP/1.1" 200 560
+INFO 2025-08-29 13:01:52,108 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:01:55,876 basehttp 61259 6205009920 "GET /admin/sms_portal/smsportalconfig/1a7b3a07-129d-470d-943d-5ab46ba651f7/change/ HTTP/1.1" 200 26213
+INFO 2025-08-29 13:01:55,882 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:02:13,748 basehttp 61259 6205009920 "GET /admin/system_notifications/notificationqueue/ HTTP/1.1" 200 18734
+INFO 2025-08-29 13:02:13,754 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:02:14,954 basehttp 61259 6205009920 "GET /admin/sms_portal/smstemplate/ HTTP/1.1" 200 30486
+INFO 2025-08-29 13:02:14,961 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:02:20,010 basehttp 61259 6205009920 "GET /admin/sms_portal/smsportalconfig/ HTTP/1.1" 200 21557
+INFO 2025-08-29 13:02:20,017 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:02:21,857 basehttp 61259 6205009920 "GET /admin/sms_portal/smsportalconfig/1a7b3a07-129d-470d-943d-5ab46ba651f7/change/ HTTP/1.1" 200 26213
+INFO 2025-08-29 13:02:21,866 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:02:25,278 basehttp 61259 6205009920 "POST /admin/sms_portal/smsportalconfig/1a7b3a07-129d-470d-943d-5ab46ba651f7/change/ HTTP/1.1" 302 0
+INFO 2025-08-29 13:02:25,290 basehttp 61259 6205009920 "GET /admin/sms_portal/smsportalconfig/ HTTP/1.1" 200 21834
+INFO 2025-08-29 13:02:25,296 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:03:47,750 basehttp 61259 6205009920 "GET /admin/delivery_channels/deliveryattempt/ HTTP/1.1" 200 18918
+INFO 2025-08-29 13:03:47,763 basehttp 61259 6221836288 "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2025-08-29 13:03:47,766 basehttp 61259 6238662656 "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:03:47,772 basehttp 61259 6255489024 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2025-08-29 13:03:47,773 basehttp 61259 6272315392 "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2025-08-29 13:03:47,776 basehttp 61259 6289141760 "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2025-08-29 13:03:47,778 basehttp 61259 6289141760 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:03:47,780 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:03:49,111 basehttp 61259 6205009920 "GET /admin/delivery_channels/notificationchannel/ HTTP/1.1" 200 19377
+INFO 2025-08-29 13:03:49,118 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:03:50,697 basehttp 61259 6205009920 "GET /admin/delivery_channels/channelratelimit/ HTTP/1.1" 200 18990
+INFO 2025-08-29 13:03:50,702 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:03:54,293 basehttp 61259 6205009920 "GET /admin/notification_logs/apilog/ HTTP/1.1" 200 18520
+INFO 2025-08-29 13:03:54,302 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:03:55,189 basehttp 61259 6205009920 "GET /admin/notification_logs/auditlog/ HTTP/1.1" 200 19150
+INFO 2025-08-29 13:03:55,195 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:03:55,877 basehttp 61259 6205009920 "GET /admin/notification_logs/errorlog/ HTTP/1.1" 200 18938
+INFO 2025-08-29 13:03:55,882 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:03:56,602 basehttp 61259 6205009920 "GET /admin/notification_logs/notificationlog/ HTTP/1.1" 200 19171
+INFO 2025-08-29 13:03:56,609 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:03:57,171 basehttp 61259 6205009920 "GET /admin/notification_logs/systemlog/ HTTP/1.1" 200 18840
+INFO 2025-08-29 13:03:57,179 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:20:30,514 basehttp 61259 6205009920 "GET /admin/delivery_channels/channelratelimit/ HTTP/1.1" 200 18990
+INFO 2025-08-29 13:20:30,525 basehttp 61259 6221836288 "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,526 basehttp 61259 6238662656 "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,527 basehttp 61259 6255489024 "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,527 basehttp 61259 6272315392 "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,527 basehttp 61259 6221836288 "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,527 basehttp 61259 6238662656 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,528 basehttp 61259 6255489024 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,529 basehttp 61259 6289141760 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,529 basehttp 61259 6272315392 "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,530 basehttp 61259 6221836288 "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,530 basehttp 61259 6238662656 "GET /static/admin/js/core.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,530 basehttp 61259 6289141760 "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,530 basehttp 61259 6255489024 "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,531 basehttp 61259 6272315392 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,532 basehttp 61259 6289141760 "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,532 basehttp 61259 6205009920 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:20:30,534 basehttp 61259 6289141760 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:30,534 basehttp 61259 6205009920 "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+INFO 2025-08-29 13:20:31,852 basehttp 61259 6289141760 "GET /admin/delivery_channels/deliveryattempt/ HTTP/1.1" 200 18918
+INFO 2025-08-29 13:20:31,859 basehttp 61259 6289141760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:20:32,723 basehttp 61259 6289141760 "GET /admin/delivery_channels/notificationchannel/ HTTP/1.1" 200 19377
+INFO 2025-08-29 13:20:32,730 basehttp 61259 6289141760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:20:34,735 basehttp 61259 6289141760 "GET /admin/notification_logs/apilog/ HTTP/1.1" 200 18520
+INFO 2025-08-29 13:20:34,742 basehttp 61259 6289141760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:20:35,954 basehttp 61259 6289141760 "GET /admin/notification_logs/auditlog/ HTTP/1.1" 200 19150
+INFO 2025-08-29 13:20:35,962 basehttp 61259 6289141760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-08-29 13:20:37,272 basehttp 61259 6289141760 "GET /admin/sms_portal/smsmessage/ HTTP/1.1" 200 28979
+INFO 2025-08-29 13:20:37,280 basehttp 61259 6289141760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+WARNING 2025-08-29 13:43:32,915 log 61259 6205009920 Bad Request: /api/v1/sms/send/otp/
+WARNING 2025-08-29 13:43:32,917 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 400 127
+WARNING 2025-08-29 13:57:27,269 log 61259 6205009920 Bad Request: /api/v1/sms/send/otp/
+WARNING 2025-08-29 13:57:27,269 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 400 167
+WARNING 2025-08-29 14:06:50,187 log 61259 6205009920 Bad Request: /api/v1/sms/send/otp/
+WARNING 2025-08-29 14:06:50,188 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 400 167
+INFO 2025-08-29 14:12:26,393 basehttp 61259 6205009920 "GET /health/ HTTP/1.1" 200 76
+WARNING 2025-08-29 14:12:35,110 log 61259 6205009920 Bad Request: /api/v1/sms/send/otp/
+WARNING 2025-08-29 14:12:35,111 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 400 167
+WARNING 2025-08-29 14:12:35,231 log 61259 6223556608 Bad Request: /api/v1/sms/send/otp/
+WARNING 2025-08-29 14:12:35,232 basehttp 61259 6223556608 "POST /api/v1/sms/send/otp/ HTTP/1.1" 400 167
+WARNING 2025-08-29 14:12:35,382 log 61259 6205009920 Bad Request: /api/v1/sms/send/otp/
+WARNING 2025-08-29 14:12:35,382 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 400 167
+INFO 2025-08-29 14:13:31,763 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 14:14:47,589 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 14:17:41,348 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 14:19:56,612 basehttp 61259 6223556608 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 16:34:41,407 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 16:41:27,360 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 16:51:02,087 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 17:00:10,546 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 17:02:29,896 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 17:41:27,162 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 17:53:32,904 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 18:11:40,470 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 18:21:55,408 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 21:30:16,572 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 21:40:22,880 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 22:07:00,038 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 22:09:40,176 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 22:12:29,207 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 22:18:34,863 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 22:21:58,541 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 22:44:39,563 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 23:02:11,819 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 23:22:06,184 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 23:25:28,807 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 23:29:13,832 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-29 23:49:24,852 basehttp 61259 6205009920 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-30 00:36:11,053 basehttp 61259 6205583360 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-30 13:32:59,845 autoreload 9763 8333493696 Watching for file changes with StatReloader
+INFO 2025-08-30 13:33:27,013 basehttp 9763 6134624256 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-08-30 16:35:24,418 basehttp 9763 6134624256 "HEAD /admin/ HTTP/1.1" 302 0

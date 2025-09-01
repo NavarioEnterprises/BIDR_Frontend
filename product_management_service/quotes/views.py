@@ -22,6 +22,16 @@ from .serializers import (
     QuoteMessageCreateSerializer, QuoteStatusUpdateSerializer,
     QuoteComparisonSerializer
 )
+from .serializers_with_seller import (
+    QuoteListWithSellerSerializer, QuoteDetailWithSellerSerializer,
+    QuoteCreateUpdateWithSellerSerializer, BulkQuoteWithSellerSerializer,
+    enhance_quotes_with_seller_details, get_seller_quotes_summary
+)
+from .serializers_hybrid import QuoteCreateUpdateHybridSerializer
+from core.auth_service import (
+    get_seller_details, get_seller_basic_info, validate_seller_exists,
+    get_multiple_sellers
+)
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, BasePermission
 
 
@@ -64,7 +74,8 @@ class IsSellerOrRequesterOrAdmin(BasePermission):
         if hasattr(obj, 'seller_id'):
             if request.user == obj.seller_id:
                 return True
-        
+
+
         if hasattr(obj, 'request_id') and hasattr(obj.request_id, 'requester'):
             if request.user == obj.request_id.requester:
                 return True
@@ -91,17 +102,18 @@ class QuoteViewSet(viewsets.ModelViewSet):
     search_fields = ['id']
     ordering_fields = ['created_at', 'updated_at', 'valid_until', 'total_amount']
     ordering = ['-created_at']
-    permission_classes = [IsAuthenticated, IsSellerOrRequesterOrAdmin]
+    permission_classes = []  # Remove authentication requirements
     
     def get_serializer_class(self):
         """
         Return appropriate serializer class based on action.
         """
         if self.action == 'list':
-            return QuoteListSerializer
+            return QuoteListWithSellerSerializer
         elif self.action in ['create', 'update', 'partial_update']:
-            return QuoteCreateUpdateSerializer
-        return QuoteDetailSerializer
+            # Use hybrid serializer that supports both User IDs and seller UUIDs
+            return QuoteCreateUpdateHybridSerializer
+        return QuoteDetailWithSellerSerializer
     
     def get_queryset(self):
         """
@@ -112,6 +124,10 @@ class QuoteViewSet(viewsets.ModelViewSet):
         
         # Admin users can see all quotes
         if user.is_staff or user.is_superuser:
+            return queryset
+        
+        # For anonymous users or when permissions are disabled, return all quotes
+        if not user.is_authenticated:
             return queryset
         
         # Sellers can see their own quotes
@@ -127,11 +143,33 @@ class QuoteViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """
         Set seller_id to current user if not provided.
+        Handle seller UUID to User mapping for placeholder users.
         """
-        if not serializer.validated_data.get('seller_id'):
-            serializer.save(seller_id=self.request.user)
+        seller_id = serializer.validated_data.get('seller_id')
+        
+        if not seller_id:
+            # Only set to current user if user is authenticated
+            if self.request.user and self.request.user.is_authenticated:
+                serializer.save(seller_id=self.request.user)
+            else:
+                # For anonymous requests, seller_id must be provided
+                serializer.save()
         else:
-            serializer.save()
+            # If seller_id is a UUID string, ensure we have a placeholder user
+            if isinstance(seller_id, str) and len(seller_id) > 10:  # Likely a UUID
+                from django.contrib.auth.models import User
+                try:
+                    placeholder_user = User.objects.get(username=f"seller_{seller_id}")
+                    serializer.save(seller_id=placeholder_user)
+                except User.DoesNotExist:
+                    # Create placeholder user if it doesn't exist
+                    placeholder_user = User.objects.create_user(
+                        username=f"seller_{seller_id}",
+                        email=f"seller_{seller_id}@placeholder.com"
+                    )
+                    serializer.save(seller_id=placeholder_user)
+            else:
+                serializer.save()
     
     @action(detail=True, methods=['post'])
     def mark_as_viewed(self, request, pk=None):
@@ -274,6 +312,71 @@ class QuoteViewSet(viewsets.ModelViewSet):
                 )
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['get'])
+    def by_seller(self, request):
+        """
+        Get quotes by seller using auth_user_uid from authentication service.
+        """
+        seller_id = request.query_params.get('seller_id')
+        auth_user_uid = request.query_params.get('auth_user_uid')
+        
+        if not seller_id and not auth_user_uid:
+            return Response(
+                {'error': 'Either seller_id or auth_user_uid parameter is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # If auth_user_uid is provided, find the corresponding User object
+        if auth_user_uid:
+            from django.contrib.auth.models import User
+            try:
+                # First try to find if we have a placeholder user for this UUID
+                placeholder_user = User.objects.get(username=f"seller_{auth_user_uid}")
+                seller_id = placeholder_user.id
+            except User.DoesNotExist:
+                # If no placeholder user exists, no quotes can exist
+                return Response({
+                    'count': 0,
+                    'next': None,
+                    'previous': None,
+                    'results': []
+                })
+        
+        # If we have a seller_id string (UUID), try to find the corresponding User
+        if seller_id and isinstance(seller_id, str) and len(seller_id) > 10:  # Likely a UUID
+            from django.contrib.auth.models import User
+            try:
+                placeholder_user = User.objects.get(username=f"seller_{seller_id}")
+                seller_id = placeholder_user.id
+            except User.DoesNotExist:
+                # If no placeholder user exists, no quotes can exist
+                return Response({
+                    'count': 0,
+                    'next': None,
+                    'previous': None,
+                    'results': []
+                })
+        
+        # Convert seller_id to integer if it's a string number
+        try:
+            seller_id = int(seller_id)
+        except (ValueError, TypeError):
+            return Response(
+                {'error': 'Invalid seller_id format'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Filter quotes by seller
+        queryset = self.get_queryset().filter(seller_id=seller_id)
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class QuoteItemViewSet(viewsets.ModelViewSet):
@@ -282,7 +385,7 @@ class QuoteItemViewSet(viewsets.ModelViewSet):
     """
     queryset = QuoteItem.objects.all()
     serializer_class = QuoteItemSerializer
-    permission_classes = [IsAuthenticated, IsSellerOrRequesterOrAdmin]
+    permission_classes = []  # Remove authentication requirements
     
     def get_queryset(self):
         """
@@ -320,7 +423,7 @@ class QuoteAttachmentViewSet(viewsets.ModelViewSet):
     """
     queryset = QuoteAttachment.objects.all()
     serializer_class = QuoteAttachmentSerializer
-    permission_classes = [IsAuthenticated, IsSellerOrRequesterOrAdmin]
+    permission_classes = []  # Remove authentication requirements
     
     def get_queryset(self):
         """
@@ -365,7 +468,7 @@ class QuoteMessageViewSet(viewsets.ModelViewSet):
     API endpoint for quote messages.
     """
     queryset = QuoteMessage.objects.all()
-    permission_classes = [IsAuthenticated, IsSellerOrRequesterOrAdmin]
+    permission_classes = []  # Remove authentication requirements
     
     def get_serializer_class(self):
         """
@@ -423,7 +526,7 @@ class QuoteComparisonViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = QuoteComparison.objects.all()
     serializer_class = QuoteComparisonSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = []  # Remove authentication requirements
     
     def get_queryset(self):
         """
@@ -456,3 +559,68 @@ class QuoteComparisonViewSet(viewsets.ReadOnlyModelViewSet):
         comparison.refresh_comparison()
         serializer = self.get_serializer(comparison)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def seller_summary(self, request):
+        """
+        Get quote summary for a seller.
+        """
+        seller_id = request.query_params.get('seller_id')
+        auth_user_uid = request.query_params.get('auth_user_uid')
+        
+        if not seller_id and not auth_user_uid:
+            return Response(
+                {'error': 'Either seller_id or auth_user_uid parameter is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # If auth_user_uid is provided, get seller details first
+        if auth_user_uid and not seller_id:
+            from core.auth_service import auth_client
+            seller_data = auth_client.get_seller_by_auth_user_uid(auth_user_uid)
+            if seller_data:
+                seller_id = (
+                    seller_data.get('id') or 
+                    seller_data.get('seller_id') or 
+                    seller_data.get('seller', {}).get('id')
+                )
+        
+        if not seller_id:
+            return Response(
+                {'error': 'Seller not found in authentication service'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        summary = get_seller_quotes_summary(seller_id)
+        return Response(summary)
+    
+    @action(detail=False, methods=['post'])
+    def validate_seller(self, request):
+        """
+        Validate that a seller exists in the authentication service.
+        """
+        seller_id = request.data.get('seller_id')
+        auth_user_uid = request.data.get('auth_user_uid')
+        
+        if not seller_id and not auth_user_uid:
+            return Response(
+                {'error': 'Either seller_id or auth_user_uid is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        result = {'valid': False, 'seller_info': None}
+        
+        if seller_id:
+            seller_info = get_seller_basic_info(seller_id)
+            if seller_info and seller_info.get('seller_id'):
+                result['valid'] = True
+                result['seller_info'] = seller_info
+        
+        if auth_user_uid and not result['valid']:
+            from core.auth_service import auth_client
+            seller_data = auth_client.get_seller_by_auth_user_uid(auth_user_uid)
+            if seller_data:
+                result['valid'] = True
+                result['seller_info'] = seller_data
+        
+        return Response(result)

@@ -5,40 +5,69 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="Initial Commit">
-      <change afterPath="$PROJECT_DIR$/product_management_service/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/BIDR_Backend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BIDR_Backend.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/authentication_service/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/authentication_service/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/authentication_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/authentication_service/logs/authentication_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/logs/authentication_service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/chat_conversations/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/chat_conversations/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/otp/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/otp/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/security/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/seller/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/seller/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/seller/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/user/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/user/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/user/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-and-deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build-and-deploy.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/chat_conversations/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/chat_messaging/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/chat_messaging/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/chat_service/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/chat_service/chat_service/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/chat_service/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/chat_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/chat_service/logs/chat_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/logs/chat_service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/kustomization.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/base/kustomization.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/kustomization.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/uat/kustomization.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifications_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifications_service/logs/notification_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/logs/notification_service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifications_service/notifications/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/notifications/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifications_service/notifications/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/notifications/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifications_service/system_notifications/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/system_notifications/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifications_service/system_notifications/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/system_notifications/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/payment_service/payment_db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/payment_service/payment_db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/analytics/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/analytics/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/categories/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/categories/admin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/logs/product_management_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/logs/product_management_service.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/product_management_service/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_management_service/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/admin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/quotes/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/quotes/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reviews_and_ratings/ratings/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/reviews_and_ratings/ratings/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reviews_and_ratings/ratings/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/reviews_and_ratings/ratings/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reviews_and_ratings/reviews/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/reviews_and_ratings/reviews/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reviews_and_ratings/reviews/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/reviews_and_ratings/reviews/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reviews_and_ratings/reviews/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/reviews_and_ratings/reviews/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/quotes/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/quotes/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/quotes/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/quotes/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resolution_service/logs/resolution_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/resolution_service/logs/resolution_service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resolution_service/resolution_service.db" beforeDir="false" afterPath="$PROJECT_DIR$/resolution_service/resolution_service.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reviews_and_ratings/content/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/reviews_and_ratings/content/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reviews_and_ratings/ratings/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/reviews_and_ratings/ratings/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reviews_and_ratings/reviews_and_ratings/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/reviews_and_ratings/reviews_and_ratings/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/reviews_and_ratings/reviews_and_ratings/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/reviews_and_ratings/reviews_and_ratings/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terraform/main.tf" beforeDir="false" afterPath="$PROJECT_DIR$/terraform/main.tf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terraform/outputs.tf" beforeDir="false" afterPath="$PROJECT_DIR$/terraform/outputs.tf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terraform/terraform.tfstate" beforeDir="false" afterPath="$PROJECT_DIR$/terraform/terraform.tfstate" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terraform/terraform.tfstate.backup" beforeDir="false" afterPath="$PROJECT_DIR$/terraform/terraform.tfstate.backup" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terraform/uat.tfvars" beforeDir="false" afterPath="$PROJECT_DIR$/terraform/uat.tfvars" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/transactions_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/transactions_service/db.sqlite3" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -54,6 +83,9 @@
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="AISelfReview" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -64,6 +96,9 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Python.settings.executor&quot;: &quot;Run&quot;,
+    &quot;Python.urls.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
@@ -117,7 +152,10 @@
       <workItem from="1756050915101" duration="1234000" />
       <workItem from="1756057185810" duration="3347000" />
       <workItem from="1756080025435" duration="17096000" />
-      <workItem from="1756205347621" duration="37957000" />
+      <workItem from="1756205347621" duration="46718000" />
+      <workItem from="1756367739702" duration="26674000" />
+      <workItem from="1756447019001" duration="37204000" />
+      <workItem from="1756564553201" duration="27462000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <option name="closed" value="true" />
@@ -175,7 +213,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755819918543</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1756298660519</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1756298660520</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -184,5 +230,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial Commit" />
     <option name="LAST_COMMIT_MESSAGE" value="Initial Commit" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/BIDR_Backend$urls.coverage" NAME="urls Coverage Results" MODIFIED="1756578822990" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/reviews_and_ratings/rewards" />
   </component>
 </project>

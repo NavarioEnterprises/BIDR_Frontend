@@ -149,49 +149,41 @@ class ConversationViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['post'])
     def create_for_request(self, request):
-        """Create or get a conversation for a specific request."""
+        """Create a conversation for a specific request_id."""
         request_id = request.data.get('request_id')
+
         if not request_id:
             return Response(
                 {'error': 'request_id is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Check if conversation already exists
-        if request.user.is_authenticated:
-            # For authenticated users, check their participation
-            existing_conversation = Conversation.objects.filter(
-                request_id=request_id,
-                participants=request.user
-            ).first()
-        else:
-            # For unauthenticated users, check any conversation with this request_id
-            existing_conversation = Conversation.objects.filter(
-                request_id=request_id
-            ).first()
-        
+        # Check if conversation already exists for this request
+        existing_conversation = Conversation.objects.filter(request_id=request_id).first()
         if existing_conversation:
             serializer = self.get_serializer(existing_conversation)
             return Response(serializer.data)
         
         # Create new conversation
         conversation_data = {
-            'title': f'Request {request_id} Discussion',
             'request_id': request_id,
-            'conversation_type': 'product_inquiry',
+            'title': request.data.get('title', f'Conversation for Request #{request_id}'),
+            'conversation_type': request.data.get('conversation_type', 'product_inquiry'),
         }
         
         serializer = ConversationCreateSerializer(data=conversation_data)
         if serializer.is_valid():
+            # Create conversation
             if request.user.is_authenticated:
                 conversation = serializer.save(buyer=request.user)
                 # Add buyer as participant
                 conversation.add_participant(request.user, role='owner')
             else:
-                # For unauthenticated users, create without buyer
+                # For unauthenticated users, create conversation without buyer
                 conversation = serializer.save()
             
-            response_serializer = ConversationSerializer(conversation)
+            response_serializer = self.get_serializer(conversation)
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    

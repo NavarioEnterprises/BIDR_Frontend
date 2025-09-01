@@ -64,14 +64,63 @@ class AddressInline(admin.TabularInline):
         return super().get_queryset(request).filter(is_deleted=False)
 
 
+class SellerInline(admin.StackedInline):
+    """Inline for editing seller profile within user admin"""
+    from seller.models import Seller
+    model = Seller
+    fk_name = 'user'
+    extra = 0
+    fields = [
+        'registered_company_name', 'trading_name', 'registration_number', 
+        'vat_number', 'website_url', 'product_category', 'product_subcategory'
+    ]
+    readonly_fields = ['created_at', 'updated_at']
+    verbose_name = "Seller Profile"
+    verbose_name_plural = "Seller Profile"
+    
+    def get_queryset(self, request):
+        """Only show non-deleted seller profiles"""
+        return super().get_queryset(request).filter(is_deleted=False)
+    
+    def has_add_permission(self, request, obj=None):
+        """Only allow adding seller profile if user role is seller"""
+        if obj and obj.role == 'seller':
+            return True
+        return False
+
+
+class SellerBankAccountInline(admin.TabularInline):
+    """Inline for editing seller bank accounts within user admin"""
+    from seller.models import SellerBankAccount
+    model = SellerBankAccount
+    fk_name = 'user'
+    extra = 0
+    fields = [
+        'bank_name', 'bank_account_type', 'bank_account_number', 'bank_branch_code'
+    ]
+    readonly_fields = ['created_at', 'updated_at']
+    verbose_name = "Bank Account"
+    verbose_name_plural = "Bank Accounts"
+    
+    def get_queryset(self, request):
+        """Only show non-deleted bank accounts"""
+        return super().get_queryset(request).filter(is_deleted=False)
+    
+    def has_add_permission(self, request, obj=None):
+        """Only allow adding bank accounts for sellers"""
+        if obj and obj.role == 'seller':
+            return True
+        return False
+
+
 @admin.register(AppUser)
 class AppUserAdmin(BaseUserAdmin):
     """
     Custom admin for AppUser with role-based permissions
     """
     list_display = [
-        'email', 'first_name', 'last_name', 'role_display', 'verification_status',
-        'account_status', 'last_login_display', 'created_at_display'
+        'email', 'first_name', 'last_name', 'role_display', 'company_info', 
+        'verification_status', 'account_status', 'last_login_display', 'created_at_display'
     ]
     list_filter = [
         RoleFilter, VerificationStatusFilter, 'is_active', 'is_suspended',
@@ -82,45 +131,45 @@ class AppUserAdmin(BaseUserAdmin):
     readonly_fields = [
         'uid', 'created_at', 'updated_at', 'last_login', 'date_joined'
     ]
-    inlines = [AddressInline]
+    inlines = [AddressInline, SellerInline, SellerBankAccountInline]
 
     fieldsets = (
         ('User Information', {
-            'fields': ('uid', 'email', 'fullname', 'phone_number', 'alternative_phone')
+            'fields': ('uid', 'email', 'first_name', 'last_name', 'phone_number', 'alternative_phone', 'alternative_email')
         }),
         ('Personal Information', {
-            'fields': ('middle_name', 'date_of_birth', 'gender', 'profile_picture'),
+            'fields': ('middle_name', 'date_of_birth', 'gender', 'nationality', 'occupation', 'company_name', 'profile_picture'),
             'classes': ('collapse',)
         }),
         ('Authentication', {
             'fields': ('password', 'last_login')
         }),
         ('Verification Status', {
-            'fields': ('email_verified', 'phone_verified', 'is_verified', 'kyc_verified', 'identity_verified')
+            'fields': ('email_verified', 'phone_verified', 'is_verified')
         }),
         ('Role & Permissions', {
             'fields': ('role', 'is_active', 'is_staff', 'is_superuser', 'is_suspended')
         }),
         ('Profile & Preferences', {
             'fields': (
-                'bio', 'website', 'occupation', 'company', 'emergency_contact_name', 'emergency_contact_phone',
-                'preferred_language', 'timezone', 'currency', 'notification_preferences',
-                'marketing_preferences', 'data_sharing_consent'
+                'bio', 'website', 'linkedin_profile', 'preferred_language', 'user_timezone', 'currency_preference'
             ),
             'classes': ('collapse',)
         }),
         ('Privacy & Security', {
             'fields': (
-                'profile_visibility', 'two_factor_enabled', 'login_alerts_enabled',
-                'data_export_requested', 'account_deletion_requested'
+                'profile_visibility', 'show_email', 'show_phone'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Notification Settings', {
+            'fields': (
+                'email_notifications', 'sms_notifications', 'push_notifications', 'marketing_emails'
             ),
             'classes': ('collapse',)
         }),
         ('Account Status', {
-            'fields': (
-                'email_bounce_count', 'failed_login_attempts', 'account_locked_until',
-                'password_changed_at', 'terms_accepted_at', 'privacy_policy_accepted_at'
-            ),
+            'fields': ('profile_status',),
             'classes': ('collapse',)
         }),
         ('OTP Settings', {
@@ -132,7 +181,7 @@ class AppUserAdmin(BaseUserAdmin):
             'classes': ('collapse',)
         }),
         ('Important Dates', {
-            'fields': ('created_at', 'updated_at'),
+            'fields': ('date_joined', 'created_at', 'updated_at'),
             'classes': ('collapse',)
         })
     )
@@ -140,7 +189,7 @@ class AppUserAdmin(BaseUserAdmin):
     add_fieldsets = (
         ('User Information', {
             'classes': ('wide',),
-            'fields': ('email', 'fullname', 'phone_number', 'role', 'password1', 'password2')
+            'fields': ('email', 'first_name', 'last_name', 'phone_number', 'role', 'password1', 'password2')
         }),
     )
 
@@ -216,6 +265,25 @@ class AppUserAdmin(BaseUserAdmin):
 
     created_at_display.short_description = 'Created'
     created_at_display.admin_order_field = 'created_at'
+
+    def company_info(self, obj):
+        """Display company information for sellers"""
+        if obj.role == 'seller' and hasattr(obj, 'sellers_profile'):
+            seller = obj.sellers_profile
+            if seller.registered_company_name:
+                return format_html(
+                    '<span style="font-weight: bold;">{}</span>',
+                    seller.registered_company_name
+                )
+            elif seller.trading_name:
+                return format_html(
+                    '<span style="font-style: italic;">{}</span>',
+                    seller.trading_name
+                )
+        return '-'
+    
+    company_info.short_description = 'Company'
+    company_info.admin_order_field = 'sellers_profile__registered_company_name'
 
     def get_queryset(self, request):
         """Optimize queryset and add annotations"""

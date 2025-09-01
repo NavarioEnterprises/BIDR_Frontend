@@ -11,8 +11,9 @@ router.register(r'queue', views.NotificationQueueViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('send/', views.send_notification, name='send-notification'),
-    path('bulk-send/', views.bulk_send_notifications, name='bulk-send-notifications'),
+    path('send/', views.SendNotificationView.as_view(), name='send-notification'),
+    path('send/otp/', views.SendOTPNotificationView.as_view(), name='send-otp-notification'),
+    path('bulk-send/', views.BulkSendNotificationsView.as_view(), name='bulk-send-notifications'),
     path('mark-read/<uuid:notification_id>/', views.mark_as_read, name='mark-as-read'),
     path('user/<uuid:user_id>/', views.get_user_notifications, name='user-notifications'),
     path('user/<uuid:user_id>/unread/', views.get_unread_notifications, name='user-unread-notifications'),

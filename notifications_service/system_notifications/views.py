@@ -1,11 +1,14 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from django.http import JsonResponse
+from django.utils import timezone
 from .models import (
     NotificationTemplate, Notification, NotificationPreference, 
     NotificationBatch, NotificationQueue
 )
+from .services import NotificationDeliveryService
 
 
 class NotificationTemplateViewSet(viewsets.ModelViewSet):
@@ -48,22 +51,181 @@ class NotificationQueueViewSet(viewsets.ModelViewSet):
         return Response({"message": "NotificationQueue list endpoint"})
 
 
-@api_view(['POST'])
-def send_notification(request):
-    """Send a single notification"""
-    return Response({
-        "message": "Send notification endpoint",
-        "status": "success"
-    })
+class SendNotificationView(APIView):
+    """Send a single notification with email and SMS support"""
+    
+    def post(self, request):
+        """Send notification through multiple channels"""
+        try:
+            # Extract data from request
+            data = request.data
+            
+            # Required fields
+            recipient_id = data.get('recipient_id')
+            notification_type = data.get('type', 'notification')
+            subject = data.get('subject')
+            message = data.get('message')
+            
+            if not all([recipient_id, subject, message]):
+                return Response({
+                    'success': False,
+                    'error': 'recipient_id, subject, and message are required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Optional fields
+            context = data.get('context', {})
+            priority = data.get('priority', 'normal')
+            channels = data.get('channels')  # ['email', 'sms', 'in_app']
+            recipient_email = data.get('recipient_email')
+            recipient_phone = data.get('recipient_phone')
+            
+            # Initialize service
+            delivery_service = NotificationDeliveryService()
+            
+            # Send notification
+            success, notification = delivery_service.send_notification(
+                recipient_id=recipient_id,
+                notification_type=notification_type,
+                subject=subject,
+                message=message,
+                context=context,
+                priority=priority,
+                channels=channels,
+                recipient_email=recipient_email,
+                recipient_phone=recipient_phone
+            )
+            
+            if success:
+                return Response({
+                    'success': True,
+                    'message': 'Notification sent successfully',
+                    'notification_id': str(notification.id),
+                    'channels': {
+                        'email': notification.email_sent,
+                        'sms': notification.sms_sent,
+                        'in_app': notification.in_app_sent
+                    }
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'success': False,
+                    'message': 'Failed to send notification',
+                    'notification_id': str(notification.id)
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': f'Internal error: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view(['POST'])
-def bulk_send_notifications(request):
+class SendOTPNotificationView(APIView):
+    """Send OTP through multiple channels"""
+    
+    def post(self, request):
+        """Send OTP via email and/or SMS"""
+        try:
+            data = request.data
+            
+            # Required fields
+            recipient_id = data.get('recipient_id')
+            otp_code = data.get('otp_code')
+            
+            if not all([recipient_id, otp_code]):
+                return Response({
+                    'success': False,
+                    'error': 'recipient_id and otp_code are required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Optional fields
+            recipient_email = data.get('recipient_email')
+            recipient_phone = data.get('recipient_phone')
+            channels = data.get('channels')  # ['email', 'sms']
+            
+            if not recipient_email and not recipient_phone:
+                return Response({
+                    'success': False,
+                    'error': 'At least one of recipient_email or recipient_phone is required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Initialize service
+            delivery_service = NotificationDeliveryService()
+            
+            # Send OTP
+            result = delivery_service.send_otp_notification(
+                recipient_id=recipient_id,
+                otp_code=otp_code,
+                recipient_email=recipient_email,
+                recipient_phone=recipient_phone,
+                channels=channels
+            )
+            
+            if result['overall_success']:
+                return Response({
+                    'success': True,
+                    'message': 'OTP sent successfully',
+                    'notification_id': result['notification_id'],
+                    'channels': result['channels']
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'success': False,
+                    'message': 'Failed to send OTP',
+                    'notification_id': result['notification_id'],
+                    'channels': result['channels']
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': f'Internal error: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class BulkSendNotificationsView(APIView):
     """Send bulk notifications"""
-    return Response({
-        "message": "Bulk send notifications endpoint",
-        "status": "success"
-    })
+    
+    def post(self, request):
+        """Send notifications in bulk"""
+        try:
+            data = request.data
+            
+            # Required fields
+            notifications = data.get('notifications', [])
+            batch_name = data.get('batch_name', f'Bulk notification {timezone.now()}')
+            
+            if not notifications:
+                return Response({
+                    'success': False,
+                    'error': 'notifications list is required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Initialize service
+            delivery_service = NotificationDeliveryService()
+            
+            # Send bulk notifications
+            result = delivery_service.send_bulk_notifications(
+                notifications=notifications,
+                batch_name=batch_name,
+                template_id=data.get('template_id')
+            )
+            
+            return Response({
+                'success': True,
+                'message': f"Bulk notification completed. {result['success_count']} sent, {result['failed_count']} failed.",
+                'batch_id': result['batch_id'],
+                'total': result['total'],
+                'success_count': result['success_count'],
+                'failed_count': result['failed_count'],
+                'results': result.get('results', [])
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': f'Internal error: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])

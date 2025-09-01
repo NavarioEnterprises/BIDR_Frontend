@@ -153,13 +153,26 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
             return self.last_name  # Return as-is if not encrypted
     
     def get_decrypted_phone_number(self):
-        """Get decrypted phone number"""
+        """Get decrypted phone number with improved error handling"""
         if not self.phone_number or not self.phone_number.strip():
             return ""
+        
         try:
             return security_utils.encryption.decrypt_pii(self.phone_number)
-        except (ValueError, Exception):
-            return self.phone_number  # Return as-is if not encrypted
+        except Exception as e:
+            # Check if it's a corrupted encrypted value (base64 encoded but not decryptable)
+            import base64
+            try:
+                base64.urlsafe_b64decode(self.phone_number.encode())
+                # It's base64 encoded but corrupted - log warning and return masked value
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Corrupted encrypted phone number detected for user {self.id}: {str(e)}")
+                # Return a masked placeholder for corrupted encrypted data
+                return "[ENCRYPTED - CORRUPTED]"
+            except:
+                # It's likely plain text, return as-is
+                return self.phone_number
     
     def get_decrypted_middle_name(self):
         """Get decrypted middle name"""

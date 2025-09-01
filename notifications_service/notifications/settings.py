@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'notification_logs',
     'notification_analytics',
     'health_monitor',
+    'sms_portal',
 ]
 
 MIDDLEWARE = [
@@ -232,3 +233,9 @@ os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 
 # Allow all hosts for Kubernetes deployment
 ALLOWED_HOSTS.append('*')
+
+# SMS Portal Configuration
+SMS_PORTAL_USERNAME = 'cb3fe3f5-99c9-4ca2-89de-4af71abdc41b'
+SMS_PORTAL_PASSWORD = 'b5849253-76d8-4875-90de-c89cc9253b55'
+SMS_PORTAL_ENDPOINT = 'https://api.smsportal.com/api5/http5.aspx'
+SMS_PORTAL_FROM_NAME = 'BIDR'
