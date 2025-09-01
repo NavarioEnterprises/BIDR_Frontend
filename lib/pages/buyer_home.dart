@@ -617,8 +617,8 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                         ),
                         SizedBox(width: 12),
                         Container(
-                          height: 20,
-                          width: 20,
+                          height: 23,
+                          width: 23,
                           child: Center(
                             child: AnimatedContainer(
                               duration: Duration(milliseconds: 200),
@@ -686,7 +686,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                 ),
                                 icon: Center(
                                   child: Icon(
-                                    size: 12,
+                                    size: 10,
                                     Icons.arrow_forward,
                                     color: Colors.white,
                                   ),

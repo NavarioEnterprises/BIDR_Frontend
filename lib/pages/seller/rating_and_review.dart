@@ -5,38 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../models/review_item.dart';
 
-class ReviewItem {
-  final String uuid;
-  final String customerName;
-  final String description;
-  final int rating;
-  final String comment;
-  final String createdAt;
-  final String type;
-
-  ReviewItem({
-    required this.uuid,
-    required this.customerName,
-    required this.description,
-    required this.rating,
-    required this.comment,
-    required this.createdAt,
-    required this.type,
-  });
-
-  factory ReviewItem.fromJson(Map<String, dynamic> json) {
-    return ReviewItem(
-      uuid: json['uuid'] ?? '',
-      customerName: json['customerName'] ?? 'Anonymous',
-      description: json['description'] ?? '',
-      rating: json['rating'] ?? 0,
-      comment: json['comment'] ?? '',
-      createdAt: json['created_at'] ?? '',
-      type: json['type'] ?? 'review',
-    );
-  }
-}
 
 class RatingReviewWidget extends StatefulWidget {
   final String sellerId;
@@ -84,31 +55,41 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
         error = null;
       });
 
-      final String baseUrl = GlobalVariables.reviewsServiceUrl;
-      final response = await http
-          .get(
-            Uri.parse('${baseUrl}api/ratings/seller/${widget.sellerId}/'),
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-          )
-          .timeout(const Duration(seconds: 10));
+      // Load reviews from local storage
+      final prefs = await SharedPreferences.getInstance();
+      final reviewsJsonString = prefs.getString('reviews_list');
+      final totalReviews = prefs.getInt('total_reviews') ?? 0;
+      
+      if (reviewsJsonString != null) {
+        final reviewsJsonList = json.decode(reviewsJsonString) as List;
+        final localReviews = reviewsJsonList
+            .map((json) => ReviewItem.fromJson(json as Map<String, dynamic>))
+            .toList();
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final List<dynamic> reviewsJson = data['reviews'] ?? [];
+        // Calculate summary from local reviews
+        double averageRating = 0.0;
+        if (localReviews.isNotEmpty) {
+          double sum = localReviews.fold(0.0, (sum, review) => sum + review.rating);
+          averageRating = sum / localReviews.length;
+        }
 
         setState(() {
-          reviews = reviewsJson
-              .map((json) => ReviewItem.fromJson(json))
-              .toList();
-          summary = data['summary'];
+          reviews = localReviews;
+          summary = {
+            'total_reviews': localReviews.length,
+            'total_ratings': localReviews.length,
+            'average_rating': averageRating.toStringAsFixed(1),
+          };
           isLoading = false;
         });
       } else {
         setState(() {
-          error = 'Failed to load reviews: ${response.statusCode}';
+          reviews = [];
+          summary = {
+            'total_reviews': 0,
+            'total_ratings': 0,
+            'average_rating': '0.0',
+          };
           isLoading = false;
         });
       }
@@ -393,25 +374,43 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
             children: [
               Container(height: 10, width: 1.8, color: Constants.ctaColorLight),
               SizedBox(width: 4),
-              Text(
-                'UUID: ${review.uuid}',
-                style: GoogleFonts.manrope(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Constants.ftaColorLight,
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'UUID: ${review.uuid}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Constants.ftaColorLight,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
           // Customer name and description
-          Text(
-            review.customerName,
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  review.customerName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.manrope(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 4),
           Text(

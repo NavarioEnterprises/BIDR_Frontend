@@ -271,6 +271,7 @@ class _BusinessLandingPageState extends State<BusinessLandingPage>
                             constraints: BoxConstraints(maxWidth: 1400),
                             decoration: BoxDecoration(
                               color: Colors.white,
+                              border: Border(top: BorderSide(color: Constants.ctaColorLight, width: 6)),
                               borderRadius: BorderRadius.circular(15),
                               boxShadow: [
                                 BoxShadow(

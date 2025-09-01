@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/Constants.dart';
+import '../customWdget/custom_input2.dart';
 import '../models/faq.dart';
 import '../services/faq_api_service.dart';
 
@@ -19,6 +20,7 @@ class _FAQScreenState extends State<FAQScreen> {
   bool _isLoading = true;
   bool _isLoadingCategories = true;
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
   String _searchQuery = '';
 
   @override
@@ -206,45 +208,32 @@ class _FAQScreenState extends State<FAQScreen> {
               top: 16,
               bottom: 8,
             ),
-            child: Container(
-              constraints: BoxConstraints(maxWidth: 1600),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search FAQs...',
-                  hintStyle: GoogleFonts.manrope(color: Colors.grey[500]),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: Icon(Icons.clear, color: Colors.grey[600]),
-                          onPressed: () {
-                            _searchController.clear();
-                            _performSearch('');
-                          },
-                        )
-                      : null,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Constants.ctaColorLight),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[50],
-                ),
-                style: GoogleFonts.manrope(),
-                onSubmitted: _performSearch,
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                  });
-                  if (value.isEmpty) {
-                    _performSearch('');
-                  }
+            child:CustomInputTransparent4(
+              hintText: 'Search FAQs...',
+              labelText: "Search",
+              controller: _searchController,
+              focusNode: _searchFocusNode,
+              prefix: Icon(Icons.search, color: Colors.grey[600]),
+              suffix: _searchQuery.isNotEmpty
+                  ? IconButton(
+                icon: Icon(Icons.clear, color: Colors.grey[600]),
+                onPressed: () {
+                  _searchController.clear();
+                  _performSearch('');
                 },
-              ),
+              )
+                  : null,
+              textInputAction:TextInputAction.next,
+              isPasswordField: false,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+                if (value.isEmpty) {
+                  _performSearch('');
+                }
+              },
+              onSubmitted:(value){},
             ),
           ),
           // Category Filter

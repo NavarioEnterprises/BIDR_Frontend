@@ -12,10 +12,13 @@ import 'package:gradient_glow_border/gradient_glow_border.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../customWdget/custom_input2.dart';
 import '../../models/order.dart';
+import '../../models/product_request_api.dart';
 import '../../models/request_models.dart';
+import '../../models/review_item.dart';
 import '../../services/chat_service.dart';
 import '../buyer_dashboard.dart';
 import '../group_chat.dart';
@@ -62,6 +65,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
         );
 
     _animationController.forward();
+    _loadReviewsConditionally();
 
     // Load orders when Order tab is initialized
     if (_selectedTopTab == 1) {
@@ -136,6 +140,26 @@ class _TransactionDashboardState extends State<TransactionDashboard>
           }
         }
 
+        // Extract reviews from orders if they contain review data
+        List<ReviewItem> apiReviews = [];
+        for (var order in allOrders) {
+          // Check if order has review data (assuming orders might have review information)
+          if (order.comments.isNotEmpty) {
+            for (var comment in order.comments) {
+              // Convert order comments to reviews if they have rating-like structure
+              apiReviews.add(ReviewItem(
+                uuid: Constants.myUid.isNotEmpty ? Constants.myUid : DateTime.now().millisecondsSinceEpoch.toString(),
+                customerName: Constants.myDisplayname,
+                description: comment.description,
+                rating: order.rating.toInt(), // Use order rating
+                comment: comment.description,
+                createdAt:_formatDate(order.dateTime),
+                type: 'review',
+              ));
+            }
+          }
+        }
+
         // Categorize orders by status
         setState(() {
           onGoingOrders = allOrders
@@ -162,6 +186,12 @@ class _TransactionDashboardState extends State<TransactionDashboard>
           cancelledOrders = allOrders
               .where((order) => order.status.toLowerCase().contains('cancel'))
               .toList();
+
+          // Update reviews from API data if available
+          if (apiReviews.isNotEmpty) {
+            reviews = apiReviews;
+            totalReviews = reviews.length;
+          }
 
           _isLoadingOrders = false;
         });
@@ -201,6 +231,60 @@ class _TransactionDashboardState extends State<TransactionDashboard>
   TextEditingController _commentController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   double _currentRating = 0.0;
+  List<ReviewItem> reviews = [];
+  int totalReviews = 0;
+
+  // Save reviews to local storage
+  Future<void> _saveReviewsLocally() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final reviewsJson = reviews.map((review) => review.toJson()).toList();
+      await prefs.setString('reviews_list', json.encode(reviewsJson));
+      await prefs.setInt('total_reviews', totalReviews);
+    } catch (e) {
+      print('Error saving reviews locally: $e');
+    }
+  }
+
+  // Load reviews from local storage
+  Future<void> _loadReviewsLocally() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final reviewsJsonString = prefs.getString('reviews_list');
+      totalReviews = prefs.getInt('total_reviews') ?? 0;
+      
+      if (reviewsJsonString != null) {
+        final reviewsJsonList = json.decode(reviewsJsonString) as List;
+        reviews = reviewsJsonList
+            .map((json) => ReviewItem.fromJson(json as Map<String, dynamic>))
+            .toList();
+      }
+    } catch (e) {
+      print('Error loading reviews locally: $e');
+    }
+  }
+
+  // Add a new review to the list
+  Future<void> _addReviewLocally(ReviewItem review) async {
+    reviews.add(review);
+    totalReviews = reviews.length;
+    await _saveReviewsLocally();
+  }
+
+  // Calculate average rating from all reviews
+  double _getAverageRating() {
+    if (reviews.isEmpty) return 0.0;
+    double sum = reviews.fold(0.0, (sum, review) => sum + review.rating);
+    return sum / reviews.length;
+  }
+
+  // Load reviews conditionally - only from local storage if reviews list is empty
+  Future<void> _loadReviewsConditionally() async {
+    if (reviews.isEmpty) {
+      await _loadReviewsLocally();
+    }
+    // If reviews is not empty, keep existing reviews (could be from API or other sources)
+  }
 
   // Order Details Dialog
   void _showOrderDetailsDialog(Order order) {
@@ -364,7 +448,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
 
                         SizedBox(height: 20),
 
-                        // Comments Section
+                        // Comments Section - show order comments or local reviews
                         if (order.comments.isNotEmpty) ...[
                           _buildDetailSection(
                             "Comments",
@@ -372,6 +456,16 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                 .map(
                                   (comment) =>
                                       _buildCommentItem(comment.description),
+                                )
+                                .toList(),
+                          ),
+                        ] else if (reviews.isNotEmpty) ...[
+                          _buildDetailSection(
+                            "Reviews",
+                            reviews
+                                .map(
+                                  (review) =>
+                                      _buildCommentItem("${review.comment} (Rating: ${review.rating}/5)"),
                                 )
                                 .toList(),
                           ),
@@ -717,10 +811,11 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                     ),
                                   ),
                                 IconButton(
-                                    style: OutlinedButton.styleFrom(foregroundColor: Colors.black87,side: BorderSide(color: Colors.black87)),
+                                  padding: EdgeInsets.zero,
+                                    style: OutlinedButton.styleFrom(foregroundColor: Colors.black87,side: BorderSide(color: Colors.black87,width: 1.4)),
                                     icon: Icon(
                                       Icons.close,
-                                      color: Colors.grey[600],
+                                      color:Colors.black87,
                                     ),
                                     onPressed: () =>
                                         Navigator.of(context).pop(),
@@ -771,36 +866,45 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                   maxLines: 5,
                                   maxLength: 500,
                                   decoration: InputDecoration(
-                                    hintText:
-                                        'Description',
+                                    labelText: 'Description',  // Changed from hintText to labelText
+                                    labelStyle: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                    ),
+                                    floatingLabelStyle: TextStyle(  // Style when label is floating
+                                      color: Constants.ftaColorLight,
+                                      fontSize: 14,
+                                    ),
+                                    hintText: 'Enter your description here',  // Optional: still show hint when focused
                                     hintStyle: TextStyle(
                                       color: Colors.grey[400],
                                       fontSize: 13,
                                     ),
                                     filled: true,
+                                    floatingLabelBehavior: FloatingLabelBehavior.always,
                                     fillColor: Colors.grey[50],
                                     contentPadding: EdgeInsets.all(16),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(24),
                                       borderSide: BorderSide(
                                         color: Colors.grey[300]!,
                                       ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(24),
                                       borderSide: BorderSide(
-                                        color: Constants.ctaColorLight,
+                                        color: Constants.ftaColorLight,
                                         width: 1.5,
                                       ),
                                     ),
                                     enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(24),
                                       borderSide: BorderSide(
                                         color: Colors.grey[300]!,
                                       ),
                                     ),
                                     errorBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(24),
                                       borderSide: BorderSide(
                                         color: Colors.red[400]!,
                                         width: 1.5,
@@ -855,6 +959,24 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                           _isSubmitting = true;
                                         });
                                         try {
+                                          // Create new review item
+                                          final newReview = ReviewItem(
+                                            uuid: Constants.myUid.isNotEmpty ? Constants.myUid : DateTime.now().millisecondsSinceEpoch.toString(),
+                                            customerName: Constants.myDisplayname,
+                                            description: _commentController.text,
+                                            rating: _currentRating.toInt(),
+                                            comment: _commentController.text,
+                                            createdAt: DateTime.now().toIso8601String(),
+                                            type: 'review',
+                                          );
+
+                                          // Add review to local storage
+                                          await _addReviewLocally(newReview);
+                                          
+                                          // Clear form
+                                          _commentController.clear();
+                                          _currentRating = 0.0;
+                                          
                                           Navigator.of(context).pop();
                                           setState(() {});
                                           ScaffoldMessenger.of(
@@ -1858,6 +1980,35 @@ class _TransactionDashboardState extends State<TransactionDashboard>
         ),
       ),
     );
+  }
+
+  String _getRequestId(dynamic request) {
+    // Handle ProductRequestItem from API
+    if (request is ProductRequestItem) {
+      return request.requestId.isNotEmpty ? request.requestId : 'Unknown';
+    }
+
+    // Handle different request types (AutoSparesRequest, etc.)
+    try {
+      // Try to access id property first (most common case)
+      if (request?.id != null) {
+        return request.id.toString();
+      }
+
+      // Try to access requestId property as fallback
+      try {
+        if (request?.requestId != null) {
+          return request.requestId.toString();
+        }
+      } catch (e) {
+        // requestId property doesn't exist on this type, which is fine
+      }
+
+      return 'Unknown';
+    } catch (e) {
+      // If all approaches fail, return Unknown
+      return 'Unknown';
+    }
   }
 
   String _formatDate(DateTime? date) {
@@ -3518,14 +3669,14 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                 ),
                 SizedBox(height: 6),
 
-                // Comments
+                // Comments - show order comments or local reviews
                 Padding(
                   padding: const EdgeInsets.only(left: 16, right: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Comments:",
+                        order.comments.isNotEmpty ? "Comments:" : "Reviews:",
                         style: GoogleFonts.manrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -3533,36 +3684,103 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                         ),
                       ),
                       SizedBox(height: 4),
-                      ...order.comments
-                          .map(
-                            (comment) => Padding(
-                              padding: EdgeInsets.only(left: 8, bottom: 2),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "• ",
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      comment.description,
+                      // Show order comments if available, otherwise show local reviews
+                      if (order.comments.isNotEmpty) ...[
+                        ...order.comments
+                            .map(
+                              (comment) => Padding(
+                                padding: EdgeInsets.only(left: 8, bottom: 2),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "• ",
                                       style: GoogleFonts.manrope(
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black,
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    Expanded(
+                                      child: Text(
+                                        comment.description,
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
+                            )
+                            .toList(),
+                      ] else if (reviews.isNotEmpty) ...[
+                        ...reviews
+                            .map(
+                              (review) => Padding(
+                                padding: EdgeInsets.only(left: 8, bottom: 4),
+                                child: Container(
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.grey[200]!),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          ...List.generate(5, (index) =>
+                                            Icon(
+                                              Icons.star,
+                                              size: 14,
+                                              color: index < review.rating
+                                                  ? Constants.ctaColorLight
+                                                  : Colors.grey[300],
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            "${review.rating}/5",
+                                            style: GoogleFonts.manrope(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Constants.ftaColorLight,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        review.comment,
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ] else ...[
+                        Padding(
+                          padding: EdgeInsets.only(left: 8, bottom: 2),
+                          child: Text(
+                            "No reviews available",
+                            style: GoogleFonts.manrope(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.grey[500],
                             ),
-                          )
-                          .toList(),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -3584,7 +3802,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                           size: 16,
                         ),
                         Text(
-                          "$_currentRating",
+                          "${_getAverageRating().toStringAsFixed(1)}",
                           style: GoogleFonts.manrope(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -3593,7 +3811,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                         ),
                         SizedBox(width: 12),
                         Text(
-                          "Reviews",
+                          "$totalReviews Reviews",
                           style: GoogleFonts.manrope(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -3694,8 +3912,93 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                             borderRadius: BorderRadius.circular(360),
                           ),
                           child: IconButton(
-                            onPressed: () {
-                              // Handle notification or action
+                            onPressed:() async {
+                              // Show loading indicator while creating/getting conversation
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => Center(
+                                  child: Container(
+                                    padding: EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        CircularProgressIndicator(
+                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                            Constants.ctaColorLight,
+                                          ),
+                                        ),
+                                        SizedBox(height: 16),
+                                        Text(
+                                          'Loading conversation...',
+                                          style: GoogleFonts.manrope(
+                                            fontSize: 14,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+
+                              try {
+                                // Create or get conversation for this request (without auth)
+                                final conversationData =
+                                await ChatService.createOrGetConversationForRequest(
+                                  _getRequestId(order),
+                                );
+
+                                // Close loading dialog
+                                Navigator.of(context).pop();
+
+                                if (conversationData != null) {
+                                  // Navigate to GroupChat with backend integration
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => GroupChatScreen(
+                                        groupChat: GroupChat(
+                                          uuid: _getRequestId(order),
+                                          request: ProductRequest(
+                                            description: _getRequestDescription(order),
+                                          ),
+                                          messages:
+                                          [], // Empty - will be loaded from backend
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  // Show error if backend returns null
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Unable to create conversation. Please try again.',
+                                      ),
+                                      backgroundColor: Colors.red,
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                // Close loading dialog and show error
+                                Navigator.of(context).pop();
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Failed to load conversation. Please try again.',
+                                    ),
+                                    backgroundColor: Colors.red,
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                );
+                              }
                             },
                             icon: Icon(
                               CupertinoIcons.chat_bubble_2_fill,
@@ -3722,7 +4025,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                           size: 16,
                         ),
                         Text(
-                          "$_currentRating",
+                          "${_getAverageRating().toStringAsFixed(1)}",
                           style: GoogleFonts.manrope(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -3731,7 +4034,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                         ),
                         SizedBox(width: 12),
                         Text(
-                          "Reviews",
+                          "$totalReviews Reviews",
                           style: GoogleFonts.manrope(
                             fontSize: 13,
                             fontWeight: FontWeight.w300,

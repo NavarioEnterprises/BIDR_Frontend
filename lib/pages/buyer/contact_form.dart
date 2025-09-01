@@ -385,60 +385,55 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
           opacity: value,
           child: Transform.translate(
             offset: Offset(30 * (1 - value), 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: Text(
-                    label,
-                    style: GoogleFonts.manrope(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  height: 120, // Bigger height for message field
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+            child: Container(
+              height: 120, // Bigger height for message field
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
 
 
-                  ),
-                  child: TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    maxLines: null, // Allow unlimited lines
-                    expands: true, // Expand to fill container height
-                    textAlignVertical: TextAlignVertical.top, // Start text at top
-                    style: GoogleFonts.manrope(
-                      fontSize: 14,
-                      color: Colors.black87,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: hintText,
-                      hintStyle: GoogleFonts.manrope(
-                        fontSize: 14,
-                        color: Colors.grey[500],
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Constants.ftaColorLight),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Color(0xFFF5A623), width: 2),
-                      ),
-                      contentPadding: EdgeInsets.all(16), // More padding for bigger field
-                      fillColor: Colors.white,
-                      filled: true,
-                    ),
-                  ),
+              ),
+              child: TextField(
+                controller: controller,
+                focusNode: focusNode,
+                maxLines: null, // Allow unlimited lines
+                expands: true, // Expand to fill container height
+                textAlignVertical: TextAlignVertical.top, // Start text at top
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  color: Colors.black87,
                 ),
-              ],
+
+                decoration: InputDecoration(
+                  hintText: hintText.replaceAll('*', ''),
+                  hintStyle: GoogleFonts.manrope(
+                    fontSize: 14,
+                    color: Colors.grey[500],
+                  ),
+                  labelText: label.replaceAll('*', ''),
+                  labelStyle: TextStyle(
+                    color: Constants.ftaColorLight,
+                    fontSize: 14,
+                  ),
+                  floatingLabelStyle: TextStyle(
+                    color: Constants.ftaColorLight,
+                    fontSize: 14,
+
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: Constants.ftaColorLight),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: Color(0xFFF5A623), width: 2),
+                  ),
+                  contentPadding: EdgeInsets.all(16), // More padding for bigger field
+                  fillColor: Colors.white,
+                  filled: true,
+                ),
+              ),
             ),
           ),
         );
@@ -464,32 +459,20 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
           opacity: value,
           child: Transform.translate(
             offset: Offset(30 * (1 - value), 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: Text(
-                    label,
-                    style: GoogleFonts.manrope(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                CustomInputTransparent4(
-                  hintText: hintText,
-                  controller: controller,
-                  focusNode: focusNode,
-                  textInputAction: textInputAction,
-                  maxLines: maxLines,
-                  onChanged: (value) {},
-                  onSubmitted: onSubmitted ?? (value) {},
-                  isPasswordField: false,
-                ),
-              ],
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width*0.35,
+              child: CustomInputTransparent4(
+                hintText: hintText.replaceAll('*', ''),
+                labelText: hintText,
+                controller: controller,
+                focusNode: focusNode,
+                textInputAction: focusNode != null
+                    ? TextInputAction.next
+                    : TextInputAction.done,
+                isPasswordField: false,
+                onChanged: (value) {},
+                onSubmitted:onSubmitted??(value){},
+              ),
             ),
           ),
         );
@@ -506,52 +489,50 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
           opacity: value,
           child: Transform.translate(
             offset: Offset(30 * (1 - value), 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: Text(
-                    'Subject *',
-                    style: GoogleFonts.manrope(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
-                    ),
+            child:Container(
+              width: double.infinity,
+              height: 48,
+              child: InputDecorator(
+                decoration: InputDecoration(
+                  labelText: "Subject",
+                  labelStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'YuGothic',
+                  ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Constants.ftaColorLight),
+                    borderRadius: BorderRadius.circular(36),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Constants.ctaColorLight),
+                    borderRadius: BorderRadius.circular(36),
                   ),
                 ),
-                const SizedBox(height: 8),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Constants.ftaColorLight),
-                  ),
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedSubject,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    menuMaxHeight: 200,
+                    dropdownColor: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                      value: _selectedSubject,
+                    hint: Text(
+                      "Subject".replaceAll('*', ''),
+                      style: GoogleFonts.manrope(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Color(0xFFF5A623), width: 2),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      fillColor: Colors.white,
-                      filled: true,
                     ),
-                    style: GoogleFonts.manrope(
-                      fontSize: 14,
-                      color: Colors.black87,
-                    ),
-                    items: ContactSubjectChoices.choices.entries.map((entry) {
-                      return DropdownMenuItem<String>(
-                        value: entry.key,
-                        child: Text(entry.value),
-                      );
-                    }).toList(),
+                    isExpanded: true,
+                    icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
+                    items:ContactSubjectChoices.choices.entries.map((entry) {
+                return DropdownMenuItem<String>(
+                value: entry.key,
+                child: Text(entry.value),
+                );
+                }).toList(),
                     onChanged: (String? newValue) {
                       if (newValue != null) {
                         setState(() {
@@ -561,7 +542,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                     },
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         );

@@ -365,7 +365,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     double cardWidth,
     double horizontalSpacing,
     double verticalSpacing,
-  ) {
+  )
+  {
     List<Widget> rows = [];
 
     for (int i = 0; i < requests.length; i += cardsPerRow) {
@@ -1797,7 +1798,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     dynamic request,
     double fixedHeight,
     int index,
-  ) {
+  )
+  {
     final bids = _getSortedBids(request);
     final hasMoreThanTwoBids = bids.length > 2;
     final bidsToShow = bids

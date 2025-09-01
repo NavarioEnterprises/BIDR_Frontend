@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 
+import '../../customWdget/custom_input2.dart';
+
 class AccountManagementPage extends StatefulWidget {
   const AccountManagementPage({super.key});
 
@@ -360,7 +362,8 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     String title,
     IconData icon, {
     bool isDestructive = false,
-  }) {
+  })
+  {
     final bool isSelected = selectedMenuItem == title;
     final bool isSignOutSelected = title == "Sign Out";
     final bool isDeleteSelected = title == "Delete Account";
@@ -442,7 +445,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                 _firstNameController,
                 _firstNameFocusNode,
                 TextInputAction.next,
-                onSubmitted: () => _lastNameFocusNode.requestFocus(),
+                onSubmitted: (value) => _lastNameFocusNode.requestFocus(),
               ),
               const SizedBox(height: 24),
               _buildCustomInputField(
@@ -451,7 +454,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                 _lastNameController,
                 _lastNameFocusNode,
                 TextInputAction.next,
-                onSubmitted: () => _mobileFocusNode.requestFocus(),
+                onSubmitted: (value) => _mobileFocusNode.requestFocus(),
               ),
               const SizedBox(height: 24),
               _buildCustomInputField(
@@ -460,7 +463,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                 _mobileController,
                 _mobileFocusNode,
                 TextInputAction.next,
-                onSubmitted: () => _emailFocusNode.requestFocus(),
+                onSubmitted: (value) => _emailFocusNode.requestFocus(),
               ),
               const SizedBox(height: 24),
               _buildCustomInputField(
@@ -472,19 +475,19 @@ class _AccountManagementPageState extends State<AccountManagementPage>
               ),
             ],
           ),
-          const SizedBox(height: 32),
+         
 
           const SizedBox(height: 32),
           SizedBox(
-            width: double.infinity,
+            width: MediaQuery.of(context).size.width*0.35,
             child: ElevatedButton(
               onPressed: _isProfileLoading ? null : _saveProfileChanges,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFE29547),
+                backgroundColor: Constants.ctaColorLight,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(360),
                 ),
                 elevation: 0,
               ),
@@ -540,7 +543,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                 _currentPasswordFocusNode,
                 TextInputAction.next,
                 isPassword: true,
-                onSubmitted: () => _newPasswordFocusNode.requestFocus(),
+                onSubmitted: (value) => _newPasswordFocusNode.requestFocus(),
               ),
               const SizedBox(height: 24),
               _buildCustomInputField(
@@ -550,7 +553,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                 _newPasswordFocusNode,
                 TextInputAction.next,
                 isPassword: true,
-                onSubmitted: () => _confirmPasswordFocusNode.requestFocus(),
+                onSubmitted: (value) => _confirmPasswordFocusNode.requestFocus(),
               ),
               const SizedBox(height: 24),
               _buildCustomInputField(
@@ -566,15 +569,15 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
           const SizedBox(height: 32),
           SizedBox(
-            width: double.infinity,
+            width: MediaQuery.of(context).size.width*0.35,
             child: ElevatedButton(
               onPressed: _isPasswordLoading ? null : _changePassword,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFE29547),
+                backgroundColor: Constants.ctaColorLight,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(360),
                 ),
                 elevation: 0,
               ),
@@ -652,15 +655,15 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
           const SizedBox(height: 32),
           SizedBox(
-            width: double.infinity,
+            width: MediaQuery.of(context).size.width*0.35,
             child: ElevatedButton(
               onPressed: _requestQuote,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFE29547),
+                backgroundColor:Constants.ctaColorLight,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(360),
                 ),
                 elevation: 0,
               ),
@@ -720,7 +723,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
         const SizedBox(height: 24),
         SizedBox(
-          width: double.infinity,
+          width: MediaQuery.of(context).size.width*0.35,
           child: ElevatedButton(
             onPressed: _sendMessage,
             style: ElevatedButton.styleFrom(
@@ -807,7 +810,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
         const Spacer(),
 
         SizedBox(
-          width: double.infinity,
+          width: MediaQuery.of(context).size.width*0.35,
           child: ElevatedButton(
             onPressed: _deleteAccount,
             style: ElevatedButton.styleFrom(
@@ -815,7 +818,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(360),
               ),
               elevation: 0,
             ),
@@ -950,60 +953,50 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     TextInputAction textInputAction, {
     bool isPassword = false,
     int maxLines = 1,
-    VoidCallback? onSubmitted,
+        final Function(String)? onSubmitted,
   }) {
     return SizedBox(
-      width: MediaQuery.of(context).size.height * 0.5,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Text(
-              label,
-              style: GoogleFonts.manrope(
-                fontSize: 13,
-                fontWeight: FontWeight.w300,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(
-                label == "Message" || label == "Project Details" ? 12 : 360,
-              ),
-              border: Border.all(color: Colors.grey[300]!),
-            ),
-            child: TextFormField(
-              controller: controller,
-              focusNode: focusNode,
-              textInputAction: textInputAction,
-              obscureText: isPassword,
-              maxLines: maxLines,
-              onFieldSubmitted: (_) => onSubmitted?.call(),
-              decoration: InputDecoration(
-                hintText: hintText,
-                hintStyle: GoogleFonts.manrope(
-                  color: Colors.grey[500],
-                  fontSize: 12,
-                  fontWeight: FontWeight.w300,
-                ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-              ),
-              style: GoogleFonts.manrope(fontWeight: FontWeight.w300),
-            ),
-          ),
-        ],
+      width: MediaQuery.of(context).size.width*0.35,
+      child: CustomInputTransparent4(
+        hintText: hintText.replaceAll('*', ''),
+        labelText: hintText,
+        controller: controller,
+        focusNode: focusNode,
+        textInputAction: focusNode != null
+            ? TextInputAction.next
+            : TextInputAction.done,
+        isPasswordField: false,
+        onChanged: (value) {},
+        onSubmitted:onSubmitted??(value){},
       ),
     );
   }
+
+  /*Widget _buildCustomTextField(
+      String hintText,
+      TextEditingController controller,
+      FocusNode focusNode,
+      FocusNode? nextFocusNode, {
+        Widget? suffixIcon,
+      }) {
+    return CustomInputTransparent4(
+      hintText: hintText.replaceAll('*', ''),
+      labelText: hintText,
+      controller: controller,
+      focusNode: focusNode,
+      textInputAction: nextFocusNode != null
+          ? TextInputAction.next
+          : TextInputAction.done,
+      isPasswordField: false,
+      suffix: suffixIcon,
+      onChanged: (value) {},
+      onSubmitted: (value) {
+        if (nextFocusNode != null) {
+          nextFocusNode.requestFocus();
+        }
+      },
+    );
+  }*/
 
   // Beautiful Success Dialog Builder
   void _showSuccessDialog({
@@ -1428,7 +1421,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
       title: 'Quote Requested!',
       message: 'Your quote request has been submitted successfully.',
       icon: Icons.request_quote_outlined,
-      color: const Color(0xFFE29547),
+      color: Constants.ctaColorLight,
       additionalInfo:
           'Our team will review your request and get back to you within 24 hours.',
       onContinue: () {

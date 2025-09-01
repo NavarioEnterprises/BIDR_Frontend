@@ -306,6 +306,7 @@ class _BuyerLandingPageState extends State<BuyerLandingPage>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
+          border: Border(top: BorderSide(color: Constants.ctaColorLight, width: 6)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
