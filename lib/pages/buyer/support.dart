@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:badges/badges.dart' as badges;
 import 'package:bidr/global_values.dart';
@@ -15,7 +14,6 @@ import '../../customWdget/custom_input2.dart';
 import '../../models/ticket.dart';
 import '../../services/ticket_api_service.dart';
 
-
 import 'package:google_fonts/google_fonts.dart';
 
 class Support extends StatefulWidget {
@@ -23,7 +21,7 @@ class Support extends StatefulWidget {
   _SupportState createState() => _SupportState();
 }
 
-class _SupportState extends State<Support> with TickerProviderStateMixin {
+class _SupportState extends State<SellerSupport> with TickerProviderStateMixin {
   // Controllers
   final TextEditingController _subjectController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -53,7 +51,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
     super.initState();
     // Update auth user UID from Constants
     _authUserUid = Constants.myUid.isNotEmpty ? Constants.myUid : null;
-    
+
     _fadeController = AnimationController(
       duration: Duration(milliseconds: 1000),
       vsync: this,
@@ -63,33 +61,23 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
 
-    _leftSlideAnimation = Tween<Offset>(
-      begin: Offset(-1, 0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _leftSlideAnimation = Tween<Offset>(begin: Offset(-1, 0), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
-    _rightSlideAnimation = Tween<Offset>(
-      begin: Offset(1, 0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _rightSlideAnimation = Tween<Offset>(begin: Offset(1, 0), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     _fadeController.forward();
     _slideController.forward();
-    
+
     // Load tickets from API
     _loadTickets();
   }
@@ -117,13 +105,15 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
       });
       return;
     }
-    
+
     setState(() {
       _isLoadingTickets = true;
     });
 
     try {
-      final fetchedTickets = await _ticketApiService.fetchUserTickets(_authUserUid!);
+      final fetchedTickets = await _ticketApiService.fetchUserTickets(
+        _authUserUid!,
+      );
       if (fetchedTickets != null && mounted) {
         setState(() {
           tickets = fetchedTickets;
@@ -149,18 +139,22 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
     // Check if user is logged in
     if (_authUserUid == null || _authUserUid!.isEmpty) {
       MotionToast.error(
-        title: Text("Authentication Required",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-        description: Text("Please login first",
-            style: TextStyle(color: Colors.white)),
+        title: Text(
+          "Authentication Required",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        description: Text(
+          "Please login first",
+          style: TextStyle(color: Colors.white),
+        ),
         toastDuration: Duration(seconds: 3),
         barrierColor: Colors.black.withOpacity(0.3),
         displayBorder: false,
       ).show(context);
       return;
     }
-    
-    if (_subjectController.text.trim().isEmpty || 
+
+    if (_subjectController.text.trim().isEmpty ||
         _descriptionController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -197,7 +191,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
           );
           _subjectController.clear();
           _descriptionController.clear();
-          
+
           // Reload tickets to show the new one
           _loadTickets();
         } else {
@@ -231,7 +225,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
       opacity: _fadeAnimation,
       child: Column(
         children: [
-          SizedBox(height: 24,),
+          SizedBox(height: 24),
           TweenAnimationBuilder<double>(
             duration: Duration(milliseconds: 600),
             tween: Tween(begin: 0.0, end: 1.0),
@@ -240,7 +234,10 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                 opacity: value,
                 child: Transform.translate(
                   offset: Offset(0, 20 * (1 - value)),
-                  child: BuyerDashboardHeader(headerName: 'Support',totalAlert: GlobalVariables.alertList.length,),
+                  child: BuyerDashboardHeader(
+                    headerName: 'Support',
+                    totalAlert: GlobalVariables.alertList.length,
+                  ),
                 ),
               );
             },
@@ -250,7 +247,11 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
               child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.only(left: 68, right: 68, top: 24),
+                    padding: const EdgeInsets.only(
+                      left: 68,
+                      right: 68,
+                      top: 24,
+                    ),
                     constraints: BoxConstraints(maxWidth: 1600, maxHeight: 600),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,10 +267,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                 gradient: LinearGradient(
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.white,
-                                    Colors.grey.shade50,
-                                  ],
+                                  colors: [Colors.white, Colors.grey.shade50],
                                 ),
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
@@ -294,7 +292,8 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                         child: Row(
                                           children: [
                                             Icon(
-                                              Icons.confirmation_number_outlined,
+                                              Icons
+                                                  .confirmation_number_outlined,
                                               color: Constants.ftaColorLight,
                                               size: 24,
                                             ),
@@ -302,9 +301,9 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                             Text(
                                               'My Tickets',
                                               style: GoogleFonts.manrope(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Constants.ftaColorLight
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Constants.ftaColorLight,
                                               ),
                                             ),
                                           ],
@@ -321,162 +320,249 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                             ),
                                           )
                                         : tickets.isEmpty
-                                            ? Center(
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(
-                                                      Icons.inbox_outlined,
-                                                      size: 48,
-                                                      color: Colors.grey[400],
-                                                    ),
-                                                    SizedBox(height: 16),
-                                                    Text(
-                                                      (_authUserUid == null || _authUserUid!.isEmpty) 
-                                                          ? 'Please login to view tickets'
-                                                          : 'No tickets yet',
-                                                      style: GoogleFonts.manrope(
-                                                        fontSize: 16,
-                                                        color: Colors.grey[600],
-                                                        fontWeight: FontWeight.w500,
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 8),
-                                                    Text(
-                                                      (_authUserUid == null || _authUserUid!.isEmpty)
-                                                          ? 'Login to access support'
-                                                          : 'Create your first support ticket',
-                                                      style: GoogleFonts.manrope(
-                                                        fontSize: 14,
-                                                        color: Colors.grey[500],
-                                                      ),
-                                                    ),
-                                                  ],
+                                        ? Center(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.inbox_outlined,
+                                                  size: 48,
+                                                  color: Colors.grey[400],
                                                 ),
-                                              )
-                                            : ListView.builder(
-                                                itemCount: tickets.length,
-                                                itemBuilder: (context, index) {
-                                        final ticket = tickets[index];
-                                        return TweenAnimationBuilder<double>(
-                                          duration: Duration(milliseconds: 1000 + (index * 200)),
-                                          tween: Tween(begin: 0.0, end: 1.0),
-                                          builder: (context, value, child) {
-                                            return Opacity(
-                                              opacity: value,
-                                              child: Transform.translate(
-                                                offset: Offset(-30 * (1 - value), 0),
-                                                child: InkWell(
-                                                  onTap: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) => ChatScreen(ticket: ticket),
-                                                      ),
-                                                    );
-                                                  },
-                                                  child: AnimatedContainer(
-                                                    duration: Duration(milliseconds: 200),
-                                                    margin: EdgeInsets.only(bottom: 12),
-                                                    padding: EdgeInsets.all(16),
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                        colors: [
-                                                          Colors.white,
-                                                          Colors.grey.shade50,
-                                                        ],
-                                                      ),
-                                                      borderRadius: BorderRadius.circular(12),
-                                                      border: Border.all(
-                                                        color: Constants.ftaColorLight.withOpacity(0.3),
-                                                        width: 1.5,
-                                                      ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Constants.ftaColorLight.withOpacity(0.1),
-                                                          spreadRadius: 1,
-                                                          blurRadius: 4,
-                                                          offset: Offset(0, 2),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Row(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                          children: [
-                                                            Text(
-                                                              ticket.title,
-                                                              style: GoogleFonts.manrope(
-                                                                  fontSize: 14,
-                                                                  fontWeight: FontWeight.w600,
-                                                                  color:Constants.ftaColorLight
-                                                              ),
-                                                            ),
-                                                            TweenAnimationBuilder<double>(
-                                                              duration: Duration(milliseconds: 600),
-                                                              tween: Tween(begin: 0.0, end: 1.0),
-                                                              builder: (context, badgeValue, child) {
-                                                                return Transform.scale(
-                                                                  scale: badgeValue,
-                                                                  child: Container(
-                                                                    padding: EdgeInsets.symmetric(
-                                                                      horizontal: 8,
-                                                                      vertical: 4,
-                                                                    ),
-                                                                    decoration: BoxDecoration(
-                                                                      color: ticket.status == 'Pending'
-                                                                          ? Colors.grey[400]
-                                                                          : Constants.ctaColorLight,
-                                                                      borderRadius: BorderRadius.circular(12),
-                                                                    ),
-                                                                    child: Text(
-                                                                      ticket.status,
-                                                                      style: GoogleFonts.manrope(
-                                                                        color: Colors.white,
-                                                                        fontSize: 10,
-                                                                        fontWeight: FontWeight.w500,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                );
-                                                              },
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        SizedBox(height: 8),
-                                                        Row(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                          children: [
-                                                            Text(
-                                                              ticket.ticketId,
-                                                              style: GoogleFonts.manrope(
-                                                                fontSize: 12,
-                                                                color: Colors.black,
-                                                                fontWeight: FontWeight.w300,
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              ticket.date,
-                                                              style: GoogleFonts.manrope(
-                                                                fontSize: 12,
-                                                                color: Colors.black,
-                                                                fontWeight: FontWeight.w300,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
+                                                SizedBox(height: 16),
+                                                Text(
+                                                  (_authUserUid == null ||
+                                                          _authUserUid!.isEmpty)
+                                                      ? 'Please login to view tickets'
+                                                      : 'No tickets yet',
+                                                  style: GoogleFonts.manrope(
+                                                    fontSize: 16,
+                                                    color: Colors.grey[600],
+                                                    fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  (_authUserUid == null ||
+                                                          _authUserUid!.isEmpty)
+                                                      ? 'Login to access support'
+                                                      : 'Create your first support ticket',
+                                                  style: GoogleFonts.manrope(
+                                                    fontSize: 14,
+                                                    color: Colors.grey[500],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : ListView.builder(
+                                            itemCount: tickets.length,
+                                            itemBuilder: (context, index) {
+                                              final ticket = tickets[index];
+                                              return TweenAnimationBuilder<
+                                                double
+                                              >(
+                                                duration: Duration(
+                                                  milliseconds:
+                                                      1000 + (index * 200),
+                                                ),
+                                                tween: Tween(
+                                                  begin: 0.0,
+                                                  end: 1.0,
+                                                ),
+                                                builder: (context, value, child) {
+                                                  return Opacity(
+                                                    opacity: value,
+                                                    child: Transform.translate(
+                                                      offset: Offset(
+                                                        -30 * (1 - value),
+                                                        0,
+                                                      ),
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder:
+                                                                  (
+                                                                    context,
+                                                                  ) => ChatScreen(
+                                                                    ticket:
+                                                                        ticket,
+                                                                  ),
+                                                            ),
+                                                          );
+                                                        },
+                                                        child: AnimatedContainer(
+                                                          duration: Duration(
+                                                            milliseconds: 200,
+                                                          ),
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                bottom: 12,
+                                                              ),
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                16,
+                                                              ),
+                                                          decoration: BoxDecoration(
+                                                            gradient:
+                                                                LinearGradient(
+                                                                  colors: [
+                                                                    Colors
+                                                                        .white,
+                                                                    Colors
+                                                                        .grey
+                                                                        .shade50,
+                                                                  ],
+                                                                ),
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  12,
+                                                                ),
+                                                            border: Border.all(
+                                                              color: Constants
+                                                                  .ftaColorLight
+                                                                  .withOpacity(
+                                                                    0.3,
+                                                                  ),
+                                                              width: 1.5,
+                                                            ),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Constants
+                                                                    .ftaColorLight
+                                                                    .withOpacity(
+                                                                      0.1,
+                                                                    ),
+                                                                spreadRadius: 1,
+                                                                blurRadius: 4,
+                                                                offset: Offset(
+                                                                  0,
+                                                                  2,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Text(
+                                                                    ticket
+                                                                        .title,
+                                                                    style: GoogleFonts.manrope(
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                      color: Constants
+                                                                          .ftaColorLight,
+                                                                    ),
+                                                                  ),
+                                                                  TweenAnimationBuilder<
+                                                                    double
+                                                                  >(
+                                                                    duration: Duration(
+                                                                      milliseconds:
+                                                                          600,
+                                                                    ),
+                                                                    tween: Tween(
+                                                                      begin:
+                                                                          0.0,
+                                                                      end: 1.0,
+                                                                    ),
+                                                                    builder:
+                                                                        (
+                                                                          context,
+                                                                          badgeValue,
+                                                                          child,
+                                                                        ) {
+                                                                          return Transform.scale(
+                                                                            scale:
+                                                                                badgeValue,
+                                                                            child: Container(
+                                                                              padding: EdgeInsets.symmetric(
+                                                                                horizontal: 8,
+                                                                                vertical: 4,
+                                                                              ),
+                                                                              decoration: BoxDecoration(
+                                                                                color:
+                                                                                    ticket.status ==
+                                                                                        'Pending'
+                                                                                    ? Colors.grey[400]
+                                                                                    : Constants.ctaColorLight,
+                                                                                borderRadius: BorderRadius.circular(
+                                                                                  12,
+                                                                                ),
+                                                                              ),
+                                                                              child: Text(
+                                                                                ticket.status,
+                                                                                style: GoogleFonts.manrope(
+                                                                                  color: Colors.white,
+                                                                                  fontSize: 10,
+                                                                                  fontWeight: FontWeight.w500,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              SizedBox(
+                                                                height: 8,
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Text(
+                                                                    ticket
+                                                                        .ticketId,
+                                                                    style: GoogleFonts.manrope(
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w300,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    ticket.date,
+                                                                    style: GoogleFonts.manrope(
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w300,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          ),
                                   ),
                                 ],
                               ),
@@ -495,10 +581,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                 gradient: LinearGradient(
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.white,
-                                    Colors.grey.shade50,
-                                  ],
+                                  colors: [Colors.white, Colors.grey.shade50],
                                 ),
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
@@ -525,9 +608,9 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                       Text(
                                         'Create New Ticket',
                                         style: GoogleFonts.manrope(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: Constants.ctaColorLight
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Constants.ctaColorLight,
                                         ),
                                       ),
                                     ],
@@ -536,9 +619,9 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                   Text(
                                     'Fill out the form below to submit a support request',
                                     style: GoogleFonts.manrope(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.grey.shade600
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.grey.shade600,
                                     ),
                                   ),
                                   SizedBox(height: 24),
@@ -591,50 +674,76 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                                           offset: Offset(0, 20 * (1 - value)),
                                           child: Center(
                                             child: SizedBox(
-                                              width:MediaQuery.of(context).size.width*0.5,
+                                              width:
+                                                  MediaQuery.of(
+                                                    context,
+                                                  ).size.width *
+                                                  0.5,
                                               height: 45,
                                               child: AnimatedContainer(
-                                                duration: Duration(milliseconds: 200),
+                                                duration: Duration(
+                                                  milliseconds: 200,
+                                                ),
                                                 child: ElevatedButton(
-                                                  onPressed: _isCreatingTicket ? null : _createTicket,
+                                                  onPressed: _isCreatingTicket
+                                                      ? null
+                                                      : _createTicket,
                                                   style: ElevatedButton.styleFrom(
-                                                    backgroundColor: Constants.ctaColorLight,
+                                                    backgroundColor:
+                                                        Constants.ctaColorLight,
                                                     shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(30),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            30,
+                                                          ),
                                                     ),
                                                     elevation: 2,
-                                                    shadowColor: Constants.ctaColorLight.withOpacity(0.3),
+                                                    shadowColor: Constants
+                                                        .ctaColorLight
+                                                        .withOpacity(0.3),
                                                   ),
                                                   child: _isCreatingTicket
                                                       ? Row(
-                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
                                                           children: [
                                                             SizedBox(
                                                               width: 16,
                                                               height: 16,
-                                                              child: CircularProgressIndicator(
-                                                                color: Colors.white,
-                                                                strokeWidth: 2,
-                                                              ),
+                                                              child:
+                                                                  CircularProgressIndicator(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    strokeWidth:
+                                                                        2,
+                                                                  ),
                                                             ),
                                                             SizedBox(width: 8),
                                                             Text(
                                                               'Creating...',
                                                               style: GoogleFonts.manrope(
-                                                                color: Colors.white,
+                                                                color: Colors
+                                                                    .white,
                                                                 fontSize: 14,
-                                                                fontWeight: FontWeight.w300,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w300,
                                                               ),
                                                             ),
                                                           ],
                                                         )
                                                       : Text(
                                                           'Raise a Ticket',
-                                                          style: GoogleFonts.manrope(
-                                                            color: Colors.white,
-                                                            fontSize: 14,
-                                                            fontWeight: FontWeight.w300,
-                                                          ),
+                                                          style:
+                                                              GoogleFonts.manrope(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w300,
+                                                              ),
                                                         ),
                                                 ),
                                               ),
@@ -652,7 +761,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
-                  SizedBox(height: 24,),
+                  SizedBox(height: 24),
                   TweenAnimationBuilder<double>(
                     duration: Duration(milliseconds: 1600),
                     tween: Tween(begin: 0.0, end: 1.0),
@@ -661,21 +770,30 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                         opacity: value,
                         child: Transform.translate(
                           offset: Offset(0, 20 * (1 - value)),
-                          child: FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
+                          child: FooterSection(
+                            logo: "lib/assets/images/bidr_logo2.png",
+                          ),
                         ),
                       );
                     },
-                  )
+                  ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildCustomTextField(String hintText, TextEditingController controller, FocusNode focusNode, FocusNode? nextFocusNode, {Widget? suffixIcon, bool isDescription = false}) {
+  Widget _buildCustomTextField(
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocusNode, {
+    Widget? suffixIcon,
+    bool isDescription = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -703,7 +821,9 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
               controller: controller,
               focusNode: focusNode,
               maxLines: 5,
-              textInputAction: nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+              textInputAction: nextFocusNode != null
+                  ? TextInputAction.next
+                  : TextInputAction.done,
               decoration: InputDecoration(
                 hintText: 'Enter your detailed description here...',
                 hintStyle: GoogleFonts.manrope(
@@ -732,7 +852,9 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
             hintText: hintText,
             controller: controller,
             focusNode: focusNode,
-            textInputAction: nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+            textInputAction: nextFocusNode != null
+                ? TextInputAction.next
+                : TextInputAction.done,
             isPasswordField: false,
             suffix: suffixIcon,
             onChanged: (value) {},
@@ -747,6 +869,831 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
   }
 }
 
+class SellerSupport extends StatefulWidget {
+  @override
+  _SellerSupportState createState() => _SellerSupportState();
+}
+
+class _SellerSupportState extends State<SellerSupport>
+    with TickerProviderStateMixin {
+  // Controllers
+  final TextEditingController _subjectController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _replyController = TextEditingController();
+
+  // Focus Nodes
+  final FocusNode _subjectFocusNode = FocusNode();
+  final FocusNode _descriptionFocusNode = FocusNode();
+  final FocusNode _replyFocusNode = FocusNode();
+
+  // Animation Controllers
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _leftSlideAnimation;
+  late Animation<Offset> _rightSlideAnimation;
+
+  // API Service and State
+  final TicketApiService _ticketApiService = TicketApiService();
+  List<Ticket> tickets = [];
+  bool _isLoadingTickets = true;
+  bool _isCreatingTicket = false;
+  String? _authUserUid = Constants.myUid.isNotEmpty ? Constants.myUid : null;
+
+  @override
+  void initState() {
+    super.initState();
+    // Update auth user UID from Constants
+    _authUserUid = Constants.myUid.isNotEmpty ? Constants.myUid : null;
+
+    _fadeController = AnimationController(
+      duration: Duration(milliseconds: 1000),
+      vsync: this,
+    );
+    _slideController = AnimationController(
+      duration: Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
+
+    _leftSlideAnimation = Tween<Offset>(begin: Offset(-1, 0), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
+
+    _rightSlideAnimation = Tween<Offset>(begin: Offset(1, 0), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
+
+    _fadeController.forward();
+    _slideController.forward();
+
+    // Load tickets from API
+    _loadTickets();
+  }
+
+  @override
+  void dispose() {
+    _subjectController.dispose();
+    _descriptionController.dispose();
+    _replyController.dispose();
+    _subjectFocusNode.dispose();
+    _descriptionFocusNode.dispose();
+    _replyFocusNode.dispose();
+    _fadeController.dispose();
+    _slideController.dispose();
+    super.dispose();
+  }
+
+  /// Load tickets from API
+  Future<void> _loadTickets() async {
+    // If user is not authenticated, don't try to load tickets
+    if (_authUserUid == null || _authUserUid!.isEmpty) {
+      setState(() {
+        _isLoadingTickets = false;
+        tickets = [];
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoadingTickets = true;
+    });
+
+    try {
+      final fetchedTickets = await _ticketApiService.fetchUserTickets(
+        _authUserUid!,
+      );
+      if (fetchedTickets != null && mounted) {
+        setState(() {
+          tickets = fetchedTickets;
+          _isLoadingTickets = false;
+        });
+      } else if (mounted) {
+        setState(() {
+          _isLoadingTickets = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading tickets: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingTickets = false;
+        });
+      }
+    }
+  }
+
+  /// Create a new ticket
+  Future<void> _createTicket() async {
+    // Check if user is logged in
+    if (_authUserUid == null || _authUserUid!.isEmpty) {
+      MotionToast.error(
+        title: Text(
+          "Authentication Required",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        description: Text(
+          "Please login first",
+          style: TextStyle(color: Colors.white),
+        ),
+        toastDuration: Duration(seconds: 3),
+        barrierColor: Colors.black.withOpacity(0.3),
+        displayBorder: false,
+      ).show(context);
+      return;
+    }
+
+    if (_subjectController.text.trim().isEmpty ||
+        _descriptionController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill in all fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isCreatingTicket = true;
+    });
+
+    try {
+      final result = await _ticketApiService.createTicket(
+        authUserUid: _authUserUid!,
+        subject: _subjectController.text.trim(),
+        description: _descriptionController.text.trim(),
+        priority: 'medium',
+      );
+
+      if (mounted) {
+        setState(() {
+          _isCreatingTicket = false;
+        });
+
+        if (result != null && result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Ticket created successfully!'),
+              backgroundColor: Constants.ctaColorLight,
+            ),
+          );
+          _subjectController.clear();
+          _descriptionController.clear();
+
+          // Reload tickets to show the new one
+          _loadTickets();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result?['error'] ?? 'Failed to create ticket'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error creating ticket: $e');
+      if (mounted) {
+        setState(() {
+          _isCreatingTicket = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Network error occurred'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Column(
+        children: [
+          SizedBox(height: 24),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(left: 68, right: 68, top: 24),
+                  constraints: BoxConstraints(maxWidth: 1600, maxHeight: 600),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Left Panel - My Tickets
+                      Expanded(
+                        flex: 1,
+                        child: SlideTransition(
+                          position: _leftSlideAnimation,
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [Colors.white, Colors.grey.shade50],
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.15),
+                                  spreadRadius: 2,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            padding: EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TweenAnimationBuilder<double>(
+                                  duration: Duration(milliseconds: 800),
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  builder: (context, value, child) {
+                                    return Opacity(
+                                      opacity: value,
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.confirmation_number_outlined,
+                                            color: Constants.ftaColorLight,
+                                            size: 24,
+                                          ),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'My Tickets',
+                                            style: GoogleFonts.manrope(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Constants.ftaColorLight,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                                SizedBox(height: 24),
+                                Expanded(
+                                  child: _isLoadingTickets
+                                      ? Center(
+                                          child: CircularProgressIndicator(
+                                            color: Constants.ftaColorLight,
+                                          ),
+                                        )
+                                      : tickets.isEmpty
+                                      ? Center(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.inbox_outlined,
+                                                size: 48,
+                                                color: Colors.grey[400],
+                                              ),
+                                              SizedBox(height: 16),
+                                              Text(
+                                                (_authUserUid == null ||
+                                                        _authUserUid!.isEmpty)
+                                                    ? 'Please login to view tickets'
+                                                    : 'No tickets yet',
+                                                style: GoogleFonts.manrope(
+                                                  fontSize: 16,
+                                                  color: Colors.grey[600],
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              SizedBox(height: 8),
+                                              Text(
+                                                (_authUserUid == null ||
+                                                        _authUserUid!.isEmpty)
+                                                    ? 'Login to access support'
+                                                    : 'Create your first support ticket',
+                                                style: GoogleFonts.manrope(
+                                                  fontSize: 14,
+                                                  color: Colors.grey[500],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : ListView.builder(
+                                          itemCount: tickets.length,
+                                          itemBuilder: (context, index) {
+                                            final ticket = tickets[index];
+                                            return TweenAnimationBuilder<
+                                              double
+                                            >(
+                                              duration: Duration(
+                                                milliseconds:
+                                                    1000 + (index * 200),
+                                              ),
+                                              tween: Tween(
+                                                begin: 0.0,
+                                                end: 1.0,
+                                              ),
+                                              builder: (context, value, child) {
+                                                return Opacity(
+                                                  opacity: value,
+                                                  child: Transform.translate(
+                                                    offset: Offset(
+                                                      -30 * (1 - value),
+                                                      0,
+                                                    ),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (
+                                                                  context,
+                                                                ) => ChatScreen(
+                                                                  ticket:
+                                                                      ticket,
+                                                                ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: AnimatedContainer(
+                                                        duration: Duration(
+                                                          milliseconds: 200,
+                                                        ),
+                                                        margin: EdgeInsets.only(
+                                                          bottom: 12,
+                                                        ),
+                                                        padding: EdgeInsets.all(
+                                                          16,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          gradient:
+                                                              LinearGradient(
+                                                                colors: [
+                                                                  Colors.white,
+                                                                  Colors
+                                                                      .grey
+                                                                      .shade50,
+                                                                ],
+                                                              ),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                12,
+                                                              ),
+                                                          border: Border.all(
+                                                            color: Constants
+                                                                .ftaColorLight
+                                                                .withOpacity(
+                                                                  0.3,
+                                                                ),
+                                                            width: 1.5,
+                                                          ),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Constants
+                                                                  .ftaColorLight
+                                                                  .withOpacity(
+                                                                    0.1,
+                                                                  ),
+                                                              spreadRadius: 1,
+                                                              blurRadius: 4,
+                                                              offset: Offset(
+                                                                0,
+                                                                2,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Text(
+                                                                  ticket.title,
+                                                                  style: GoogleFonts.manrope(
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    color: Constants
+                                                                        .ftaColorLight,
+                                                                  ),
+                                                                ),
+                                                                TweenAnimationBuilder<
+                                                                  double
+                                                                >(
+                                                                  duration:
+                                                                      Duration(
+                                                                        milliseconds:
+                                                                            600,
+                                                                      ),
+                                                                  tween: Tween(
+                                                                    begin: 0.0,
+                                                                    end: 1.0,
+                                                                  ),
+                                                                  builder:
+                                                                      (
+                                                                        context,
+                                                                        badgeValue,
+                                                                        child,
+                                                                      ) {
+                                                                        return Transform.scale(
+                                                                          scale:
+                                                                              badgeValue,
+                                                                          child: Container(
+                                                                            padding: EdgeInsets.symmetric(
+                                                                              horizontal: 8,
+                                                                              vertical: 4,
+                                                                            ),
+                                                                            decoration: BoxDecoration(
+                                                                              color:
+                                                                                  ticket.status ==
+                                                                                      'Pending'
+                                                                                  ? Colors.grey[400]
+                                                                                  : Constants.ctaColorLight,
+                                                                              borderRadius: BorderRadius.circular(
+                                                                                12,
+                                                                              ),
+                                                                            ),
+                                                                            child: Text(
+                                                                              ticket.status,
+                                                                              style: GoogleFonts.manrope(
+                                                                                color: Colors.white,
+                                                                                fontSize: 10,
+                                                                                fontWeight: FontWeight.w500,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            SizedBox(height: 8),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Text(
+                                                                  ticket
+                                                                      .ticketId,
+                                                                  style: GoogleFonts.manrope(
+                                                                    fontSize:
+                                                                        12,
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w300,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  ticket.date,
+                                                                  style: GoogleFonts.manrope(
+                                                                    fontSize:
+                                                                        12,
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w300,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          },
+                                        ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 24),
+                      // Right Panel - Create Ticket Form
+                      Expanded(
+                        flex: 2,
+                        child: SlideTransition(
+                          position: _rightSlideAnimation,
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [Colors.white, Colors.grey.shade50],
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.15),
+                                  spreadRadius: 2,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            padding: EdgeInsets.all(24),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.add_circle_outline,
+                                      color: Constants.ctaColorLight,
+                                      size: 24,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Create New Ticket',
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Constants.ctaColorLight,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Fill out the form below to submit a support request',
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                                SizedBox(height: 24),
+                                TweenAnimationBuilder<double>(
+                                  duration: Duration(milliseconds: 1000),
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  builder: (context, value, child) {
+                                    return Opacity(
+                                      opacity: value,
+                                      child: Transform.translate(
+                                        offset: Offset(20 * (1 - value), 0),
+                                        child: _buildCustomTextField(
+                                          'Subject',
+                                          _subjectController,
+                                          _subjectFocusNode,
+                                          _descriptionFocusNode,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                SizedBox(height: 24),
+                                TweenAnimationBuilder<double>(
+                                  duration: Duration(milliseconds: 1200),
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  builder: (context, value, child) {
+                                    return Opacity(
+                                      opacity: value,
+                                      child: Transform.translate(
+                                        offset: Offset(20 * (1 - value), 0),
+                                        child: _buildCustomTextField(
+                                          'Description',
+                                          _descriptionController,
+                                          _descriptionFocusNode,
+                                          null,
+                                          isDescription: true,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                Spacer(),
+                                TweenAnimationBuilder<double>(
+                                  duration: Duration(milliseconds: 1400),
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  builder: (context, value, child) {
+                                    return Opacity(
+                                      opacity: value,
+                                      child: Transform.translate(
+                                        offset: Offset(0, 20 * (1 - value)),
+                                        child: Center(
+                                          child: SizedBox(
+                                            width:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width *
+                                                0.5,
+                                            height: 45,
+                                            child: AnimatedContainer(
+                                              duration: Duration(
+                                                milliseconds: 200,
+                                              ),
+                                              child: ElevatedButton(
+                                                onPressed: _isCreatingTicket
+                                                    ? null
+                                                    : _createTicket,
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Constants.ctaColorLight,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          30,
+                                                        ),
+                                                  ),
+                                                  elevation: 2,
+                                                  shadowColor: Constants
+                                                      .ctaColorLight
+                                                      .withOpacity(0.3),
+                                                ),
+                                                child: _isCreatingTicket
+                                                    ? Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          SizedBox(
+                                                            width: 16,
+                                                            height: 16,
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  strokeWidth:
+                                                                      2,
+                                                                ),
+                                                          ),
+                                                          SizedBox(width: 8),
+                                                          Text(
+                                                            'Creating...',
+                                                            style:
+                                                                GoogleFonts.manrope(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w300,
+                                                                ),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    : Text(
+                                                        'Raise a Ticket',
+                                                        style:
+                                                            GoogleFonts.manrope(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w300,
+                                                            ),
+                                                      ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 24),
+                TweenAnimationBuilder<double>(
+                  duration: Duration(milliseconds: 1600),
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.translate(
+                        offset: Offset(0, 20 * (1 - value)),
+                        child: FooterSection(
+                          logo: "lib/assets/images/bidr_logo2.png",
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCustomTextField(
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocusNode, {
+    Widget? suffixIcon,
+    bool isDescription = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Text(
+            hintText,
+            style: GoogleFonts.manrope(
+              color: Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        SizedBox(height: 8),
+        if (isDescription)
+          Container(
+            height: 120,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.withOpacity(0.3)),
+              color: Colors.grey.withOpacity(0.05),
+            ),
+            child: TextField(
+              controller: controller,
+              focusNode: focusNode,
+              maxLines: 5,
+              textInputAction: nextFocusNode != null
+                  ? TextInputAction.next
+                  : TextInputAction.done,
+              decoration: InputDecoration(
+                hintText: 'Enter your detailed description here...',
+                hintStyle: GoogleFonts.manrope(
+                  fontSize: 13,
+                  color: Colors.grey.withOpacity(0.7),
+                  fontWeight: FontWeight.w400,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.all(16),
+              ),
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: Colors.black87,
+                fontWeight: FontWeight.w400,
+              ),
+              onChanged: (value) {},
+              onSubmitted: (value) {
+                if (nextFocusNode != null) {
+                  nextFocusNode.requestFocus();
+                }
+              },
+            ),
+          )
+        else
+          CustomInputTransparent4(
+            hintText: hintText,
+            controller: controller,
+            focusNode: focusNode,
+            textInputAction: nextFocusNode != null
+                ? TextInputAction.next
+                : TextInputAction.done,
+            isPasswordField: false,
+            suffix: suffixIcon,
+            onChanged: (value) {},
+            onSubmitted: (value) {
+              if (nextFocusNode != null) {
+                nextFocusNode.requestFocus();
+              }
+            },
+          ),
+      ],
+    );
+  }
+}
 
 class Message {
   final String text;
@@ -769,6 +1716,7 @@ class Message {
 }
 
 enum MessageStatus { sending, sent, delivered, read }
+
 enum MessageType { text, image, document, voice }
 
 class ChatScreen extends StatefulWidget {
@@ -780,8 +1728,7 @@ class ChatScreen extends StatefulWidget {
   _ChatScreenState createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen>
-    with TickerProviderStateMixin {
+class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final TextEditingController _replyController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<Message> _messages = [];
@@ -797,13 +1744,9 @@ class _ChatScreenState extends State<ChatScreen>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
 
     _addInitialMessages();
     _fadeController.forward();
@@ -819,32 +1762,39 @@ class _ChatScreenState extends State<ChatScreen>
 
   void _addInitialMessages() {
     // Add initial ticket description as first message
-    _messages.add(Message(
-      text: widget.ticket.description,
-      isMe: true,
-      timestamp: DateTime.now().subtract(Duration(days: 1)),
-      status: MessageStatus.read,
-    ));
+    _messages.add(
+      Message(
+        text: widget.ticket.description,
+        isMe: true,
+        timestamp: DateTime.now().subtract(Duration(days: 1)),
+        status: MessageStatus.read,
+      ),
+    );
 
     // Add assignee's initial response
-    _messages.add(Message(
-      text: "Hello! I've received your ticket and I'm looking into this issue. I'll get back to you with more details soon.",
-      isMe: false,
-      timestamp: DateTime.now().subtract(Duration(hours: 2)),
-      status: MessageStatus.read,
-    ));
+    _messages.add(
+      Message(
+        text:
+            "Hello! I've received your ticket and I'm looking into this issue. I'll get back to you with more details soon.",
+        isMe: false,
+        timestamp: DateTime.now().subtract(Duration(hours: 2)),
+        status: MessageStatus.read,
+      ),
+    );
   }
 
   void _sendReply() {
     if (_replyController.text.trim().isEmpty) return;
 
     setState(() {
-      _messages.add(Message(
-        text: _replyController.text.trim(),
-        isMe: true,
-        timestamp: DateTime.now(),
-        status: MessageStatus.sending,
-      ));
+      _messages.add(
+        Message(
+          text: _replyController.text.trim(),
+          isMe: true,
+          timestamp: DateTime.now(),
+          status: MessageStatus.sending,
+        ),
+      );
     });
 
     _replyController.clear();
@@ -898,12 +1848,16 @@ class _ChatScreenState extends State<ChatScreen>
         bottom: 12,
       ),
       child: Column(
-        crossAxisAlignment: message.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: message.isMe
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: message.isMe ? Constants.ftaColorLight.withOpacity(0.1) : Colors.grey[100],
+              color: message.isMe
+                  ? Constants.ftaColorLight.withOpacity(0.1)
+                  : Colors.grey[100],
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -911,7 +1865,9 @@ class _ChatScreenState extends State<ChatScreen>
                 bottomRight: Radius.circular(message.isMe ? 4 : 16),
               ),
               border: Border.all(
-                color: message.isMe ? Constants.ftaColorLight.withOpacity(0.3) : Colors.grey[300]!,
+                color: message.isMe
+                    ? Constants.ftaColorLight.withOpacity(0.3)
+                    : Colors.grey[300]!,
                 width: 1,
               ),
             ),
@@ -1098,9 +2054,7 @@ class _ChatScreenState extends State<ChatScreen>
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border(
-                  top: BorderSide(color: Colors.grey[200]!),
-                ),
+                border: Border(top: BorderSide(color: Colors.grey[200]!)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1156,11 +2110,7 @@ class _ChatScreenState extends State<ChatScreen>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                Icons.send,
-                                size: 16,
-                                color: Colors.white,
-                              ),
+                              Icon(Icons.send, size: 16, color: Colors.white),
                               SizedBox(width: 6),
                               Text(
                                 'Send',
@@ -1186,11 +2136,14 @@ class _ChatScreenState extends State<ChatScreen>
   }
 }
 
-
 class BuyerDashboardHeader extends StatefulWidget {
   final String headerName;
   final int totalAlert;
-  const BuyerDashboardHeader({super.key, required this.headerName, required this.totalAlert});
+  const BuyerDashboardHeader({
+    super.key,
+    required this.headerName,
+    required this.totalAlert,
+  });
 
   @override
   State<BuyerDashboardHeader> createState() => _BuyerDashboardHeaderState();
@@ -1199,7 +2152,7 @@ class BuyerDashboardHeader extends StatefulWidget {
 class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> {
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       height: 60,
       width: MediaQuery.of(context).size.width,
       color: Constants.ctaColorLight,
@@ -1208,11 +2161,19 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> {
         children: [
           Text(
             'Buyer',
-            style: TextStyle(color: Colors.white, fontSize: 16, fontFamily: 'YuGothic'),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontFamily: 'YuGothic',
+            ),
           ),
           Text(
             ' Dashboard',
-            style: TextStyle(color: Constants.ftaColorLight, fontSize: 16, fontFamily: 'YuGothic'),
+            style: TextStyle(
+              color: Constants.ftaColorLight,
+              fontSize: 16,
+              fontFamily: 'YuGothic',
+            ),
           ),
           Spacer(),
           badges.Badge(
@@ -1250,7 +2211,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Constants.ftaColorLight
+                color: Constants.ftaColorLight,
                 /*border: Border.all(
                         color: Constants.primaryColor.withOpacity(0.5),
                         width: 1,

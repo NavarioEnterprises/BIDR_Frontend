@@ -518,4 +518,121 @@ class AuthApiService {
       return {'success': false, 'error': 'Sign out error: $e'};
     }
   }
+
+  /// Get seller profile by auth_user_uid
+  Future<Map<String, dynamic>> getSellerProfile({
+    required String authUserUid,
+  }) async {
+    try {
+      final url =
+          '${GlobalVariables.authServiceUrl}api/seller/profiles/by-auth-user-uid/$authUserUid/';
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (kDebugMode) {
+        print('Get seller profile response status: ${response.statusCode}');
+        print('Get seller profile response body: ${response.body}');
+      }
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        final errorData = json.decode(response.body);
+        return {
+          'success': false,
+          'error': errorData,
+          'statusCode': response.statusCode,
+        };
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Get seller profile error: $e');
+      }
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  /// Update seller profile
+  Future<Map<String, dynamic>> updateSellerProfile({
+    required String profileId,
+    required Map<String, dynamic> profileData,
+  }) async {
+    try {
+      final url =
+          '${GlobalVariables.authServiceUrl}api/seller/profiles/$profileId/';
+
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(profileData),
+      );
+
+      if (kDebugMode) {
+        print('Update seller profile response status: ${response.statusCode}');
+        print('Update seller profile response body: ${response.body}');
+      }
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        final errorData = json.decode(response.body);
+        return {
+          'success': false,
+          'error': errorData,
+          'statusCode': response.statusCode,
+        };
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Update seller profile error: $e');
+      }
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  /// Update seller basic info (company details)
+  Future<Map<String, dynamic>> updateSellerBasicInfo({
+    required String authUserUid,
+    required Map<String, dynamic> sellerData,
+  }) async {
+    try {
+      final url =
+          '${GlobalVariables.authServiceUrl}api/seller/profiles/update-by-auth-user-uid/$authUserUid/';
+
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(sellerData),
+      );
+
+      if (kDebugMode) {
+        print(
+          'Update seller basic info response status: ${response.statusCode}',
+        );
+        print('Update seller basic info response body: ${response.body}');
+      }
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        return {'success': true, 'data': responseData};
+      } else {
+        final errorData = json.decode(response.body);
+        return {
+          'success': false,
+          'error': errorData,
+          'statusCode': response.statusCode,
+        };
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Update seller basic info error: $e');
+      }
+      return {'success': false, 'error': e.toString()};
+    }
+  }
 }

@@ -956,4 +956,100 @@ class ApiService {
       };
     }
   }
+
+  /// Submit a flag for a product request
+  static Future<Map<String, dynamic>> flagRequest({
+    required String requestId,
+    required String reason,
+    required String authUserUid,
+  }) async {
+    print('Flagging request: $requestId with reason: $reason');
+
+    try {
+      final url = '${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/$requestId/flag_request/';
+
+      final flagData = {
+        'reason': reason,
+        'auth_user_uid': authUserUid,
+      };
+
+      print('Flag data: $flagData');
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(flagData),
+      );
+
+      print('Flag request response status: ${response.statusCode}');
+      print('Flag request response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        return {
+          'success': true,
+          'message': responseData['message'] ?? 'Request flagged successfully',
+          'data': responseData,
+        };
+      } else {
+        final errorData = json.decode(response.body);
+        return {
+          'success': false,
+          'message': errorData['error'] ?? 'Failed to flag request',
+          'error': errorData,
+        };
+      }
+    } catch (e) {
+      print('Flag request error: $e');
+      return {
+        'success': false,
+        'message': 'Failed to flag request',
+        'error': e.toString(),
+      };
+    }
+  }
+
+  /// Get seller orders summary for analytics/revenue tracking
+  static Future<Map<String, dynamic>> getSellerOrdersSummary({
+    required String authUserUid,
+    String timeframe = 'monthly',
+  }) async {
+    print('Fetching seller orders summary for: $authUserUid, timeframe: $timeframe');
+
+    try {
+      final url = '${GlobalVariables.productsServiceUrl}api/v1/analytics/dashboard/seller_orders_summary/?auth_user_uid=$authUserUid&timeframe=$timeframe';
+
+      print('Seller orders summary URL: $url');
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      print('Seller orders summary response status: ${response.statusCode}');
+      print('Seller orders summary response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        return {
+          'success': true,
+          'data': responseData,
+        };
+      } else {
+        final errorData = json.decode(response.body);
+        return {
+          'success': false,
+          'message': errorData['error'] ?? 'Failed to fetch orders summary',
+          'error': errorData,
+        };
+      }
+    } catch (e) {
+      print('Seller orders summary error: $e');
+      return {
+        'success': false,
+        'message': 'Failed to fetch orders summary',
+        'error': e.toString(),
+      };
+    }
+  }
 }

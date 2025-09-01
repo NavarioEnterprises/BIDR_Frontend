@@ -3288,6 +3288,32 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       if (response.statusCode == 201 || response.statusCode == 200) {
         print('Order created successfully: ${response.body}');
 
+        // Parse response to get order ID
+        final responseData = json.decode(response.body);
+        final orderId =
+            responseData['id']?.toString() ??
+            responseData['order_id']?.toString();
+
+        if (orderId != null) {
+          // Update order status to PAID
+          try {
+            final updateResult = await ApiService.updateOrderStatus(
+              orderId: orderId,
+              status: 'PAID',
+            );
+
+            if (updateResult['success']) {
+              print('Order status updated to PAID successfully');
+            } else {
+              print(
+                'Failed to update order status: ${updateResult['message']}',
+              );
+            }
+          } catch (e) {
+            print('Error updating order status: $e');
+          }
+        }
+
         // Navigate to Transaction Management tab
         setState(() {
           dashboardIndex = 2; // Transaction Management tab

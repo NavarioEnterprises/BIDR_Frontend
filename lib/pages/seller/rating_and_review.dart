@@ -1,8 +1,10 @@
-
-
 import 'package:bidr/constants/Constants.dart';
+import 'package:bidr/global_values.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
 
 class ReviewItem {
   final String uuid;
@@ -10,6 +12,8 @@ class ReviewItem {
   final String description;
   final int rating;
   final String comment;
+  final String createdAt;
+  final String type;
 
   ReviewItem({
     required this.uuid,
@@ -17,17 +21,31 @@ class ReviewItem {
     required this.description,
     required this.rating,
     required this.comment,
+    required this.createdAt,
+    required this.type,
   });
+
+  factory ReviewItem.fromJson(Map<String, dynamic> json) {
+    return ReviewItem(
+      uuid: json['uuid'] ?? '',
+      customerName: json['customerName'] ?? 'Anonymous',
+      description: json['description'] ?? '',
+      rating: json['rating'] ?? 0,
+      comment: json['comment'] ?? '',
+      createdAt: json['created_at'] ?? '',
+      type: json['type'] ?? 'review',
+    );
+  }
 }
 
 class RatingReviewWidget extends StatefulWidget {
-  final List<ReviewItem> reviews;
+  final String sellerId;
   final Function(String uuid, String response)? onRespond;
   final Function(String uuid, String reportType, String details)? onReport;
 
   const RatingReviewWidget({
     Key? key,
-    required this.reviews,
+    required this.sellerId,
     this.onRespond,
     this.onReport,
   }) : super(key: key);
@@ -39,20 +57,254 @@ class RatingReviewWidget extends StatefulWidget {
 class _RatingReviewWidgetState extends State<RatingReviewWidget> {
   int currentPage = 1;
   final int itemsPerPage = 4;
+  List<ReviewItem> reviews = [];
+  bool isLoading = true;
+  String? error;
+  Map<String, dynamic>? summary;
 
   List<ReviewItem> get currentPageReviews {
     int startIndex = (currentPage - 1) * itemsPerPage;
     int endIndex = startIndex + itemsPerPage;
-    if (endIndex > widget.reviews.length) endIndex = widget.reviews.length;
-    return widget.reviews.sublist(startIndex, endIndex);
+    if (endIndex > reviews.length) endIndex = reviews.length;
+    return reviews.sublist(startIndex, endIndex);
   }
 
-  int get totalPages => (widget.reviews.length / itemsPerPage).ceil();
+  int get totalPages => (reviews.length / itemsPerPage).ceil();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchReviews();
+  }
+
+  Future<void> _fetchReviews() async {
+    try {
+      setState(() {
+        isLoading = true;
+        error = null;
+      });
+
+      final String baseUrl = GlobalVariables.reviewsServiceUrl;
+      final response = await http
+          .get(
+            Uri.parse('${baseUrl}api/ratings/seller/${widget.sellerId}/'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> reviewsJson = data['reviews'] ?? [];
+
+        setState(() {
+          reviews = reviewsJson
+              .map((json) => ReviewItem.fromJson(json))
+              .toList();
+          summary = data['summary'];
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          error = 'Failed to load reviews: ${response.statusCode}';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        error = 'Error loading reviews: $e';
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _respondToReview(String uuid, String response) async {
+    try {
+      final String baseUrl = GlobalVariables.reviewsServiceUrl;
+      final apiResponse = await http
+          .post(
+            Uri.parse('$baseUrl/api/ratings/respond/'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: json.encode({'uuid': uuid, 'response': response}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (apiResponse.statusCode == 200) {
+        // Handle successful response
+        widget.onRespond?.call(uuid, response);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Response sent successfully')),
+        );
+      } else {
+        throw Exception('Failed to send response: ${apiResponse.statusCode}');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error sending response: $e')));
+    }
+  }
+
+  Future<void> _reportReview(
+    String uuid,
+    String reportType,
+    String details,
+  ) async {
+    try {
+      final String baseUrl = GlobalVariables.reviewsServiceUrl;
+      final apiResponse = await http
+          .post(
+            Uri.parse('$baseUrl/api/ratings/report/'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: json.encode({
+              'uuid': uuid,
+              'reportType': reportType,
+              'details': details,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (apiResponse.statusCode == 200) {
+        // Handle successful report
+        widget.onReport?.call(uuid, reportType, details);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Report submitted successfully')),
+        );
+      } else {
+        throw Exception('Failed to submit report: ${apiResponse.statusCode}');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error submitting report: $e')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(50.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 50, color: Colors.grey.shade600),
+            const SizedBox(height: 16),
+            Text(
+              error!,
+              style: GoogleFonts.manrope(
+                fontSize: 16,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _fetchReviews,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (reviews.isEmpty) {
+      return Center(
+        child: Container(
+          padding: EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  color: Constants.ctaColorLight.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.star_border_rounded,
+                    size: 60,
+                    color: Constants.ctaColorLight,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'No Reviews Yet',
+                style: GoogleFonts.manrope(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Your ratings and reviews will appear here\nonce customers start sharing their feedback',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[600],
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 32),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.lightbulb_outline,
+                      size: 20,
+                      color: Constants.ctaColorLight,
+                    ),
+                    SizedBox(width: 12),
+                    Flexible(
+                      child: Text(
+                        'Deliver great service to earn positive reviews',
+                        style: GoogleFonts.manrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Column(
       children: [
+        // Summary information
+        if (summary != null) _buildSummaryCard(),
         // Reviews List
         const SizedBox(height: 16),
         Row(
@@ -62,7 +314,55 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
         ),
         const SizedBox(height: 20),
         // Pagination
-        _buildPagination(),
+        if (totalPages > 1) _buildPagination(),
+      ],
+    );
+  }
+
+  Widget _buildSummaryCard() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Constants.ctaColorLight.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Constants.ctaColorLight.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildSummaryItem(
+            'Total Reviews',
+            summary!['total_reviews'].toString(),
+          ),
+          _buildSummaryItem(
+            'Total Ratings',
+            summary!['total_ratings'].toString(),
+          ),
+          _buildSummaryItem(
+            'Average Rating',
+            '${summary!['average_rating']} ★',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: GoogleFonts.manrope(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Constants.ctaColorLight,
+          ),
+        ),
+        Text(
+          label,
+          style: GoogleFonts.manrope(fontSize: 12, color: Colors.grey.shade600),
+        ),
       ],
     );
   }
@@ -91,8 +391,8 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
           // Header with UUID
           Row(
             children: [
-              Container(height: 10,width: 1.8,color: Constants.ctaColorLight,),
-              SizedBox(width: 4,),
+              Container(height: 10, width: 1.8, color: Constants.ctaColorLight),
+              SizedBox(width: 4),
               Text(
                 'UUID: ${review.uuid}',
                 style: GoogleFonts.manrope(
@@ -128,7 +428,9 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
               return Icon(
                 Icons.star,
                 size: 16,
-                color: index < review.rating ? Constants.ctaColorLight : Colors.grey.shade300,
+                color: index < review.rating
+                    ? Constants.ctaColorLight
+                    : Colors.grey.shade300,
               );
             }),
           ),
@@ -143,10 +445,7 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
             ),
             child: Text(
               'Comment: ${review.comment}',
-              style: GoogleFonts.manrope(
-                fontSize: 13,
-                color: Colors.black87,
-              ),
+              style: GoogleFonts.manrope(fontSize: 13, color: Colors.black87),
             ),
           ),
           const SizedBox(height: 16),
@@ -187,7 +486,7 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  child:  Text(
+                  child: Text(
                     'Report',
                     style: GoogleFonts.manrope(
                       fontSize: 13,
@@ -209,7 +508,9 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
       children: [
         // Previous button
         IconButton(
-          onPressed: currentPage > 1 ? () => setState(() => currentPage--) : null,
+          onPressed: currentPage > 1
+              ? () => setState(() => currentPage--)
+              : null,
           icon: const Icon(Icons.chevron_left),
           color: Colors.grey.shade600,
         ),
@@ -221,34 +522,39 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
             margin: const EdgeInsets.symmetric(horizontal: 4),
             child: isCurrentPage
                 ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Constants.ctaColorLight,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                pageNumber.toString(),
-                style: GoogleFonts.manrope(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            )
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Constants.ctaColorLight,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      pageNumber.toString(),
+                      style: GoogleFonts.manrope(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  )
                 : TextButton(
-              onPressed: () => setState(() => currentPage = pageNumber),
-              child: Text(
-                pageNumber.toString(),
-                style: GoogleFonts.manrope(
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
+                    onPressed: () => setState(() => currentPage = pageNumber),
+                    child: Text(
+                      pageNumber.toString(),
+                      style: GoogleFonts.manrope(
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
           );
         }),
         // Next button
         IconButton(
-          onPressed: currentPage < totalPages ? () => setState(() => currentPage++) : null,
+          onPressed: currentPage < totalPages
+              ? () => setState(() => currentPage++)
+              : null,
           icon: const Icon(Icons.chevron_right),
           color: Colors.grey.shade600,
         ),
@@ -278,7 +584,7 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                     Text(
+                    Text(
                       'Respond',
                       style: GoogleFonts.manrope(
                         fontSize: 18,
@@ -297,7 +603,7 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
                 ),
                 const SizedBox(height: 20),
                 // Message field
-                 Text(
+                Text(
                   'Message',
                   style: GoogleFonts.manrope(
                     fontSize: 14,
@@ -325,7 +631,7 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(36),
-                      borderSide:  BorderSide(color: Constants.ctaColorLight),
+                      borderSide: BorderSide(color: Constants.ctaColorLight),
                     ),
                     contentPadding: const EdgeInsets.all(12),
                   ),
@@ -337,8 +643,8 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (messageController.text.isNotEmpty) {
-                        widget.onRespond?.call(review.uuid, messageController.text);
                         Navigator.of(context).pop();
+                        _respondToReview(review.uuid, messageController.text);
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -350,7 +656,7 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child:  Text(
+                    child: Text(
                       'Submit',
                       style: GoogleFonts.manrope(
                         fontSize: 16,
@@ -370,7 +676,8 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
   void _showReportDialog(ReviewItem review) {
     String selectedReportType = '';
     final TextEditingController spamController = TextEditingController();
-    final TextEditingController inappropriateController = TextEditingController();
+    final TextEditingController inappropriateController =
+        TextEditingController();
     final TextEditingController otherController = TextEditingController();
 
     showDialog(
@@ -394,7 +701,7 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                         Text(
+                        Text(
                           'Report',
                           style: GoogleFonts.manrope(
                             fontSize: 18,
@@ -413,11 +720,26 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
                     ),
                     const SizedBox(height: 20),
                     // Report options
-                    _buildReportOption('Spam', spamController, selectedReportType, setState),
+                    _buildReportOption(
+                      'Spam',
+                      spamController,
+                      selectedReportType,
+                      setState,
+                    ),
                     const SizedBox(height: 16),
-                    _buildReportOption('Inappropriate Content', inappropriateController, selectedReportType, setState),
+                    _buildReportOption(
+                      'Inappropriate Content',
+                      inappropriateController,
+                      selectedReportType,
+                      setState,
+                    ),
                     const SizedBox(height: 16),
-                    _buildReportOption('Other', otherController, selectedReportType, setState),
+                    _buildReportOption(
+                      'Other',
+                      otherController,
+                      selectedReportType,
+                      setState,
+                    ),
                     const SizedBox(height: 24),
                     // Submit button
                     SizedBox(
@@ -425,13 +747,21 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
                       child: ElevatedButton(
                         onPressed: () {
                           String details = '';
-                          if (selectedReportType == 'Spam') details = spamController.text;
-                          else if (selectedReportType == 'Inappropriate Content') details = inappropriateController.text;
-                          else if (selectedReportType == 'Other') details = otherController.text;
+                          if (selectedReportType == 'Spam')
+                            details = spamController.text;
+                          else if (selectedReportType ==
+                              'Inappropriate Content')
+                            details = inappropriateController.text;
+                          else if (selectedReportType == 'Other')
+                            details = otherController.text;
 
                           if (selectedReportType.isNotEmpty) {
-                            widget.onReport?.call(review.uuid, selectedReportType, details);
                             Navigator.of(context).pop();
+                            _reportReview(
+                              review.uuid,
+                              selectedReportType,
+                              details,
+                            );
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -443,7 +773,7 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child:  Text(
+                        child: Text(
                           'Submit',
                           style: GoogleFonts.manrope(
                             fontSize: 16,
@@ -462,7 +792,12 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
     );
   }
 
-  Widget _buildReportOption(String title, TextEditingController controller, String selectedReportType, StateSetter setState) {
+  Widget _buildReportOption(
+    String title,
+    TextEditingController controller,
+    String selectedReportType,
+    StateSetter setState,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -494,7 +829,7 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide:  BorderSide(color: Constants.ctaColorLight),
+              borderSide: BorderSide(color: Constants.ctaColorLight),
             ),
             contentPadding: const EdgeInsets.all(12),
           ),
@@ -506,42 +841,17 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
 
 // Example usage
 class ReviewScreen extends StatelessWidget {
+  final String sellerId;
+
+  const ReviewScreen({
+    Key? key,
+    this.sellerId = 'c97f2da1-810c-4f86-98b4-18b722d5eecb', // Default seller ID
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    final List<ReviewItem> sampleReviews = [
-      ReviewItem(
-        uuid: '000100',
-        customerName: 'Mr. Joseph Anthony',
-        description: 'Fuel Filter, Toyota Corolla, 2016',
-        rating: 5,
-        comment: 'Good Service',
-      ),
-      ReviewItem(
-        uuid: '000180',
-        customerName: 'Benjamin Thompson',
-        description: 'Tail light, BMW M3, 2024',
-        rating: 5,
-        comment: 'Good Service',
-      ),
-      ReviewItem(
-        uuid: '003100',
-        customerName: 'Miss Jane Smith',
-        description: 'Fuel Filter, Toyota Corolla, 2016',
-        rating: 5,
-        comment: 'Good Service',
-      ),
-      ReviewItem(
-        uuid: '000100',
-        customerName: 'Mr. Joseph Anthony',
-        description: 'Fuel Filter, Toyota Corolla, 2016',
-        rating: 5,
-        comment: 'Good Service',
-      ),
-
-    ];
-
     return RatingReviewWidget(
-      reviews: sampleReviews,
+      sellerId: sellerId,
       onRespond: (uuid, response) {
         print('Responding to $uuid: $response');
       },

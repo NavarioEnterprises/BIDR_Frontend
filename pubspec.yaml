@@ -164,6 +164,7 @@ flutter:
     - lib/assets/svgs/Layer 1.svg
     - lib/assets/svgs/Vector.svg
     - lib/assets/images/rim&type.png
+    - lib/assets/images/star_eyes_emoji_1.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
