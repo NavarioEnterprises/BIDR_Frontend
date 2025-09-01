@@ -3216,6 +3216,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   ) async {
     try {
       // Show loading indicator
+      ApiService apiService = ApiService();
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -3256,6 +3257,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       print("Processing payment for seller: $sellerUid");
 
       // Create order data required by backend
+      //ApiService.updateOrderStatus(orderId: '', status: '');
       final orderData = {
         'request_id': _getRequestId(request),
         'quote_id': _getQuoteId(seller),
