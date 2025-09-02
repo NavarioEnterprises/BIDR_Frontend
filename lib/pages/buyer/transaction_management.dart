@@ -77,6 +77,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
   void dispose() {
     _tabController.dispose();
     _animationController.dispose();
+    _returnReasonController.dispose();
+    _returnDescriptionController.dispose();
     super.dispose();
   }
 
@@ -147,15 +149,19 @@ class _TransactionDashboardState extends State<TransactionDashboard>
           if (order.comments.isNotEmpty) {
             for (var comment in order.comments) {
               // Convert order comments to reviews if they have rating-like structure
-              apiReviews.add(ReviewItem(
-                uuid: Constants.myUid.isNotEmpty ? Constants.myUid : DateTime.now().millisecondsSinceEpoch.toString(),
-                customerName: Constants.myDisplayname,
-                description: comment.description,
-                rating: order.rating.toInt(), // Use order rating
-                comment: comment.description,
-                createdAt:_formatDate(order.dateTime),
-                type: 'review',
-              ));
+              apiReviews.add(
+                ReviewItem(
+                  uuid: Constants.myUid.isNotEmpty
+                      ? Constants.myUid
+                      : DateTime.now().millisecondsSinceEpoch.toString(),
+                  customerName: Constants.myDisplayname,
+                  description: comment.description,
+                  rating: order.rating.toInt(), // Use order rating
+                  comment: comment.description,
+                  createdAt: _formatDate(order.dateTime),
+                  type: 'review',
+                ),
+              );
             }
           }
         }
@@ -252,7 +258,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
       final prefs = await SharedPreferences.getInstance();
       final reviewsJsonString = prefs.getString('reviews_list');
       totalReviews = prefs.getInt('total_reviews') ?? 0;
-      
+
       if (reviewsJsonString != null) {
         final reviewsJsonList = json.decode(reviewsJsonString) as List;
         reviews = reviewsJsonList
@@ -464,8 +470,9 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                             "Reviews",
                             reviews
                                 .map(
-                                  (review) =>
-                                      _buildCommentItem("${review.comment} (Rating: ${review.rating}/5)"),
+                                  (review) => _buildCommentItem(
+                                    "${review.comment} (Rating: ${review.rating}/5)",
+                                  ),
                                 )
                                 .toList(),
                           ),
@@ -476,7 +483,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                         // Action Buttons
                         Row(
                           children: [
-                            if (order.status.toLowerCase() == "Pending Payment".toLowerCase() ) ...[
+                            if (order.status.toLowerCase() ==
+                                "Pending Payment".toLowerCase()) ...[
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: _showCollectGoodsDialog,
@@ -533,8 +541,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                   ),
                                 ),
                               ),
-                            ]
-                            else if (order.status.toLowerCase()  == "Delivered".toLowerCase() ) ...[
+                            ] else if (order.status.toLowerCase() ==
+                                "Delivered".toLowerCase()) ...[
                               Expanded(
                                 child: OutlinedButton.icon(
                                   onPressed: _showAddReviewDialog,
@@ -566,7 +574,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: () {
-                                    // Handle return & refund
+                                    _showReturnAndRefundDialog(order);
                                   },
                                   icon: Icon(
                                     Icons.refresh,
@@ -590,8 +598,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                   ),
                                 ),
                               ),
-                            ]
-                            else ...[
+                            ] else ...[
                               Expanded(
                                 child: OutlinedButton(
                                   onPressed: () => Navigator.of(context).pop(),
@@ -722,12 +729,12 @@ class _TransactionDashboardState extends State<TransactionDashboard>
       ),
     );
   }
-  Widget _buildCustomTextField(
-      String hintText,
-      TextEditingController controller,
-      FocusNode focusNode)
 
-  {
+  Widget _buildCustomTextField(
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+  ) {
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
       labelText: hintText,
@@ -737,9 +744,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
       textInputAction: TextInputAction.next,
       isPasswordField: false,
       onChanged: (value) {},
-      onSubmitted: (value) {
-
-      },
+      onSubmitted: (value) {},
     );
   }
 
@@ -810,16 +815,21 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                       ),
                                     ),
                                   ),
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                    style: OutlinedButton.styleFrom(foregroundColor: Colors.black87,side: BorderSide(color: Colors.black87,width: 1.4)),
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: Colors.black87,
+                                      side: BorderSide(
+                                        color: Colors.black87,
+                                        width: 1.4,
+                                      ),
+                                    ),
                                     icon: Icon(
                                       Icons.close,
-                                      color:Colors.black87,
+                                      color: Colors.black87,
                                     ),
                                     onPressed: () =>
                                         Navigator.of(context).pop(),
-
                                   ),
                                 ],
                               ),
@@ -834,8 +844,11 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                   itemPadding: EdgeInsets.symmetric(
                                     horizontal: 4.0,
                                   ),
-                                  itemBuilder: (context, _) =>
-                                      Icon(Iconsax.star1, color: Colors.amber,size: 16,),
+                                  itemBuilder: (context, _) => Icon(
+                                    Iconsax.star1,
+                                    color: Colors.amber,
+                                    size: 16,
+                                  ),
                                   onRatingUpdate: (rating) {
                                     setState(() {
                                       _currentRating = rating;
@@ -857,7 +870,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                 ),
                               ),
                               SizedBox(height: 16),
-                             // _buildCustomTextField("Description",_commentController,_commentFocusNode),
+                              // _buildCustomTextField("Description",_commentController,_commentFocusNode),
                               //SizedBox(height: 8),
                               Form(
                                 key: _formKey,
@@ -866,22 +879,26 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                   maxLines: 5,
                                   maxLength: 500,
                                   decoration: InputDecoration(
-                                    labelText: 'Description',  // Changed from hintText to labelText
+                                    labelText:
+                                        'Description', // Changed from hintText to labelText
                                     labelStyle: TextStyle(
                                       color: Colors.grey[600],
                                       fontSize: 14,
                                     ),
-                                    floatingLabelStyle: TextStyle(  // Style when label is floating
+                                    floatingLabelStyle: TextStyle(
+                                      // Style when label is floating
                                       color: Constants.ftaColorLight,
                                       fontSize: 14,
                                     ),
-                                    hintText: 'Enter your description here',  // Optional: still show hint when focused
+                                    hintText:
+                                        'Enter your description here', // Optional: still show hint when focused
                                     hintStyle: TextStyle(
                                       color: Colors.grey[400],
                                       fontSize: 13,
                                     ),
                                     filled: true,
-                                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
                                     fillColor: Colors.grey[50],
                                     contentPadding: EdgeInsets.all(16),
                                     border: OutlineInputBorder(
@@ -961,22 +978,29 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                         try {
                                           // Create new review item
                                           final newReview = ReviewItem(
-                                            uuid: Constants.myUid.isNotEmpty ? Constants.myUid : DateTime.now().millisecondsSinceEpoch.toString(),
-                                            customerName: Constants.myDisplayname,
-                                            description: _commentController.text,
+                                            uuid: Constants.myUid.isNotEmpty
+                                                ? Constants.myUid
+                                                : DateTime.now()
+                                                      .millisecondsSinceEpoch
+                                                      .toString(),
+                                            customerName:
+                                                Constants.myDisplayname,
+                                            description:
+                                                _commentController.text,
                                             rating: _currentRating.toInt(),
                                             comment: _commentController.text,
-                                            createdAt: DateTime.now().toIso8601String(),
+                                            createdAt: DateTime.now()
+                                                .toIso8601String(),
                                             type: 'review',
                                           );
 
                                           // Add review to local storage
                                           await _addReviewLocally(newReview);
-                                          
+
                                           // Clear form
                                           _commentController.clear();
                                           _currentRating = 0.0;
-                                          
+
                                           Navigator.of(context).pop();
                                           setState(() {});
                                           ScaffoldMessenger.of(
@@ -1501,7 +1525,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
               builder: (context) => SparesDetailScreen(
                 request: request,
                 autoSpare: request.autoSpare,
-                bids: request.sellerOffers ?? [], index: 1,
+                bids: request.sellerOffers ?? [],
+                index: 1,
               ),
             ),
           );
@@ -1514,7 +1539,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
               builder: (context) => RimTyreDetailScreen(
                 request: request,
                 rimTyre: request.rimTyre,
-                bids: request.sellerOffers ?? [], index: 1,
+                bids: request.sellerOffers ?? [],
+                index: 1,
               ),
             ),
           );
@@ -1527,7 +1553,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
               builder: (context) => ConsumerElectronicsDetailScreen(
                 request: request,
                 consumerElectronics: request.consumerElectronics,
-                bids: request.sellerOffers ?? [], index: 1,
+                bids: request.sellerOffers ?? [],
+                index: 1,
               ),
             ),
           );
@@ -3052,6 +3079,23 @@ class _TransactionDashboardState extends State<TransactionDashboard>
   // Add these variables to your _TransactionDashboardState class
   String uniqueIdentifierNumber = '';
 
+  // Return and Refund form controllers
+  final TextEditingController _returnReasonController = TextEditingController();
+  final TextEditingController _returnDescriptionController =
+      TextEditingController();
+  String _selectedReturnReason = '';
+  final List<String> _returnReasons = [
+    'Product defective/damaged',
+    'Not as described',
+    'Wrong item received',
+    'Product quality issues',
+    'Size/fit issues',
+    'Changed mind',
+    'Order was placed by mistake',
+    'Product arrived too late',
+    'Other',
+  ];
+
   // Method to generate random 4-digit number
   void _generateUniqueIdentifier() {
     Random random = Random();
@@ -3227,6 +3271,429 @@ class _TransactionDashboardState extends State<TransactionDashboard>
       },
     );
   }
+
+  // Method to show the return and refund dialog
+  void _showReturnAndRefundDialog(dynamic order) {
+    // Reset form fields
+    _selectedReturnReason = '';
+    _returnReasonController.clear();
+    _returnDescriptionController.clear();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing by tapping outside
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.4,
+                padding: EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Warning Icon
+                      Icon(
+                        CupertinoIcons.return_icon,
+                        color: Colors.red[600],
+                        size: 60,
+                      ),
+                      SizedBox(height: 20),
+
+                      // Title
+                      Text(
+                        'Request Return & Refund',
+                        style: GoogleFonts.manrope(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF2B3A5C),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 16),
+
+                      // Description
+                      Text(
+                        'Please provide details about why you want to return this product. This will help us process your request efficiently.',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 24),
+
+                      // Order Info
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[200]!),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Order Details',
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF2B3A5C),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Order #${order.orderNumber.length > 8 ? order.orderNumber.substring(0, 8).toUpperCase() : order.orderNumber.toUpperCase()}',
+                              style: GoogleFonts.manrope(
+                                fontSize: 13,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            Text(
+                              'Amount: R${order.price.toStringAsFixed(2)}',
+                              style: GoogleFonts.manrope(
+                                fontSize: 13,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 20),
+
+                      // Return Reason Dropdown
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Reason for Return *',
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2B3A5C),
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: _selectedReturnReason.isEmpty
+                                    ? null
+                                    : _selectedReturnReason,
+                                hint: Text(
+                                  'Select a reason',
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 14,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                items: _returnReasons.map((String reason) {
+                                  return DropdownMenuItem<String>(
+                                    value: reason,
+                                    child: Text(
+                                      reason,
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 14,
+                                        color: Color(0xFF2B3A5C),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  setDialogState(() {
+                                    _selectedReturnReason = newValue ?? '';
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+
+                      // Description Text Field
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Additional Details *',
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2B3A5C),
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          TextField(
+                            controller: _returnDescriptionController,
+                            maxLines: 4,
+                            decoration: InputDecoration(
+                              hintText:
+                                  'Please provide detailed information about the issue...',
+                              hintStyle: GoogleFonts.manrope(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Constants.ctaColorLight,
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.all(16),
+                            ),
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              color: Color(0xFF2B3A5C),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+
+                      // Photos/Evidence Section (Suggestion)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Photos/Evidence (Optional)',
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2B3A5C),
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.grey[300]!,
+                                style: BorderStyle.solid,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  CupertinoIcons.camera,
+                                  color: Colors.grey[600],
+                                  size: 32,
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Upload photos to support your return request',
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 24),
+
+                      // Preferred Resolution Section
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Preferred Resolution',
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2B3A5C),
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  padding: EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.red[200]!),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        CupertinoIcons.money_dollar_circle,
+                                        color: Colors.red[600],
+                                        size: 24,
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        'Full Refund',
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.red[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Container(
+                                  padding: EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Colors.blue[200]!,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        CupertinoIcons.refresh,
+                                        color: Colors.blue[600],
+                                        size: 24,
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        'Exchange',
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.blue[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 24),
+
+                      // Submit Return Request Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed:
+                              (_selectedReturnReason.isNotEmpty &&
+                                  _returnDescriptionController.text
+                                      .trim()
+                                      .isNotEmpty)
+                              ? () {
+                                  // Handle return request submission
+                                  _submitReturnRequest(order);
+                                  Navigator.of(context).pop();
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                (_selectedReturnReason.isNotEmpty &&
+                                    _returnDescriptionController.text
+                                        .trim()
+                                        .isNotEmpty)
+                                ? Colors.red[600]
+                                : Colors.grey[400],
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(360),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'Submit Return Request',
+                            style: GoogleFonts.manrope(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 12),
+
+                      // Cancel Button
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // Method to handle return request submission
+  void _submitReturnRequest(dynamic order) {
+    // Show success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Return request submitted successfully. We will contact you within 24 hours.',
+          style: GoogleFonts.manrope(fontSize: 14),
+        ),
+        backgroundColor: Colors.green[600],
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+
+    // Here you would typically send the request to your backend API
+    print('Return request submitted:');
+    print('Order Number: ${order.orderNumber}');
+    print('Reason: $_selectedReturnReason');
+    print('Description: ${_returnDescriptionController.text}');
+  }
+
   void _verifyCollectionPINDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -3239,14 +3706,14 @@ class _TransactionDashboardState extends State<TransactionDashboard>
             borderRadius: BorderRadius.circular(16),
           ),
           child: Container(
-            constraints: BoxConstraints(maxWidth: 450,maxHeight: 450),
+            constraints: BoxConstraints(maxWidth: 450, maxHeight: 450),
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
-              mainAxisSize: MainAxisSize.min,//
+              mainAxisSize: MainAxisSize.min, //
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
@@ -3254,20 +3721,20 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
-                      onPressed: (){
+                      onPressed: () {
                         Navigator.pop(context);
                         _congratulationDialog(context);
-                        setState(() {
-
-                        });
+                        setState(() {});
                       },
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Constants.ftaColorLight,
-                          minimumSize: Size(40, 40),
-                          shadowColor: Colors.grey.shade100,
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(8))
+                        backgroundColor: Colors.white,
+                        foregroundColor: Constants.ftaColorLight,
+                        minimumSize: Size(40, 40),
+                        shadowColor: Colors.grey.shade100,
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.circular(8),
+                        ),
                       ),
                       child: Icon(
                         CupertinoIcons.back,
@@ -3282,16 +3749,13 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                         height: 100,
                       ),
                     ),
-                    Container(
-                      width: 50,
-                      height: 40,
-                    )
+                    Container(width: 50, height: 40),
                   ],
                 ),
                 SizedBox(height: 24),
                 Center(
                   child: Image.asset(
-                   "lib/assets/images/confirmed.png",
+                    "lib/assets/images/confirmed.png",
                     width: 140,
                     height: 140,
                   ),
@@ -3316,6 +3780,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
       },
     );
   }
+
   void _congratulationDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -3328,14 +3793,14 @@ class _TransactionDashboardState extends State<TransactionDashboard>
             borderRadius: BorderRadius.circular(16),
           ),
           child: Container(
-            constraints: BoxConstraints(maxWidth: 450,maxHeight: 450),
+            constraints: BoxConstraints(maxWidth: 450, maxHeight: 450),
             padding: EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
-              mainAxisSize: MainAxisSize.min,//
+              mainAxisSize: MainAxisSize.min, //
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
@@ -3350,7 +3815,9 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                         minimumSize: Size(40, 40),
                         shadowColor: Colors.grey.shade100,
                         elevation: 5,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(8))
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.circular(8),
+                        ),
                       ),
                       child: Icon(
                         CupertinoIcons.back,
@@ -3365,7 +3832,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                         height: 100,
                       ),
                     ),
-                    Container(width:50,height:40)
+                    Container(width: 50, height: 40),
                   ],
                 ),
                 SizedBox(height: 24),
@@ -3398,7 +3865,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
   }
 
   Widget _buildOrderCard(Order order) {
-    return order.status == "Cancelled" //
+    return order.status ==
+            "Cancelled" //
         ? Container(
             padding: EdgeInsets.all(12),
             constraints: BoxConstraints(maxWidth: 300),
@@ -3579,9 +4047,12 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: order.status.toLowerCase()  == "Refunded".toLowerCase()
+                              color:
+                                  order.status.toLowerCase() ==
+                                      "Refunded".toLowerCase()
                                   ? Color(0XFF0045BD)
-                                  : order.status.toLowerCase()  == "Cancelled".toLowerCase()
+                                  : order.status.toLowerCase() ==
+                                        "Cancelled".toLowerCase()
                                   ? Color(0XFFD62828)
                                   : Constants.ctaColorLight.withOpacity(0.25),
                               borderRadius: BorderRadius.circular(8),
@@ -3591,7 +4062,9 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                               style: GoogleFonts.manrope(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: order.status.toLowerCase()  == "Refunded".toLowerCase()
+                                color:
+                                    order.status.toLowerCase() ==
+                                        "Refunded".toLowerCase()
                                     ? Colors.white
                                     : Constants.ftaColorLight,
                               ),
@@ -3726,15 +4199,19 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                   decoration: BoxDecoration(
                                     color: Colors.grey[50],
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.grey[200]!),
+                                    border: Border.all(
+                                      color: Colors.grey[200]!,
+                                    ),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
-                                          ...List.generate(5, (index) =>
-                                            Icon(
+                                          ...List.generate(
+                                            5,
+                                            (index) => Icon(
                                               Icons.star,
                                               size: 14,
                                               color: index < review.rating
@@ -3788,11 +4265,12 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                 SizedBox(height: 8),
 
                 // Conditional UI based on order status and review state
-                if (order.status.toLowerCase()  == "Delivered".toLowerCase())...[
+                if (order.status.toLowerCase() ==
+                    "Delivered".toLowerCase()) ...[
                   // Show rating and reviews
                   Padding(
                     padding: const EdgeInsets.only(left: 16, right: 16),
-                    child:  Row(
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -3857,6 +4335,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                           child: ElevatedButton(
                             onPressed: () {
                               // Handle return & refund
+                              _showReturnAndRefundDialog(order);
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Constants.ctaColorLight,
@@ -3878,8 +4357,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                       ],
                     ),
                   ),
-                ]
-                else if (order.status.toLowerCase()  == "Pending Payment".toLowerCase() ) ...[
+                ] else if (order.status.toLowerCase() ==
+                    "Pending Payment".toLowerCase()) ...[
                   // Collect Goods Button for ongoing orders
                   Padding(
                     padding: const EdgeInsets.only(left: 16, right: 16),
@@ -3912,7 +4391,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                             borderRadius: BorderRadius.circular(360),
                           ),
                           child: IconButton(
-                            onPressed:() async {
+                            onPressed: () async {
                               // Show loading indicator while creating/getting conversation
                               showDialog(
                                 context: context,
@@ -3928,9 +4407,10 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         CircularProgressIndicator(
-                                          valueColor: AlwaysStoppedAnimation<Color>(
-                                            Constants.ctaColorLight,
-                                          ),
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Constants.ctaColorLight,
+                                              ),
                                         ),
                                         SizedBox(height: 16),
                                         Text(
@@ -3949,9 +4429,9 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                               try {
                                 // Create or get conversation for this request (without auth)
                                 final conversationData =
-                                await ChatService.createOrGetConversationForRequest(
-                                  _getRequestId(order),
-                                );
+                                    await ChatService.createOrGetConversationForRequest(
+                                      _getRequestId(order),
+                                    );
 
                                 // Close loading dialog
                                 Navigator.of(context).pop();
@@ -3965,10 +4445,12 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                         groupChat: GroupChat(
                                           uuid: _getRequestId(order),
                                           request: ProductRequest(
-                                            description: _getRequestDescription(order),
+                                            description: _getRequestDescription(
+                                              order,
+                                            ),
                                           ),
                                           messages:
-                                          [], // Empty - will be loaded from backend
+                                              [], // Empty - will be loaded from backend
                                         ),
                                       ),
                                     ),
@@ -4010,8 +4492,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                       ],
                     ),
                   ),
-                ]
-                  else if (order.status.toLowerCase()  == "Refunded".toLowerCase() )...[
+                ] else if (order.status.toLowerCase() ==
+                    "Refunded".toLowerCase()) ...[
                   // Show rating for refunded orders
                   Padding(
                     padding: const EdgeInsets.only(left: 16, right: 16),
