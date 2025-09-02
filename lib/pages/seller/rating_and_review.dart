@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/review_item.dart';
+import '../../services/rewards_service.dart';
 
 
 class RatingReviewWidget extends StatefulWidget {
@@ -47,6 +48,17 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
     super.initState();
     _fetchReviews();
   }
+
+  /*Future<void> _loadReviews() async {
+    final result = await RewardsService.getProductReviews(widget.productId);
+    if (result['success']) {
+      setState(() {
+        // Update your reviews list with the fetched data
+        // Example: _reviews = result['data']['reviews'];
+      });
+    }
+  }*/
+
 
   Future<void> _fetchReviews() async {
     try {

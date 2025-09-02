@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 
+import '../../customWdget/custom_input2.dart';
 import '../../services/auth_api_service.dart';
 import '../../services/shared_preferences.dart';
 
@@ -700,7 +701,8 @@ class _ProfileManagementState extends State<ProfileManagement>
     String title,
     IconData icon, {
     bool isDestructive = false,
-  }) {
+  })
+  {
     final bool isSelected = selectedTab == title;
     final bool isSignOutSelected = title == "Sign Out";
     final bool isDeleteSelected = title == "Delete Account";
@@ -754,7 +756,8 @@ class _ProfileManagementState extends State<ProfileManagement>
     String title,
     IconData icon, {
     bool isDestructive = false,
-  }) {
+  })
+  {
     final bool isSelected = selectedSellerTab == title;
     final Color textColor = isDestructive
         ? Constants.ftaColorLight.withOpacity(0.55)
@@ -1705,12 +1708,12 @@ class _ProfileManagementState extends State<ProfileManagement>
 
   Widget _buildSaveButton() {
     return SizedBox(
-      width: MediaQuery.of(context).size.height * 0.5,
+      width:MediaQuery.of(context).size.width*0.35,
       child: ElevatedButton(
         onPressed: isLoadingProfile ? null : () => _handleSaveAction(),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFE8A838),
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          backgroundColor: Constants.ctaColorLight,
+          padding:  EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(360),
           ),
@@ -1736,7 +1739,7 @@ class _ProfileManagementState extends State<ProfileManagement>
     int index, {
     bool isPassword = false,
     int maxLines = 1,
-    VoidCallback? onSubmitted,
+        final Function(String)? onSubmitted,
   }) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
@@ -1762,8 +1765,33 @@ class _ProfileManagementState extends State<ProfileManagement>
       },
     );
   }
-
   Widget _buildCustomInputField(
+      String label,
+      String hintText,
+      TextEditingController controller,
+      FocusNode focusNode,
+      TextInputAction textInputAction, {
+        bool isPassword = false,
+        int maxLines = 1,
+        final Function(String)? onSubmitted,
+      }) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width*0.35,
+      child: CustomInputTransparent4(
+        hintText: hintText,
+        labelText: hintText,
+        controller: controller,
+        focusNode: focusNode,
+        textInputAction: focusNode != null
+            ? TextInputAction.next
+            : TextInputAction.done,
+        isPasswordField: false,
+        onChanged: (value) {},
+        onSubmitted:onSubmitted??(value){},
+      ),
+    );
+  }
+  /*Widget _buildCustomInputField(
     String label,
     String hintText,
     TextEditingController controller,
@@ -1838,7 +1866,7 @@ class _ProfileManagementState extends State<ProfileManagement>
         ],
       ),
     );
-  }
+  }*/
 
   void _signOut() async {
     setState(() {

@@ -1,6 +1,8 @@
 
 class Order {
   final String vendorName;
+  final String? productId;
+  final String? sellerId;
   final String product;
   final String vehicle;
   final String orderNumber;
@@ -15,6 +17,8 @@ class Order {
   Order({
     required this.vendorName,
     required this.product,
+     this.productId,
+     this.sellerId,
     required this.vehicle,
     required this.orderNumber,
     required this.status,
@@ -52,6 +56,8 @@ class Order {
     return Order(
       vendorName: vendorName,
       product: json['request_title'] ?? json['product'] ?? 'Unknown Product',
+      productId: json['product_id'] ?? "",
+      sellerId: json['seller_id'] ?? "",
       vehicle: _extractVehicleInfo(json),
       orderNumber: json['order_number'] ?? json['orderNumber'] ?? 'Unknown Order',
       status: json['status_display'] ?? json['status'] ?? 'Unknown',

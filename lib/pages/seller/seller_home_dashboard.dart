@@ -1,4 +1,5 @@
 import 'package:bidr/constants/Constants.dart';
+import 'package:bidr/pages/notification.dart';
 import 'package:bidr/pages/seller/profile_management.dart';
 import 'package:bidr/pages/seller/rating_and_review.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'dart:html' as html;
 
 import '../../customWdget/appbar.dart';
+import '../../customWdget/dropdownMenu.dart';
 import '../../models/alert.dart';
 import '../../models/request_models.dart';
 import '../../services/chat_service.dart';
@@ -243,7 +245,8 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   Future<void> _showLocationPermissionDialog({
     bool isPermanentlyDenied = false,
-  }) async {
+  }) async
+  {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -392,6 +395,8 @@ class _SellerDashboardState extends State<SellerDashboard>
     }
   }
 
+  SortOption? _currentSort;
+
   @override
   Widget build(BuildContext context) {
     final unreadCount = notifications.where((n) => !n.read).length;
@@ -459,10 +464,14 @@ class _SellerDashboardState extends State<SellerDashboard>
                     ),
                   ),
                   SizedBox(width: 15),
-                  Icon(
-                    HugeIcons.strokeRoundedFilter,
-                    color: Colors.white,
-                    size: 20,
+                  SellerSortDropdownMenu(
+                    initialValue: _currentSort,
+                    onSortChanged: (option) {
+                      setState(() {
+                        _currentSort = option;
+                      });
+                      print('Sort changed to: $option');
+                    },
                   ),
                 ],
               ),
@@ -631,7 +640,8 @@ class _SellerDashboardState extends State<SellerDashboard>
                       child: ReviewScreen(),
                     ),
                   ),
-                ] else if (tabActiveIndex == 5) ...[
+                ]
+                else if (tabActiveIndex == 5) ...[
                   Padding(
                     padding: const EdgeInsets.only(left: 64, right: 64),
                     child: Container(
@@ -641,7 +651,19 @@ class _SellerDashboardState extends State<SellerDashboard>
                       child: ProfileManagement(),
                     ),
                   ),
-                ] else ...[
+                ]
+                  else if (tabActiveIndex == 6) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 64, right: 64),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          constraints: BoxConstraints(maxWidth: 1600),
+                          //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          child: NotificationPage(notifications: notifications),
+                        ),
+                      ),
+                    ]
+                    else ...[
                   Container(),
                 ],
                 SizedBox(height: 24),
@@ -763,9 +785,11 @@ class _SellerDashboardState extends State<SellerDashboard>
                     child: TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        Constants.buyerAppBarValue = 8;
-                        appBarValueNotifier.value++;
+                         tabActiveIndex =6;
                         sellerHomeValueNotifier.value++;
+                        setState(() {
+
+                        });
                       },
                       child: Text(
                         'More Notifications',
@@ -4038,53 +4062,34 @@ class _SellerDashboardState extends State<SellerDashboard>
     return Column(
       children: [
         // Tab Navigation
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              _buildSubTab('Earning History', 0),
-              _buildSubTab('Withdraw History', 1),
-            ],
-          ),
+        Row(
+          children: [
+            _buildSubTab('Earning History', 0),
+            _buildSubTab('Withdraw History', 1),
+          ],
         ),
         SizedBox(height: 20),
         // Transaction List
         Row(
           children: [
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Constants.ftaColorLight, width: 2),
-                ),
-                child: Column(
-                  children: List.generate(
-                    5,
-                    (index) => TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0, end: 1),
-                      duration: Duration(milliseconds: 300 + (index * 100)),
-                      curve: Curves.easeOutBack,
-                      builder: (context, value, child) {
-                        return Transform.scale(
-                          scale: value,
+            SizedBox(
+              width: MediaQuery.of(context).size.width*0.5,
+              child: Column(
+                children: List.generate(
+                  3,
+                  (index) => TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0, end: 1),
+                    duration: Duration(milliseconds: 300 + (index * 100)),
+                    curve: Curves.easeOutBack,
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: value,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 24),
                           child: _buildTransactionItem(),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -4097,33 +4102,27 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   Widget _buildSubTab(String title, int index) {
     bool isSelected = selectedSubIndex == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            selectedSubIndex = index;
-          });
-        },
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedSubIndex = index;
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(right: 16),
         child: AnimatedContainer(
           duration: Duration(milliseconds: 200),
-          padding: EdgeInsets.symmetric(vertical: 14),
+          padding: EdgeInsets.symmetric(vertical: 24),
           decoration: BoxDecoration(
-            color: isSelected ? Constants.ctaColorLight : Colors.transparent,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
-            borderRadius: BorderRadius.circular(8),
+            color: Colors.transparent,
+            border:Border(bottom: BorderSide(color: isSelected ? Constants.ctaColorLight : Colors.transparent, width: 2.2)),
           ),
           child: Text(
             title,
             textAlign: TextAlign.center,
             style: GoogleFonts.manrope(
-              color: isSelected ? Colors.white : Color(0xFF7F8C8D),
-              fontWeight: FontWeight.w600,
+              color: isSelected ? Constants.ctaColorLight  : Color(0xFF7F8C8D),
+              fontWeight: FontWeight.w700,
               fontSize: 14,
             ),
           ),
@@ -4135,24 +4134,25 @@ class _SellerDashboardState extends State<SellerDashboard>
   Widget _buildTransactionItem() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 16),
+      padding: EdgeInsets.only(bottom: 6,top: 6,right: 16,left: 8),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFECF0F1), width: 1)),
+        border: Border.all(color: Colors.grey.shade400),
+        borderRadius: BorderRadius.circular(360),
       ),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: selectedSubIndex == 0
-                  ? Color(0xFFD5EDDA)
-                  : Color(0xFFF8D7DA),
+              color:Colors.transparent,
+
+              border: Border.all(color: Color(0xFF04AD01)),
               shape: BoxShape.circle,
             ),
             child: Icon(
               selectedSubIndex == 0 ? Icons.add : Icons.remove,
               color: selectedSubIndex == 0
-                  ? Constants.ctaColorLight
+                  ? Color(0xFF04AD01)
                   : Constants.ftaColorLight,
               size: 16,
             ),
@@ -4165,7 +4165,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                 Text(
                   'Vehicle Service',
                   style: GoogleFonts.manrope(
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     fontSize: 14,
                   ),
                 ),
@@ -4281,7 +4281,7 @@ class _SellerDashboardState extends State<SellerDashboard>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.green.shade900, width: 1.4),
+        border: Border.all(color: Colors.grey.shade300, width: 1.4),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
@@ -4294,21 +4294,23 @@ class _SellerDashboardState extends State<SellerDashboard>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 16, top: 16),
+            padding: const EdgeInsets.only(left: 16, top: 12),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   id,
                   style: GoogleFonts.manrope(
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                     fontSize: 14,
+                    color: Constants.ctaColorLight
                   ),
                 ),
                 Spacer(),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.green.shade900,
+                    color: Color(0xFF04AD01),
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(360),
                       topLeft: Radius.circular(360),
@@ -4326,14 +4328,15 @@ class _SellerDashboardState extends State<SellerDashboard>
               ],
             ),
           ),
-          SizedBox(height: 12),
+          //SizedBox(height: 2),
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16),
             child: Text(
               name,
               style: GoogleFonts.manrope(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -4351,9 +4354,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                 Text(
                   date,
                   style: GoogleFonts.manrope(
-                    color: Constants.ftaColorLight,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
+                    color: Colors.black87,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -4373,9 +4376,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                 Text(
                   time,
                   style: GoogleFonts.manrope(
-                    color: Constants.ftaColorLight,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
+                    color: Colors.black87,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -4391,11 +4394,11 @@ class _SellerDashboardState extends State<SellerDashboard>
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Constants.ctaColorLight,
-                      foregroundColor: Constants.ftaColorLight,
+                      backgroundColor: Color(0xFFFFD9D9),
+                      foregroundColor: Color(0xFF04AD01),
                       elevation: 3,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(36),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
@@ -4403,7 +4406,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                       'Reject',
                       style: GoogleFonts.manrope(
                         fontSize: 13,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
@@ -4420,11 +4423,11 @@ class _SellerDashboardState extends State<SellerDashboard>
                       },
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Constants.ftaColorLight,
-                      foregroundColor: Colors.white,
+                      backgroundColor: Color(0xFFE2F8E3),
+                      foregroundColor: Color(0xFF04AD01),
                       elevation: 3,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(36),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),

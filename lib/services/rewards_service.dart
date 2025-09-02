@@ -6,10 +6,86 @@ import '../models/rewards/rewards_models.dart';
 
 class RewardsService {
   // Get complete dashboard data
+  static Future<Map<String, dynamic>> submitReview({
+    required String authUserUid,
+    required String productId,
+    required String sellerId,
+    required int rating,
+    required String content,
+    required String customerName,
+    String? title,
+  }) async
+  {
+    try {
+      final response = await http.post(
+        Uri.parse('${GlobalVariables.reviewsServiceUrl}api/reviews/'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'auth_user_uid': authUserUid,
+          'product_id': productId,
+          'seller_id': sellerId,
+          'rating': rating,
+          'content': content,
+          'customer_name': customerName,
+          'title': title ?? 'Review by $customerName',
+        }),
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return {
+          'success': true,
+          'data': jsonDecode(response.body),
+        };
+      } else {
+        final error = jsonDecode(response.body);
+        return {
+          'success': false,
+          'error': error['error'] ?? 'Failed to submit review',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': 'Network error: ${e.toString()}',
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> getProductReviews(
+      String productId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${GlobalVariables
+            .reviewsServiceUrl}api/reviews/by_product/?product_id=$productId'),
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'data': jsonDecode(response.body),
+        };
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to fetch reviews',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': 'Network error: ${e.toString()}',
+      };
+    }
+  }
+
+
   Future<RewardsDashboard> getDashboard(String userUuid) async {
     final response = await http.get(
       Uri.parse(
-        '${GlobalVariables.reviewsServiceUrl}api/dashboard/?user_uuid=$userUuid',
+        '${GlobalVariables
+            .reviewsServiceUrl}api/dashboard/?user_uuid=$userUuid',
       ),
     );
 
@@ -74,7 +150,8 @@ class RewardsService {
   Future<List<RewardTransaction>> getTransactionHistory(String userUuid) async {
     final response = await http.get(
       Uri.parse(
-        '${GlobalVariables.reviewsServiceUrl}api//my-transactions/?user_uuid=$userUuid',
+        '${GlobalVariables
+            .reviewsServiceUrl}api//my-transactions/?user_uuid=$userUuid',
       ),
     );
 
@@ -95,7 +172,8 @@ class RewardsService {
   Future<RewardsSummary> getRewardsSummary(String userUuid) async {
     final response = await http.get(
       Uri.parse(
-        '${GlobalVariables.reviewsServiceUrl}api//my-summary/?user_uuid=$userUuid',
+        '${GlobalVariables
+            .reviewsServiceUrl}api//my-summary/?user_uuid=$userUuid',
       ),
     );
 

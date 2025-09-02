@@ -6,8 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:math';
 
 import 'package:share_plus/share_plus.dart';
-import '../../services/rewards_service.dart';
+
 import '../../models/rewards/rewards_models.dart';
+import '../../services/rewards_service.dart';
 
 class ShareWidget extends StatefulWidget {
   @override
@@ -148,7 +149,7 @@ Let's grow together and enjoy exclusive benefits! 💰
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.35,
-      height: 450,
+      height: 520,
       padding: EdgeInsets.all(24),
       color: Colors.white,
       child: Column(
@@ -164,7 +165,7 @@ Let's grow together and enjoy exclusive benefits! 💰
             ),
           ),
 
-          SizedBox(height: 24),
+          SizedBox(height: 16),
 
           // Title and Description
           Text(
@@ -185,7 +186,7 @@ Let's grow together and enjoy exclusive benefits! 💰
             textAlign: TextAlign.center,
           ),
 
-          SizedBox(height: 24),
+          SizedBox(height: 16),
 
           // Referral Code Container
           Container(
