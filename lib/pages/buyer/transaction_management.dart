@@ -25,6 +25,8 @@ import '../buyer_dashboard.dart';
 import '../group_chat.dart';
 
 class TransactionDashboard extends StatefulWidget {
+  const TransactionDashboard({Key? key}) : super(key: key);
+
   @override
   _TransactionDashboardState createState() => _TransactionDashboardState();
 }
@@ -46,6 +48,10 @@ class _TransactionDashboardState extends State<TransactionDashboard>
       setState(() {
         _selectedTab = _tabController.index;
       });
+      // Reload orders whenever tab changes within the Order section
+      if (_selectedTopTab == 1) {
+        _loadOrdersFromAPI();
+      }
     });
 
     _animationController = AnimationController(
@@ -220,6 +226,10 @@ class _TransactionDashboardState extends State<TransactionDashboard>
     }
   }
 
+  // Public method that can be called from parent widget
+  void loadOrdersFromAPI() {
+    _loadOrdersFromAPI();
+  }
 
   TextEditingController _commentController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -532,9 +542,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                 "Delivered".toLowerCase()) ...[
                               Expanded(
                                 child: OutlinedButton.icon(
-                                  onPressed: (){
+                                  onPressed: () {
                                     _showAddReviewDialog(order);
-
                                   },
                                   icon: Icon(
                                     Icons.star_outline,
@@ -741,7 +750,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
   void _showAddReviewDialog(Order order) {
     bool _isSubmitting = false;
     final GlobalKey<FormState> _dialogFormKey = GlobalKey<FormState>();
-    final TextEditingController _dialogCommentController = TextEditingController();
+    final TextEditingController _dialogCommentController =
+        TextEditingController();
     double _dialogRating = 0.0;
 
     showDialog(
@@ -760,334 +770,358 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                 padding: const EdgeInsets.all(24.0),
                 child: _isSubmitting
                     ? Container(
-                  height: 200,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Constants.ctaColorLight,
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Submitting Review...',
-                          style: GoogleFonts.manrope(
-                            textStyle: TextStyle(
-                              fontSize: 14,
-                              color: Constants.ftaColorLight.withOpacity(0.55),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-                    : SingleChildScrollView(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    constraints: BoxConstraints(
-                      maxWidth: 500, // Max width for larger screens
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Rating & Review',
-                              style: GoogleFonts.manrope(
-                                textStyle: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Icon(
-                                Icons.close,
-                                color: Colors.black87,
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 24),
-
-                        // Rating Section
-                        Center(
+                        height: 200,
+                        child: Center(
                           child: Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              RatingBar.builder(
-                                initialRating: _dialogRating,
-                                minRating: 1,
-                                direction: Axis.horizontal,
-                                allowHalfRating: false,
-                                itemCount: 5,
-                                itemSize: 40,
-                                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                                itemBuilder: (context, _) => Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
+                              CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Constants.ctaColorLight,
                                 ),
-                                onRatingUpdate: (rating) {
-                                  setState(() {
-                                    _dialogRating = rating;
-                                  });
-                                },
                               ),
-                              SizedBox(height: 12),
+                              SizedBox(height: 16),
                               Text(
-                                _getRatingText(_dialogRating),
+                                'Submitting Review...',
                                 style: GoogleFonts.manrope(
                                   textStyle: TextStyle(
                                     fontSize: 14,
-                                    color: _getRatingColor(_dialogRating),
-                                    fontWeight: FontWeight.w600,
+                                    color: Constants.ftaColorLight.withOpacity(
+                                      0.55,
+                                    ),
                                   ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        SizedBox(height: 24),
-
-                        // Review Form
-                        Form(
-                          key: _dialogFormKey,
-                          child: TextFormField(
-                            controller: _dialogCommentController,
-                            maxLines: 5,
-                            maxLength: 500,
-                            decoration: InputDecoration(
-                              labelText: 'Your Review',
-                              labelStyle: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 14,
-                              ),
-                              floatingLabelStyle: TextStyle(
-                                color: Constants.ftaColorLight,
-                                fontSize: 14,
-                              ),
-                              hintText: 'Share your experience with this product...',
-                              hintStyle: TextStyle(
-                                color: Colors.grey[400],
-                                fontSize: 13,
-                              ),
-                              filled: true,
-                              floatingLabelBehavior: FloatingLabelBehavior.always,
-                              fillColor: Colors.grey[50],
-                              contentPadding: EdgeInsets.all(16),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Constants.ftaColorLight,
-                                  width: 2,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.red[400]!,
-                                  width: 2,
-                                ),
-                              ),
-                              counterText: '',
-                            ),
-                            validator: (value) {
-                              if (_dialogRating == 0) {
-                                return 'Please select a rating';
-                              }
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your review';
-                              } else if (value.trim().length < 10) {
-                                return 'Review must be at least 10 characters';
-                              }
-                              return null;
-                            },
+                      )
+                    : SingleChildScrollView(
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          constraints: BoxConstraints(
+                            maxWidth: 500, // Max width for larger screens
                           ),
-                        ),
-
-                        // Character count
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: ValueListenableBuilder(
-                            valueListenable: _dialogCommentController,
-                            builder: (context, value, child) {
-                              return Text(
-                                '${value.text.length}/500 characters',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 24),
-
-                        // Action buttons
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: Text(
-                                'CANCEL',
-                                style: GoogleFonts.manrope(
-                                  textStyle: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            ElevatedButton(
-                              onPressed: () async {
-                                if (_dialogFormKey.currentState!.validate() && _dialogRating > 0) {
-                                  setState(() {
-                                    _isSubmitting = true;
-                                  });
-
-                                  try {
-                                    // Submit to API
-                                    final result = await RewardsService.submitReview(
-                                      authUserUid: Constants.myUid.isNotEmpty
-                                          ? Constants.myUid
-                                          : 'anonymous_${DateTime.now().millisecondsSinceEpoch}',
-                                      productId: order.productId!, // Assuming this is passed to the widget
-                                      sellerId: order.sellerId!, // Optional seller ID
-                                      rating: _dialogRating.toInt(),
-                                      content: _dialogCommentController.text.trim(),
-                                      customerName: Constants.myDisplayname.isNotEmpty
-                                          ? Constants.myDisplayname
-                                          : 'Anonymous User',
-                                    );
-
-                                    if (result['success']) {
-                                      // Also save locally if needed
-                                      final newReview = ReviewItem(
-                                        uuid: Constants.myUid.isNotEmpty
-                                            ? Constants.myUid
-                                            : DateTime.now().millisecondsSinceEpoch.toString(),
-                                        customerName: Constants.myDisplayname,
-                                        description: _dialogCommentController.text,
-                                        rating: _dialogRating.toInt(),
-                                        comment: _dialogCommentController.text,
-                                        createdAt: DateTime.now().toIso8601String(),
-                                        type: 'review',
-                                      );
-
-                                      await _addReviewLocally(newReview);
-
-                                      // Refresh the reviews list
-                                      _loadOrdersFromAPI(); // You'll need to implement this
-
-                                      Navigator.of(context).pop();
-
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text('Review submitted successfully!'),
-                                          backgroundColor: Colors.green[700],
-                                          behavior: SnackBarBehavior.floating,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      throw Exception(result['error']);
-                                    }
-                                  } catch (e) {
-                                    setState(() {
-                                      _isSubmitting = false;
-                                    });
-
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Failed to submit review: ${e.toString()}'),
-                                        backgroundColor: Colors.red[700],
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                } else if (_dialogRating == 0) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Please select a rating'),
-                                      backgroundColor: Colors.orange[700],
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Rating & Review',
+                                    style: GoogleFonts.manrope(
+                                      textStyle: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
                                       ),
                                     ),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Constants.ctaColorLight,
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 32,
-                                  vertical: 12,
-                                ),
-                                elevation: 2,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: Text(
-                                'SUBMIT REVIEW',
-                                style: GoogleFonts.manrope(
-                                  textStyle: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 0.5,
                                   ),
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    icon: Icon(
+                                      Icons.close,
+                                      color: Colors.black87,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 24),
+
+                              // Rating Section
+                              Center(
+                                child: Column(
+                                  children: [
+                                    RatingBar.builder(
+                                      initialRating: _dialogRating,
+                                      minRating: 1,
+                                      direction: Axis.horizontal,
+                                      allowHalfRating: false,
+                                      itemCount: 5,
+                                      itemSize: 40,
+                                      itemPadding: EdgeInsets.symmetric(
+                                        horizontal: 4.0,
+                                      ),
+                                      itemBuilder: (context, _) =>
+                                          Icon(Icons.star, color: Colors.amber),
+                                      onRatingUpdate: (rating) {
+                                        setState(() {
+                                          _dialogRating = rating;
+                                        });
+                                      },
+                                    ),
+                                    SizedBox(height: 12),
+                                    Text(
+                                      _getRatingText(_dialogRating),
+                                      style: GoogleFonts.manrope(
+                                        textStyle: TextStyle(
+                                          fontSize: 14,
+                                          color: _getRatingColor(_dialogRating),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 24),
+
+                              // Review Form
+                              Form(
+                                key: _dialogFormKey,
+                                child: TextFormField(
+                                  controller: _dialogCommentController,
+                                  maxLines: 5,
+                                  maxLength: 500,
+                                  decoration: InputDecoration(
+                                    labelText: 'Your Review',
+                                    labelStyle: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                    ),
+                                    floatingLabelStyle: TextStyle(
+                                      color: Constants.ftaColorLight,
+                                      fontSize: 14,
+                                    ),
+                                    hintText:
+                                        'Share your experience with this product...',
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey[400],
+                                      fontSize: 13,
+                                    ),
+                                    filled: true,
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
+                                    fillColor: Colors.grey[50],
+                                    contentPadding: EdgeInsets.all(16),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Constants.ftaColorLight,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.red[400]!,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    counterText: '',
+                                  ),
+                                  validator: (value) {
+                                    if (_dialogRating == 0) {
+                                      return 'Please select a rating';
+                                    }
+                                    if (value == null || value.trim().isEmpty) {
+                                      return 'Please enter your review';
+                                    } else if (value.trim().length < 10) {
+                                      return 'Review must be at least 10 characters';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+
+                              // Character count
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: ValueListenableBuilder(
+                                  valueListenable: _dialogCommentController,
+                                  builder: (context, value, child) {
+                                    return Text(
+                                      '${value.text.length}/500 characters',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              SizedBox(height: 24),
+
+                              // Action buttons
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'CANCEL',
+                                      style: GoogleFonts.manrope(
+                                        textStyle: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      if (_dialogFormKey.currentState!
+                                              .validate() &&
+                                          _dialogRating > 0) {
+                                        setState(() {
+                                          _isSubmitting = true;
+                                        });
+
+                                        try {
+                                          // Submit to API
+                                          print("gfghhhg ${order.toJson()}");
+
+                                          final result =
+                                              await RewardsService.submitReview(
+                                                authUserUid:
+                                                    Constants.myUid.isNotEmpty
+                                                    ? Constants.myUid
+                                                    : 'anonymous_${DateTime.now().millisecondsSinceEpoch}',
+                                                productId:
+                                                    order.productId ?? "",
+                                                requestId: order.requestId!,
+
+                                                sellerId: order
+                                                    .sellerId!, // Optional seller ID
+                                                rating: _dialogRating.toInt(),
+                                                content:
+                                                    _dialogCommentController
+                                                        .text
+                                                        .trim(),
+                                                customerName:
+                                                    Constants
+                                                        .myDisplayname
+                                                        .isNotEmpty
+                                                    ? Constants.myDisplayname
+                                                    : 'Anonymous User',
+                                              );
+
+                                          if (result['success']) {
+                                            // Refresh the reviews list
+                                            _loadOrdersFromAPI(); // You'll need to implement this
+
+                                            Navigator.of(context).pop();
+
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  'Review submitted successfully!',
+                                                ),
+                                                backgroundColor:
+                                                    Colors.green[700],
+                                                behavior:
+                                                    SnackBarBehavior.floating,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            throw Exception(result['error']);
+                                          }
+                                        } catch (e) {
+                                          setState(() {
+                                            _isSubmitting = false;
+                                          });
+
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Failed to submit review: ${e.toString()}',
+                                              ),
+                                              backgroundColor: Colors.red[700],
+                                              behavior:
+                                                  SnackBarBehavior.floating,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      } else if (_dialogRating == 0) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Please select a rating',
+                                            ),
+                                            backgroundColor: Colors.orange[700],
+                                            behavior: SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Constants.ctaColorLight,
+                                      foregroundColor: Colors.white,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 32,
+                                        vertical: 12,
+                                      ),
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'SUBMIT REVIEW',
+                                      style: GoogleFonts.manrope(
+                                        textStyle: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
+                      ),
               ),
             );
           },
@@ -1096,7 +1130,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
     );
   }
 
-// Helper methods
+  // Helper methods
   String _getRatingText(double rating) {
     if (rating == 0) return 'Tap to rate';
     if (rating == 1) return 'Poor';
@@ -1115,8 +1149,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
     return Colors.grey;
   }
 
-// Method to load reviews from API
-
+  // Method to load reviews from API
 
   @override
   Widget build(BuildContext context) {
@@ -1137,6 +1170,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                       _animationController.reset();
                       _animationController.forward();
                     });
+                    // Reload orders to ensure fresh data when switching back to Order tab later
+                    _loadOrdersFromAPI();
                   },
                   child: AnimatedContainer(
                     duration: Duration(milliseconds: 300),
@@ -1268,6 +1303,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
           setState(() {
             _selectedTab = index;
           });
+          // Reload orders when switching between status tabs
+          _loadOrdersFromAPI();
         },
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
@@ -1300,6 +1337,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
           setState(() {
             _selectedTab = index;
           });
+          // Reload orders when switching between status tabs
+          _loadOrdersFromAPI();
         },
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
@@ -4342,9 +4381,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: (){
+                          onPressed: () {
                             _showAddReviewDialog(order);
-
                           },
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Colors.transparent,

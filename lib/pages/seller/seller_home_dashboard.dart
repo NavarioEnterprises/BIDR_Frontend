@@ -251,27 +251,169 @@ class _SellerDashboardState extends State<SellerDashboard>
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Location Access'),
-          content: Text(
-            'This app needs location access to show you nearby requests. Please allow location access when prompted by your browser.',
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Skip'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Keep default coordinates and proceed
-              },
+          elevation: 5,
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              constraints: BoxConstraints(
+                maxWidth: 400, // Max width for larger screens
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header with close button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Location Access Required',
+                        style: GoogleFonts.manrope(
+                          textStyle: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        icon: Icon(
+                          Icons.close,
+                          color: Colors.black87,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  
+                  // Location icon
+                  Center(
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: Constants.ctaColorLight.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.location_on,
+                        size: 40,
+                        color: Constants.ctaColorLight,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+
+                  // Content
+                  Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          isPermanentlyDenied 
+                              ? 'Location Permission Denied'
+                              : 'Enable Location Services',
+                          style: GoogleFonts.manrope(
+                            textStyle: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          isPermanentlyDenied
+                              ? 'Please enable location permission in your device settings to see nearby product requests.'
+                              : 'This app needs location access to show you nearby product requests. Please allow location access when prompted by your browser.',
+                          style: GoogleFonts.manrope(
+                            textStyle: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                              height: 1.4,
+                            ),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 32),
+
+                  // Action buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            // Keep default coordinates and proceed
+                          },
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            'Skip for Now',
+                            style: GoogleFonts.manrope(
+                              textStyle: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            await _getCurrentLocation();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Constants.ctaColorLight,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 2,
+                          ),
+                          child: Text(
+                            isPermanentlyDenied ? 'Open Settings' : 'Try Again',
+                            style: GoogleFonts.manrope(
+                              textStyle: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            TextButton(
-              child: Text('Try Again'),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await _getCurrentLocation();
-              },
-            ),
-          ],
+          ),
         );
       },
     );

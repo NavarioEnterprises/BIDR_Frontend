@@ -10,21 +10,38 @@ class RewardsService {
     required String authUserUid,
     required String productId,
     required String sellerId,
+    required String requestId,
     required int rating,
     required String content,
     required String customerName,
     String? title,
-  }) async
-  {
+  }) async {
     try {
+      print(
+        "Url ${GlobalVariables.reviewsServiceUrl}api/reviews/router/reviews/",
+      );
+      print("Submitting review for product $productId by user $authUserUid");
+      print(
+        "Review details: rating=$rating, content=$content, customerName=$customerName, title=$title",
+      );
+      print({
+        'auth_user_uid': authUserUid,
+        'product_id': requestId,
+        'seller_id': sellerId,
+        'rating': rating,
+        'content': content,
+        'customer_name': customerName,
+        'title': title ?? 'Review by $customerName',
+      });
       final response = await http.post(
-        Uri.parse('${GlobalVariables.reviewsServiceUrl}api/reviews/'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        Uri.parse(
+          '${GlobalVariables.reviewsServiceUrl}api/reviews/router/reviews/',
+        ),
+
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'auth_user_uid': authUserUid,
-          'product_id': productId,
+          'product_id': requestId,
           'seller_id': sellerId,
           'rating': rating,
           'content': content,
@@ -32,60 +49,62 @@ class RewardsService {
           'title': title ?? 'Review by $customerName',
         }),
       );
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        return {
-          'success': true,
-          'data': jsonDecode(response.body),
-        };
+        final responseData = jsonDecode(response.body);
+        print("Parsed response data: $responseData");
+
+        // Handle the response format from our custom endpoint
+        if (responseData is Map && responseData.containsKey('success')) {
+          return {
+            'success': responseData['success'] ?? true,
+            'data': responseData['review'] ?? responseData,
+            'message':
+                responseData['message'] ?? 'Review submitted successfully',
+          };
+        }
+
+        // Fallback for standard DRF response
+        return {'success': true, 'data': responseData};
       } else {
         final error = jsonDecode(response.body);
         return {
           'success': false,
-          'error': error['error'] ?? 'Failed to submit review',
+          'error':
+              error['error'] ?? error['detail'] ?? 'Failed to submit review',
         };
       }
     } catch (e) {
-      return {
-        'success': false,
-        'error': 'Network error: ${e.toString()}',
-      };
+      return {'success': false, 'error': 'Network error: ${e.toString()}'};
     }
   }
 
   static Future<Map<String, dynamic>> getProductReviews(
-      String productId) async {
+    String productId,
+  ) async {
     try {
       final response = await http.get(
-        Uri.parse('${GlobalVariables
-            .reviewsServiceUrl}api/reviews/by_product/?product_id=$productId'),
+        Uri.parse(
+          '${GlobalVariables.reviewsServiceUrl}api/reviews/by_product/?product_id=$productId',
+        ),
       );
 
       if (response.statusCode == 200) {
-        return {
-          'success': true,
-          'data': jsonDecode(response.body),
-        };
+        return {'success': true, 'data': jsonDecode(response.body)};
       } else {
-        return {
-          'success': false,
-          'error': 'Failed to fetch reviews',
-        };
+        return {'success': false, 'error': 'Failed to fetch reviews'};
       }
     } catch (e) {
-      return {
-        'success': false,
-        'error': 'Network error: ${e.toString()}',
-      };
+      return {'success': false, 'error': 'Network error: ${e.toString()}'};
     }
   }
-
 
   Future<RewardsDashboard> getDashboard(String userUuid) async {
     final response = await http.get(
       Uri.parse(
-        '${GlobalVariables
-            .reviewsServiceUrl}api/dashboard/?user_uuid=$userUuid',
+        '${GlobalVariables.reviewsServiceUrl}api/dashboard/?user_uuid=$userUuid',
       ),
     );
 
@@ -150,8 +169,7 @@ class RewardsService {
   Future<List<RewardTransaction>> getTransactionHistory(String userUuid) async {
     final response = await http.get(
       Uri.parse(
-        '${GlobalVariables
-            .reviewsServiceUrl}api//my-transactions/?user_uuid=$userUuid',
+        '${GlobalVariables.reviewsServiceUrl}api//my-transactions/?user_uuid=$userUuid',
       ),
     );
 
@@ -172,8 +190,7 @@ class RewardsService {
   Future<RewardsSummary> getRewardsSummary(String userUuid) async {
     final response = await http.get(
       Uri.parse(
-        '${GlobalVariables
-            .reviewsServiceUrl}api//my-summary/?user_uuid=$userUuid',
+        '${GlobalVariables.reviewsServiceUrl}api//my-summary/?user_uuid=$userUuid',
       ),
     );
 

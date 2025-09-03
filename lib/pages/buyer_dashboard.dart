@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/customWdget/customCard.dart';
 import 'package:bidr/global_values.dart';
@@ -30,6 +31,10 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   String? _error;
   Map<String, String> _bidSortOptions = {}; // Track sort option per request ID
   Set<String> _cancelledRequests = {}; // Track cancelled request IDs
+  
+  // Auto-refresh timer
+  Timer? _refreshTimer;
+  final GlobalKey _transactionKey = GlobalKey();
 
   // Filter state variables
   String _selectedCategory = 'All Categories';
@@ -42,6 +47,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   void initState() {
     super.initState();
     _fetchProductRequests();
+    _startAutoRefresh();
     print(
       "Buyer Dashboard Initialized ${Constants.myUid} xx ${Constants.currentUser!.uid}",
     );
@@ -49,11 +55,44 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
   @override
   void dispose() {
+    _refreshTimer?.cancel();
     super.dispose();
   }
 
   int dashboardIndex = 0;
   bool isActive = false;
+
+  // Start auto-refresh timer for background updates every 20 seconds
+  void _startAutoRefresh() {
+    _refreshTimer = Timer.periodic(Duration(seconds: 20), (timer) {
+      // Only refresh if the widget is still mounted and not loading
+      if (mounted) {
+        // Refresh data based on current tab
+        if (dashboardIndex == 0) {
+          // My Dashboard - refresh product requests
+          _fetchProductRequests();
+        } else if (dashboardIndex == 2) {
+          // Transaction Management - refresh orders
+          _refreshTransactionManagement();
+        }
+        // Reviews and other data can be added here as needed
+      }
+    });
+  }
+
+  // Method to refresh Transaction Management data
+  void _refreshTransactionManagement() {
+    // Call the transaction management refresh method if the widget is available
+    final state = _transactionKey.currentState;
+    if (state != null && state is State && state.mounted) {
+      // Use dynamic typing to call the method
+      try {
+        (state as dynamic).loadOrdersFromAPI();
+      } catch (e) {
+        print('Error calling loadOrdersFromAPI: $e');
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -77,6 +116,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                     () {
                       dashboardIndex = 0;
                       setState(() {});
+                      // Reload product requests when navigating to My Dashboard
+                      _fetchProductRequests();
                     },
                     HugeIcons.strokeRoundedDashboardSquare01,
                     "My Dashboard",
@@ -95,6 +136,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                     () {
                       dashboardIndex = 2;
                       setState(() {});
+                      // Trigger refresh for Transaction Management when navigating to it
+                      _refreshTransactionManagement();
                     },
                     HugeIcons.strokeRoundedTransaction,
                     "Transaction Management",
@@ -138,7 +181,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                           : dashboardIndex == 2
                           ? Column(
                               children: [
-                                Expanded(child: TransactionDashboard()),
+                                Expanded(child: TransactionDashboard(key: _transactionKey)),
                               ],
                             )
                           : dashboardIndex == 3
@@ -365,8 +408,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     double cardWidth,
     double horizontalSpacing,
     double verticalSpacing,
-  )
-  {
+  ) {
     List<Widget> rows = [];
 
     for (int i = 0; i < requests.length; i += cardsPerRow) {
@@ -1798,8 +1840,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     dynamic request,
     double fixedHeight,
     int index,
-  )
-  {
+  ) {
     final bids = _getSortedBids(request);
     final hasMoreThanTwoBids = bids.length > 2;
     final bidsToShow = bids
@@ -3211,6 +3252,79 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     );
   }
 
+  // Helper function to normalize error messages
+  String _normalizeErrorMessage(String errorMessage) {
+    // Check for specific error patterns and normalize them
+    if (errorMessage.contains(
+      'Cannot create order for request with status: CLOSED',
+    )) {
+      return 'Cannot pay for a bid that has been closed.';
+    }
+
+    // Extract error details from JSON response if present
+    if (errorMessage.contains('Failed to create order:') &&
+        errorMessage.contains('"error"')) {
+      try {
+        // Try to extract the detailed error message
+        final regex = RegExp(r'"message":"([^"]*)"');
+        final match = regex.firstMatch(errorMessage);
+        if (match != null) {
+          String detailedMessage = match.group(1) ?? '';
+          // Further normalize specific messages
+          if (detailedMessage.contains(
+            'Cannot create order for request with status',
+          )) {
+            return 'Cannot pay for a bid that has been closed.';
+          }
+          return detailedMessage;
+        }
+
+        // Try to extract from non_field_errors
+        final nonFieldRegex = RegExp(r'"non_field_errors":\["([^"]*)"');
+        final nonFieldMatch = nonFieldRegex.firstMatch(errorMessage);
+        if (nonFieldMatch != null) {
+          String detailedMessage = nonFieldMatch.group(1) ?? '';
+          if (detailedMessage.contains(
+            'Cannot create order for request with status',
+          )) {
+            return 'Cannot pay for a bid that has been closed.';
+          }
+          return detailedMessage;
+        }
+      } catch (e) {
+        // If parsing fails, fall through to default handling
+      }
+    }
+
+    // Handle other common error patterns
+    if (errorMessage.contains('NetworkException') ||
+        errorMessage.contains('SocketException')) {
+      return 'Network connection error. Please check your internet connection.';
+    }
+
+    if (errorMessage.contains('TimeoutException')) {
+      return 'Request timed out. Please try again.';
+    }
+
+    if (errorMessage.contains('FormatException')) {
+      return 'Invalid response format. Please try again.';
+    }
+
+    // If no specific pattern matches, return a cleaned version
+    // Remove "Exception: " prefix if present
+    String cleanedMessage = errorMessage.replaceFirst('Exception: ', '');
+
+    // Capitalize first letter if needed
+    if (cleanedMessage.isNotEmpty) {
+      cleanedMessage =
+          cleanedMessage[0].toUpperCase() + cleanedMessage.substring(1);
+    }
+
+    return cleanedMessage.isNotEmpty
+        ? cleanedMessage
+        : 'An unexpected error occurred. Please try again.';
+  }
+
   // Payment processing and order creation
   Future<void> _processPaymentAndCreateOrder(
     dynamic seller,
@@ -3256,7 +3370,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
           ? seller.sellerId.username.substring(7)
           : seller.sellerId.username;
 
-      print("Processing payment for seller: $sellerUid");
+      print("Processing payment for buyer: $sellerUid");
 
       // Create order data required by backend
       //ApiService.updateOrderStatus(orderId: '', status: '');
@@ -3304,27 +3418,30 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
             final updateResult = await ApiService.updateOrderStatus(
               orderId: orderId,
               status: 'PAID',
+              userId: Constants.currentUser?.uid,
             );
 
             if (updateResult['success']) {
               print('Order status updated to PAID successfully');
+              
+              // Navigate to Transaction Management tab
+              setState(() {
+                dashboardIndex = 2; // Transaction Management tab
+              });
+
+              // Show success dialog
+              _showPaymentSuccessfulDialog(context);
             } else {
-              print(
-                'Failed to update order status: ${updateResult['message']}',
-              );
+              print('Failed to update order status: ${updateResult['message']}');
+              throw Exception('Failed to update order status: ${updateResult['message']}');
             }
           } catch (e) {
             print('Error updating order status: $e');
+            throw Exception('Error updating order status: $e');
           }
+        } else {
+          throw Exception('Order ID not found in response');
         }
-
-        // Navigate to Transaction Management tab
-        setState(() {
-          dashboardIndex = 2; // Transaction Management tab
-        });
-
-        // Show success dialog
-        _showPaymentSuccessfulDialog(context);
       } else {
         throw Exception(
           'Failed to create order: ${response.statusCode} - ${response.body}',
@@ -3339,7 +3456,9 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       print('Error processing payment1: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Payment failed: ${e.toString()}'),
+          content: Text(
+            'Payment failed: ${_normalizeErrorMessage(e.toString())}',
+          ),
           backgroundColor: Colors.red[600],
           duration: Duration(seconds: 3),
         ),

@@ -12,7 +12,7 @@ class EnvironmentConfig {
   final String notificationsServiceUrl;
   final String transactionsServiceUrl;
   final String reviewsServiceUrl;
-  
+
   // Admin URLs
   final String authAdminUrl;
   final String chatAdminUrl;
@@ -22,7 +22,7 @@ class EnvironmentConfig {
   final String notificationsAdminUrl;
   final String transactionsAdminUrl;
   final String reviewsAdminUrl;
-  
+
   // Monitoring URLs
   final String grafanaUrl;
   final String prometheusUrl;
@@ -82,23 +82,23 @@ class AppConfig {
     ),
     EnvironmentType.uat: EnvironmentConfig(
       // Service URLs
-      authServiceUrl: "http://108.141.192.60/",
-      chatServiceUrl: "http://108.141.192.60/chat/",
-      paymentServiceUrl: "http://108.141.192.60/payments/",
-      resolutionServiceUrl: "http://108.141.192.60/resolution/",
-      productsServiceUrl: "http://108.141.192.60/products/",
-      notificationsServiceUrl: "http://108.141.192.60/notifications/",
-      transactionsServiceUrl: "http://108.141.192.60/transactions/",
-      reviewsServiceUrl: "http://108.141.192.60/reviews/",
+      authServiceUrl: "http://74.179.193.18/",
+      chatServiceUrl: "http://74.179.193.18/chat/",
+      paymentServiceUrl: "http://74.179.193.18/payments/",
+      resolutionServiceUrl: "http://74.179.193.18/resolution/",
+      productsServiceUrl: "http://74.179.193.18/products/",
+      notificationsServiceUrl: "http://74.179.193.18/notifications/",
+      transactionsServiceUrl: "http://74.179.193.18/transactions/",
+      reviewsServiceUrl: "http://74.179.193.18/reviews/",
       // Admin URLs
-      authAdminUrl: "http://108.141.192.60/admin/",
-      chatAdminUrl: "http://108.141.192.60/chat/admin/",
-      paymentAdminUrl: "http://108.141.192.60/payments/admin/",
-      resolutionAdminUrl: "http://108.141.192.60/resolution/admin/",
-      productsAdminUrl: "http://108.141.192.60/products/admin/",
-      notificationsAdminUrl: "http://108.141.192.60/notifications/admin/",
-      transactionsAdminUrl: "http://108.141.192.60/transactions/admin/",
-      reviewsAdminUrl: "http://108.141.192.60/reviews/admin/",
+      authAdminUrl: "http://74.179.193.18/admin/",
+      chatAdminUrl: "http://74.179.193.18/chat/admin/",
+      paymentAdminUrl: "http://74.179.193.18/payments/admin/",
+      resolutionAdminUrl: "http://74.179.193.18/resolution/admin/",
+      productsAdminUrl: "http://74.179.193.18/products/admin/",
+      notificationsAdminUrl: "http://74.179.193.18/notifications/admin/",
+      transactionsAdminUrl: "http://74.179.193.18/transactions/admin/",
+      reviewsAdminUrl: "http://74.179.193.18/reviews/admin/",
       // Monitoring
       grafanaUrl: "http://48.222.241.55:3000/",
       prometheusUrl: "http://48.222.241.55:4000/",
@@ -157,20 +157,23 @@ class AppConfig {
   static String get paymentServiceUrl => currentConfig.paymentServiceUrl;
   static String get resolutionServiceUrl => currentConfig.resolutionServiceUrl;
   static String get productsServiceUrl => currentConfig.productsServiceUrl;
-  static String get notificationsServiceUrl => currentConfig.notificationsServiceUrl;
-  static String get transactionsServiceUrl => currentConfig.transactionsServiceUrl;
+  static String get notificationsServiceUrl =>
+      currentConfig.notificationsServiceUrl;
+  static String get transactionsServiceUrl =>
+      currentConfig.transactionsServiceUrl;
   static String get reviewsServiceUrl => currentConfig.reviewsServiceUrl;
-  
+
   // --- Convenience Getters for Admin URLs ---
   static String get authAdminUrl => currentConfig.authAdminUrl;
   static String get chatAdminUrl => currentConfig.chatAdminUrl;
   static String get paymentAdminUrl => currentConfig.paymentAdminUrl;
   static String get resolutionAdminUrl => currentConfig.resolutionAdminUrl;
   static String get productsAdminUrl => currentConfig.productsAdminUrl;
-  static String get notificationsAdminUrl => currentConfig.notificationsAdminUrl;
+  static String get notificationsAdminUrl =>
+      currentConfig.notificationsAdminUrl;
   static String get transactionsAdminUrl => currentConfig.transactionsAdminUrl;
   static String get reviewsAdminUrl => currentConfig.reviewsAdminUrl;
-  
+
   // --- Monitoring URLs ---
   static String get grafanaUrl => currentConfig.grafanaUrl;
   static String get prometheusUrl => currentConfig.prometheusUrl;

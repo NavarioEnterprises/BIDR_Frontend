@@ -9,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/review_item.dart';
 import '../../services/rewards_service.dart';
 
-
 class RatingReviewWidget extends StatefulWidget {
   final String sellerId;
   final Function(String uuid, String response)? onRespond;
@@ -59,7 +58,6 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
     }
   }*/
 
-
   Future<void> _fetchReviews() async {
     try {
       setState(() {
@@ -67,79 +65,168 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
         error = null;
       });
 
-      // Load reviews from local storage
-      final prefs = await SharedPreferences.getInstance();
-      final reviewsJsonString = prefs.getString('reviews_list');
-      final totalReviews = prefs.getInt('total_reviews') ?? 0;
-      
-      if (reviewsJsonString != null) {
-        final reviewsJsonList = json.decode(reviewsJsonString) as List;
-        final localReviews = reviewsJsonList
+      // Fetch reviews from API
+      final String baseUrl = GlobalVariables.reviewsServiceUrl;
+      final response = await http
+          .get(
+            Uri.parse('${baseUrl}api/reviews/router/reviews/'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print("ffgghhg ${responseData}");
+
+        // Handle response based on format
+        List<dynamic> reviewsList;
+        if (responseData is Map && responseData.containsKey('results')) {
+          // Django REST Framework paginated response
+          reviewsList = responseData['results'] as List;
+        } else if (responseData is List) {
+          // Direct list response
+          reviewsList = responseData;
+        } else if (responseData is Map && responseData.containsKey('reviews')) {
+          // Custom format with reviews key
+          reviewsList = responseData['reviews'] as List;
+        } else {
+          reviewsList = [];
+        }
+
+        final fetchedReviews = reviewsList
             .map((json) => ReviewItem.fromJson(json as Map<String, dynamic>))
             .toList();
 
-        // Calculate summary from local reviews
+        // Calculate summary from fetched reviews
         double averageRating = 0.0;
-        if (localReviews.isNotEmpty) {
-          double sum = localReviews.fold(0.0, (sum, review) => sum + review.rating);
-          averageRating = sum / localReviews.length;
+        if (fetchedReviews.isNotEmpty) {
+          double sum = fetchedReviews.fold(
+            0.0,
+            (sum, review) => sum + review.rating,
+          );
+          averageRating = sum / fetchedReviews.length;
         }
 
         setState(() {
-          reviews = localReviews;
+          reviews = fetchedReviews;
           summary = {
-            'total_reviews': localReviews.length,
-            'total_ratings': localReviews.length,
+            'total_reviews': fetchedReviews.length,
+            'total_ratings': fetchedReviews.length,
             'average_rating': averageRating.toStringAsFixed(1),
           };
           isLoading = false;
         });
+
+        // Optional: Save to local storage for offline access
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('reviews_list', json.encode(reviewsList));
+        await prefs.setInt('total_reviews', fetchedReviews.length);
       } else {
+        throw Exception('Server returned ${response.statusCode}');
+      }
+    } catch (e) {
+      // Try loading from local storage as fallback
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final reviewsJsonString = prefs.getString('reviews_list');
+
+        if (reviewsJsonString != null) {
+          final reviewsJsonList = json.decode(reviewsJsonString) as List;
+          final localReviews = reviewsJsonList
+              .map((json) => ReviewItem.fromJson(json as Map<String, dynamic>))
+              .toList();
+
+          double averageRating = 0.0;
+          if (localReviews.isNotEmpty) {
+            double sum = localReviews.fold(
+              0.0,
+              (sum, review) => sum + review.rating,
+            );
+            averageRating = sum / localReviews.length;
+          }
+
+          setState(() {
+            reviews = localReviews;
+            summary = {
+              'total_reviews': localReviews.length,
+              'total_ratings': localReviews.length,
+              'average_rating': averageRating.toStringAsFixed(1),
+            };
+            isLoading = false;
+            error = 'Using offline data. Network error: $e';
+          });
+        } else {
+          setState(() {
+            error = 'Error loading reviews: $e';
+            isLoading = false;
+          });
+        }
+      } catch (localError) {
         setState(() {
-          reviews = [];
-          summary = {
-            'total_reviews': 0,
-            'total_ratings': 0,
-            'average_rating': '0.0',
-          };
+          error = 'Error loading reviews: $e';
           isLoading = false;
         });
       }
-    } catch (e) {
-      setState(() {
-        error = 'Error loading reviews: $e';
-        isLoading = false;
-      });
     }
   }
 
   Future<void> _respondToReview(String uuid, String response) async {
     try {
       final String baseUrl = GlobalVariables.reviewsServiceUrl;
+      
+      // Get the seller's auth_user_uid - you may need to get this from your auth service
+      // For now, using a placeholder - replace with actual seller UUID
+      final String authUserUid = widget.sellerId; // Or get from auth service
+      
       final apiResponse = await http
           .post(
-            Uri.parse('$baseUrl/api/ratings/respond/'),
+            Uri.parse('${baseUrl}api/reviews/router/respond/'),
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
             },
-            body: json.encode({'uuid': uuid, 'response': response}),
+            body: json.encode({
+              'uuid': uuid,
+              'response': response,
+              'auth_user_uid': authUserUid,
+            }),
           )
           .timeout(const Duration(seconds: 10));
 
-      if (apiResponse.statusCode == 200) {
+      if (apiResponse.statusCode == 200 || apiResponse.statusCode == 201) {
+        // Parse the response
+        final responseData = json.decode(apiResponse.body);
+        
         // Handle successful response
         widget.onRespond?.call(uuid, response);
+        
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Response sent successfully')),
+          SnackBar(
+            content: Text(responseData['message'] ?? 'Response sent successfully'),
+            backgroundColor: Colors.green,
+          ),
         );
+        
+        // Refresh the reviews list to show the new response
+        _fetchReviews();
       } else {
-        throw Exception('Failed to send response: ${apiResponse.statusCode}');
+        final errorData = json.decode(apiResponse.body);
+        throw Exception(errorData['error'] ?? 'Failed to send response: ${apiResponse.statusCode}');
       }
     } catch (e) {
+      print('Error responding to review: $e');
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Error sending response: $e')));
+      ).showSnackBar(
+        SnackBar(
+          content: Text('Error sending response: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -391,7 +478,7 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
                   children: [
                     Expanded(
                       child: Text(
-                        'UUID: ${review.uuid}',
+                        'UUID: ${review.uuid.length >= 8 ? review.uuid.substring(0, 8) : review.uuid}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.manrope(

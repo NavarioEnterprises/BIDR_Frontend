@@ -686,8 +686,8 @@ class ApiService {
         },
       );
 
-      print('Get requests response status: ${response.statusCode}');
-      print('Get requests response body: ${response.body}');
+      print('Get requests by seller response status: ${response.statusCode}');
+      print('Get requests by seller response body: ${response.body}');
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final data = jsonDecode(response.body);
@@ -916,6 +916,7 @@ class ApiService {
   static Future<Map<String, dynamic>> updateOrderStatus({
     required String orderId,
     required String status,
+    String? userId,
   }) async {
     print('Updating order status for order: $orderId to status: $status');
 
@@ -923,10 +924,16 @@ class ApiService {
       final url =
           '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/$orderId/update_status/';
 
+      // Include user_id in request body for permission checking
+      final requestBody = {
+        'status': status,
+        if (userId != null) 'user_id': userId,
+      };
+
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'status': status}),
+        body: json.encode(requestBody),
       );
 
       print('Update order status response status: ${response.statusCode}');
@@ -966,12 +973,10 @@ class ApiService {
     print('Flagging request: $requestId with reason: $reason');
 
     try {
-      final url = '${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/$requestId/flag_request/';
+      final url =
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/$requestId/flag_request/';
 
-      final flagData = {
-        'reason': reason,
-        'auth_user_uid': authUserUid,
-      };
+      final flagData = {'reason': reason, 'auth_user_uid': authUserUid};
 
       print('Flag data: $flagData');
 
@@ -1014,10 +1019,13 @@ class ApiService {
     required String authUserUid,
     String timeframe = 'monthly',
   }) async {
-    print('Fetching seller orders summary for: $authUserUid, timeframe: $timeframe');
+    print(
+      'Fetching seller orders summary for: $authUserUid, timeframe: $timeframe',
+    );
 
     try {
-      final url = '${GlobalVariables.productsServiceUrl}api/v1/analytics/dashboard/seller_orders_summary/?auth_user_uid=$authUserUid&timeframe=$timeframe';
+      final url =
+          '${GlobalVariables.productsServiceUrl}api/v1/analytics/dashboard/seller_orders_summary/?auth_user_uid=$authUserUid&timeframe=$timeframe';
 
       print('Seller orders summary URL: $url');
 
@@ -1031,10 +1039,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        return {
-          'success': true,
-          'data': responseData,
-        };
+        return {'success': true, 'data': responseData};
       } else {
         final errorData = json.decode(response.body);
         return {
