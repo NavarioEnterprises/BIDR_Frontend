@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../constants/Constants.dart';
 import '../../customWdget/appbar.dart';
 import '../buyer_home.dart';
+import '../mobileView/breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class BuyerLandingPage extends StatefulWidget {

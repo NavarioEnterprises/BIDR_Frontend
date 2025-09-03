@@ -6,6 +6,7 @@ import '../../customWdget/custom_input2.dart';
 import '../buyer_home.dart';
 import '../../models/contact_submission.dart';
 import '../../services/contact_api_service.dart';
+import '../mobileView/breakpoints.dart';
 
 class ContactFormScreen extends StatefulWidget {
   @override
@@ -193,7 +194,13 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                               child: Opacity(
                                 opacity: value,
                                 child: Padding(
-                                  padding: const EdgeInsets.only(bottom: 40,left: 24,right: 24),
+                                  padding: Breakpoints.isTablet(context) 
+                                      ? EdgeInsets.only(
+                                          bottom: ResponsiveSpacing.getSpacing(context).marginLarge,
+                                          left: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                                          right: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                                        )
+                                      : const EdgeInsets.only(bottom: 40,left: 24,right: 24),
                                   child: Image.asset(
                                     "lib/assets/images/contact.png",
                                     fit: BoxFit.contain,
@@ -212,7 +219,9 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                     Expanded(
                       flex: 2,
                       child: Container(
-                        padding: EdgeInsets.all(24),
+                        padding: Breakpoints.isTablet(context) 
+                            ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingLarge)
+                            : EdgeInsets.all(24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -228,7 +237,9 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                                     child: Text(
                                       'Contact Us',
                                       style: GoogleFonts.manrope(
-                                        fontSize: 32,
+                                        fontSize: Breakpoints.isTablet(context) 
+                                            ? ResponsiveTypography.getTypography(context).heading 
+                                            : 32,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
                                       ),
@@ -248,7 +259,9 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                                   child: Text(
                                     'We\'d love to hear from you. Send us a message!',
                                     style: GoogleFonts.manrope(
-                                      fontSize: 16,
+                                      fontSize: Breakpoints.isTablet(context) 
+                                          ? ResponsiveTypography.getTypography(context).normal 
+                                          : 16,
                                       color: Colors.grey[600],
                                     ),
                                     textAlign: TextAlign.center,
@@ -400,24 +413,32 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                 expands: true, // Expand to fill container height
                 textAlignVertical: TextAlignVertical.top, // Start text at top
                 style: GoogleFonts.manrope(
-                  fontSize: 14,
+                  fontSize: Breakpoints.isTablet(context) 
+                      ? ResponsiveTypography.getTypography(context).normal 
+                      : 14,
                   color: Colors.black87,
                 ),
 
                 decoration: InputDecoration(
                   hintText: hintText.replaceAll('*', ''),
                   hintStyle: GoogleFonts.manrope(
-                    fontSize: 14,
+                    fontSize: Breakpoints.isTablet(context) 
+                        ? ResponsiveTypography.getTypography(context).normal 
+                        : 14,
                     color: Colors.grey[500],
                   ),
                   labelText: label.replaceAll('*', ''),
                   labelStyle: TextStyle(
                     color: Constants.ftaColorLight,
-                    fontSize: 14,
+                    fontSize: Breakpoints.isTablet(context) 
+                        ? ResponsiveTypography.getTypography(context).normal 
+                        : 14,
                   ),
                   floatingLabelStyle: TextStyle(
                     color: Constants.ftaColorLight,
-                    fontSize: 14,
+                    fontSize: Breakpoints.isTablet(context) 
+                        ? ResponsiveTypography.getTypography(context).normal 
+                        : 14,
 
                   ),
                   floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -429,7 +450,9 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                     borderRadius: BorderRadius.circular(24),
                     borderSide: BorderSide(color: Color(0xFFF5A623), width: 2),
                   ),
-                  contentPadding: EdgeInsets.all(16), // More padding for bigger field
+                  contentPadding: Breakpoints.isTablet(context) 
+                      ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium) 
+                      : EdgeInsets.all(16), // More padding for bigger field
                   fillColor: Colors.white,
                   filled: true,
                 ),
@@ -579,7 +602,9 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                   Text(
                     'Submitting...',
                     style: GoogleFonts.manrope(
-                      fontSize: 16,
+                      fontSize: Breakpoints.isTablet(context) 
+                          ? ResponsiveTypography.getTypography(context).normal 
+                          : 16,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -588,7 +613,9 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
             : Text(
                 'Submit',
                 style: GoogleFonts.manrope(
-                  fontSize: 16,
+                  fontSize: Breakpoints.isTablet(context) 
+                      ? ResponsiveTypography.getTypography(context).normal 
+                      : 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -664,7 +691,9 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                   child: Text(
                     'Thank You!',
                     style: GoogleFonts.manrope(
-                      fontSize: 24,
+                      fontSize: Breakpoints.isTablet(context) 
+                          ? ResponsiveTypography.getTypography(context).subHeading 
+                          : 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
@@ -676,7 +705,9 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                   child: Text(
                     'Your message has been sent successfully.',
                     style: GoogleFonts.manrope(
-                      fontSize: 16,
+                      fontSize: Breakpoints.isTablet(context) 
+                          ? ResponsiveTypography.getTypography(context).normal 
+                          : 16,
                       color: Colors.grey[600],
                     ),
                     textAlign: TextAlign.center,
@@ -687,7 +718,9 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                   child: Text(
                     'We\'ll get back to you soon!',
                     style: GoogleFonts.manrope(
-                      fontSize: 14,
+                      fontSize: Breakpoints.isTablet(context) 
+                          ? ResponsiveTypography.getTypography(context).normal 
+                          : 14,
                       color: Colors.grey[500],
                     ),
                     textAlign: TextAlign.center,
@@ -713,7 +746,9 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                       child: Text(
                         'OK',
                         style: GoogleFonts.manrope(
-                          fontSize: 16,
+                          fontSize: Breakpoints.isTablet(context) 
+                              ? ResponsiveTypography.getTypography(context).normal 
+                              : 16,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

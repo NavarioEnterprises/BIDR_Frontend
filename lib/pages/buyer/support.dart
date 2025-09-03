@@ -14,6 +14,7 @@ import '../../customWdget/custom_input2.dart';
 import '../../models/alert.dart';
 import '../../models/ticket.dart';
 import '../../services/ticket_api_service.dart';
+import '../mobileView/breakpoints.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
@@ -250,11 +251,17 @@ class _SupportState extends State<SellerSupport> with TickerProviderStateMixin {
               child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.only(
-                      left: 68,
-                      right: 68,
-                      top: 24,
-                    ),
+                    padding: Breakpoints.isTablet(context) 
+                        ? EdgeInsets.only(
+                            left: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                            right: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                            top: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                          )
+                        : const EdgeInsets.only(
+                            left: 68,
+                            right: 68,
+                            top: 24,
+                          ),
                     constraints: BoxConstraints(maxWidth: 1600, maxHeight: 600),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,

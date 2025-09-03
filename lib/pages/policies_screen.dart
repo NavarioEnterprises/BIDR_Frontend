@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/Constants.dart';
+import 'mobileView/breakpoints.dart';
 
 class PoliciesScreen extends StatefulWidget {
   const PoliciesScreen({Key? key}) : super(key: key);
@@ -35,8 +36,10 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
         title: Text(
           'Policies',
           style: GoogleFonts.manrope(
-
             fontWeight: FontWeight.bold,
+            fontSize: Breakpoints.isTablet(context) 
+                ? ResponsiveTypography.getTypography(context).subHeading 
+                : null,
           ),
         ),
         leading: IconButton(
@@ -58,7 +61,12 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.only(left: 50, right: 50),
+        padding: Breakpoints.isTablet(context) 
+            ? EdgeInsets.only(
+                left: ResponsiveSpacing.getSpacing(context).paddingLarge, 
+                right: ResponsiveSpacing.getSpacing(context).paddingLarge,
+              )
+            : const EdgeInsets.only(left: 50, right: 50),
         child: Container(
           width: MediaQuery.of(context).size.width,
           constraints: BoxConstraints(maxWidth: 1600),
@@ -78,7 +86,9 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
 
   Widget _buildTermsOfService() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: Breakpoints.isTablet(context) 
+          ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium)
+          : const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -146,7 +156,9 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
 
   Widget _buildPrivacyPolicy() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: Breakpoints.isTablet(context) 
+          ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium)
+          : const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -220,7 +232,9 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
 
   Widget _buildReturnPolicy() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: Breakpoints.isTablet(context) 
+          ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium)
+          : const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -298,7 +312,9 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
 
   Widget _buildSellerAgreement() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: Breakpoints.isTablet(context) 
+          ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium)
+          : const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -378,7 +394,9 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
     return Text(
       title,
       style: GoogleFonts.manrope(
-        fontSize: 24,
+        fontSize: Breakpoints.isTablet(context) 
+            ? ResponsiveTypography.getTypography(context).subHeading 
+            : 24,
         fontWeight: FontWeight.bold,
         color: Colors.black87,
       ),
@@ -389,7 +407,9 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
     return Text(
       'Last updated: January 15, 2025',
       style: GoogleFonts.manrope(
-        fontSize: 14,
+        fontSize: Breakpoints.isTablet(context) 
+            ? ResponsiveTypography.getTypography(context).normal 
+            : 14,
         color: Colors.grey[600],
       ),
     );
@@ -397,21 +417,27 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
 
   Widget _buildSection(String title, String content) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
+      padding: Breakpoints.isTablet(context) 
+          ? EdgeInsets.only(bottom: ResponsiveSpacing.getSpacing(context).marginLarge)
+          : const EdgeInsets.only(bottom: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
             style: GoogleFonts.manrope(
-              fontSize: 18,
+              fontSize: Breakpoints.isTablet(context) 
+                  ? ResponsiveTypography.getTypography(context).medium 
+                  : 18,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
           ),
           const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: Breakpoints.isTablet(context) 
+                ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium)
+                : const EdgeInsets.all(16),
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
               color: Colors.white,
@@ -421,7 +447,9 @@ class _PoliciesScreenState extends State<PoliciesScreen> with SingleTickerProvid
             child: Text(
               content,
               style: GoogleFonts.manrope(
-                fontSize: 14,
+                fontSize: Breakpoints.isTablet(context) 
+                    ? ResponsiveTypography.getTypography(context).normal 
+                    : 14,
                 height: 1.6,
                 color: Colors.black54,
               ),

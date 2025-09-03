@@ -2,6 +2,7 @@ import 'package:bidr/constants/Constants.dart';
 import 'package:flutter/material.dart';
 import '../../customWdget/appbar.dart';
 import '../buyer_home.dart';
+import '../mobileView/breakpoints.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 

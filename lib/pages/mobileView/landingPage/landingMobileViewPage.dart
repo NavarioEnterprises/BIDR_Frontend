@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:bidr/pages/mobileView/landingPage/policiesMobileView.dart';
+import 'package:bidr/pages/mobileView/landingPage/supportMobileView.dart';
 import 'package:bidr/pages/seller/seller_home_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,6 +31,9 @@ import '../../faq_screen.dart';
 import '../../notification.dart';
 import '../../policies_screen.dart';
 import '../breakpoints.dart';
+import 'blogcardMobileView.dart';
+import 'contactUsMobileView.dart';
+import 'faqMobileView.dart';
 
 
 class BuyerHomeMobilePage extends StatefulWidget {
@@ -220,8 +225,8 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                                   opacity: _categoryAnimation,
                                   child: Padding(
                                     padding: const EdgeInsets.only(
-                                      left: 64,
-                                      right: 64,
+                                      left: 16,
+                                      right: 16,
                                     ),
                                     child: Center(
                                       child: _buildCategoryItems(),
@@ -255,26 +260,26 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                                 child: selectedIndex == 0
                                     ? Padding(
                                   padding: const EdgeInsets.only(
-                                    left: 64,
-                                    right: 64,
+                                    left: 16,
+                                    right: 16,
                                   ),
                                   child: VehicleDetailsQuoteMobileForm(),
                                 )
                                     : selectedIndex == 1
                                     ? Padding(
                                   padding: const EdgeInsets.only(
-                                    left: 64,
-                                    right: 64,
+                                    left: 16,
+                                    right: 16,
                                   ),
-                                  child: ProductQuoteMobileForm(),
+                                  child:TireProductQuoteMobileForm(), 
                                 )
                                     : selectedIndex == 2
                                     ? Padding(
                                   padding: const EdgeInsets.only(
-                                    left: 64,
-                                    right: 64,
+                                    left: 16,
+                                    right: 16,
                                   ),
-                                  child: TireProductQuoteMobileForm(),
+                                  child: ProductQuoteMobileForm(),
                                 )
                                     : SizedBox.shrink(),
                               ),
@@ -284,9 +289,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                       ),
 
                       // Animated About Us Section
-                      selectedIndex < 0
-                          ? SizedBox.shrink()
-                          : SizedBox(height: 60),
+                      SizedBox(height: 60),
                       TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0.0, end: 1.0),
                         duration: Duration(milliseconds: 1000),
@@ -312,8 +315,8 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                           constraints: BoxConstraints(maxWidth: 1600),
                           child: Padding(
                             padding: const EdgeInsets.only(
-                              left: 64,
-                              right: 64,
+                              left: 16,
+                              right: 16,
                             ),
                             child: Center(
                               child: _buildAnimatedBannerSection(
@@ -384,15 +387,15 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
               ),
             )
                 : Constants.buyerAppBarValue == 1
-                ? Expanded(child: Support())
+                ? Expanded(child: SupportMobile())
                 : Constants.buyerAppBarValue == 2
-                ? Expanded(child: FAQScreen())
+                ? Expanded(child: FAQMobileScreen())
                 : Constants.buyerAppBarValue == 3
-                ? Expanded(child: PoliciesScreen())
+                ? Expanded(child: PoliciesMobileScreen())
                 : Constants.buyerAppBarValue == 4
-                ? Expanded(child: BlogCardsScreen())
+                ? Expanded(child: BlogCardsMobileScreen())
                 : Constants.buyerAppBarValue == 5
-                ? Expanded(child: ContactFormScreen())
+                ? Expanded(child: ContactFormMobileScreen())
                 : Constants.buyerAppBarValue == 6
                 ? Expanded(child: BuyerDashboardScreen())
                 : Constants.buyerAppBarValue == 7
@@ -435,9 +438,9 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
           Center(
             child: Container(
               constraints: BoxConstraints(maxWidth: 1600),
-              child: Row(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   _buildAnimatedVideoSection(
                     "About Us",
@@ -445,7 +448,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                     "Why Join As A Buyer?",
                     0,
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
                   _buildAnimatedVideoSection(
                     "How It Works",
                     "Unlike catalogue-based online shops, BIDR allows buyers to send out a single request to multiple sellers that are registered on our platform.The buyer simply specifies the area to search and all sellers within that area are notified of therequest. If the seller has the product (or similar products), they will make an offer. The sellers are continuously updated of the current market price offered by other sellers in the area, and should they opt to do so, they will have the opportunity of revising their bid with a best and final offer. No more long repetitive phone calls, waiting in queues, or countless hours browsing for special deals. With BIDR the sellers come to you with their best price.",
@@ -483,9 +486,8 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
               ),
               child: Column(
                 children: [
-                  Expanded(
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.35,
+                  Container(
+                      width: MediaQuery.of(context).size.width,
                       padding: EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium),
                       decoration: BoxDecoration(
                         color: Constants.dtaColorLight,
@@ -586,13 +588,12 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                         ],
                       ),
                     ),
-                  ),
-                  SizedBox(height: 40),
+                  SizedBox(height: 24),
                   AnimatedContainer(
                     duration: Duration(milliseconds: 300),
                     padding: EdgeInsets.only(left: 12, right: 12),
-                    height: 55,
-                    width: MediaQuery.of(context).size.width * 0.35,
+                    height: 45,
+                    width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(360),

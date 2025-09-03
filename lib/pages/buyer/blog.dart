@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:intl/intl.dart';
 
 import '../../constants/Constants.dart';
 import '../../customWdget/appbar.dart';
@@ -15,6 +16,7 @@ import '../../global_values.dart';
 import '../../models/blog.dart';
 import '../../services/blog_api_service.dart';
 import '../buyer_home.dart';
+import '../mobileView/breakpoints.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
@@ -87,7 +89,9 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
             Text(
               'Loading blog posts...',
               style: GoogleFonts.manrope(
-                fontSize: 16,
+                fontSize: Breakpoints.isTablet(context) 
+                    ? ResponsiveTypography.getTypography(context).normal 
+                    : 16,
                 color: Colors.grey[600],
               ),
             ),
@@ -110,7 +114,9 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
             Text(
               'Failed to load blog posts',
               style: GoogleFonts.manrope(
-                fontSize: 18,
+                fontSize: Breakpoints.isTablet(context) 
+                    ? ResponsiveTypography.getTypography(context).medium 
+                    : 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
@@ -119,7 +125,9 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
             Text(
               _error!.replaceAll('Exception: ', ''),
               style: GoogleFonts.manrope(
-                fontSize: 14,
+                fontSize: Breakpoints.isTablet(context) 
+                    ? ResponsiveTypography.getTypography(context).normal 
+                    : 14,
                 color: Colors.grey[600],
               ),
               textAlign: TextAlign.center,
@@ -141,7 +149,9 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
               child: Text(
                 'Retry',
                 style: GoogleFonts.manrope(
-                  fontSize: 14,
+                  fontSize: Breakpoints.isTablet(context) 
+                      ? ResponsiveTypography.getTypography(context).normal 
+                      : 14,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -165,7 +175,9 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
             Text(
               'No blog posts available',
               style: GoogleFonts.manrope(
-                fontSize: 18,
+                fontSize: Breakpoints.isTablet(context) 
+                    ? ResponsiveTypography.getTypography(context).medium 
+                    : 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
@@ -174,7 +186,9 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
             Text(
               'Check back later for new content!',
               style: GoogleFonts.manrope(
-                fontSize: 14,
+                fontSize: Breakpoints.isTablet(context) 
+                    ? ResponsiveTypography.getTypography(context).normal 
+                    : 14,
                 color: Colors.grey[600],
               ),
             ),
@@ -191,7 +205,9 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
         //childAspectRatio: 0.4,
       ),
       itemCount: blogItems.length,
-      padding: EdgeInsets.all(24),
+      padding: Breakpoints.isTablet(context) 
+          ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingLarge)
+          : EdgeInsets.all(24),
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         return TweenAnimationBuilder<double>(
@@ -272,7 +288,12 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 45, right: 45),
+                    padding: Breakpoints.isTablet(context) 
+                      ? EdgeInsets.only(
+                          left: ResponsiveSpacing.getSpacing(context).paddingLarge, 
+                          right: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                        )
+                      : const EdgeInsets.only(left: 45, right: 45),
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       height: 400,
@@ -401,11 +422,12 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                           duration: Duration(milliseconds: 300),
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                            borderRadius: BorderRadius.only(topLeft: Radius.circular(12),topRight: Radius.circular(12)),
+
                             color: Colors.grey[300],
                           ),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                            borderRadius: BorderRadius.only(topLeft: Radius.circular(12),topRight: Radius.circular(12)),
                             child: Stack(
                               children: [
                                 CachedNetworkImage(
@@ -415,7 +437,7 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                                   height: double.infinity,
                                   placeholder: (context, url) => Container(
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(12),topRight: Radius.circular(12)),
                                       color: Colors.grey.shade100,
                                     ),
                                     child: const Center(
@@ -431,7 +453,7 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                                   ),
                                   errorWidget: (context, url, error) => Container(
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(12),topRight: Radius.circular(12)),
                                       color: Colors.grey.shade100,
                                     ),
                                     child: const Icon(
@@ -471,7 +493,9 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                                     child: Text(
                                       widget.blogItem.title,
                                       style: GoogleFonts.manrope(
-                                        fontSize: 16,
+                                        fontSize: Breakpoints.isTablet(context) 
+                                            ? ResponsiveTypography.getTypography(context).normal 
+                                            : 14,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
                                       ),
@@ -491,7 +515,9 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                                         widget.blogItem.description,
                                         textAlign: TextAlign.justify,
                                         style: GoogleFonts.manrope(
-                                          fontSize: 12,
+                                          fontSize: Breakpoints.isTablet(context) 
+                                              ? ResponsiveTypography.getTypography(context).normal - 4 
+                                              : 12,
                                           color: Colors.grey[600],
                                           height: 1.3,
                                         ),
@@ -514,9 +540,11 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                                         Icon(Icons.calendar_today, size: 12, color: Colors.grey[600]),
                                         SizedBox(width: 4),
                                         Text(
-                                          widget.blogItem.date,
+                                          DateFormat("yyyy-MM-dd HH:mm").format(DateTime.parse(widget.blogItem.date)),
                                           style: GoogleFonts.manrope(
-                                            fontSize: 11,
+                                            fontSize: Breakpoints.isTablet(context) 
+                                                ? ResponsiveTypography.getTypography(context).normal - 5 
+                                                : 11,
                                             color: Colors.grey[600],
                                           ),
                                         ),
@@ -581,8 +609,10 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
               return Text(
                 '$value',
                 style: GoogleFonts.manrope(
-                    fontSize: 11,
-                    color: Colors.grey[600]
+                  fontSize: Breakpoints.isTablet(context) 
+                      ? ResponsiveTypography.getTypography(context).normal - 5 
+                      : 11,
+                  color: Colors.grey[600]
                 ),
               );
             },
@@ -748,7 +778,14 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                     height: 60,
                     width: MediaQuery.of(context).size.width,
                     color: Constants.ctaColorLight,
-                    padding: EdgeInsets.only(left: 40, right: 24, top: 8, bottom: 8),
+                    padding: Breakpoints.isTablet(context) 
+                        ? EdgeInsets.only(
+                            left: ResponsiveSpacing.getSpacing(context).paddingLarge, 
+                            right: ResponsiveSpacing.getSpacing(context).paddingLarge, 
+                            top: ResponsiveSpacing.getSpacing(context).paddingSmall, 
+                            bottom: ResponsiveSpacing.getSpacing(context).paddingSmall,
+                          )
+                        : EdgeInsets.only(left: 40, right: 24, top: 8, bottom: 8),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -767,11 +804,23 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                         SizedBox(width: 22),
                         Text(
                           'Buyer',
-                          style: TextStyle(color: Colors.white, fontSize: 16, fontFamily: 'YuGothic'),
+                          style: TextStyle(
+                            color: Colors.white, 
+                            fontSize: Breakpoints.isTablet(context) 
+                                ? ResponsiveTypography.getTypography(context).normal 
+                                : 16, 
+                            fontFamily: 'YuGothic',
+                          ),
                         ),
                         Text(
                           ' Dashboard',
-                          style: TextStyle(color: Constants.ftaColorLight, fontSize: 16, fontFamily: 'YuGothic'),
+                          style: TextStyle(
+                            color: Constants.ftaColorLight, 
+                            fontSize: Breakpoints.isTablet(context) 
+                                ? ResponsiveTypography.getTypography(context).normal 
+                                : 16, 
+                            fontFamily: 'YuGothic',
+                          ),
                         ),
                       ],
                     ),
@@ -779,7 +828,12 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                   SizedBox(height: 24),
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 55, right: 55),
+                      padding: Breakpoints.isTablet(context) 
+                          ? EdgeInsets.only(
+                              left: ResponsiveSpacing.getSpacing(context).paddingLarge, 
+                              right: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                            )
+                          : const EdgeInsets.only(left: 55, right: 55),
                       child: Container(
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.height + 400,
@@ -831,7 +885,9 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                               child: Text(
                                                 widget.blogItem.title,
                                                 style: GoogleFonts.manrope(
-                                                  fontSize: 32,
+                                                  fontSize: Breakpoints.isTablet(context) 
+                                                      ? ResponsiveTypography.getTypography(context).heading 
+                                                      : 32,
                                                   fontWeight: FontWeight.bold,
                                                   color: Constants.ftaColorLight,
                                                   height: 1.2,
@@ -855,7 +911,9 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                               child: Text(
                                                 widget.blogItem.description,
                                                 style: GoogleFonts.manrope(
-                                                  fontSize: 14,
+                                                  fontSize: Breakpoints.isTablet(context) 
+                                                      ? ResponsiveTypography.getTypography(context).normal 
+                                                      : 14,
                                                   color: Colors.black,
                                                   height: 1.5,
                                                 ),
@@ -882,7 +940,9 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                                     Text(
                                                       widget.blogItem.date,
                                                       style: GoogleFonts.manrope(
-                                                        fontSize: 14,
+                                                        fontSize: Breakpoints.isTablet(context) 
+                                                            ? ResponsiveTypography.getTypography(context).normal 
+                                                            : 14,
                                                         color: Constants.ftaColorLight,
                                                       ),
                                                     ),
@@ -915,7 +975,9 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                             child: Text(
                                               widget.blogItem.detailContent,
                                               style: GoogleFonts.manrope(
-                                                fontSize: 14,
+                                                fontSize: Breakpoints.isTablet(context) 
+                                                    ? ResponsiveTypography.getTypography(context).normal 
+                                                    : 14,
                                                 height: 1.6,
                                                 color: Colors.black,
                                               ),
@@ -930,7 +992,9 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                       Text(
                                         'Comments (${blogComments.length})',
                                         style: GoogleFonts.manrope(
-                                          fontSize: 20,
+                                          fontSize: Breakpoints.isTablet(context) 
+                                              ? ResponsiveTypography.getTypography(context).large 
+                                              : 20,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black87,
                                         ),
@@ -990,7 +1054,9 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                     Text(
                                       'Related Articles',
                                       style: GoogleFonts.manrope(
-                                        fontSize: 18,
+                                        fontSize: Breakpoints.isTablet(context) 
+                                            ? ResponsiveTypography.getTypography(context).medium 
+                                            : 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
                                       ),
@@ -1050,7 +1116,9 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
               Text(
                 '$count',
                 style: GoogleFonts.manrope(
-                  fontSize: 14,
+                  fontSize: Breakpoints.isTablet(context) 
+                      ? ResponsiveTypography.getTypography(context).normal 
+                      : 14,
                   color: color,
                   fontWeight: FontWeight.w600,
                 ),

@@ -11,9 +11,9 @@ class GroupChat {
   });
 
   factory GroupChat.fromJson(Map<String, dynamic> json) => GroupChat(
-    uuid: json['uuid'],
-    request: ProductRequest.fromJson(json['request']),
-    messages: (json['messages'] as List)
+    uuid: json['uuid'] ?? '',
+    request: ProductRequest.fromJson(json['request'] ?? {}),
+    messages: (json['messages'] as List<dynamic>? ?? [])
         .map((msg) => Message.fromJson(msg))
         .toList(),
   );
@@ -31,7 +31,7 @@ class ProductRequest {
   ProductRequest({required this.description});
 
   factory ProductRequest.fromJson(Map<String, dynamic> json) =>
-      ProductRequest(description: json['description']);
+      ProductRequest(description: json['description'] ?? '');
 
   Map<String, dynamic> toJson() => {'description': description};
 }
@@ -52,9 +52,9 @@ class Message {
   });
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
-    sender: User.fromJson(json['sender']),
-    content: json['content'],
-    timestamp: DateTime.parse(json['timestamp']),
+    sender: User.fromJson(json['sender'] ?? {}),
+    content: json['content'] ?? '',
+    timestamp: DateTime.tryParse(json['timestamp'] ?? '') ?? DateTime.now(),
     isReply: json['is_reply'] ?? false,
     replies:
         (json['replies'] as List<dynamic>?)
@@ -80,8 +80,8 @@ class User {
   User({required this.name, required this.role, this.profileImageUrl});
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-    name: json['name'],
-    role: json['role'],
+    name: json['name'] ?? '',
+    role: json['role'] ?? '',
     profileImageUrl: json['profile_image_url'],
   );
 
@@ -107,14 +107,14 @@ class CombinedRequest {
 
   factory CombinedRequest.fromJson(Map<String, dynamic> json) {
     return CombinedRequest(
-      id: json['id'],
-      autoSparesRequest: (json['auto_spares_request'] as List)
+      id: json['id'] ?? 0,
+      autoSparesRequest: (json['auto_spares_request'] as List<dynamic>? ?? [])
           .map((item) => AutoSparesRequest.fromJson(item))
           .toList(),
-      rimTyreRequest: (json['rim_tyre_request'] as List)
+      rimTyreRequest: (json['rim_tyre_request'] as List<dynamic>? ?? [])
           .map((item) => RimTyreRequest.fromJson(item))
           .toList(),
-      consumerElectronicsRequest: (json['consumer_electronics_request'] as List)
+      consumerElectronicsRequest: (json['consumer_electronics_request'] as List<dynamic>? ?? [])
           .map((item) => ConsumerElectronicsRequest.fromJson(item))
           .toList(),
     );
@@ -162,10 +162,10 @@ class Seller {
       id: json['id'] ?? 0,
       name: json['name'] ?? "",
       comment: json['comment'] ?? "",
-      radius: json['radius'] ?? 0.0,
-      bid: (json['bid'] as num).toDouble(),
-      bidTime: DateTime.parse(json['bid_time']),
-      rating: (json['rating'] as num).toDouble(),
+      radius: (json['radius'] as num?)?.toDouble() ?? 0.0,
+      bid: (json['bid'] as num?)?.toDouble() ?? 0.0,
+      bidTime: DateTime.tryParse(json['bid_time'] ?? '') ?? DateTime.now(),
+      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
       maxRating: json['max_rating'] ?? 0,
     );
   }
@@ -204,12 +204,12 @@ class VehicleDetails {
 
   factory VehicleDetails.fromJson(Map<String, dynamic> json) {
     return VehicleDetails(
-      vin: json['vin'],
-      manufacturer: json['manufacturer'],
-      makeModel: json['make_model'],
-      type: json['type'],
-      condition: json['condition'],
-      year: json['year'],
+      vin: json['vin'] ?? '',
+      manufacturer: json['manufacturer'] ?? '',
+      makeModel: json['make_model'] ?? '',
+      type: json['type'] ?? '',
+      condition: json['condition'] ?? '',
+      year: json['year'] ?? '',
     );
   }
 
@@ -246,12 +246,12 @@ class PartDetails {
 
   factory PartDetails.fromJson(Map<String, dynamic> json) {
     return PartDetails(
-      partName: json['part_name'],
-      quantity: json['quantity'],
-      location: json['location'],
-      maxDistanceKm: json['max_distance_km'],
-      urgency: json['urgency'],
-      productDescription: json['product_description'],
+      partName: json['part_name'] ?? '',
+      quantity: json['quantity'] ?? 0,
+      location: json['location'] ?? '',
+      maxDistanceKm: (json['max_distance_km'] as num?)?.toDouble() ?? 0.0,
+      urgency: json['urgency'] ?? '',
+      productDescription: json['product_description'] ?? '',
       imageUrls: List<String>.from(json['image_urls'] ?? []),
     );
   }
@@ -286,11 +286,11 @@ class MoreFields {
 
   factory MoreFields.fromJson(Map<String, dynamic> json) {
     return MoreFields(
-      partNumber: json['part_number'],
-      transmissionType: json['transmission_type'],
-      mileage: json['mileage'],
-      fuelType: json['fuel_type'],
-      bodyType: json['body_type'],
+      partNumber: json['part_number'] ?? '',
+      transmissionType: json['transmission_type'] ?? '',
+      mileage: json['mileage'] ?? '',
+      fuelType: json['fuel_type'] ?? '',
+      bodyType: json['body_type'] ?? '',
     );
   }
 
@@ -352,10 +352,10 @@ class AutoSparesRequest {
 
   factory AutoSparesRequest.fromJson(Map<String, dynamic> json) {
     return AutoSparesRequest(
-      id: json['id'] ?? 0,
+      id: json['id']?.toString() ?? '0',
       status: json['status'] ?? "",
       category: json['category'] ?? "",
-      createdAt: DateTime.parse(json['created_at']),
+      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
       autoSpares: AutoSpares.fromJson(json['auto_spares'] ?? {}),
       sellerOffers: json['seller_offers'] as List<dynamic>? ?? [],
     );
@@ -386,10 +386,10 @@ class ProductDetails {
 
   factory ProductDetails.fromJson(Map<String, dynamic> json) {
     return ProductDetails(
-      typeOfElectronics: json['type_of_electronics'],
-      brandPreference: json['brand_preference'],
+      typeOfElectronics: json['type_of_electronics'] ?? '',
+      brandPreference: json['brand_preference'] ?? '',
       modelSeries: json['model_series'],
-      quantityNeeded: json['quantity_needed'],
+      quantityNeeded: json['quantity_needed'] ?? 0,
     );
   }
 
@@ -418,10 +418,10 @@ class BudgetTimeline {
 
   factory BudgetTimeline.fromJson(Map<String, dynamic> json) {
     return BudgetTimeline(
-      minPrice: json['min_price']?.toDouble(),
-      maxPrice: json['max_price']?.toDouble(),
-      urgency: json['urgency'],
-      needsInstallation: json['needs_installation'],
+      minPrice: (json['min_price'] as num?)?.toDouble(),
+      maxPrice: (json['max_price'] as num?)?.toDouble(),
+      urgency: json['urgency'] ?? '',
+      needsInstallation: json['needs_installation'] ?? false,
     );
   }
 
@@ -453,8 +453,8 @@ class FeaturesAndSpecs {
   factory FeaturesAndSpecs.fromJson(Map<String, dynamic> json) {
     return FeaturesAndSpecs(
       requiredFeatures: json['required_features'],
-      conditionPreference: json['condition_preference'],
-      purpose: json['purpose'],
+      conditionPreference: json['condition_preference'] ?? '',
+      purpose: json['purpose'] ?? '',
       documentsOrImages: List<String>.from(json['documents_or_images'] ?? []),
       additionalComments: json['additional_comments'],
     );
@@ -518,10 +518,10 @@ class ConsumerElectronicsRequest {
 
   factory ConsumerElectronicsRequest.fromJson(Map<String, dynamic> json) {
     return ConsumerElectronicsRequest(
-      id: json['id'],
+      id: json['id']?.toString() ?? '',
       status: json['status'] ?? "",
       category: json['category'] ?? "",
-      createdAt: DateTime.parse(json['created_at']),
+      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
       consumerElectronics: ConsumerElectronics.fromJson(
         json['consumer_electronics'] ?? {},
       ),
@@ -558,12 +558,12 @@ class RimTyreProductDetails {
 
   factory RimTyreProductDetails.fromJson(Map<String, dynamic> json) {
     return RimTyreProductDetails(
-      tyreWidthMm: json['tyre_width_mm'],
-      sidewallProfile: json['sidewall_profile'],
-      wheelRimDiameterInches: json['wheel_rim_diameter_inches'],
-      tyreType: json['tyre_type'],
-      quantity: json['quantity'],
-      urgency: json['urgency'],
+      tyreWidthMm: json['tyre_width_mm'] ?? 0,
+      sidewallProfile: json['sidewall_profile'] ?? '',
+      wheelRimDiameterInches: json['wheel_rim_diameter_inches'] ?? '',
+      tyreType: json['tyre_type'] ?? '',
+      quantity: json['quantity'] ?? 0,
+      urgency: json['urgency'] ?? '',
     );
   }
 
@@ -604,14 +604,14 @@ class RimTyreMoreFields {
 
   factory RimTyreMoreFields.fromJson(Map<String, dynamic> json) {
     return RimTyreMoreFields(
-      description: json['description'],
-      vehicleType: json['vehicle_type'],
-      pitchCircleDiameter: json['pitch_circle_diameter'],
-      preferredBrand: json['preferred_brand'],
-      tyreConstructionType: json['tyre_construction_type'],
-      fitmentRequired: json['fitment_required'],
-      balancingRequired: json['balancing_required'],
-      tyreRotationRequired: json['tyre_rotation_required'],
+      description: json['description'] ?? '',
+      vehicleType: json['vehicle_type'] ?? '',
+      pitchCircleDiameter: json['pitch_circle_diameter'] ?? '',
+      preferredBrand: json['preferred_brand'] ?? '',
+      tyreConstructionType: json['tyre_construction_type'] ?? '',
+      fitmentRequired: json['fitment_required'] ?? false,
+      balancingRequired: json['balancing_required'] ?? false,
+      tyreRotationRequired: json['tyre_rotation_required'] ?? false,
       imageUrls: List<String>.from(json['image_urls'] ?? []),
     );
   }
@@ -671,10 +671,10 @@ class RimTyreRequest {
 
   factory RimTyreRequest.fromJson(Map<String, dynamic> json) {
     return RimTyreRequest(
-      id: json['id'],
+      id: json['id']?.toString() ?? '',
       status: json['status'] ?? "",
       category: json['category'] ?? "",
-      createdAt: DateTime.parse(json['created_at']),
+      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
       rimTyre: RimTyre.fromJson(json['rim_tyre'] ?? {}),
       sellerOffers: json['seller_offers'] as List<dynamic>? ?? [],
     );

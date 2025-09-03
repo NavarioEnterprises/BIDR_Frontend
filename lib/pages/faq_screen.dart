@@ -4,6 +4,7 @@ import '../constants/Constants.dart';
 import '../customWdget/custom_input2.dart';
 import '../models/faq.dart';
 import '../services/faq_api_service.dart';
+import 'mobileView/breakpoints.dart';
 
 class FAQScreen extends StatefulWidget {
   const FAQScreen({Key? key}) : super(key: key);
@@ -191,7 +192,12 @@ class _FAQScreenState extends State<FAQScreen> {
         elevation: 1,
         title: Text(
           'Frequently Asked Questions',
-          style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
+          style: GoogleFonts.manrope(
+            fontWeight: FontWeight.bold,
+            fontSize: Breakpoints.isTablet(context) 
+                ? ResponsiveTypography.getTypography(context).subHeading 
+                : null,
+          ),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -202,12 +208,19 @@ class _FAQScreenState extends State<FAQScreen> {
         children: [
           // Search Bar
           Padding(
-            padding: const EdgeInsets.only(
-              left: 64,
-              right: 64,
-              top: 16,
-              bottom: 8,
-            ),
+            padding: Breakpoints.isTablet(context) 
+                ? EdgeInsets.only(
+                    left: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                    right: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                    top: ResponsiveSpacing.getSpacing(context).paddingMedium,
+                    bottom: ResponsiveSpacing.getSpacing(context).paddingSmall,
+                  )
+                : const EdgeInsets.only(
+                    left: 64,
+                    right: 64,
+                    top: 16,
+                    bottom: 8,
+                  ),
             child:CustomInputTransparent4(
               hintText: 'Search FAQs...',
               labelText: "Search",
@@ -238,7 +251,13 @@ class _FAQScreenState extends State<FAQScreen> {
           ),
           // Category Filter
           Padding(
-            padding: const EdgeInsets.only(left: 64, right: 64, top: 8),
+            padding: Breakpoints.isTablet(context) 
+                ? EdgeInsets.only(
+                    left: ResponsiveSpacing.getSpacing(context).paddingLarge, 
+                    right: ResponsiveSpacing.getSpacing(context).paddingLarge, 
+                    top: ResponsiveSpacing.getSpacing(context).paddingSmall,
+                  )
+                : const EdgeInsets.only(left: 64, right: 64, top: 8),
             child: Container(
               height: 50,
               width: MediaQuery.of(context).size.width,
@@ -263,6 +282,9 @@ class _FAQScreenState extends State<FAQScreen> {
                                 fontWeight: isSelected
                                     ? FontWeight.w600
                                     : FontWeight.normal,
+                                fontSize: Breakpoints.isTablet(context) 
+                                    ? ResponsiveTypography.getTypography(context).normal 
+                                    : null,
                               ),
                             ),
                             selected: isSelected,
@@ -281,7 +303,12 @@ class _FAQScreenState extends State<FAQScreen> {
           // FAQ Items
           Expanded(
             child: Container(
-              padding: const EdgeInsets.only(left: 64, right: 64),
+              padding: Breakpoints.isTablet(context) 
+                  ? EdgeInsets.only(
+                      left: ResponsiveSpacing.getSpacing(context).paddingLarge, 
+                      right: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                    )
+                  : const EdgeInsets.only(left: 64, right: 64),
               width: MediaQuery.of(context).size.width,
               constraints: BoxConstraints(maxWidth: 1600),
               child: _isLoading
@@ -304,7 +331,9 @@ class _FAQScreenState extends State<FAQScreen> {
                                 ? 'No FAQs found in "$_selectedCategory" category'
                                 : 'No FAQs available',
                             style: GoogleFonts.manrope(
-                              fontSize: 18,
+                              fontSize: Breakpoints.isTablet(context) 
+                                  ? ResponsiveTypography.getTypography(context).medium 
+                                  : 18,
                               fontWeight: FontWeight.w600,
                               color: Colors.grey[600],
                             ),
@@ -318,7 +347,9 @@ class _FAQScreenState extends State<FAQScreen> {
                                 ? 'Try selecting a different category'
                                 : 'Check back later for updates',
                             style: GoogleFonts.manrope(
-                              fontSize: 14,
+                              fontSize: Breakpoints.isTablet(context) 
+                                  ? ResponsiveTypography.getTypography(context).normal 
+                                  : 14,
                               color: Colors.grey[500],
                             ),
                             textAlign: TextAlign.center,
@@ -340,6 +371,9 @@ class _FAQScreenState extends State<FAQScreen> {
                                 style: GoogleFonts.manrope(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w500,
+                                  fontSize: Breakpoints.isTablet(context) 
+                                      ? ResponsiveTypography.getTypography(context).normal 
+                                      : null,
                                 ),
                               ),
                             ),
@@ -348,7 +382,9 @@ class _FAQScreenState extends State<FAQScreen> {
                       ),
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.all(16),
+                      padding: Breakpoints.isTablet(context) 
+                          ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium)
+                          : const EdgeInsets.all(16),
                       itemCount: _filteredFAQItems.length,
                       itemBuilder: (context, index) {
                         final faq = _filteredFAQItems[index];
@@ -378,7 +414,9 @@ class _FAQScreenState extends State<FAQScreen> {
                             title: Text(
                               faq.question,
                               style: GoogleFonts.manrope(
-                                fontSize: 16,
+                                fontSize: Breakpoints.isTablet(context) 
+                                    ? ResponsiveTypography.getTypography(context).medium 
+                                    : 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black87,
                               ),
@@ -388,7 +426,9 @@ class _FAQScreenState extends State<FAQScreen> {
                               child: Text(
                                 faq.categoryDisplay,
                                 style: GoogleFonts.manrope(
-                                  fontSize: 12,
+                                  fontSize: Breakpoints.isTablet(context) 
+                                      ? ResponsiveTypography.getTypography(context).normal - 4 
+                                      : 12,
                                   color: Constants.ctaColorLight,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -398,7 +438,9 @@ class _FAQScreenState extends State<FAQScreen> {
                               Text(
                                 faq.answer,
                                 style: GoogleFonts.manrope(
-                                  fontSize: 14,
+                                  fontSize: Breakpoints.isTablet(context) 
+                                      ? ResponsiveTypography.getTypography(context).normal 
+                                      : 14,
                                   height: 1.5,
                                   color: Colors.black54,
                                 ),
@@ -413,7 +455,9 @@ class _FAQScreenState extends State<FAQScreen> {
         ],
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
+        padding: Breakpoints.isTablet(context) 
+            ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium)
+            : const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -429,7 +473,12 @@ class _FAQScreenState extends State<FAQScreen> {
           children: [
             Text(
               "Can't find what you're looking for?",
-              style: GoogleFonts.manrope(fontSize: 14, color: Colors.black87),
+              style: GoogleFonts.manrope(
+                fontSize: Breakpoints.isTablet(context) 
+                    ? ResponsiveTypography.getTypography(context).normal 
+                    : 14, 
+                color: Colors.black87,
+              ),
             ),
             const SizedBox(height: 8),
             SizedBox(
@@ -450,6 +499,9 @@ class _FAQScreenState extends State<FAQScreen> {
                   style: GoogleFonts.manrope(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
+                    fontSize: Breakpoints.isTablet(context) 
+                        ? ResponsiveTypography.getTypography(context).normal 
+                        : null,
                   ),
                 ),
               ),

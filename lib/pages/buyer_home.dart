@@ -28,6 +28,8 @@ import 'buyer/join_as_buyer.dart';
 import 'buyer/support.dart';
 import 'buyer/video.dart';
 import 'faq_screen.dart';
+import 'mobileView/breakpoints.dart';
+import 'mobileView/landingPage/landingMobileViewPage.dart';
 import 'notification.dart';
 import 'policies_screen.dart';
 
@@ -159,7 +161,8 @@ class _BuyerHomePageState extends State<BuyerHomePage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return  Breakpoints.isMobile(context)?BuyerHomeMobilePage():
+    Scaffold(
       backgroundColor: Colors.white, //
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -184,7 +187,8 @@ class _BuyerHomePageState extends State<BuyerHomePage>
             ),
 
             Constants.buyerAppBarValue == 0
-                ? Expanded(
+                ?
+            Expanded(
                     child: Container(
                       child: SingleChildScrollView(
                         child: Column(
@@ -200,9 +204,9 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                   ScaleTransition(
                                     scale: _scaleAnimation,
                                     child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 64,
-                                        right: 64,
+                                      padding:  EdgeInsets.only(
+                                        left: Breakpoints.isTablet(context)?24:64,
+                                        right: Breakpoints.isTablet(context)?24:64,
                                       ),
                                       child: Center(
                                         child: _buildAnimatedBannerSection(
@@ -221,9 +225,9 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                       child: FadeTransition(
                                         opacity: _categoryAnimation,
                                         child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 64,
-                                            right: 64,
+                                          padding:  EdgeInsets.only(
+                                            left: Breakpoints.isTablet(context)?24:64,
+                                            right: Breakpoints.isTablet(context)?24:64,
                                           ),
                                           child: Center(
                                             child: _buildCategoryItems(),
@@ -256,27 +260,27 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                       key: ValueKey(selectedIndex),
                                       child: selectedIndex == 0
                                           ? Padding(
-                                              padding: const EdgeInsets.only(
-                                                left: 64,
-                                                right: 64,
+                                              padding:  EdgeInsets.only(
+                                                left: Breakpoints.isTablet(context)?24:64,
+                                                right:64,
                                               ),
                                               child: VehicleDetailsQuoteForm(),
                                             )
                                           : selectedIndex == 1
                                           ? Padding(
-                                              padding: const EdgeInsets.only(
-                                                left: 64,
-                                                right: 64,
+                                              padding:  EdgeInsets.only(
+                                                left:Breakpoints.isTablet(context)?24:64,
+                                                right: Breakpoints.isTablet(context)?24:64,
                                               ),
-                                              child: ProductQuoteForm(),
+                                              child:TireProductQuoteForm() ,
                                             )
                                           : selectedIndex == 2
                                           ? Padding(
-                                              padding: const EdgeInsets.only(
-                                                left: 64,
-                                                right: 64,
+                                              padding:  EdgeInsets.only(
+                                                left: Breakpoints.isTablet(context)?24:64,
+                                                right: Breakpoints.isTablet(context)?24:64,
                                               ),
-                                              child: TireProductQuoteForm(),
+                                              child: ProductQuoteForm(),
                                             )
                                           : SizedBox.shrink(),
                                     ),
@@ -313,9 +317,9 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                               child: Container(
                                 constraints: BoxConstraints(maxWidth: 1600),
                                 child: Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 64,
-                                    right: 64,
+                                  padding:  EdgeInsets.only(
+                                    left: Breakpoints.isTablet(context)?24:64,
+                                    right: Breakpoints.isTablet(context)?24:64,
                                   ),
                                   child: Center(
                                     child: _buildAnimatedBannerSection(

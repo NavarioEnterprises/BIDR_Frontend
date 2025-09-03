@@ -44,7 +44,8 @@ class AuthApiService {
     required String password,
     required String confirmPassword,
     String deliveryMethod = 'sms',
-  }) async {
+  }) async
+  {
     final url = Uri.parse('${GlobalVariables.authServiceUrl}register/');
 
     final headers = {'Content-Type': 'application/json'};
@@ -143,7 +144,8 @@ class AuthApiService {
     String email,
     String cellphone, {
     String deliveryMethod = 'sms',
-  }) async {
+  }) async
+  {
     var url = Uri.parse('${GlobalVariables.authServiceUrl}resend-otp/');
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
