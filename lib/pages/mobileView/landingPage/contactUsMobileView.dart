@@ -190,7 +190,7 @@ class _ContactFormMobileScreenState extends State<ContactFormMobileScreen> with 
                 child: Transform.translate(
                   offset: Offset(0, 20 * (1 - value)),
                   child: BuyerDashboardHeader(
-                    headerName: '',
+                    headerName: 'Buyer Dashboard',
                     totalAlert: 0,
                   ),
                 ),
@@ -214,14 +214,6 @@ class _ContactFormMobileScreenState extends State<ContactFormMobileScreen> with 
                         horizontal: spacing.paddingLarge,
                       ),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Constants.ctaColorLight.withOpacity(0.1),
-                            Constants.ctaColorLight.withOpacity(0.05),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
                       ),
                       child: Column(
                         children: [
@@ -322,14 +314,6 @@ class _ContactFormMobileScreenState extends State<ContactFormMobileScreen> with 
               child: Container(
                 padding: EdgeInsets.all(spacing.paddingLarge),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Constants.ctaColorLight.withOpacity(0.05),
-                      Colors.white,
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(

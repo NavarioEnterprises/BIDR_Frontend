@@ -275,7 +275,7 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
                 child: Transform.translate(
                   offset: Offset(0, 20 * (1 - value)),
                   child: BuyerDashboardHeader(
-                    headerName: '',
+                    headerName: 'Buyer Dashboard',
                     totalAlert: GlobalVariables.alertList.length,
                   ),
                 ),

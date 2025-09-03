@@ -544,276 +544,267 @@ class _SellerDashboardState extends State<SellerDashboard>
     final unreadCount = notifications.where((n) => !n.read).length;
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 66, vertical: 15),
-              decoration: BoxDecoration(color: Constants.ftaColorLight),
-              child: Row(
-                children: [
-                  Text(
-                    'Seller Dashboard',
-                    style: GoogleFonts.manrope(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Spacer(),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Constants.ctaColorLight,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Row(
-                      children: [
-                        Stack(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.notifications_outlined),
-                              onPressed: _showNotificationDialog,
-                            ),
-                            if (unreadCount > 0)
-                              Positioned(
-                                right: 2,
-                                top: 2,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  constraints: const BoxConstraints(
-                                    minWidth: 16,
-                                    minHeight: 16,
-                                  ),
-                                  child: Text(
-                                    unreadCount.toString(),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 15),
-                  SellerSortDropdownMenu(
-                    initialValue: _currentSort,
-                    onSortChanged: (option) {
-                      setState(() {
-                        _currentSort = option;
-                      });
-                      print('Sort changed to: $option');
-                    },
-                  ),
-                ],
-              ),
-            ),
-            // Orange Navigation Bar
-            SizedBox(height: 24),
-            // Main Content Area
-            Column(
+      body: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 66, vertical: 8),
+            decoration: BoxDecoration(color: Constants.ftaColorLight),
+            child: Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 64, right: 64),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    constraints: BoxConstraints(maxWidth: 1600),
-                    decoration: BoxDecoration(
-                      color: Constants.ctaColorLight,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildNavItem(
-                          () {
-                            print('Dashboard tab clicked');
-                            setState(() {
-                              tabActiveIndex = 0;
-                            });
-                          },
-                          HugeIcons.strokeRoundedDashboardSquare01,
-                          'My Dashboard',
-                          tabActiveIndex == 0 ? true : false,
-                        ),
-                        _buildNavItem(
-                          () {
-                            setState(() {
-                              tabActiveIndex = 1;
-                            });
-                          },
-                          HugeIcons.strokeRoundedBook01,
-                          'My Bookkeeper',
-                          tabActiveIndex == 1 ? true : false,
-                        ),
-                        _buildNavItem(
-                          () {
-                            setState(() {
-                              tabActiveIndex = 2;
-                            });
-                          },
-                          HugeIcons.strokeRoundedCustomerSupport,
-                          'Support (BIDR)',
-                          tabActiveIndex == 2 ? true : false,
-                        ),
-                        _buildNavItem(
-                          () {
-                            setState(() {
-                              tabActiveIndex = 3;
-                            });
-                          },
-                          HugeIcons.strokeRoundedUserAdd01,
-                          'Refer a Friend/Business',
-                          tabActiveIndex == 3 ? true : false,
-                        ),
-                        _buildNavItem(
-                          () {
-                            setState(() {
-                              tabActiveIndex = 4;
-                            });
-                          },
-                          HugeIcons.strokeRoundedStar,
-                          'Review & Rating Manager',
-                          tabActiveIndex == 4 ? true : false,
-                        ),
-                        _buildNavItem(
-                          () {
-                            setState(() {
-                              tabActiveIndex = 5;
-                            });
-                          },
-                          HugeIcons.strokeRoundedProfile,
-                          'Profile Management',
-                          tabActiveIndex == 5 ? true : false,
-                        ),
-                      ],
-                    ),
+                Text(
+                  'Seller Dashboard',
+                  style: GoogleFonts.manrope(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                if (tabActiveIndex == 0) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 64, right: 64),
-                    child: Container(
-                      height: 900,
-                      width: MediaQuery.of(context).size.width,
-                      constraints: BoxConstraints(maxWidth: 1600),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 12,
-                      ),
-                      child: buildLeadsRequestsWidget(),
+                Spacer(),
+                Stack(
+                  children: [
+                    IconButton(
+                      icon: const Icon(HugeIcons.strokeRoundedNotification01,color: Colors.white,),
+                      onPressed: _showNotificationDialog,
                     ),
-                  ),
-                ] else if (tabActiveIndex == 1) ...[
+                    if (unreadCount > 0)
+                      Positioned(
+                        right: 2,
+                        top: 2,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Constants.ctaColorLight,
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            unreadCount.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                SizedBox(width: 15),
+                SellerSortDropdownMenu(
+                  initialValue: _currentSort,
+                  onSortChanged: (option) {
+                    setState(() {
+                      _currentSort = option;
+                    });
+                    print('Sort changed to: $option');
+                  },
+                ),
+              ],
+            ),
+          ),
+          // Orange Navigation Bar
+          SizedBox(height: 24),
+          // Main Content Area
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 64, right: 64),
                     child: Container(
-                      height: 900,
-                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       constraints: BoxConstraints(maxWidth: 1600),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 12,
+                      decoration: BoxDecoration(
+                        color: Constants.ctaColorLight,
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          // Left Sidebar
-                          Container(
-                            width: 180,
-                            color: Colors.white,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                SizedBox(height: 10),
-                                ...menuItems.asMap().entries.map((entry) {
-                                  int index = entry.key;
-                                  String item = entry.value;
-                                  return _buildMenuItem(item, index);
-                                }).toList(),
-                              ],
-                            ),
+                          _buildNavItem(
+                            () {
+                              print('Dashboard tab clicked');
+                              setState(() {
+                                tabActiveIndex = 0;
+                              });
+                            },
+                            HugeIcons.strokeRoundedDashboardSquare01,
+                            'My Dashboard',
+                            tabActiveIndex == 0 ? true : false,
                           ),
-                          // Main Content
-                          Expanded(
-                            child: Container(
-                              padding: EdgeInsets.all(20),
-                              child: FadeTransition(
-                                opacity: _fadeAnimation,
-                                child: SlideTransition(
-                                  position: _slideAnimation,
-                                  child: _buildMainContent(),
-                                ),
-                              ),
-                            ),
+                          _buildNavItem(
+                            () {
+                              setState(() {
+                                tabActiveIndex = 1;
+                              });
+                            },
+                            HugeIcons.strokeRoundedBook01,
+                            'My Bookkeeper',
+                            tabActiveIndex == 1 ? true : false,
+                          ),
+                          _buildNavItem(
+                            () {
+                              setState(() {
+                                tabActiveIndex = 2;
+                              });
+                            },
+                            HugeIcons.strokeRoundedCustomerSupport,
+                            'Support (BIDR)',
+                            tabActiveIndex == 2 ? true : false,
+                          ),
+                          _buildNavItem(
+                            () {
+                              setState(() {
+                                tabActiveIndex = 3;
+                              });
+                            },
+                            HugeIcons.strokeRoundedUserAdd01,
+                            'Refer a Friend/Business',
+                            tabActiveIndex == 3 ? true : false,
+                          ),
+                          _buildNavItem(
+                            () {
+                              setState(() {
+                                tabActiveIndex = 4;
+                              });
+                            },
+                            HugeIcons.strokeRoundedStar,
+                            'Review & Rating Manager',
+                            tabActiveIndex == 4 ? true : false,
+                          ),
+                          _buildNavItem(
+                            () {
+                              setState(() {
+                                tabActiveIndex = 5;
+                              });
+                            },
+                            HugeIcons.strokeRoundedProfile,
+                            'Profile Management',
+                            tabActiveIndex == 5 ? true : false,
                           ),
                         ],
                       ),
                     ),
                   ),
-                ] else if (tabActiveIndex == 2) ...[
-                  Container(
-                    //height: 400,
-                    width: MediaQuery.of(context).size.width,
-                    child: SellerSupport(),
-                  ),
-                ] else if (tabActiveIndex == 3) ...[
-                  ShareWidget(),
-                ] else if (tabActiveIndex == 4) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 64, right: 64),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      constraints: BoxConstraints(maxWidth: 1600),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
+                  if (tabActiveIndex == 0) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(left: 64, right: 64),
+                      child: Container(
+                        height: 900,
+                        width: MediaQuery.of(context).size.width,
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 0,
+                          vertical: 12,
+                        ),
+                        child: buildLeadsRequestsWidget(),
                       ),
-                      child: ReviewScreen(),
                     ),
-                  ),
-                ]
-                else if (tabActiveIndex == 5) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 64, right: 64),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      constraints: BoxConstraints(maxWidth: 1600),
-                      //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      child: ProfileManagement(),
-                    ),
-                  ),
-                ]
-                  else if (tabActiveIndex == 6) ...[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 64, right: 64),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          constraints: BoxConstraints(maxWidth: 1600),
-                          //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                          child: NotificationPage(notifications: notifications),
+                  ] else if (tabActiveIndex == 1) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(left: 64, right: 64),
+                      child: Container(
+                        height: 900,
+                        width: MediaQuery.of(context).size.width,
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 0,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Left Sidebar
+                            Container(
+                              width: 180,
+                              color: Colors.white,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  SizedBox(height: 10),
+                                  ...menuItems.asMap().entries.map((entry) {
+                                    int index = entry.key;
+                                    String item = entry.value;
+                                    return _buildMenuItem(item, index);
+                                  }).toList(),
+                                ],
+                              ),
+                            ),
+                            // Main Content
+                            Expanded(
+                              child: Container(
+                                padding: EdgeInsets.all(20),
+                                child: FadeTransition(
+                                  opacity: _fadeAnimation,
+                                  child: SlideTransition(
+                                    position: _slideAnimation,
+                                    child: _buildMainContent(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ]
-                    else ...[
-                  Container(),
+                    ),
+                  ] else if (tabActiveIndex == 2) ...[
+                    Container(
+                      //height: 400,
+                      width: MediaQuery.of(context).size.width,
+                      child: SellerSupport(),
+                    ),
+                  ] else if (tabActiveIndex == 3) ...[
+                    ShareWidget(),
+                  ] else if (tabActiveIndex == 4) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(left: 64, right: 64),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        child: ReviewScreen(),
+                      ),
+                    ),
+                  ]
+                  else if (tabActiveIndex == 5) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(left: 64, right: 64),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        child: ProfileManagement(),
+                      ),
+                    ),
+                  ]
+                    else if (tabActiveIndex == 6) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 64, right: 64),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            constraints: BoxConstraints(maxWidth: 1600),
+                            //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            child: NotificationPage(notifications: notifications),
+                          ),
+                        ),
+                      ]
+                      else ...[
+                    Container(),
+                  ],
+                  SizedBox(height: 24),
+                  FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
                 ],
-                SizedBox(height: 24),
-                FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
-              ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

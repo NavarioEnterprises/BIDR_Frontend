@@ -25,7 +25,7 @@ class Support extends StatefulWidget {
   _SupportState createState() => _SupportState();
 }
 
-class _SupportState extends State<SellerSupport> with TickerProviderStateMixin {
+class _SupportState extends State<Support> with TickerProviderStateMixin {
   // Controllers
   final TextEditingController _subjectController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -239,7 +239,7 @@ class _SupportState extends State<SellerSupport> with TickerProviderStateMixin {
                 child: Transform.translate(
                   offset: Offset(0, 20 * (1 - value)),
                   child: BuyerDashboardHeader(
-                    headerName: 'Support',
+                    headerName: 'Buyer Dashboard',
                     totalAlert: GlobalVariables.alertList.length,
                   ),
                 ),

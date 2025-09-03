@@ -87,10 +87,7 @@ class _NotificationPageState extends State<NotificationPage>
 
   @override
   Widget build(BuildContext context) {
-    final unreadNotifications = notifications.where((n) => !n.read).toList();
-    final readNotifications = notifications.where((n) => n.read).toList();
-
-    // Show loading indicator
+    // Show loading indicator first
     if (isLoading) {
       return Center(
         child: Column(
@@ -98,6 +95,7 @@ class _NotificationPageState extends State<NotificationPage>
           children: [
             CircularProgressIndicator(
               color: Constants.ctaColorLight,
+              strokeWidth: 3,
             ),
             const SizedBox(height: 24),
             Text(
@@ -105,6 +103,7 @@ class _NotificationPageState extends State<NotificationPage>
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -112,30 +111,79 @@ class _NotificationPageState extends State<NotificationPage>
       );
     }
 
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: notifications.isEmpty
-          ? Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.notifications_off_outlined,
-              size: 80,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No notifications',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
+    final unreadNotifications = notifications.where((n) => !n.read).toList();
+    final readNotifications = notifications.where((n) => n.read).toList();
+
+    // Show empty state if no notifications after loading
+    if (notifications.isEmpty) {
+      return FadeTransition(
+        opacity: _fadeAnimation,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Constants.ctaColorLight.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.notifications_off_outlined,
+                  size: 64,
+                  color: Constants.ctaColorLight,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 24),
+              Text(
+                'No notifications yet',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[700],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'You\'ll see your notifications here when they arrive.',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[500],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: () {
+                  if (Navigator.canPop(context)) {
+                    Navigator.pop(context);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: const Text(
+                  'Go to Dashboard',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      )
-          : Padding(
+      );
+    }
+
+    // Show notifications list
+    return  FadeTransition(
+      opacity: _fadeAnimation,
+      child: Padding(
         padding: const EdgeInsets.only(left: 64, right: 64),
         child: Container(
           constraints: BoxConstraints(maxWidth: 1600),
@@ -154,9 +202,9 @@ class _NotificationPageState extends State<NotificationPage>
                 leading: IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.black),
                     onPressed: () {
-                      Constants.buyerAppBarValue =7;
-                      appBarValueNotifier.value++;
-                      sellerHomeValueNotifier.value++;
+                      if (Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      }
                     }
                 ),
                 actions: [

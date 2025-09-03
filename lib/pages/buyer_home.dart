@@ -4797,18 +4797,19 @@ class FooterSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(50),
+      //padding: EdgeInsets.all(Breakpoints.isMobile(context)?16:50),
+      width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(color: Constants.ftaColorLight),
       child: Column(
         children: [
           Container(
-            padding: EdgeInsets.all(30),
+            padding: EdgeInsets.all(Breakpoints.isMobile(context)?16:50),
             child: Column(
               children: [
                 Image.asset(logo, fit: BoxFit.contain),
                 SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+
                   children: [
                     _footerLink('Home'),
                     _footerLink('Support'),
@@ -4823,7 +4824,7 @@ class FooterSection extends StatelessWidget {
                   '© 2024 BIDR. All rights reserved.',
                   style: GoogleFonts.manrope(
                     color: Colors.white.withOpacity(0.7),
-                    fontSize: 14,
+                    fontSize: Breakpoints.isMobile(context)?12:14,
                   ),
                 ),
                 SizedBox(height: 20),

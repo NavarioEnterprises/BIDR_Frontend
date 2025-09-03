@@ -385,7 +385,7 @@ class _SellerSortDropdownMenuState extends State<SellerSortDropdownMenu> {
           ),
           // The actual dropdown
           Positioned(
-            left: offset.dx,
+            left: offset.dx + size.width + 8,
             top: offset.dy + size.height + 8,
             width: 200,
             child: Material(
@@ -580,7 +580,7 @@ class _SellerSortDropdownMenuState extends State<SellerSortDropdownMenu> {
         onPressed: _toggleDropdown, icon: Icon(
       Icons.filter_alt,
       size: 24,
-      color: Constants.ftaColorLight,
+      color:Colors.white,
     ));
 
     /*GestureDetector(

@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../customWdget/custom_input2.dart';
+import '../../global_values.dart';
 import '../buyer_home.dart';
 import '../../models/contact_submission.dart';
 import '../../services/contact_api_service.dart';
 import '../mobileView/breakpoints.dart';
+import '../mobileView/landingPage/supportMobileView.dart';
 
 class ContactFormScreen extends StatefulWidget {
   @override
@@ -169,217 +171,236 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: Container(
-        width: double.infinity,
-        //height: MediaQuery.of(context).size.height,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: 24),
-              Container(
-                constraints: BoxConstraints(maxWidth: 1400),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Left Side - Illustration
-                    Expanded(
-                      flex: 2,
-                      child: Center(
-                        child: TweenAnimationBuilder<double>(
-                          duration: Duration(milliseconds: 400),
-                          tween: Tween(begin: 0.0, end: 1.0),
-                          builder: (context, value, child) {
-                            return Transform.scale(
-                              scale: 0.8 + (0.2 * value),
-                              child: Opacity(
-                                opacity: value,
-                                child: Padding(
-                                  padding: Breakpoints.isTablet(context) 
-                                      ? EdgeInsets.only(
-                                          bottom: ResponsiveSpacing.getSpacing(context).marginLarge,
-                                          left: ResponsiveSpacing.getSpacing(context).paddingLarge,
-                                          right: ResponsiveSpacing.getSpacing(context).paddingLarge,
-                                        )
-                                      : const EdgeInsets.only(bottom: 40,left: 24,right: 24),
-                                  child: Image.asset(
-                                    "lib/assets/images/contact.png",
-                                    fit: BoxFit.contain,
-                                    width: MediaQuery.of(context).size.width,
-                                    height: 450,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-
-                    // Right Side - Contact Form
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        padding: Breakpoints.isTablet(context) 
-                            ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingLarge)
-                            : EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            // Title
-                            TweenAnimationBuilder<double>(
+      child: Column(
+        children: [
+          SizedBox(height: 24),
+          TweenAnimationBuilder<double>(
+            duration: Duration(milliseconds: 600),
+            tween: Tween(begin: 0.0, end: 1.0),
+            builder: (context, value, child) {
+              return Opacity(
+                opacity: value,
+                child: Transform.translate(
+                  offset: Offset(0, 20 * (1 - value)),
+                  child: BuyerDashboardHeader(
+                    headerName: 'Buyer Dashboard',
+                    totalAlert: GlobalVariables.alertList.length,
+                  ),
+                ),
+              );
+            },
+          ),
+          SizedBox(height: 24),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    constraints: BoxConstraints(maxWidth: 1400),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Left Side - Illustration
+                        Expanded(
+                          flex: 2,
+                          child: Center(
+                            child: TweenAnimationBuilder<double>(
                               duration: Duration(milliseconds: 400),
                               tween: Tween(begin: 0.0, end: 1.0),
                               builder: (context, value, child) {
-                                return Opacity(
-                                  opacity: value,
-                                  child: Transform.translate(
-                                    offset: Offset(20 * (1 - value), 0),
-                                    child: Text(
-                                      'Contact Us',
-                                      style: GoogleFonts.manrope(
-                                        fontSize: Breakpoints.isTablet(context) 
-                                            ? ResponsiveTypography.getTypography(context).heading 
-                                            : 32,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
+                                return Transform.scale(
+                                  scale: 0.8 + (0.2 * value),
+                                  child: Opacity(
+                                    opacity: value,
+                                    child: Padding(
+                                      padding: Breakpoints.isTablet(context)
+                                          ? EdgeInsets.only(
+                                              bottom: ResponsiveSpacing.getSpacing(context).marginLarge,
+                                              left: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                                              right: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                                            )
+                                          : const EdgeInsets.only(bottom: 40,left: 24,right: 24),
+                                      child: Image.asset(
+                                        "lib/assets/images/contact.png",
+                                        fit: BoxFit.contain,
+                                        width: MediaQuery.of(context).size.width,
+                                        height: 450,
                                       ),
-                                      textAlign: TextAlign.center,
                                     ),
                                   ),
                                 );
                               },
                             ),
-                            SizedBox(height: 8),
-                            TweenAnimationBuilder<double>(
-                              duration: Duration(milliseconds: 1000),
-                              tween: Tween(begin: 0.0, end: 1.0),
-                              builder: (context, value, child) {
-                                return Opacity(
-                                  opacity: value,
-                                  child: Text(
-                                    'We\'d love to hear from you. Send us a message!',
-                                    style: GoogleFonts.manrope(
-                                      fontSize: Breakpoints.isTablet(context) 
-                                          ? ResponsiveTypography.getTypography(context).normal 
-                                          : 16,
-                                      color: Colors.grey[600],
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                );
-                              },
-                            ),
-                            SizedBox(height: 40),
-
-                            // Name Field
-                            _buildAnimatedTextField(
-                              label: 'Full Name *',
-                              hintText: 'Enter your full name',
-                              controller: nameController,
-                              focusNode: nameFocusNode,
-                              textInputAction: TextInputAction.next,
-                              delay: 100,
-                              onSubmitted: (value) {
-                                FocusScope.of(context).requestFocus(emailFocusNode);
-                              },
-                            ),
-                            SizedBox(height: 20),
-
-                            // Email Field
-                            _buildAnimatedTextField(
-                              label: 'Email Address *',
-                              hintText: 'Enter your email address',
-                              controller: emailController,
-                              focusNode: emailFocusNode,
-                              textInputAction: TextInputAction.next,
-                              delay: 200,
-                              onSubmitted: (value) {
-                                FocusScope.of(context).requestFocus(mobileFocusNode);
-                              },
-                            ),
-                            SizedBox(height: 20),
-
-                            // Mobile Number Field
-                            _buildAnimatedTextField(
-                              label: 'Phone Number',
-                              hintText: 'Enter your phone number (optional)',
-                              controller: mobileController,
-                              focusNode: mobileFocusNode,
-                              textInputAction: TextInputAction.next,
-                              delay: 300,
-                              onSubmitted: (value) {
-                                FocusScope.of(context).requestFocus(companyFocusNode);
-                              },
-                            ),
-                            SizedBox(height: 20),
-
-                            // Company Field
-                            _buildAnimatedTextField(
-                              label: 'Company',
-                              hintText: 'Enter your company name (optional)',
-                              controller: companyController,
-                              focusNode: companyFocusNode,
-                              textInputAction: TextInputAction.next,
-                              delay: 400,
-                              onSubmitted: (value) {
-                                // Move focus to message field since subject is now a dropdown
-                                FocusScope.of(context).requestFocus(messageFocusNode);
-                              },
-                            ),
-                            SizedBox(height: 20),
-
-                            // Subject Dropdown
-                            _buildAnimatedSubjectDropdown(
-                              delay: 500,
-                            ),
-                            SizedBox(height: 20),
-
-                            // Message Field
-                            _buildAnimatedMessageField(
-                              label: 'Message *',
-                              hintText: 'Enter your message',
-                              controller: messageController,
-                              focusNode: messageFocusNode,
-                              delay: 600,
-                            ),
-                            SizedBox(height: 40),
-
-                            // Submit Button
-                            TweenAnimationBuilder<double>(
-                              duration: Duration(milliseconds: 1200),
-                              tween: Tween(begin: 0.0, end: 1.0),
-                              builder: (context, value, child) {
-                                return Opacity(
-                                  opacity: value,
-                                  child: Transform.translate(
-                                    offset: Offset(0, 20 * (1 - value)),
-                                    child: _buildSubmitButton(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 24),
 
-              // Animated Footer
-              SlideTransition(
-                position: Tween<Offset>(
-                  begin: Offset(0, 1),
-                  end: Offset.zero,
-                ).animate(_slideController),
-                child: Center(
-                    child: FooterSection(logo: "lib/assets/images/bidr_logo2.png")
-                ),
+                        // Right Side - Contact Form
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            padding: Breakpoints.isTablet(context)
+                                ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingLarge)
+                                : EdgeInsets.all(24),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                // Title
+                                TweenAnimationBuilder<double>(
+                                  duration: Duration(milliseconds: 400),
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  builder: (context, value, child) {
+                                    return Opacity(
+                                      opacity: value,
+                                      child: Transform.translate(
+                                        offset: Offset(20 * (1 - value), 0),
+                                        child: Text(
+                                          'Contact Us',
+                                          style: GoogleFonts.manrope(
+                                            fontSize: Breakpoints.isTablet(context)
+                                                ? ResponsiveTypography.getTypography(context).heading
+                                                : 32,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                SizedBox(height: 8),
+                                TweenAnimationBuilder<double>(
+                                  duration: Duration(milliseconds: 1000),
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  builder: (context, value, child) {
+                                    return Opacity(
+                                      opacity: value,
+                                      child: Text(
+                                        'We\'d love to hear from you. Send us a message!',
+                                        style: GoogleFonts.manrope(
+                                          fontSize: Breakpoints.isTablet(context)
+                                              ? ResponsiveTypography.getTypography(context).normal
+                                              : 16,
+                                          color: Colors.grey[600],
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                SizedBox(height: 40),
+
+                                // Name Field
+                                _buildAnimatedTextField(
+                                  label: 'Full Name *',
+                                  hintText: 'Enter your full name',
+                                  controller: nameController,
+                                  focusNode: nameFocusNode,
+                                  textInputAction: TextInputAction.next,
+                                  delay: 100,
+                                  onSubmitted: (value) {
+                                    FocusScope.of(context).requestFocus(emailFocusNode);
+                                  },
+                                ),
+                                SizedBox(height: 20),
+
+                                // Email Field
+                                _buildAnimatedTextField(
+                                  label: 'Email Address *',
+                                  hintText: 'Enter your email address',
+                                  controller: emailController,
+                                  focusNode: emailFocusNode,
+                                  textInputAction: TextInputAction.next,
+                                  delay: 200,
+                                  onSubmitted: (value) {
+                                    FocusScope.of(context).requestFocus(mobileFocusNode);
+                                  },
+                                ),
+                                SizedBox(height: 20),
+
+                                // Mobile Number Field
+                                _buildAnimatedTextField(
+                                  label: 'Phone Number',
+                                  hintText: 'Enter your phone number (optional)',
+                                  controller: mobileController,
+                                  focusNode: mobileFocusNode,
+                                  textInputAction: TextInputAction.next,
+                                  delay: 300,
+                                  onSubmitted: (value) {
+                                    FocusScope.of(context).requestFocus(companyFocusNode);
+                                  },
+                                ),
+                                SizedBox(height: 20),
+
+                                // Company Field
+                                _buildAnimatedTextField(
+                                  label: 'Company',
+                                  hintText: 'Enter your company name (optional)',
+                                  controller: companyController,
+                                  focusNode: companyFocusNode,
+                                  textInputAction: TextInputAction.next,
+                                  delay: 400,
+                                  onSubmitted: (value) {
+                                    // Move focus to message field since subject is now a dropdown
+                                    FocusScope.of(context).requestFocus(messageFocusNode);
+                                  },
+                                ),
+                                SizedBox(height: 20),
+
+                                // Subject Dropdown
+                                _buildAnimatedSubjectDropdown(
+                                  delay: 500,
+                                ),
+                                SizedBox(height: 20),
+
+                                // Message Field
+                                _buildAnimatedMessageField(
+                                  label: 'Message *',
+                                  hintText: 'Enter your message',
+                                  controller: messageController,
+                                  focusNode: messageFocusNode,
+                                  delay: 600,
+                                ),
+                                SizedBox(height: 40),
+
+                                // Submit Button
+                                TweenAnimationBuilder<double>(
+                                  duration: Duration(milliseconds: 1200),
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  builder: (context, value, child) {
+                                    return Opacity(
+                                      opacity: value,
+                                      child: Transform.translate(
+                                        offset: Offset(0, 20 * (1 - value)),
+                                        child: _buildSubmitButton(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 24),
+
+                  // Animated Footer
+                  SlideTransition(
+                    position: Tween<Offset>(
+                      begin: Offset(0, 1),
+                      end: Offset.zero,
+                    ).animate(_slideController),
+                    child: Center(
+                        child: FooterSection(logo: "lib/assets/images/bidr_logo2.png")
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -623,15 +644,6 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
     );
   }
 
-  Widget _buildIllustration() {
-    return Container(
-      width: 300,
-      height: 300,
-      child: CustomPaint(
-        painter: ContactIllustrationPainter(),
-      ),
-    );
-  }
 
   void _showSuccessDialog() {
     showDialog(
@@ -761,102 +773,5 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
         );
       },
     );
-  }
-}
-
-
-// Custom Painter for the Contact Illustration
-class ContactIllustrationPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    // Draw woman figure (simplified)
-    // Head
-    paint.color = Color(0xFFFFDBB5);
-    canvas.drawCircle(Offset(size.width * 0.35, size.height * 0.25), 30, paint);
-
-    // Hair
-    paint.color = Colors.black87;
-    final hairPath = Path();
-    hairPath.addOval(Rect.fromCenter(
-      center: Offset(size.width * 0.35, size.height * 0.2),
-      width: 80,
-      height: 60,
-    ));
-    canvas.drawPath(hairPath, paint);
-
-    // Body (orange sweater)
-    paint.color = Color(0xFFF5A623);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(
-          center: Offset(size.width * 0.35, size.height * 0.45),
-          width: 80,
-          height: 100,
-        ),
-        Radius.circular(20),
-      ),
-      paint,
-    );
-
-    // Phone
-    paint.color = Color(0xFF4A4A4A);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(
-          center: Offset(size.width * 0.55, size.height * 0.4),
-          width: 40,
-          height: 60,
-        ),
-        Radius.circular(8),
-      ),
-      paint,
-    );
-
-    // Phone details (simplified)
-    paint.color = Colors.white;
-    canvas.drawCircle(Offset(size.width * 0.55, size.height * 0.35), 8, paint);
-
-    // Speech bubble
-    paint.color = Colors.white;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(
-          center: Offset(size.width * 0.6, size.height * 0.15),
-          width: 80,
-          height: 40,
-        ),
-        Radius.circular(20),
-      ),
-      paint,
-    );
-
-    // Speech bubble tail
-    final bubbleTail = Path();
-    bubbleTail.moveTo(size.width * 0.55, size.height * 0.2);
-    bubbleTail.lineTo(size.width * 0.45, size.height * 0.28);
-    bubbleTail.lineTo(size.width * 0.6, size.height * 0.25);
-    bubbleTail.close();
-    canvas.drawPath(bubbleTail, paint);
-
-    // Add some decorative lines in speech bubble
-    paint.color = Colors.grey[300]!;
-    paint.strokeWidth = 2;
-    canvas.drawLine(
-      Offset(size.width * 0.55, size.height * 0.13),
-      Offset(size.width * 0.65, size.height * 0.13),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(size.width * 0.55, size.height * 0.17),
-      Offset(size.width * 0.65, size.height * 0.17),
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
   }
 }

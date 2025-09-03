@@ -27,6 +27,7 @@ import '../../buyer/join_as_buyer.dart';
 import '../../buyer/support.dart';
 import '../../buyer/video.dart';
 import '../../buyer_dashboard.dart';
+import '../../buyer_home.dart';
 import '../../faq_screen.dart';
 import '../../notification.dart';
 import '../../policies_screen.dart';
@@ -336,7 +337,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                           end: Offset.zero,
                         ).animate(_slideController),
                         child: Center(
-                          child: FooterMobileSection(
+                          child:  FooterSection(
                             logo: "lib/assets/images/bidr_logo2.png",
                             onFooterLinkTap: (String text) {
                               switch (text) {

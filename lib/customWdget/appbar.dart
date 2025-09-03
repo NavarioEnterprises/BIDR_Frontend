@@ -535,7 +535,7 @@ class _HeaderSectionState extends State<HeaderSection> {
         children: [
           IntrinsicWidth(
             child: Container(
-              constraints: BoxConstraints(minWidth: 75),
+              constraints: BoxConstraints(minWidth: 65),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -547,19 +547,17 @@ class _HeaderSectionState extends State<HeaderSection> {
                         color: index == Constants.buyerAppBarValue
                             ? Constants.ftaColorLight
                             : Colors.black45,
-                        fontSize: typography.normal,
+                        fontSize: 13,
                         fontWeight: index == Constants.buyerAppBarValue
                             ? FontWeight.bold
                             : FontWeight.w600,
                       ),
                     ),
                   ),
-                  index == Constants.buyerAppBarValue
-                      ? SizedBox(height: spacing.spacingSmall / 2)
-                      : SizedBox.shrink(),
+
                   index == Constants.buyerAppBarValue
                       ? Padding(
-                          padding: EdgeInsets.symmetric(horizontal: spacing.paddingSmall),
+                          padding: EdgeInsets.symmetric(horizontal: 8),
                           child: Container(
                             height: 2,
                             color: Constants.ctaColorLight,

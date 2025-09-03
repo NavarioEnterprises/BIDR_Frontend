@@ -21,13 +21,15 @@ class WebNotification {
 
   factory WebNotification.fromJson(Map<String, dynamic> json) {
     return WebNotification(
-      id: json['id']??0,
-      title: json['title']??"",
-      body: json['body']??"",
+      id: json['id'] ?? 0,
+      title: json['title'] ?? "",
+      body: json['body'] ?? "",
       description: json['description'] ?? '',
-      type: json['type']??"",
-      read: json['read']??false,
-      createdAt: DateTime.parse(json['created_at']),
+      type: json['type'] ?? "",
+      read: json['read'] ?? false,
+      createdAt: json['created_at'] != null 
+          ? DateTime.tryParse(json['created_at']) ?? DateTime.now()
+          : DateTime.now(),
     );
   }
 
