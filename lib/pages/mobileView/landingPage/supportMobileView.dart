@@ -582,6 +582,7 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
               color: Colors.grey.shade600,
             ),
           ),
+          SizedBox(height: spacing.spacingLarge),
           TweenAnimationBuilder<double>(
             duration: Duration(milliseconds: 1000),
             tween: Tween(begin: 0.0, end: 1.0),
@@ -590,11 +591,9 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
                 opacity: value,
                 child: Transform.translate(
                   offset: Offset((20 * (1 - value)).toDouble(), 0),
-                  child: _buildCustomTextField(
-                    'Subject',
-                    _subjectController,
-                    _subjectFocusNode,
-                    _descriptionFocusNode,
+                  child: _buildAnimatedTextField(
+
+                    label:'Subject',     hintText:'Subject', controller:  _subjectController, focusNode: _subjectFocusNode, icon: HugeIcons.strokeRoundedSubtitle, required: false, delay: 200,
                   ),
                 ),
               );
@@ -609,12 +608,9 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
                 opacity: value,
                 child: Transform.translate(
                   offset: Offset((20 * (1 - value)).toDouble(), 0),
-                  child: _buildCustomTextField(
-                    'Description',
-                    _descriptionController,
-                    _descriptionFocusNode,
-                    null,
-                    isDescription: true,
+                  child:_buildAnimatedMessageField(
+
+                    label:'Description',     hintText:'Enter your description', controller:  _descriptionController, focusNode: _descriptionFocusNode,delay: 200,
                   ),
                 ),
               );
@@ -684,93 +680,133 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
               );
             },
           ),
+          SizedBox(height: spacing.spacingLarge),
         ],
       ),
     );
   }
 
-  Widget _buildCustomTextField(
-      String hintText,
-      TextEditingController controller,
-      FocusNode focusNode,
-      FocusNode? nextFocusNode, {
-        Widget? suffixIcon,
-        bool isDescription = false,
-      }) {
+  Widget _buildAnimatedTextField({
+    required String label,
+    required String hintText,
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    required IconData icon,
+    required bool required,
+    required int delay,
+    Function(String)? onSubmitted,
+  }) {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(left: spacing.paddingSmall),
-          child: Text(
-            hintText,
-            style: GoogleFonts.manrope(
-              color: Colors.black,
-              fontSize: typography.normal,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        SizedBox(height: spacing.spacingSmall),
-        if (isDescription)
-          Container(
-            height: 120,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.withOpacity(0.3)),
-              color: Colors.grey.withOpacity(0.05),
-            ),
-            child: TextField(
+
+    return TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 600 + delay),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(30 * (1 - value), 0),
+            child:  CustomInputTransparent4(
+              hintText: hintText,
+              labelText: label,
               controller: controller,
               focusNode: focusNode,
-              maxLines: 5,
-              textInputAction: nextFocusNode != null
-                  ? TextInputAction.next
-                  : TextInputAction.done,
-              decoration: InputDecoration(
-                hintText: 'Enter your detailed description here...',
-                hintStyle: GoogleFonts.manrope(
-                  fontSize: typography.normal,
-                  color: Colors.grey.withOpacity(0.7),
-                  fontWeight: FontWeight.w400,
-                ),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.all(spacing.paddingMedium),
+              prefix: Icon(
+                icon,
+                color: Constants.ctaColorLight,
+                size: typography.normal,
               ),
-              style: GoogleFonts.manrope(
-                fontSize: typography.normal,
-                color: Colors.black87,
-                fontWeight: FontWeight.w400,
-              ),
+              textInputAction: TextInputAction.next,
+              isPasswordField: false,
               onChanged: (value) {},
-              onSubmitted: (value) {
-                if (nextFocusNode != null) {
-                  nextFocusNode.requestFocus();
-                }
-              },
+              onSubmitted: onSubmitted ?? (value) {},
             ),
-          )
-        else
-          CustomInputTransparent4(
-            hintText: hintText,
-            controller: controller,
-            focusNode: focusNode,
-            textInputAction: nextFocusNode != null
-                ? TextInputAction.next
-                : TextInputAction.done,
-            isPasswordField: false,
-            suffix: suffixIcon,
-            onChanged: (value) {},
-            onSubmitted: (value) {
-              if (nextFocusNode != null) {
-                nextFocusNode.requestFocus();
-              }
-            },
           ),
-      ],
+        );
+      },
+    );
+  }
+
+
+  Widget _buildAnimatedMessageField({
+    required String label,
+    required String hintText,
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    required int delay,
+  }) {
+    return TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 800 + delay),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(30 * (1 - value), 0),
+            child: Container(
+              height: 120, // Bigger height for message field
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+
+
+              ),
+              child: TextField(
+                controller: controller,
+                focusNode: focusNode,
+                maxLines: null, // Allow unlimited lines
+                expands: true, // Expand to fill container height
+                textAlignVertical: TextAlignVertical.top, // Start text at top
+                style: GoogleFonts.manrope(
+                  fontSize: Breakpoints.isTablet(context)
+                      ? ResponsiveTypography.getTypography(context).normal
+                      : 14,
+                  color: Colors.black87,
+                ),
+
+                decoration: InputDecoration(
+                  hintText: hintText.replaceAll('*', ''),
+                  hintStyle: GoogleFonts.manrope(
+                    fontSize: Breakpoints.isTablet(context)
+                        ? ResponsiveTypography.getTypography(context).normal
+                        : 14,
+                    color: Colors.grey[500],
+                  ),
+                  labelText: label.replaceAll('*', ''),
+                  labelStyle: TextStyle(
+                    color: Constants.ftaColorLight,
+                    fontSize: Breakpoints.isTablet(context)
+                        ? ResponsiveTypography.getTypography(context).normal
+                        : 14,
+                  ),
+                  floatingLabelStyle: TextStyle(
+                    color: Constants.ftaColorLight,
+                    fontSize: Breakpoints.isTablet(context)
+                        ? ResponsiveTypography.getTypography(context).normal
+                        : 14,
+
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: Constants.ftaColorLight),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: Color(0xFFF5A623), width: 2),
+                  ),
+                  contentPadding: Breakpoints.isTablet(context)
+                      ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium)
+                      : EdgeInsets.all(16), // More padding for bigger field
+                  fillColor: Colors.white,
+                  filled: true,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -1854,7 +1890,7 @@ class _ChatMobileScreenState extends State<ChatMobileScreen> with TickerProvider
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Icon(
-                          Icons.support_agent,
+                          HugeIcons.strokeRoundedCustomerSupport,
                           color: Constants.ftaColorLight,
                           size: typography.medium,
                         ),

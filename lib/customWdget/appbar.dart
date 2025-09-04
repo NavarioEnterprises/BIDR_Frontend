@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 import '../constants/Constants.dart';
 import '../notifier/my_notifier.dart';
@@ -209,7 +210,11 @@ class _HeaderSectionState extends State<HeaderSection> {
     final typography = ResponsiveTypography.getTypography(context);
     
     return Container(
-      color: Colors.white,
+
+      decoration: BoxDecoration(
+          color: Colors.white,
+        borderRadius: BorderRadius.only(topRight: Radius.circular(16),bottomRight: Radius.circular(16))
+      ),
       child: SafeArea(
         child: Column(
           children: [
@@ -217,7 +222,7 @@ class _HeaderSectionState extends State<HeaderSection> {
             Container(
               padding: EdgeInsets.all(spacing.paddingLarge),
               decoration: BoxDecoration(
-                color: Constants.ctaColorLight.withOpacity(0.1),
+                color: Colors.grey.shade50,
                 border: Border(
                   bottom: BorderSide(
                     color: Colors.grey[300]!,
@@ -226,12 +231,22 @@ class _HeaderSectionState extends State<HeaderSection> {
                 ),
               ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Image.asset(
-                    "lib/assets/images/bidr_logo1.png",
-                    fit: BoxFit.contain,
-                    height: 45,
-                    width: 72,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(CupertinoIcons.person_alt_circle_fill,size: 50, color:  Constants.ftaColorLight, weight: 2,),
+                      SizedBox(height: spacing.spacingMedium,),
+                      Text(
+                        Constants.myEmail==""?"guest@gmail.com": Constants.myEmail,
+                        style: GoogleFonts.manrope(
+                          color:  Constants.ftaColorLight,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    ],
                   ),
                   Spacer(),
                   IconButton(
@@ -254,7 +269,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                   SizedBox(height: spacing.spacingMedium),
                   _buildDrawerItem(
                     context: context,
-                    icon: Icons.home_outlined,
+                    icon: HugeIcons.strokeRoundedHome01,
                     title: 'Home',
                     index: 0,
                     onTap: () {
@@ -268,7 +283,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                   ),
                   _buildDrawerItem(
                     context: context,
-                    icon: Icons.support_agent_outlined,
+                    icon: HugeIcons.strokeRoundedCustomerSupport,
                     title: 'Support',
                     index: 1,
                     onTap: () {
@@ -282,7 +297,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                   ),
                   _buildDrawerItem(
                     context: context,
-                    icon: Icons.help_outline,
+                    icon: HugeIcons.strokeRoundedHelpCircle,
                     title: 'FAQs',
                     index: 2,
                     onTap: () {
@@ -310,7 +325,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                   ),
                   _buildDrawerItem(
                     context: context,
-                    icon: Icons.article_outlined,
+                    icon: HugeIcons.strokeRoundedBlogger,
                     title: 'Blogs',
                     index: 4,
                     onTap: () {
@@ -324,7 +339,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                   ),
                   _buildDrawerItem(
                     context: context,
-                    icon: Icons.contact_mail_outlined,
+                    icon: HugeIcons.strokeRoundedContact01,
                     title: 'Contact Us',
                     index: 5,
                     onTap: () {
@@ -342,6 +357,7 @@ class _HeaderSectionState extends State<HeaderSection> {
             
             // Authentication Button at Bottom
             Container(
+              width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.all(spacing.paddingLarge),
               decoration: BoxDecoration(
                 border: Border(
@@ -351,7 +367,11 @@ class _HeaderSectionState extends State<HeaderSection> {
                   ),
                 ),
               ),
-              child: _buildAuthenticationButtons(),
+              child: Row(
+                children: [
+                  Expanded(child: _buildAuthenticationButtons()),
+                ],
+              ),
             ),
           ],
         ),
@@ -373,11 +393,11 @@ class _HeaderSectionState extends State<HeaderSection> {
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: spacing.marginSmall,
-        vertical: spacing.marginSmall / 2,
+        vertical: 0,
       ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: isSelected ? Constants.ctaColorLight.withOpacity(0.1) : Colors.transparent,
+        borderRadius: BorderRadius.only(topRight: Radius.circular(36),bottomRight: Radius.circular(36)),
+        color: isSelected ? Constants.ftaColorLight.withOpacity(0.1) : Colors.transparent,
       ),
       child: ListTile(
         onTap: onTap,
@@ -390,7 +410,7 @@ class _HeaderSectionState extends State<HeaderSection> {
           title,
           style: GoogleFonts.manrope(
             color: isSelected ? Constants.ftaColorLight : Colors.black87,
-            fontSize: typography.medium,
+            fontSize: 13,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
           ),
         ),
@@ -436,6 +456,7 @@ class _HeaderSectionState extends State<HeaderSection> {
               backgroundColor: Constants.ctaColorLight,
               foregroundColor: Colors.white,
               elevation: 3,
+              //minimumSize: Size(MediaQuery.of(context).size.width, 45),
               padding: EdgeInsets.symmetric(
                 horizontal: isMobile ? spacing.paddingMedium : spacing.paddingLarge,
                 vertical: spacing.paddingSmall,
@@ -460,6 +481,7 @@ class _HeaderSectionState extends State<HeaderSection> {
               backgroundColor: Constants.ctaColorLight,
               foregroundColor: Colors.white,
               elevation: 3,
+             // minimumSize: Size(MediaQuery.of(context).size.width, 45),
               padding: EdgeInsets.symmetric(
                 horizontal: isMobile ? spacing.paddingMedium : spacing.paddingLarge,
                 vertical: spacing.paddingSmall,
@@ -472,11 +494,17 @@ class _HeaderSectionState extends State<HeaderSection> {
             ),
           );
         default:
-          return _buildLoginButton();
+          return SizedBox(
+              //width: MediaQuery.of(context).size.width,
+              height: 45,
+              child: _buildLoginButton());
       }
     } else {
       // User is not logged in - show login button
-      return _buildLoginButton();
+      return SizedBox(
+       // width: MediaQuery.of(context).size.width,
+          height: 45,
+          child: _buildLoginButton());
     }
   }
 
@@ -489,6 +517,7 @@ class _HeaderSectionState extends State<HeaderSection> {
       onPressed: () => context.go('/login'),
       style: ElevatedButton.styleFrom(
         backgroundColor: Constants.ctaColorLight,
+        //minimumSize: Size(MediaQuery.of(context).size.width, 45),
         padding: EdgeInsets.symmetric(
           horizontal: isMobile ? spacing.paddingMedium : spacing.paddingLarge,
           vertical: spacing.paddingSmall,

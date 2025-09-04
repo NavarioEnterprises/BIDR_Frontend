@@ -108,7 +108,7 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
                 child: Transform.translate(
                   offset: Offset(0, 20 * (1 - value)),
                   child: BuyerDashboardHeader(
-                    headerName: '',
+                    headerName: 'Buyer Dashboard',
                     totalAlert: 0,
                   ),
                 ),
@@ -229,7 +229,7 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
 
   Widget _buildMobileTabSelector(TypographyConfig typography, SpacingConfig spacing) {
     return Container(
-      height: 50,
+      height: 40,
       decoration: BoxDecoration(
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(25),
@@ -254,15 +254,15 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
               ),
               decoration: BoxDecoration(
                 color: isSelected ? Constants.ctaColorLight : Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(36),
               ),
               child: Center(
                 child: Text(
                   labels[index],
                   style: GoogleFonts.manrope(
-                    fontSize: typography.normal,
+                    fontSize: 12,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected ? Colors.white : Colors.grey[700],
+                    color: isSelected ? Colors.white : Colors.grey[500],
                   ),
                 ),
               ),

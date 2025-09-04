@@ -290,7 +290,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                       ),
 
                       // Animated About Us Section
-                      SizedBox(height: 60),
+                      SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                       TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0.0, end: 1.0),
                         duration: Duration(milliseconds: 1000),
@@ -313,16 +313,22 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                       FadeTransition(
                         opacity: _fadeAnimation,
                         child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          //height: 800,
                           constraints: BoxConstraints(maxWidth: 1600),
                           child: Padding(
                             padding: const EdgeInsets.only(
                               left: 16,
                               right: 16,
                             ),
-                            child: Center(
-                              child: _buildAnimatedBannerSection(
-                                "lib/assets/images/mask_group.png",
-                              ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: _buildAnimatedBannerSection(
+                                    "lib/assets/images/mask_group.png",
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -415,7 +421,8 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
   Widget _buildAboutUsSection() {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 500,
+      height: 1200,
+      constraints: BoxConstraints(minHeight:980 ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -423,15 +430,12 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
       child: Stack(
         children: [
           Column(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 200,
-                color: Colors.white,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 300,
+                //height: 800,
+                constraints: BoxConstraints(minHeight:550 ),
                 color: Constants.ftaColorLight,
               ),
             ],
@@ -439,6 +443,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
           Center(
             child: Container(
               constraints: BoxConstraints(maxWidth: 1600),
+              width: MediaQuery.of(context).size.width,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -449,7 +454,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                     "Why Join As A Buyer?",
                     0,
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildAnimatedVideoSection(
                     "How It Works",
                     "Unlike catalogue-based online shops, BIDR allows buyers to send out a single request to multiple sellers that are registered on our platform.The buyer simply specifies the area to search and all sellers within that area are notified of therequest. If the seller has the product (or similar products), they will make an offer. The sellers are continuously updated of the current market price offered by other sellers in the area, and should they opt to do so, they will have the opportunity of revising their bid with a best and final offer. No more long repetitive phone calls, waiting in queues, or countless hours browsing for special deals. With BIDR the sellers come to you with their best price.",
@@ -489,6 +494,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                 children: [
                   Container(
                       width: MediaQuery.of(context).size.width,
+
                       padding: EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium),
                       decoration: BoxDecoration(
                         color: Constants.dtaColorLight,
@@ -515,7 +521,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                               color: Constants.ftaColorLight,
                             ),
                           ),
-                          SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                          SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                           Row(
                             children: [
                               Expanded(
@@ -535,54 +541,42 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                               ),
                             ],
                           ),
-                          SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                          SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                           if (title == "About Us") ...[
-                            Expanded(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: CustomVideoPlayerWidget(
-                                      videoUrl:
-                                      'assets/videos/4058080-sd_426_226_25fps.mp4',
-                                      autoPlay: false,
-                                      looping: true,
-                                      placeholder: 'Loading awesome video...',
-                                    ),
-                                  ),
-                                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
-                                  Expanded(
-                                    child: CustomVideoPlayerWidget(
-                                      videoUrl:
-                                      'assets/videos/5585948-hd_1920_1080_25fps.mp4',
-                                      autoPlay: false,
-                                      looping: true,
-                                      placeholder: 'Loading awesome video...',
-                                    ),
-                                  ),
-                                ],
+                            SizedBox(
+                              height: 180,
+                              width: MediaQuery.of(context).size.width,
+                              child: CustomVideoPlayerWidget(
+                                videoUrl:
+                                'assets/videos/4058080-sd_426_226_25fps.mp4',
+                                autoPlay: false,
+                                looping: true,
+                                placeholder: 'Loading awesome video...',
+                              ),
+                            ),
+                            SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                            SizedBox(
+                              height: 180,
+                              width: MediaQuery.of(context).size.width,
+                              child: CustomVideoPlayerWidget(
+                                videoUrl:
+                                'assets/videos/5585948-hd_1920_1080_25fps.mp4',
+                                autoPlay: false,
+                                looping: true,
+                                placeholder: 'Loading awesome video...',
                               ),
                             ),
                           ],
                           if (title == "How It Works") ...[
-                            Expanded(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: CustomVideoPlayerWidget(
-                                      videoUrl:
-                                      'assets/videos/6353353-hd_1080_1920_30fps.mp4',
-                                      autoPlay: false,
-                                      looping: true,
-                                      placeholder: 'Loading awesome video...',
-                                    ),
-                                  ),
-                                ],
+                            SizedBox(
+                              height: 180,
+                              width: MediaQuery.of(context).size.width,
+                              child: CustomVideoPlayerWidget(
+                                videoUrl:
+                                'assets/videos/6353353-hd_1080_1920_30fps.mp4',
+                                autoPlay: false,
+                                looping: true,
+                                placeholder: 'Loading awesome video...',
                               ),
                             ),
                           ],
@@ -778,7 +772,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                   child: Text(
                     'Shop by Categories',
                     style: GoogleFonts.manrope(
-                      fontSize: 34,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Constants.ftaColorLight,
                     ),
@@ -797,7 +791,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                 child: Text(
                   'Please click on one of the categories to begin',
                   style: GoogleFonts.manrope(
-                    fontSize: 13.5,
+                    fontSize: 13,
                     color: Colors.grey.shade500,
                     fontWeight: FontWeight.w500,
                   ),
@@ -822,7 +816,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                       opacity: value,
                       child: Container(
                         width:
-                        (MediaQuery.of(context).size.width - 48 - 48) / 6.8,
+                        (MediaQuery.of(context).size.width - 48 - 48) /2.9,
                         child: _categoryCard(
                           category["icon"]!,
                           category["icon2"]!,
@@ -890,14 +884,14 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                   child: Image.asset(isSelected?iconImage:iconImage2, fit: BoxFit.contain),
                 ),
               ),
-              SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+              SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
               AnimatedDefaultTextStyle(
                 duration: Duration(milliseconds: 200),
                 style: GoogleFonts.manrope(
                   color: isSelected
                       ? Constants.ftaColorLight
                       : Constants.ftaColorLight.withOpacity(0.85),
-                  fontSize: isSelected ? 24 : 20,
+                  fontSize: isSelected ? 14 : 16,
                   fontWeight: FontWeight.bold,
                 ),
                 child: Text(
@@ -1451,7 +1445,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
             ? Column(
                 children: [
                   _buildVinField(),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Manufacturer*',
                     _selectedManufacturer,
@@ -1467,7 +1461,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     ],
                     (value) => setState(() => _selectedManufacturer = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Makes & Models*',
                     _selectedMakeModel,
@@ -1487,7 +1481,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
             : Row(
                 children: [
                   Expanded(child: _buildVinField()),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Manufacturer*',
@@ -1505,7 +1499,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       (value) => setState(() => _selectedManufacturer = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Makes & Models*',
@@ -1542,14 +1536,14 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     ],
                     (value) => setState(() => _selectedType = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'New/Used Part*',
                     _selectedNewUsedPart,
                     ['Select New/Used Part', 'New', 'Used', 'Refurbished'],
                     (value) => setState(() => _selectedNewUsedPart = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Year*',
                     _selectedYear,
@@ -1586,7 +1580,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       (value) => setState(() => _selectedType = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'New/Used Part*',
@@ -1595,7 +1589,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       (value) => setState(() => _selectedNewUsedPart = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Year*',
@@ -1630,14 +1624,14 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     _partNameFocus,
                     _locationFocus,
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Quantity*',
                     _selectedQuantity,
                     ['Select Quantity', '1', '2', '3', '4', '5', '6', '7', '8'],
                     (value) => setState(() => _selectedQuantity = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildLocationField(),
                 ],
               )
@@ -1651,7 +1645,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       _locationFocus,
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Quantity*',
@@ -1660,7 +1654,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       (value) => setState(() => _selectedQuantity = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(child: _buildLocationField()),
                 ],
               ),
@@ -1675,7 +1669,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     200,
                     (value) => setState(() => _maxDistance = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'How Soon Do You Need To Buy This Product?*',
                     _selectedTimeframe,
@@ -1690,7 +1684,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     ],
                     (value) => setState(() => _selectedTimeframe = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomTextField(
                     'Description of the Product*',
                     _descriptionController,
@@ -1710,7 +1704,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       (value) => setState(() => _maxDistance = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'How Soon Do You Need To Buy This Product?*',
@@ -1727,7 +1721,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       (value) => setState(() => _selectedTimeframe = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomTextField(
                       'Description of the Product*',
@@ -1754,7 +1748,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     _partNumberFocus,
                     _mileageFocus,
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Transmission Type (Manual/Auto)',
                     _selectedTransmissionType,
@@ -1767,7 +1761,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     ],
                     (value) => setState(() => _selectedTransmissionType = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomTextField(
                     'Mileage of Vehicle',
                     _mileageController,
@@ -1786,7 +1780,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       _mileageFocus,
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Transmission Type (Manual/Auto)',
@@ -1801,7 +1795,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       (value) => setState(() => _selectedTransmissionType = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomTextField(
                       'Mileage of Vehicle',
@@ -1829,7 +1823,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     ],
                     (value) => setState(() => _selectedFuelType = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Body Type',
                     _selectedBodyType,
@@ -1864,7 +1858,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       (value) => setState(() => _selectedFuelType = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Body Type',
@@ -1882,7 +1876,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       (value) => setState(() => _selectedBodyType = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(child: Container()), // Empty space for alignment
                 ],
               ),
@@ -2288,7 +2282,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
 
                 // Success Message
                 Text(
@@ -2329,7 +2323,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                         ),
                       ),
                     ),
-                    SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                    SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
@@ -2804,7 +2798,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     ),
                   ],
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                 Container(
                   height: 300,
                   child: GridView.builder(
@@ -2874,7 +2868,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     },
                   ),
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -3314,7 +3308,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                     _typeFocus,
                     _brandFocus,
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomTextField(
                     'Brand Preference',
                     _brandController,
@@ -3333,7 +3327,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                       _brandFocus,
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomTextField(
                       'Brand Preference',
@@ -3354,7 +3348,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                     _modelFocus,
                     _quantityFocus,
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomTextField(
                     'Quantity Needed',
                     _quantityController,
@@ -3373,7 +3367,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                       _quantityFocus,
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomTextField(
                       'Quantity Needed',
@@ -3400,7 +3394,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                     _minPriceFocus,
                     _maxPriceFocus,
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomTextField(
                     'Max Price',
                     _maxPriceController,
@@ -3419,7 +3413,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                       _maxPriceFocus,
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomTextField(
                       'Max Price',
@@ -3446,7 +3440,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                     ],
                     (value) => setState(() => _selectedTimeframe = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Do You Need Installation Services?',
                     _selectedInstallation,
@@ -3471,7 +3465,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                       (value) => setState(() => _selectedTimeframe = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Do You Need Installation Services?',
@@ -3535,7 +3529,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                     ],
                     (value) => setState(() => _selectedCondition = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Purpose of Purchase',
                     _selectedPurpose,
@@ -3564,7 +3558,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                       (value) => setState(() => _selectedCondition = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Purpose of Purchase',
@@ -3841,7 +3835,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
 
                 // Success Message
                 Text(
@@ -3882,7 +3876,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                         ),
                       ),
                     ),
-                    SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                    SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
@@ -4490,14 +4484,14 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                     _tyreWidthFocus,
                     null,
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Sidewall Profile*',
                     _selectedSidewallProfile,
                     ['35', '40', '45', '50', '55', '60', '65', '70', '75'],
                     (value) => setState(() => _selectedSidewallProfile = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Wheel Rim Diameter (inches)*',
                     _selectedWheelRimDiameter,
@@ -4516,7 +4510,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                       null,
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Sidewall Profile*',
@@ -4525,7 +4519,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                       (value) => setState(() => _selectedSidewallProfile = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Wheel Rim Diameter (inches)*',
@@ -4546,14 +4540,14 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                     ['Tyres', 'Rims', 'Tyres & Rims'],
                     (value) => setState(() => _selectedTyresRims = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Quantity*',
                     _selectedQuantity,
                     ['1', '2', '3', '4', '5', '6', '7', '8'],
                     (value) => setState(() => _selectedQuantity = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'How Soon Do You Need To Buy This Product?*',
                     _selectedTimeframe,
@@ -4579,7 +4573,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                       (value) => setState(() => _selectedTyresRims = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Quantity*',
@@ -4588,7 +4582,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                       (value) => setState(() => _selectedQuantity = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'How Soon Do You Need To Buy This Product?*',
@@ -4620,14 +4614,14 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                     _descriptionFocus,
                     _preferredBrandFocus,
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Vehicle Type',
                     _selectedVehicleType,
                     ['Passenger Car', 'SUV', 'Truck', 'Van', 'Motorcycle', 'Bus'],
                     (value) => setState(() => _selectedVehicleType = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomTextField(
                     'Pitch Circle Diameter (PCD)',
                     _pcdController,
@@ -4646,7 +4640,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                       _preferredBrandFocus,
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Vehicle Type',
@@ -4655,7 +4649,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                       (value) => setState(() => _selectedVehicleType = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomTextField(
                       'Pitch Circle Diameter (PCD)',
@@ -4666,7 +4660,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                   ),
                 ],
               ),
-          SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+          SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           isMobile
             ? Column(
                 children: [
@@ -4676,14 +4670,14 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                     _preferredBrandFocus,
                     null,
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Tyre Construction Type',
                     _selectedTyreConstruction,
                     ['Radial', 'Bias', 'Bias-Belted'],
                     (value) => setState(() => _selectedTyreConstruction = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Fitment Required',
                     _selectedFitmentRequired,
@@ -4702,7 +4696,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                       null,
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Tyre Construction Type',
@@ -4711,7 +4705,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                       (value) => setState(() => _selectedTyreConstruction = value),
                     ),
                   ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Expanded(
                     child: _buildCustomDropdown(
                       'Fitment Required',
@@ -4722,7 +4716,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                   ),
                 ],
               ),
-          SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+          SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           isMobile
             ? Column(
                 children: [
@@ -4732,16 +4726,16 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                     ['Yes', 'No'],
                     (value) => setState(() => _selectedBalancingRequired = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildCustomDropdown(
                     'Tyre Rotation Required',
                     _selectedTyreRotation,
                     ['Yes', 'No'],
                     (value) => setState(() => _selectedTyreRotation = value),
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildImageUploadSection(),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   _buildLocationField(),
                 ],
               )
@@ -4757,7 +4751,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                           (value) => setState(() => _selectedBalancingRequired = value),
                         ),
                       ),
-                      SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                      SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                       Expanded(
                         child: _buildCustomDropdown(
                           'Tyre Rotation Required',
@@ -4766,17 +4760,17 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                           (value) => setState(() => _selectedTyreRotation = value),
                         ),
                       ),
-                      SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                      SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                       Expanded(child: _buildImageUploadSection()),
                     ],
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
                   Row(
                     children: [
                       Expanded(child: _buildLocationField()),
-                      SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                      SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                       Expanded(child: Container()),
-                      SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                      SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                       Expanded(child: Container()),
                     ],
                   ),
@@ -5009,7 +5003,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
 
                 // Success Message
                 Text(
@@ -5050,7 +5044,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                         ),
                       ),
                     ),
-                    SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingMedium),
+                    SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {

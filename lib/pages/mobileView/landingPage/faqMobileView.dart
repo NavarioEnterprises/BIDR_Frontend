@@ -260,7 +260,7 @@ class _FAQMobileScreenState extends State<FAQMobileScreen> with TickerProviderSt
                 child: Transform.translate(
                   offset: Offset(0, 20 * (1 - value)),
                   child: BuyerDashboardHeader(
-                    headerName: '',
+                    headerName: 'Frequently Answered\nQuestioned',
                     totalAlert: 0,
                   ),
                 ),
@@ -344,6 +344,7 @@ class _FAQMobileScreenState extends State<FAQMobileScreen> with TickerProviderSt
                       child: _buildCategoryFilter(typography, spacing),
                     ),
                     
+                    SizedBox(height: spacing.spacingLarge),
                     SizedBox(height: spacing.spacingLarge),
                     
                     // FAQ Content
@@ -477,7 +478,7 @@ class _FAQMobileScreenState extends State<FAQMobileScreen> with TickerProviderSt
                 ),
               ),
               Container(
-                height: 50,
+                height: 40,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: _categories.length,
@@ -499,7 +500,7 @@ class _FAQMobileScreenState extends State<FAQMobileScreen> with TickerProviderSt
                             color: isSelected
                                 ? Constants.ctaColorLight
                                 : Colors.grey[100],
-                            borderRadius: BorderRadius.circular(25),
+                            borderRadius: BorderRadius.circular(360),
                             border: Border.all(
                               color: isSelected
                                   ? Constants.ctaColorLight
@@ -511,11 +512,11 @@ class _FAQMobileScreenState extends State<FAQMobileScreen> with TickerProviderSt
                             child: Text(
                               category.label,
                               style: GoogleFonts.manrope(
-                                color: isSelected ? Colors.white : Colors.grey[700],
-                                fontSize: typography.normal,
+                                color: isSelected ? Colors.white : Colors.grey[500],
+                                fontSize: 12,
                                 fontWeight: isSelected
                                     ? FontWeight.bold
-                                    : FontWeight.w500,
+                                    : FontWeight.w300,
                               ),
                             ),
                           ),

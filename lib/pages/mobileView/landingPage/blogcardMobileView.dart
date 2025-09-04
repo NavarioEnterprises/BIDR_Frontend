@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:intl/intl.dart';
 
 import '../../../constants/Constants.dart';
 import '../../../customWdget/appbar.dart';
@@ -467,7 +468,7 @@ class _MobileBlogCardState extends State<MobileBlogCard> with SingleTickerProvid
                   // Image section
                   Container(
                     width: double.infinity,
-                    height: 200,
+                    height: 180,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                     ),
@@ -561,7 +562,7 @@ class _MobileBlogCardState extends State<MobileBlogCard> with SingleTickerProvid
                             ),
                             SizedBox(width: widget.spacing.spacingSmall / 2),
                             Text(
-                              widget.blogItem.date,
+                              DateFormat("dd MMM yyyy").format(DateTime.parse(widget.blogItem.date)),
                               style: GoogleFonts.manrope(
                                 fontSize: widget.typography.normal,
                                 color: Constants.ctaColorLight,
@@ -796,7 +797,7 @@ class _MobileBlogDetailScreenState extends State<MobileBlogDetailScreen> with Ti
                           ),
                           SizedBox(width: spacing.spacingSmall),
                           Text(
-                            widget.blogItem.date,
+                            DateFormat("dd MMM yyyy").format(DateTime.parse(widget.blogItem.date)),
                             style: GoogleFonts.manrope(
                               fontSize: typography.normal,
                               color: Constants.ctaColorLight,
@@ -944,7 +945,7 @@ class _MobileBlogDetailScreenState extends State<MobileBlogDetailScreen> with Ti
                                           ),
                                           SizedBox(height: spacing.spacingSmall / 2),
                                           Text(
-                                            item.date,
+                                            DateFormat("dd MMM yyyy").format(DateTime.parse(item.date)),
                                             style: GoogleFonts.manrope(
                                               fontSize: typography.normal,
                                               color: Colors.grey[600],

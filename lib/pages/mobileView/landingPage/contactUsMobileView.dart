@@ -603,12 +603,14 @@ class _ContactFormMobileScreenState extends State<ContactFormMobileScreen> with 
                       },
                     ),
                     
-                    SizedBox(height: spacing.spacingMedium),
+                    SizedBox(height: spacing.spacingLarge),
+                    SizedBox(height: spacing.spacingSmall),
                     
                     // Subject Dropdown
                     _buildAnimatedSubjectDropdown(delay: 600),
                     
-                    SizedBox(height: spacing.spacingMedium),
+                    SizedBox(height: spacing.spacingLarge),
+                    SizedBox(height: spacing.spacingSmall),
                     
                     // Message Field
                     _buildAnimatedMessageField(
@@ -620,6 +622,7 @@ class _ContactFormMobileScreenState extends State<ContactFormMobileScreen> with 
                     ),
                     
                     SizedBox(height: spacing.spacingLarge),
+                    SizedBox(height: spacing.spacingSmall),
                     
                     // Submit Button
                     TweenAnimationBuilder<double>(
