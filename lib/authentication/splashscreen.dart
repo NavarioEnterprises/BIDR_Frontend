@@ -67,29 +67,6 @@ class _SplashScreenState extends State<SplashScreen>
                       height: MediaQuery.of(context).size.height,
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 24),
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          context.go('/login');
-                        },
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Constants.ctaColorLight,
-                          foregroundColor: Constants.ftaColorLight,
-                        ),
-                        icon: Icon(CupertinoIcons.back),
-                        label: Text(
-                          'Back',
-                          style: GoogleFonts.manrope(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -111,15 +88,41 @@ class _SplashScreenState extends State<SplashScreen>
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Logo
-                      SizedBox(
-                        width: 180,
-                        height: 180,
-                        child: Image.asset(
-                          "lib/assets/images/bidr_logo_with_text.png",
-                          fit: BoxFit.contain,
-                          width: 180,
-                          height: 180,
-                        ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          IconButton(
+                            onPressed: (){
+                              context.go('/login');
+                            },
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Constants.ftaColorLight,
+                              elevation: 5,
+                              shadowColor: Colors.black54,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            icon: Icon(
+                              CupertinoIcons.back,
+                              color: Constants.ftaColorLight,
+                            ),
+                          ),
+                          Spacer(),
+                          SizedBox(
+                            width: 180,
+                            height: 180,
+                            child: Image.asset(
+                              "lib/assets/images/bidr_logo_with_text.png",
+                              fit: BoxFit.contain,
+                              width: 180,
+                              height: 180,
+                            ),
+                          ),
+                          Spacer(),
+                          const SizedBox(width: 32),
+                        ],
                       ),
                       const SizedBox(height: 24),
 

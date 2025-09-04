@@ -156,207 +156,209 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 32, vertical: 40),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Fixed spacing at top
-                        //const SizedBox(height: 60),
-                        Center(
-                          child: Container(
-                            width: 130,
-                            height: 130,
-                            child: Image.asset(
-                              "lib/assets/images/bidr_logo_with_text.png",
-                              fit: BoxFit.contain,
-                              width: 90,
-                              height: 90,
-                            ),
-                          ),
-                        ),
-                        // Welcome back title
-                        const SizedBox(height: 24),
-                        Center(
-                          child: Text(
-                            'Welcome back! Sign In',
-                            style: GoogleFonts.manrope(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.2,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-
-                        // Subtitle
-                        Center(
-                          child: Text(
-                            'Sign in to existing account',
-                            style: GoogleFonts.manrope(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Email input
-                        SizedBox(
-                          width: MediaQuery.of(context).size.height * 0.5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 8),
-                              _buildCustomTextField(
-                                // floatingLabel: 'Email',
-                                'Enter Email',
-                                _emailController,
-                                _emailFocusNode,
-                                _passwordFocusNode,
-                                isPasswordField: false,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Fixed spacing at top
+                          //const SizedBox(height: 60),
+                          Center(
+                            child: Container(
+                              width: 130,
+                              height: 130,
+                              child: Image.asset(
+                                "lib/assets/images/bidr_logo_with_text.png",
+                                fit: BoxFit.contain,
+                                width: 90,
+                                height: 90,
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Password input
-                        SizedBox(
-                          width: MediaQuery.of(context).size.height * 0.5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 8),
-                              _buildCustomTextField(
-                                // floatingLabel: 'Email',
-                                'Enter Password',
-                                _passwordController,
-                                _passwordFocusNode,
-                                null,
-                                isPasswordField: true,
+                          // Welcome back title
+                          const SizedBox(height: 24),
+                          Center(
+                            child: Text(
+                              'Welcome back! Sign In',
+                              style: GoogleFonts.manrope(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                                color: Colors.black,
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Forgot password
-                        SizedBox(
-                          width: MediaQuery.of(context).size.height * 0.5,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        BidrPasswordResetFlow(),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                'Forgot Password?',
-                                style: GoogleFonts.manrope(
-                                  color: Color(0xFF999999),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                          const SizedBox(height: 8),
+                      
+                          // Subtitle
+                          Center(
+                            child: Text(
+                              'Sign in to existing account',
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                      
+                          // Email input
+                          SizedBox(
+                            width: MediaQuery.of(context).size.height * 0.5,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 8),
+                                _buildCustomTextField(
+                                  // floatingLabel: 'Email',
+                                  'Enter Email',
+                                  _emailController,
+                                  _emailFocusNode,
+                                  _passwordFocusNode,
+                                  isPasswordField: false,
                                 ),
-                              ),
+                              ],
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Sign in button
-                        SizedBox(
-                          width: MediaQuery.of(context).size.height * 0.5,
-                          height: 45,
-                          child: ElevatedButton(
-                            onPressed: _isLoading ? null : _handleLogin,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Constants.ctaColorLight,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              elevation: 0,
+                          const SizedBox(height: 24),
+                      
+                          // Password input
+                          SizedBox(
+                            width: MediaQuery.of(context).size.height * 0.5,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 8),
+                                _buildCustomTextField(
+                                  // floatingLabel: 'Email',
+                                  'Enter Password',
+                                  _passwordController,
+                                  _passwordFocusNode,
+                                  null,
+                                  isPasswordField: true,
+                                ),
+                              ],
                             ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
-                                      ),
+                          ),
+                          const SizedBox(height: 12),
+                      
+                          // Forgot password
+                          SizedBox(
+                            width: MediaQuery.of(context).size.height * 0.5,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          BidrPasswordResetFlow(),
                                     ),
-                                  )
-                                : Text(
-                                    'Sign In',
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  'Forgot Password?',
+                                  style: GoogleFonts.manrope(
+                                    color: Color(0xFF999999),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
                                   ),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Sign up link
-                        SizedBox(
-                          width: MediaQuery.of(context).size.height * 0.5,
-                          child: MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: GestureDetector(
-                              onTap: () {
-                                context.go('/register');
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 8,
-                                  horizontal: 12,
+                          const SizedBox(height: 24),
+                      
+                          // Sign in button
+                          SizedBox(
+                            width: MediaQuery.of(context).size.height * 0.5,
+                            height: 45,
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _handleLogin,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Constants.ctaColorLight,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Colors.transparent,
-                                ),
-                                child: RichText(
-                                  textAlign: TextAlign.center,
-                                  text: TextSpan(
-                                    style: GoogleFonts.manrope(fontSize: 14),
-                                    children: [
-                                      TextSpan(
-                                        text: "Don't Have an Account? ",
-                                        style: TextStyle(
-                                          color: Color(0xFF999999),
-                                          fontWeight: FontWeight.w500,
+                                elevation: 0,
+                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white,
                                         ),
                                       ),
-                                      TextSpan(
-                                        text: ' Sign Up',
-                                        style: TextStyle(
-                                          color: Constants.ftaColorLight,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 1.1,
-                                          // decoration: TextDecoration.underline,
-                                          decorationColor:
-                                              Constants.ftaColorLight,
-                                        ),
+                                    )
+                                  : Text(
+                                      'Sign In',
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
                                       ),
-                                    ],
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                      
+                          // Sign up link
+                          SizedBox(
+                            width: MediaQuery.of(context).size.height * 0.5,
+                            child: MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                onTap: () {
+                                  context.go('/register');
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 8,
+                                    horizontal: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Colors.transparent,
+                                  ),
+                                  child: RichText(
+                                    textAlign: TextAlign.center,
+                                    text: TextSpan(
+                                      style: GoogleFonts.manrope(fontSize: 14),
+                                      children: [
+                                        TextSpan(
+                                          text: "Don't Have an Account? ",
+                                          style: TextStyle(
+                                            color: Color(0xFF999999),
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: ' Sign Up',
+                                          style: TextStyle(
+                                            color: Constants.ftaColorLight,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 1.1,
+                                            // decoration: TextDecoration.underline,
+                                            decorationColor:
+                                                Constants.ftaColorLight,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        // Fixed spacing at bottom to match top
-                        const SizedBox(height: 12),
-                      ],
+                          // Fixed spacing at bottom to match top
+                          const SizedBox(height: 12),
+                        ],
+                      ),
                     ),
                   ),
                 ),

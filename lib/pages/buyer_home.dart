@@ -29,6 +29,7 @@ import 'buyer/support.dart';
 import 'buyer/video.dart';
 import 'faq_screen.dart';
 import 'mobileView/breakpoints.dart';
+import 'mobileView/buyerDashboard/buyerMobileDashboard.dart';
 import 'mobileView/landingPage/landingMobileViewPage.dart';
 import 'notification.dart';
 import 'policies_screen.dart';
@@ -400,7 +401,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                 : Constants.buyerAppBarValue == 5
                 ? Expanded(child: ContactFormScreen())
                 : Constants.buyerAppBarValue == 6
-                ? Expanded(child: BuyerDashboardScreen())
+                ? Expanded(child:Breakpoints.isMobile(context)?BuyerMobileDashboard():BuyerDashboardScreen())
                 : Constants.buyerAppBarValue == 7
                 ? Expanded(child: SellerDashboard())
                 : Constants.buyerAppBarValue == 8

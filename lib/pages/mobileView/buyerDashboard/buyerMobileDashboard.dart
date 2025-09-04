@@ -1,3 +1,5 @@
+
+
 import 'dart:async';
 import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/customWdget/customCard.dart';
@@ -7,31 +9,32 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
-import '../customWdget/dropdownMenu.dart';
-import '../models/request_models.dart';
-import '../models/product_request_api.dart';
-import '../services/chat_service.dart';
-import '../services/products_management_api_service.dart';
+import '../../../customWdget/dropdownMenu.dart';
+import '../../../models/product_request_api.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'buyer/account_management.dart';
-import 'buyer/share_with_friends.dart';
-import 'buyer/transaction_management.dart';
-import 'group_chat.dart';
+import '../../../models/request_models.dart';
+import '../../../services/chat_service.dart';
+import '../../../services/products_management_api_service.dart';
+import '../breakpoints.dart';
+import 'accountManagementMobile.dart';
+import 'shareMobile.dart';
+import 'transactionMobileDashboard.dart';
+import '../../group_chat.dart';
 
-class BuyerDashboardScreen extends StatefulWidget {
+class BuyerMobileDashboard extends StatefulWidget {
   @override
-  _BuyerDashboardScreenState createState() => _BuyerDashboardScreenState();
+  _BuyerMobileDashboardState createState() => _BuyerMobileDashboardState();
 }
 
-class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
+class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
   List<ProductRequestItem> _productRequests = [];
   bool _isLoading = true;
   String? _error;
   Map<String, String> _bidSortOptions = {}; // Track sort option per request ID
   Set<String> _cancelledRequests = {}; // Track cancelled request IDs
-  
+
   // Auto-refresh timer
   Timer? _refreshTimer;
   final GlobalKey _transactionKey = GlobalKey();
@@ -61,6 +64,34 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
   int dashboardIndex = 0;
   bool isActive = false;
+  bool _isSidebarCollapsed = true;
+  
+  // Pagination for requests grid
+  int _currentPage = 0;
+  final int _itemsPerPage = 2;
+
+  
+  List<dynamic> get _paginatedRequests {
+    List<dynamic> allRequests = [
+      ...GlobalVariables.combinedRequest.autoSparesRequest,
+      ...GlobalVariables.combinedRequest.rimTyreRequest,
+      ...GlobalVariables.combinedRequest.consumerElectronicsRequest,
+    ];
+    
+    final startIndex = _currentPage * _itemsPerPage;
+    final endIndex = (startIndex + _itemsPerPage).clamp(0, allRequests.length);
+    
+    return allRequests.sublist(startIndex.clamp(0, allRequests.length), endIndex);
+  }
+  
+  int get _totalPages {
+    List<dynamic> allRequests =[
+      ...GlobalVariables.combinedRequest.autoSparesRequest,
+      ...GlobalVariables.combinedRequest.rimTyreRequest,
+      ...GlobalVariables.combinedRequest.consumerElectronicsRequest,
+    ];
+    return (allRequests.length / _itemsPerPage).ceil().clamp(1, double.infinity).toInt();
+  }
 
   // Start auto-refresh timer for background updates every 20 seconds
   void _startAutoRefresh() {
@@ -95,109 +126,1006 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(height: 24),
-        Padding(
-          padding: const EdgeInsets.only(left: 68, right: 68),
-          child: Center(
-            child: Container(
-              width: double.infinity,
-              constraints: BoxConstraints(maxWidth: 1600),
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              decoration: BoxDecoration(
-                color: Constants.ftaColorLight,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildNavItem(
-                    () {
-                      dashboardIndex = 0;
-                      setState(() {});
-                      // Reload product requests when navigating to My Dashboard
-                      _fetchProductRequests();
-                    },
-                    HugeIcons.strokeRoundedDashboardSquare01,
-                    "My Dashboard",
-                    dashboardIndex == 0 ? true : false,
-                  ),
-                  _buildNavItem(
-                    () {
-                      dashboardIndex = 1;
-                      setState(() {});
-                    },
-                    HugeIcons.strokeRoundedShare01,
-                    "Refer A Friend/Business",
-                    dashboardIndex == 1 ? true : false,
-                  ),
-                  _buildNavItem(
-                    () {
-                      dashboardIndex = 2;
-                      setState(() {});
-                      // Trigger refresh for Transaction Management when navigating to it
-                      _refreshTransactionManagement();
-                    },
-                    HugeIcons.strokeRoundedTransaction,
-                    "Transaction Management",
-                    dashboardIndex == 2 ? true : false,
-                  ),
-                  _buildNavItem(
-                    () {
-                      dashboardIndex = 3;
-                      setState(() {});
-                    },
-                    HugeIcons.strokeRoundedUserAccount,
-                    "Account Management",
-                    dashboardIndex == 3 ? true : false,
-                  ),
-                ],
+    return ResponsiveBuilder(
+      builder: (context, typography, spacing) {
+        return Stack(
+          children: [
+            // Main Content Area (Full Width)
+            Positioned.fill(
+              child: ResponsiveContainer(
+                paddingType: SpacingType.medium,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header with Menu Toggle
+                    _buildMobileHeader(typography, spacing),
+                    ResponsiveGap(type: SpacingType.medium),
+                    
+                    // Content
+                    Expanded(
+                      child: _buildContent(dashboardIndex,typography, spacing),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ),
-        SizedBox(height: 24),
-        // Requests Grid
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 68, right: 68),
-                  child: Center(
-                    child: Container(
-                      width: double.infinity,
-                      constraints: BoxConstraints(maxWidth: 1600),
-                      height: 600,
-                      child: dashboardIndex == 0
-                          ? _buildRequestsGrid()
-                          : dashboardIndex == 1
-                          ? Container(
-                              width: MediaQuery.of(context).size.width * 0.35,
-                              height: 400,
-                              child: ShareWidget(),
-                            )
-                          : dashboardIndex == 2
-                          ? Column(
-                              children: [
-                                Expanded(child: TransactionDashboard(key: _transactionKey)),
-                              ],
-                            )
-                          : dashboardIndex == 3
-                          ? AccountManagementPage()
-                          : Container(),
+            
+            // Drawer Sidebar Overlay
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              left: _isSidebarCollapsed ? -220 : 0,
+              top: 0,
+              bottom: 0,
+              width: 220,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Constants.ftaColorLight,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 15,
+                      offset: const Offset(2, 0),
                     ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    ResponsiveGap(type: SpacingType.large),
+                    
+                    // Sidebar Header
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: spacing.paddingMedium,
+                        vertical: spacing.paddingSmall,
+                      ),
+                      child: Row(
+                        children: [
+                          ResponsiveText(
+                            text: 'Menu',
+                            type: TextType.medium,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _isSidebarCollapsed = true;
+                              });
+                            },
+                            icon: Icon(
+                              HugeIcons.strokeRoundedCancel01,
+                              color: Colors.white70,
+                              size: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    ResponsiveGap(type: SpacingType.small),
+                    
+                    // Navigation Items
+                    _buildSidebarNavItem(
+                      () {
+                        setState(() {
+                          dashboardIndex = 0;
+                          _currentPage = 0; // Reset pagination
+                          _isSidebarCollapsed = true; // Close drawer
+                        });
+                        _fetchProductRequests();
+                      },
+                      HugeIcons.strokeRoundedDashboardSquare01,
+                      "My Dashboard",
+                      dashboardIndex == 0,
+                    ),
+                    _buildSidebarNavItem(
+                      () {
+                        setState(() {
+                          dashboardIndex = 1;
+                          _isSidebarCollapsed = true; // Close drawer
+                        });
+                      },
+                      HugeIcons.strokeRoundedShare01,
+                      "Share",
+                      dashboardIndex == 1,
+                    ),
+                    _buildSidebarNavItem(
+                      () {
+                        setState(() {
+                          dashboardIndex = 2;
+                          _isSidebarCollapsed = true; // Close drawer
+                        });
+                        _refreshTransactionManagement();
+                      },
+                      HugeIcons.strokeRoundedTransaction,
+                      "Transactions",
+                      dashboardIndex == 2,
+                    ),
+                    _buildSidebarNavItem(
+                      () {
+                        setState(() {
+                          dashboardIndex = 3;
+                          _isSidebarCollapsed = true; // Close drawer
+                        });
+                      },
+                      HugeIcons.strokeRoundedUserAccount,
+                      "Account",
+                      dashboardIndex == 3,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+            // Overlay when sidebar is open
+            /*if (!_isSidebarCollapsed)
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isSidebarCollapsed = true;
+                    });
+                  },
+                  child: Container(
+                    color: Colors.black.withOpacity(0.3),
                   ),
                 ),
-                SizedBox(height: 24),
-                FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
-              ],
+              ),*/
+          ],
+        );
+      },
+    );
+  }
+  
+  // Drawer toggle moved to header - old collapse button removed
+  
+  Widget _buildSidebarNavItem(
+      VoidCallback onTap,
+      IconData icon,
+      String title,
+      bool isSelected,
+      ) {
+    final Color iconColor = isSelected ? Colors.white : Colors.white70;
+    final Color backgroundColor = isSelected 
+        ? Colors.white.withOpacity(0.15) 
+        : Colors.transparent;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: _isSidebarCollapsed 
+          ? BorderRadius.circular(360) 
+          : BorderRadius.only(
+              topRight: Radius.circular(36),
+              bottomRight: Radius.circular(36),
             ),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: _isSidebarCollapsed 
+              ? BorderRadius.circular(360) 
+              : BorderRadius.only(
+                  topRight: Radius.circular(36),
+                  bottomRight: Radius.circular(36),
+                ),
+          border: isSelected 
+              ? Border.all(color: Colors.white.withOpacity(0.2), width: 1)
+              : null,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: iconColor,
+              size: 20,
+            ),
+            if (!_isSidebarCollapsed)...[
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: GoogleFonts.manrope(
+                    color: isSelected ? Colors.white : Colors.white70,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildMobileHeader(TypographyConfig typography, SpacingConfig spacing) {
+    String title = '';
+    switch (dashboardIndex) {
+      case 0:
+        title = 'My Dashboard';
+        break;
+      case 1:
+        title = 'Refer a Friend/Business';
+        break;
+      case 2:
+        title = 'Transactions';
+        break;
+      case 3:
+        title = 'Account';
+        break;
+    }
+    
+    return Row(
+      children: [
+        // Hamburger Menu Icon
+        IconButton(
+          onPressed: () {
+            setState(() {
+              _isSidebarCollapsed = !_isSidebarCollapsed;
+            });
+          },
+          icon: Icon(
+            HugeIcons.strokeRoundedDashboardSquare01,
+            color: Constants.ftaColorLight,
+            size: 18,
+          ),
+          padding: EdgeInsets.all(spacing.paddingSmall),
+          constraints: BoxConstraints(
+            minWidth: 35,
+            minHeight: 35,
+          ),
+        ),
+        
+        SizedBox(width: spacing.spacingSmall),
+        
+        // Title
+        Expanded(
+          child: ResponsiveText(
+            text: title,
+            type: TextType.medium,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
           ),
         ),
       ],
     );
+  }
+  
+  Widget _buildContent(int index, TypographyConfig typography, SpacingConfig spacing) {
+    switch (index) {
+      case 0:
+        return _buildMobileRequestsGrid(typography, spacing);
+      case 1:
+        return ShareWidgetMobile();
+      case 2:
+        return TransactionMobileDashboard(key: _transactionKey);
+      case 3:
+        return AccountManagementMobile();
+      default:
+        return Container();
+    }
+  }
+  
+  Widget _buildMobileRequestsGrid(TypographyConfig typography, SpacingConfig spacing) {
+    if (_isLoading) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: Constants.ctaColorLight),
+            ResponsiveGap(type: SpacingType.medium),
+            ResponsiveText(
+              text: 'Loading requests...',
+              type: TextType.medium,
+              color: Colors.grey[600],
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              HugeIcons.strokeRoundedAlert02,
+              size: 48,
+              color: Colors.red[400],
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+            ResponsiveText(
+              text: 'Error loading requests',
+              type: TextType.medium,
+              fontWeight: FontWeight.w600,
+              color: Colors.red[600],
+            ),
+            ResponsiveGap(type: SpacingType.small),
+            ResponsiveText(
+              text: _error!,
+              type: TextType.normal,
+              color: Colors.grey[600],
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    List<dynamic> allRequests = [
+      ...GlobalVariables.combinedRequest.autoSparesRequest,
+      ...GlobalVariables.combinedRequest.rimTyreRequest,
+      ...GlobalVariables.combinedRequest.consumerElectronicsRequest,
+    ];
+
+    if (allRequests.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              HugeIcons.strokeRoundedInbox,
+              size: 48,
+              color: Colors.grey[400],
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+            ResponsiveText(
+              text: 'No requests found',
+              type: TextType.medium,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+            ResponsiveGap(type: SpacingType.small),
+            ResponsiveText(
+              text: 'Create your first product request to get started',
+              type: TextType.normal,
+              color: Colors.grey[500],
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    final paginatedRequests = _paginatedRequests;
+    final totalPages = _totalPages;
+
+    return Column(
+      children: [
+        // Filter and Sort Controls (if needed)
+        if (allRequests.length > _itemsPerPage) _buildPaginationInfo(typography),
+        
+        ResponsiveGap(type: SpacingType.medium),
+        
+        // Requests List (Vertical, up to 2 items)
+        Expanded(
+          child: ListView.builder(
+            itemCount: paginatedRequests.length,
+            itemBuilder: (context, index) {
+              final request = paginatedRequests[index];
+              // Calculate global index for request numbering
+              final globalIndex = (_currentPage * _itemsPerPage) + index + 1;
+              return _buildMobileRequestCard(request, globalIndex, typography, spacing);
+            },
+          ),
+        ),
+        
+        // Pagination Controls
+        if (totalPages > 1) _buildPaginationControls(typography, spacing),
+      ],
+    );
+  }
+  
+  Widget _buildPaginationInfo(TypographyConfig typography) {
+    List<dynamic> allRequests = [
+      ...GlobalVariables.combinedRequest.autoSparesRequest,
+      ...GlobalVariables.combinedRequest.rimTyreRequest,
+      ...GlobalVariables.combinedRequest.consumerElectronicsRequest,
+    ];
+    
+    final start = (_currentPage * _itemsPerPage) + 1;
+    final end = ((_currentPage + 1) * _itemsPerPage).clamp(1, allRequests.length);
+    
+    return ResponsiveText(
+      text: '$start-$end of ${allRequests.length} requests',
+      type: TextType.normal,
+      color: Colors.grey[400],
+      fontWeight: FontWeight.w300,
+    );
+  }
+  
+  Widget _buildPaginationControls(TypographyConfig typography, SpacingConfig spacing) {
+    return ResponsiveContainer(
+      paddingType: SpacingType.small,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Previous Button
+          _buildPaginationButton(
+            onTap: _currentPage > 0 ? () {
+              setState(() {
+                _currentPage--;
+              });
+            } : null,
+            icon: HugeIcons.strokeRoundedArrowLeft02,
+            typography: typography,
+            spacing: spacing,
+          ),
+          
+          // Page Info
+          ResponsiveText(
+            text: '${_currentPage + 1} of $_totalPages',
+            type: TextType.medium,
+            fontWeight: FontWeight.w400,
+            color: Constants.ctaColorLight,
+          ),
+          
+          // Next Button
+          _buildPaginationButton(
+            onTap: _currentPage < _totalPages - 1 ? () {
+              setState(() {
+                _currentPage++;
+              });
+            } : null,
+            icon: HugeIcons.strokeRoundedArrowRight02,
+            typography: typography,
+            spacing: spacing,
+            isNext: true,
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildPaginationButton({
+    required VoidCallback? onTap,
+    required IconData icon,
+    required TypographyConfig typography,
+    required SpacingConfig spacing,
+    bool isNext = false,
+  }) {
+    final isEnabled = onTap != null;
+    
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.symmetric(
+          horizontal: spacing.paddingMedium,
+          vertical: spacing.paddingSmall,
+        ),
+        decoration: BoxDecoration(
+          color: isEnabled ? Constants.ctaColorLight.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(360),
+          border: Border.all(
+            color: isEnabled ? Constants.ctaColorLight : Colors.grey.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!isNext)...[
+              Icon(
+                icon,
+                size: 16,
+                color: isEnabled ? Constants.ctaColorLight : Colors.grey,
+              ),
+              SizedBox(width: spacing.spacingSmall),
+            ],
+            if (isNext)...[
+              SizedBox(width: spacing.spacingSmall),
+              Icon(
+                icon,
+                size: 16,
+                color: isEnabled ? Constants.ctaColorLight : Colors.grey,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildMobileRequestCard(dynamic request, int index, TypographyConfig typography, SpacingConfig spacing) {
+    final bids = _getSortedBids(request);
+    final hasMoreThanTwoBids = bids.length > 2;
+    final bidsToShow = bids.take(2).toList();
+    final requestId = _getRequestId(request);
+    final isCancelled = _cancelledRequests.contains(requestId);
+
+    return Container(
+      margin: EdgeInsets.all(spacing.paddingSmall),
+      padding: EdgeInsets.all(spacing.paddingMedium),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row with date, request ID, cancel button, and sort
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ResponsiveText(
+                    text: _formatDate(request.createdAt?.toString()),
+                    type: TextType.normal,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  ResponsiveText(
+                    text: "REQUEST #$index",
+                    type: TextType.subHeading,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  if (!isCancelled)
+                    InkWell(
+                      onTap: () => _showCancelRequestDialog(request),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.red.shade300),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: ResponsiveText(
+                          text: "Cancel",
+                          type: TextType.normal,
+                          color: Colors.red.shade500,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  SizedBox(width: 12),
+                  // Sort dropdown placeholder for mobile
+                  Icon(
+                    Icons.sort,
+                    color: Colors.grey.shade600,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          ResponsiveGap(type: SpacingType.small),
+          
+          // Description section with orange border
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    right: spacing.spacingSmall,
+                    top: 4,
+                    bottom: 4,
+                  ),
+                  child: Container(
+                    width: 4,
+                    decoration: BoxDecoration(
+                      color: Constants.ctaColorLight,
+                      borderRadius: BorderRadius.circular(36),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ResponsiveText(
+                            text: "Description -",
+                            type: TextType.normal,
+                            color: Colors.grey.shade600,
+                          ),
+                          Spacer(),
+                          GestureDetector(
+                            onTap: () => _navigateToDetailScreen(request, index),
+                            child: ResponsiveText(
+                              text: "View Details",
+                              type: TextType.normal,
+                              color: Constants.ftaColorLight,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      ResponsiveGap(type: SpacingType.small),
+                      ResponsiveText(
+                        text: _getRequestDescription(request),
+                        type: TextType.normal,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      ResponsiveGap(type: SpacingType.small),
+                      // Category
+                      ResponsiveText(
+                        text: _getCategoryDisplayName(request.category),
+                        type: TextType.normal,
+                        color: Colors.orange.shade600,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          ResponsiveGap(type: SpacingType.large),
+          
+          // Countdown Timer
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildTimerCircle("0", "D"),
+              SizedBox(width: 12),
+              _buildTimerCircle(
+                _getElapsedTime(request.createdAt, 'hours'),
+                "H",
+
+              ),
+              SizedBox(width: 12),
+              _buildTimerCircle(
+                _getElapsedTime(request.createdAt, 'minutes'),
+                "M",
+              ),
+              SizedBox(width: 12),
+              _buildTimerCircle(
+                _getElapsedTime(request.createdAt, 'seconds'),
+                "S",
+
+              ),
+            ],
+          ),
+          
+          ResponsiveGap(type: SpacingType.large),
+          
+          // Seller Bids Section
+          if (bidsToShow.isNotEmpty) ...[
+            ...bidsToShow.asMap().entries.map(
+              (entry) => _buildModernSellerBid(
+                entry.value,
+                request,
+                entry.key + 1,
+              ),
+            ),
+            if (hasMoreThanTwoBids) ...[
+              ResponsiveGap(type: SpacingType.medium),
+              _buildViewAllBidsButton(bids.length,),
+            ],
+          ] else ...[
+            Container(
+              height: 100,
+              child: Center(
+                child: ResponsiveText(
+                  text: "No bids yet",
+                  type: TextType.medium,
+                  color: Colors.grey.shade500,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+  String _getRequestDescription(dynamic request) {
+    try {
+      if (request?.category == null) return "No description available";
+
+      // Handle different request types - either API response models or transformed models
+      if (request is AutoSparesRequest) {
+        // Transformed model
+        if (request.autoSpares?.partDetails?.partName != null &&
+            request.autoSpares?.vehicleDetails?.makeModel != null &&
+            request.autoSpares?.vehicleDetails?.year != null) {
+          return "${request.autoSpares.partDetails.partName}, ${request.autoSpares.vehicleDetails.makeModel}, ${request.autoSpares.vehicleDetails.year}";
+        }
+        return "Vehicle Spares Request";
+      } else if (request is RimTyreRequest) {
+        // Transformed model
+        if (request.rimTyre?.productDetails != null) {
+          final tyreType = request.rimTyre.productDetails.tyreType ?? "Tyres";
+          final tyreWidth = request.rimTyre.productDetails.tyreWidthMm ?? 0;
+          final sidewall = request.rimTyre.productDetails.sidewallProfile ?? "";
+          final rimDiameter =
+              request.rimTyre.productDetails.wheelRimDiameterInches ?? "";
+          final brand =
+              request.rimTyre.moreFields?.preferredBrand ?? "Various Brands";
+          return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
+        }
+        return "Tyre/Rim Request";
+      } else if (request is ConsumerElectronicsRequest) {
+        // Transformed model
+        if (request.consumerElectronics?.productDetails != null) {
+          final typeOfElectronics =
+              request.consumerElectronics.productDetails.typeOfElectronics ??
+                  "Electronics";
+          final brandPreference =
+              request.consumerElectronics.productDetails.brandPreference ??
+                  "Various Brands";
+          final modelSeries =
+              request.consumerElectronics.productDetails.modelSeries;
+          return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
+        }
+        return "Electronics Request";
+      }
+
+      // Handle API response category strings
+      switch (request.category) {
+        case "VEHICLE_SPARES":
+        // Use vehicle_spares_summary from API or fallback to title/description
+          if (request.vehicleSparesSummary != null &&
+              request.vehicleSparesSummary.isNotEmpty) {
+            return request.vehicleSparesSummary;
+          } else if (request.title != null && request.title.isNotEmpty) {
+            return "${request.title} - ${request.description ?? 'Vehicle Spares Request'}";
+          }
+          return "Vehicle Spares Request";
+
+        case "TYRES_RIMS":
+        // Use tyres_rims_summary from API or fallback to title/description
+          if (request.tyresRimsSummary != null &&
+              request.tyresRimsSummary.isNotEmpty) {
+            return "${request.tyresRimsSummary} - ${request.title ?? 'Tyre/Rim Request'}";
+          } else if (request.title != null && request.title.isNotEmpty) {
+            return "${request.title} - ${request.description ?? 'Tyre/Rim Request'}";
+          }
+          return "Tyre/Rim Request";
+
+        case "ELECTRONICS":
+        // Use consumer_electronics_summary from API or fallback to title/description
+          if (request.consumerElectronicsSummary != null &&
+              request.consumerElectronicsSummary.isNotEmpty) {
+            return request.consumerElectronicsSummary;
+          } else if (request.title != null && request.title.isNotEmpty) {
+            return "${request.title} - ${request.description ?? 'Electronics Request'}";
+          }
+          return "Electronics Request";
+
+      // Legacy categories for backward compatibility
+        case "Vehicle Spares":
+          if (request?.partDetails?.partName != null &&
+              request?.vehicleDetails?.makeModel != null &&
+              request?.vehicleDetails?.year != null) {
+            return "${request.partDetails.partName}, ${request.vehicleDetails.makeModel}, ${request.vehicleDetails.year}";
+          }
+          return "Vehicle Spares Request";
+
+        case "Vehicle Tyres and Rims":
+          if (request?.productDetails != null) {
+            final typeOfElectronics =
+                request.productDetails.typeOfElectronics ?? "Electronics";
+            final brandPreference =
+                request.productDetails.brandPreference ?? "Various Brands";
+            final modelSeries = request.productDetails.modelSeries;
+            return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
+          }
+          return "Electronics Request";
+
+        case "Consumer Electronics":
+          if (request?.productDetails != null) {
+            final tyreType = request.productDetails.tyreType ?? "Tyres";
+            final tyreWidth = request.productDetails.tyreWidthMm ?? 0;
+            final sidewall = request.productDetails.sidewallProfile ?? "";
+            final rimDiameter =
+                request.productDetails.wheelRimDiameterInches ?? "";
+            final brand =
+                request.moreFields?.preferredBrand ?? "Various Brands";
+            return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
+          }
+          return "Tyre/Rim Request";
+
+        default:
+        // Fallback to title and description from API
+          if (request.title != null && request.title.isNotEmpty) {
+            return "${request.title} - ${request.description ?? 'Request'}";
+          }
+          return "Request #${_getRequestId(request)}";
+      }
+    } catch (e) {
+      print('Error getting description: $e');
+      return "Request information unavailable";
+    }
+  }
+  
+  Color _getStatusColor(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'active':
+      case 'ongoing':
+        return Colors.green;
+      case 'pending':
+        return Colors.orange;
+      case 'completed':
+        return Colors.blue;
+      case 'cancelled':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+  
+  String _formatDate(String? dateTime) {
+    if (dateTime == null) return 'No date';
+    try {
+      final date = DateTime.parse(dateTime);
+      return '${date.day}/${date.month}/${date.year}';
+    } catch (e) {
+      return 'Invalid date';
+    }
+  }
+  
+  void _handleRequestTap(dynamic request) {
+    // Handle request tap - navigate to details or show modal
+    final requestId = _getRequestId(request);
+    final hasOffers = request?.sellerOffers?.isNotEmpty ?? false;
+    
+    if (hasOffers) {
+      // Show offers modal or navigate to offers view
+      _showOffersModal(request);
+    } else {
+      // Show request details
+      _showRequestDetailsModal(request);
+    }
+  }
+  
+  // Helper method to get lowest bid text
+  String _getLowestBidText(dynamic request) {
+    try {
+      if (request?.sellerOffers == null || request.sellerOffers.isEmpty) {
+        return 'No offers yet';
+      }
+      
+      // Sort offers by price to get lowest
+      final offers = List.from(request.sellerOffers);
+      offers.sort((a, b) {
+        final priceA = double.tryParse(a?.unitPrice?.toString() ?? '0') ?? 0;
+        final priceB = double.tryParse(b?.unitPrice?.toString() ?? '0') ?? 0;
+        return priceA.compareTo(priceB);
+      });
+      
+      final lowestPrice = offers.first?.unitPrice ?? 0;
+      return 'Lowest: \$${lowestPrice.toString()}';
+    } catch (e) {
+      return 'View offers';
+    }
+  }
+  
+  // Show offers modal
+  void _showOffersModal(dynamic request) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.75,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 10),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Offers for Request #${_getRequestId(request)}',
+                style: GoogleFonts.manrope(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            // Add offers list here
+          ],
+        ),
+      ),
+    );
+  }
+  
+  // Show request details modal
+  void _showRequestDetailsModal(dynamic request) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.5,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 10),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Request #${_getRequestId(request)} Details',
+                style: GoogleFonts.manrope(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            // Add request details here
+          ],
+        ),
+      ),
+    );
+  }
+  
+  String _getRequestDisplayTitle(dynamic request) {
+    try {
+      // Use category as the main title, or generate a descriptive title
+      String category = request?.category ?? 'Product Request';
+      
+      // Make the category more readable
+      switch (category.toLowerCase()) {
+        case 'vehicle spares':
+        case 'autospares':
+          return 'Auto Spares Request';
+        case 'consumer electronics':
+        case 'consumerelectronics':
+          return 'Electronics Request';
+        case 'rim tyre':
+        case 'rimtyre':
+        case 'tyres':
+          return 'Tyre & Rim Request';
+        default:
+          return '$category Request';
+      }
+    } catch (e) {
+      print('Error getting request title: $e');
+      return 'Product Request';
+    }
   }
 
   List<Widget> _buildAllRequestCards() {
@@ -299,7 +1227,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     );
   }
 
-
   /// Filter and sort requests based on current settings
   List<dynamic> _filterRequests(List<dynamic> requests) {
     // First, filter the requests
@@ -357,7 +1284,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
           final bidsB = b.sellerOffers?.length ?? 0;
           return bidsA.compareTo(bidsB);
         case 'urgent':
-          // Sort by urgency level
+        // Sort by urgency level
           final urgencyOrder = {
             'ASAP': 0,
             '24_HOURS': 1,
@@ -385,7 +1312,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       builder: (context, constraints) {
         final double cardWidth =
             (constraints.maxWidth - (horizontalSpacing * (cardsPerRow - 1))) /
-            cardsPerRow;
+                cardsPerRow;
 
         return SingleChildScrollView(
           child: Column(
@@ -404,12 +1331,12 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
   /// Build rows of cards with dynamic heights
   List<Widget> _buildRows(
-    List<dynamic> requests,
-    int cardsPerRow,
-    double cardWidth,
-    double horizontalSpacing,
-    double verticalSpacing,
-  ) {
+      List<dynamic> requests,
+      int cardsPerRow,
+      double cardWidth,
+      double horizontalSpacing,
+      double verticalSpacing,
+      ) {
     List<Widget> rows = [];
 
     for (int i = 0; i < requests.length; i += cardsPerRow) {
@@ -552,12 +1479,12 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
               'withBids': allRequests
                   .where(
                     (r) => r.sellerOffers != null && r.sellerOffers.isNotEmpty,
-                  )
+              )
                   .length,
               'withoutBids': allRequests
                   .where(
                     (r) => r.sellerOffers == null || r.sellerOffers.isEmpty,
-                  )
+              )
                   .length,
               'vehicleSpares': allRequests
                   .where((r) => r.category == 'VEHICLE_SPARES')
@@ -642,7 +1569,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                               children: [
                                 Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                                  MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Column(
                                       children: [
@@ -744,24 +1671,24 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                             spacing: 8,
                             runSpacing: 8,
                             children:
-                                [
-                                      'All Categories',
-                                      'Vehicle Spares',
-                                      'Tyres & Rims',
-                                      'Electronics',
-                                    ]
-                                    .map(
-                                      (category) => _buildModernFilterChip(
-                                        category,
-                                        tempSelectedCategory == category,
-                                        (selected) {
-                                          setDialogState(() {
-                                            tempSelectedCategory = category;
-                                          });
-                                        },
-                                      ),
-                                    )
-                                    .toList(),
+                            [
+                              'All Categories',
+                              'Vehicle Spares',
+                              'Tyres & Rims',
+                              'Electronics',
+                            ]
+                                .map(
+                                  (category) => _buildModernFilterChip(
+                                category,
+                                tempSelectedCategory == category,
+                                    (selected) {
+                                  setDialogState(() {
+                                    tempSelectedCategory = category;
+                                  });
+                                },
+                              ),
+                            )
+                                .toList(),
                           ),
 
                           SizedBox(height: 24),
@@ -788,7 +1715,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                                   title: 'All Status',
                                   count: bidStatistics['total']!,
                                   isSelected:
-                                      tempSelectedStatus == 'All Status',
+                                  tempSelectedStatus == 'All Status',
                                   onTap: () {
                                     setDialogState(() {
                                       tempSelectedStatus = 'All Status';
@@ -825,7 +1752,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                                   title: 'Without Bids',
                                   count: bidStatistics['withoutBids']!,
                                   isSelected:
-                                      tempSelectedStatus == 'Without Bids',
+                                  tempSelectedStatus == 'Without Bids',
                                   onTap: () {
                                     setDialogState(() {
                                       tempSelectedStatus = 'Without Bids';
@@ -978,7 +1905,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                   'Newest First',
                   'Show most recent requests first',
                   _sortBy == 'newest',
-                  () {
+                      () {
                     _sortRequests('newest');
                     Navigator.of(context).pop();
                   },
@@ -988,7 +1915,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                   'Oldest First',
                   'Show oldest requests first',
                   _sortBy == 'oldest',
-                  () {
+                      () {
                     _sortRequests('oldest');
                     Navigator.of(context).pop();
                   },
@@ -998,7 +1925,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                   'By Category',
                   'Group by request category',
                   _sortBy == 'category',
-                  () {
+                      () {
                     _sortRequests('category');
                     Navigator.of(context).pop();
                   },
@@ -1008,7 +1935,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                   'By Status',
                   'Group by request status',
                   _sortBy == 'status',
-                  () {
+                      () {
                     _sortRequests('status');
                     Navigator.of(context).pop();
                   },
@@ -1022,12 +1949,12 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   }
 
   Widget _buildModernSortOption(
-    IconData icon,
-    String title,
-    String subtitle,
-    bool isSelected,
-    VoidCallback onTap,
-  ) {
+      IconData icon,
+      String title,
+      String subtitle,
+      bool isSelected,
+      VoidCallback onTap,
+      ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -1089,10 +2016,10 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   }
 
   Widget _buildModernFilterChip(
-    String label,
-    bool isSelected,
-    Function(bool) onSelected,
-  ) {
+      String label,
+      bool isSelected,
+      Function(bool) onSelected,
+      ) {
     return GestureDetector(
       onTap: () => onSelected(!isSelected),
       child: Container(
@@ -1230,7 +2157,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       // Filter by category
       bool categoryMatch =
           _selectedCategory == 'All Categories' ||
-          _getCategoryDisplayName(request.category) == _selectedCategory;
+              _getCategoryDisplayName(request.category) == _selectedCategory;
 
       // Filter by status
       bool statusMatch =
@@ -1401,161 +2328,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     );
   }
 
-  Widget _buildNavItem(
-    VoidCallback voidCallBack,
-    IconData icon,
-    String title,
-    bool isActive,
-  ) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextButton.icon(
-          onPressed: voidCallBack,
-          icon: Icon(icon, color: Colors.white, size: 22),
-          label: Text(
-            title,
-            style: GoogleFonts.manrope(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        if (isActive) ...[
-          SizedBox(width: 8),
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: Colors.orange,
-              shape: BoxShape.circle,
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  String _getRequestDescription(dynamic request) {
-    try {
-      if (request?.category == null) return "No description available";
-
-      // Handle different request types - either API response models or transformed models
-      if (request is AutoSparesRequest) {
-        // Transformed model
-        if (request.autoSpares?.partDetails?.partName != null &&
-            request.autoSpares?.vehicleDetails?.makeModel != null &&
-            request.autoSpares?.vehicleDetails?.year != null) {
-          return "${request.autoSpares.partDetails.partName}, ${request.autoSpares.vehicleDetails.makeModel}, ${request.autoSpares.vehicleDetails.year}";
-        }
-        return "Vehicle Spares Request";
-      } else if (request is RimTyreRequest) {
-        // Transformed model
-        if (request.rimTyre?.productDetails != null) {
-          final tyreType = request.rimTyre.productDetails.tyreType ?? "Tyres";
-          final tyreWidth = request.rimTyre.productDetails.tyreWidthMm ?? 0;
-          final sidewall = request.rimTyre.productDetails.sidewallProfile ?? "";
-          final rimDiameter =
-              request.rimTyre.productDetails.wheelRimDiameterInches ?? "";
-          final brand =
-              request.rimTyre.moreFields?.preferredBrand ?? "Various Brands";
-          return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
-        }
-        return "Tyre/Rim Request";
-      } else if (request is ConsumerElectronicsRequest) {
-        // Transformed model
-        if (request.consumerElectronics?.productDetails != null) {
-          final typeOfElectronics =
-              request.consumerElectronics.productDetails.typeOfElectronics ??
-              "Electronics";
-          final brandPreference =
-              request.consumerElectronics.productDetails.brandPreference ??
-              "Various Brands";
-          final modelSeries =
-              request.consumerElectronics.productDetails.modelSeries;
-          return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
-        }
-        return "Electronics Request";
-      }
-
-      // Handle API response category strings
-      switch (request.category) {
-        case "VEHICLE_SPARES":
-          // Use vehicle_spares_summary from API or fallback to title/description
-          if (request.vehicleSparesSummary != null &&
-              request.vehicleSparesSummary.isNotEmpty) {
-            return request.vehicleSparesSummary;
-          } else if (request.title != null && request.title.isNotEmpty) {
-            return "${request.title} - ${request.description ?? 'Vehicle Spares Request'}";
-          }
-          return "Vehicle Spares Request";
-
-        case "TYRES_RIMS":
-          // Use tyres_rims_summary from API or fallback to title/description
-          if (request.tyresRimsSummary != null &&
-              request.tyresRimsSummary.isNotEmpty) {
-            return "${request.tyresRimsSummary} - ${request.title ?? 'Tyre/Rim Request'}";
-          } else if (request.title != null && request.title.isNotEmpty) {
-            return "${request.title} - ${request.description ?? 'Tyre/Rim Request'}";
-          }
-          return "Tyre/Rim Request";
-
-        case "ELECTRONICS":
-          // Use consumer_electronics_summary from API or fallback to title/description
-          if (request.consumerElectronicsSummary != null &&
-              request.consumerElectronicsSummary.isNotEmpty) {
-            return request.consumerElectronicsSummary;
-          } else if (request.title != null && request.title.isNotEmpty) {
-            return "${request.title} - ${request.description ?? 'Electronics Request'}";
-          }
-          return "Electronics Request";
-
-        // Legacy categories for backward compatibility
-        case "Vehicle Spares":
-          if (request?.partDetails?.partName != null &&
-              request?.vehicleDetails?.makeModel != null &&
-              request?.vehicleDetails?.year != null) {
-            return "${request.partDetails.partName}, ${request.vehicleDetails.makeModel}, ${request.vehicleDetails.year}";
-          }
-          return "Vehicle Spares Request";
-
-        case "Vehicle Tyres and Rims":
-          if (request?.productDetails != null) {
-            final typeOfElectronics =
-                request.productDetails.typeOfElectronics ?? "Electronics";
-            final brandPreference =
-                request.productDetails.brandPreference ?? "Various Brands";
-            final modelSeries = request.productDetails.modelSeries;
-            return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
-          }
-          return "Electronics Request";
-
-        case "Consumer Electronics":
-          if (request?.productDetails != null) {
-            final tyreType = request.productDetails.tyreType ?? "Tyres";
-            final tyreWidth = request.productDetails.tyreWidthMm ?? 0;
-            final sidewall = request.productDetails.sidewallProfile ?? "";
-            final rimDiameter =
-                request.productDetails.wheelRimDiameterInches ?? "";
-            final brand =
-                request.moreFields?.preferredBrand ?? "Various Brands";
-            return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
-          }
-          return "Tyre/Rim Request";
-
-        default:
-          // Fallback to title and description from API
-          if (request.title != null && request.title.isNotEmpty) {
-            return "${request.title} - ${request.description ?? 'Request'}";
-          }
-          return "Request #${_getRequestId(request)}";
-      }
-    } catch (e) {
-      print('Error getting description: $e');
-      return "Request information unavailable";
-    }
-  }
+  // Old navigation method removed - now using sidebar navigation
 
   void _navigateToDetailScreen(dynamic request, int index) {
     try {
@@ -1637,7 +2410,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                _formatDate(request.createdAt),
+                _formatDate(request.createdAt?.toString()),
                 style: GoogleFonts.manrope(
                   color: Colors.grey.shade700,
                   fontSize: 12,
@@ -1709,7 +2482,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  _getRequestDescription(request),
+                  _getRequestDescription(request,),
                   style: GoogleFonts.manrope(fontSize: 13, color: Colors.black),
                 ),
                 SizedBox(height: 8),
@@ -1831,18 +2604,17 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     const double bidCardHeight = 88.0; // Height per bid card in new design
     final double dynamicHeight =
         baseHeight +
-        (bidsToShow.length * bidCardHeight) +
-        (hasMoreThanTwoBids ? 50.0 : 0.0);
+            (bidsToShow.length * bidCardHeight) +
+            (hasMoreThanTwoBids ? 50.0 : 0.0);
 
     return _buildActiveRequestCardWithHeight(request, dynamicHeight, index);
   }
 
   Widget _buildActiveRequestCardWithHeight(
-    dynamic request,
-    double fixedHeight,
-    int index,
-  )
-  {
+      dynamic request,
+      double fixedHeight,
+      int index,
+      ) {
     final bids = _getSortedBids(request);
     final hasMoreThanTwoBids = bids.length > 2;
     final bidsToShow = bids
@@ -1882,7 +2654,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _formatDate(request.createdAt),
+                      _formatDate(request.createdAt?.toString()),
                       style: GoogleFonts.manrope(
                         color: Colors.grey.shade600,
                         fontSize: 11.5,
@@ -2051,7 +2823,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                   children: [
                     if (bidsToShow.isNotEmpty) ...[
                       ...bidsToShow.asMap().entries.map(
-                        (entry) => _buildModernSellerBid(
+                            (entry) => _buildModernSellerBid(
                           entry.value,
                           request,
                           entry.key + 1,
@@ -2332,9 +3104,9 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                     try {
                       // Create or get conversation for this request (without auth)
                       final conversationData =
-                          await ChatService.createOrGetConversationForRequest(
-                            _getRequestId(request),
-                          );
+                      await ChatService.createOrGetConversationForRequest(
+                        _getRequestId(request),
+                      );
 
                       // Close loading dialog
                       Navigator.of(context).pop();
@@ -2351,7 +3123,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                                   description: _getRequestDescription(request),
                                 ),
                                 messages:
-                                    [], // Empty - will be loaded from backend
+                                [], // Empty - will be loaded from backend
                               ),
                             ),
                           ),
@@ -2410,6 +3182,251 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     );
   }
 
+  /*  Widget _buildModernSellerBid(
+    dynamic bid,
+    dynamic request, [
+    int? sellerIndex,
+  ])
+  {
+    String sellerName = sellerIndex != null
+        ? "Seller #$sellerIndex"
+        : _getSellerName(bid);
+    double bidAmount = _getBidAmount(bid);
+    DateTime bidTime = _getBidTime(bid);
+    double rating = _getBidRating(bid);
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          // Seller info and bid details
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Header with seller name, timestamp, and accept button
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            sellerName,
+                            style: GoogleFonts.manrope(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            _formatDateTime(bidTime),
+                            style: GoogleFonts.manrope(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Expand/Collapse icon
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.grey.shade600,
+                      size: 20,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                // Bid amount and accept button
+                Row(
+                  children: [
+                    Text(
+                      'Bid: ',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    Text(
+                      'R${bidAmount.toInt()}',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Spacer(),
+                    InkWell(
+                      onTap: () {
+                        _showConfirmationDialog(context, bid, request);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade500,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          'Accept',
+                          style: GoogleFonts.manrope(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Rating and Group Chat section
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Color(0xFF2B3A5C), // Dark orange background
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  'Rating: ${rating.toStringAsFixed(1)}/5',
+                  style: GoogleFonts.manrope(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Spacer(),
+                InkWell(
+                  onTap: () async {
+                    // Show loading indicator while creating/getting conversation
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => Center(
+                        child: Container(
+                          padding: EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Constants.ctaColorLight,
+                                ),
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'Loading conversation...',
+                                style: GoogleFonts.manrope(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+
+                    try {
+                      // Create or get conversation for this request (without auth)
+                      final conversationData =
+                          await ChatService.createOrGetConversationForRequest(
+                            _getRequestId(request),
+                          );
+
+                      // Close loading dialog
+                      Navigator.of(context).pop();
+
+                      if (conversationData != null) {
+                        // Navigate to GroupChat with backend integration
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GroupChatScreen(
+                              groupChat: GroupChat(
+                                uuid: _getRequestId(request),
+                                request: ProductRequest(
+                                  description: _getRequestDescription(request),
+                                ),
+                                messages:
+                                    [], // Empty - will be loaded from backend
+                              ),
+                            ),
+                          ),
+                        );
+                      } else {
+                        // Show error if backend returns null
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Unable to create conversation. Please try again.',
+                            ),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      // Close loading dialog and show error
+                      Navigator.of(context).pop();
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Failed to load conversation. Please try again.',
+                          ),
+                          backgroundColor: Colors.red,
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                  },
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.chat_bubble_outline,
+                        color: Colors.orange.shade500,
+                        size: 16,
+                      ),
+                      SizedBox(width: 6),
+                      Text(
+                        'Group Chat',
+                        style: GoogleFonts.manrope(
+                          color: Colors.orange.shade500,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }*/
 
   // View All Bids button
   Widget _buildViewAllBidsButton(int totalBids) {
@@ -2482,10 +3499,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     }
   }
 
-  String _formatDate(DateTime? date) {
-    if (date == null) return "Date unavailable";
-    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
-  }
+
 
   String _getElapsedTime(DateTime? createdAt, String unit) {
     if (createdAt == null) return "0";
@@ -2496,15 +3510,15 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       case 'days':
         return difference.inDays.toString();
       case 'hours':
-        // Hours remaining after accounting for days (0-23)
+      // Hours remaining after accounting for days (0-23)
         final remainingHours = difference.inHours % 24;
         return remainingHours.toString();
       case 'minutes':
-        // Minutes remaining after accounting for hours (0-59)
+      // Minutes remaining after accounting for hours (0-59)
         final remainingMinutes = difference.inMinutes % 60;
         return remainingMinutes.toString();
       case 'seconds':
-        // Seconds remaining after accounting for minutes (0-59)
+      // Seconds remaining after accounting for minutes (0-59)
         final remainingSeconds = difference.inSeconds % 60;
         return remainingSeconds.toString();
       default:
@@ -2719,9 +3733,9 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                           try {
                             // Create or get conversation for this request (without auth)
                             final conversationData =
-                                await ChatService.createOrGetConversationForRequest(
-                                  _getRequestId(request),
-                                );
+                            await ChatService.createOrGetConversationForRequest(
+                              _getRequestId(request),
+                            );
 
                             // Close loading dialog
                             Navigator.of(context).pop();
@@ -2740,7 +3754,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                                         ),
                                       ),
                                       messages:
-                                          [], // Empty - will be loaded from backend
+                                      [], // Empty - will be loaded from backend
                                     ),
                                   ),
                                 ),
@@ -3084,10 +4098,9 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
   // Payment processing and order creation
   Future<void> _processPaymentAndCreateOrder(
-    dynamic seller,
-    dynamic request,
-  ) async
-  {
+      dynamic seller,
+      dynamic request,
+      ) async {
     try {
       // Show loading indicator
       ApiService apiService = ApiService();
@@ -3168,7 +4181,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
         final responseData = json.decode(response.body);
         final orderId =
             responseData['id']?.toString() ??
-            responseData['order_id']?.toString();
+                responseData['order_id']?.toString();
 
         if (orderId != null) {
           // Update order status to PAID
@@ -3181,7 +4194,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
             if (updateResult['success']) {
               print('Order status updated to PAID successfully');
-              
+
               // Navigate to Transaction Management tab
               setState(() {
                 dashboardIndex = 2; // Transaction Management tab
@@ -3226,10 +4239,10 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
   // Confirmation Dialog
   void _showConfirmationDialog(
-    BuildContext context,
-    dynamic seller,
-    dynamic request,
-  ) {
+      BuildContext context,
+      dynamic seller,
+      dynamic request,
+      ) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -3432,10 +4445,10 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
   // Payment Dialog
   void _showPaymentDialog(
-    BuildContext context,
-    dynamic seller,
-    dynamic request,
-  ) {
+      BuildContext context,
+      dynamic seller,
+      dynamic request,
+      ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -3761,14 +4774,14 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     try {
       final response = await http
           .get(
-            Uri.parse(
-              'http://108.141.192.60/api/v1/product-requests/requests/',
-            ),
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-          )
+        Uri.parse(
+          'http://108.141.192.60/api/v1/product-requests/requests/',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      )
           .timeout(Duration(seconds: 5));
       print('Without /products/ - Status: ${response.statusCode}');
       if (response.statusCode == 200) {
@@ -3794,11 +4807,11 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     try {
       final response = await http
           .get(
-            Uri.parse(
-              'http://127.0.0.1:8005/api/v1/product-requests/requests/',
-            ),
-            headers: {'User-Agent': 'Flutter App', 'Accept': '*/*'},
-          )
+        Uri.parse(
+          'http://127.0.0.1:8005/api/v1/product-requests/requests/',
+        ),
+        headers: {'User-Agent': 'Flutter App', 'Accept': '*/*'},
+      )
           .timeout(Duration(seconds: 5));
       print(
         'Original URL with different headers - Status: ${response.statusCode}',
@@ -3816,7 +4829,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   void _populateGlobalVariables(ProductRequestItem item) {
     switch (item.category) {
       case 'VEHICLE_SPARES':
-        // Convert API item to AutoSparesRequest
+      // Convert API item to AutoSparesRequest
         final autoSparesRequest = _createAutoSparesRequest(item);
         GlobalVariables.combinedRequest.autoSparesRequest.add(
           autoSparesRequest,
@@ -3824,13 +4837,13 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
         break;
 
       case 'TYRES_RIMS':
-        // Convert API item to RimTyreRequest
+      // Convert API item to RimTyreRequest
         final rimTyreRequest = _createRimTyreRequest(item);
         GlobalVariables.combinedRequest.rimTyreRequest.add(rimTyreRequest);
         break;
 
       case 'ELECTRONICS':
-        // Convert API item to ConsumerElectronicsRequest
+      // Convert API item to ConsumerElectronicsRequest
         final electronicsRequest = _createElectronicsRequest(item);
         GlobalVariables.combinedRequest.consumerElectronicsRequest.add(
           electronicsRequest,
@@ -3936,8 +4949,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   }
 
   ConsumerElectronicsRequest _createElectronicsRequest(
-    ProductRequestItem item,
-  ) {
+      ProductRequestItem item,
+      ) {
     // Parse consumer electronics summary
     final parts =
         item.consumerElectronicsSummary?.split(' - ') ?? [item.title, ''];
@@ -4019,6 +5032,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     }
     return 'Unknown';
   }
+
 
   String? _extractModelFromSummary(String? summary) {
     if (summary == null) return null;
@@ -4556,12 +5570,12 @@ class SparesDetailScreen extends StatefulWidget {
   State<SparesDetailScreen> createState() => _SparesDetailScreenState();
 
   static void showAsDialog(
-    BuildContext context, {
-    required int index,
-    required AutoSparesRequest request,
-    required AutoSpares autoSpare,
-    required List<dynamic> bids,
-  }) {
+      BuildContext context, {
+        required int index,
+        required AutoSparesRequest request,
+        required AutoSpares autoSpare,
+        required List<dynamic> bids,
+      }) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -4869,11 +5883,11 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               "Description -",
@@ -4889,11 +5903,11 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                                 "View Details",
                                                 style: GoogleFonts.manrope(
                                                   color:
-                                                      Constants.ftaColorLight,
+                                                  Constants.ftaColorLight,
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
                                                   decoration:
-                                                      TextDecoration.underline,
+                                                  TextDecoration.underline,
                                                 ),
                                               ),
                                             ),
@@ -5166,10 +6180,10 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
   }
 
   Widget _buildDetailCard(
-    String title,
-    Color borderColor,
-    List<Widget> children,
-  ) {
+      String title,
+      Color borderColor,
+      List<Widget> children,
+      ) {
     return CustomCard(
       elevation: 3,
       color: Colors.white,
@@ -5215,11 +6229,11 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
   }
 
   Widget _buildDetailItem(
-    String label,
-    String value, {
-    bool showImage = false,
-    bool isProductImages = false,
-  }) {
+      String label,
+      String value, {
+        bool showImage = false,
+        bool isProductImages = false,
+      }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16),
       child: Column(
@@ -5526,12 +6540,12 @@ class ConsumerElectronicsDetailScreen extends StatefulWidget {
       _ConsumerElectronicsDetailScreenState();
 
   static void showAsDialog(
-    BuildContext context, {
-    required int index,
-    required ConsumerElectronicsRequest request,
-    required ConsumerElectronics consumerElectronics,
-    required List<dynamic> bids,
-  }) {
+      BuildContext context, {
+        required int index,
+        required ConsumerElectronicsRequest request,
+        required ConsumerElectronics consumerElectronics,
+        required List<dynamic> bids,
+      }) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -5840,11 +6854,11 @@ class _ConsumerElectronicsDetailScreenState
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               "Description -",
@@ -5860,11 +6874,11 @@ class _ConsumerElectronicsDetailScreenState
                                                 "View Details",
                                                 style: GoogleFonts.manrope(
                                                   color:
-                                                      Constants.ftaColorLight,
+                                                  Constants.ftaColorLight,
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
                                                   decoration:
-                                                      TextDecoration.underline,
+                                                  TextDecoration.underline,
                                                 ),
                                               ),
                                             ),
@@ -5974,9 +6988,9 @@ class _ConsumerElectronicsDetailScreenState
                                   _buildDetailItem(
                                     "Model Series",
                                     widget
-                                            .consumerElectronics
-                                            .productDetails
-                                            .modelSeries ??
+                                        .consumerElectronics
+                                        .productDetails
+                                        .modelSeries ??
                                         "-",
                                   ),
                                   _buildDetailItem(
@@ -6014,20 +7028,20 @@ class _ConsumerElectronicsDetailScreenState
                                   _buildDetailItem(
                                     "Min Price",
                                     widget
-                                                .consumerElectronics
-                                                .budgetTimeline
-                                                .minPrice !=
-                                            null
+                                        .consumerElectronics
+                                        .budgetTimeline
+                                        .minPrice !=
+                                        null
                                         ? "\$${widget.consumerElectronics.budgetTimeline.minPrice!.toStringAsFixed(2)}"
                                         : "-",
                                   ),
                                   _buildDetailItem(
                                     "Max Price",
                                     widget
-                                                .consumerElectronics
-                                                .budgetTimeline
-                                                .maxPrice !=
-                                            null
+                                        .consumerElectronics
+                                        .budgetTimeline
+                                        .maxPrice !=
+                                        null
                                         ? "\$${widget.consumerElectronics.budgetTimeline.maxPrice!.toStringAsFixed(2)}"
                                         : "-",
                                   ),
@@ -6041,9 +7055,9 @@ class _ConsumerElectronicsDetailScreenState
                                   _buildDetailItem(
                                     "Needs Installation",
                                     widget
-                                            .consumerElectronics
-                                            .budgetTimeline
-                                            .needsInstallation
+                                        .consumerElectronics
+                                        .budgetTimeline
+                                        .needsInstallation
                                         ? "Yes"
                                         : "No",
                                   ),
@@ -6060,17 +7074,17 @@ class _ConsumerElectronicsDetailScreenState
                                   _buildDetailItem(
                                     "Required Features",
                                     widget
-                                            .consumerElectronics
-                                            .featuresAndSpecs
-                                            .requiredFeatures ??
+                                        .consumerElectronics
+                                        .featuresAndSpecs
+                                        .requiredFeatures ??
                                         "-",
                                   ),
                                   _buildDetailItem(
                                     "Additional Comments",
                                     widget
-                                            .consumerElectronics
-                                            .featuresAndSpecs
-                                            .additionalComments ??
+                                        .consumerElectronics
+                                        .featuresAndSpecs
+                                        .additionalComments ??
                                         "-",
                                   ),
                                   _buildDetailItem(
@@ -6151,10 +7165,10 @@ class _ConsumerElectronicsDetailScreenState
   }
 
   Widget _buildDetailCard(
-    String title,
-    Color borderColor,
-    List<Widget> children,
-  ) {
+      String title,
+      Color borderColor,
+      List<Widget> children,
+      ) {
     return CustomCard(
       elevation: 3,
       color: Colors.white,
@@ -6200,12 +7214,12 @@ class _ConsumerElectronicsDetailScreenState
   }
 
   Widget _buildDetailItem(
-    String label,
-    String value, {
-    bool showImage = false,
-    bool isProductImages = false,
-    List<String>? imageList,
-  }) {
+      String label,
+      String value, {
+        bool showImage = false,
+        bool isProductImages = false,
+        List<String>? imageList,
+      }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16),
       child: Column(
@@ -6571,12 +7585,12 @@ class RimTyreDetailScreen extends StatefulWidget {
   State<RimTyreDetailScreen> createState() => _RimTyreDetailScreenState();
 
   static void showAsDialog(
-    BuildContext context, {
-    required int index,
-    required RimTyreRequest request,
-    required RimTyre rimTyre,
-    required List<dynamic> bids,
-  }) {
+      BuildContext context, {
+        required int index,
+        required RimTyreRequest request,
+        required RimTyre rimTyre,
+        required List<dynamic> bids,
+      }) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -6601,6 +7615,53 @@ class RimTyreDetailScreen extends StatefulWidget {
 }
 
 class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
+  String _getRequestDescription(dynamic request, dynamic item) {
+    try {
+      if (request?.category == null) return "No description available";
+
+      switch (request.category) {
+        case "Vehicle Spares":
+          if (item?.partDetails?.partName != null &&
+              item?.vehicleDetails?.makeModel != null &&
+              item?.vehicleDetails?.year != null) {
+            return "${item.partDetails.partName}, ${item.vehicleDetails
+                .makeModel}, ${item.vehicleDetails.year}";
+          }
+          return "Vehicle Spares Request";
+
+        case "Vehicle Tyres and Rims":
+          if (item?.productDetails != null) {
+            final typeOfElectronics =
+                item.productDetails.typeOfElectronics ?? "Electronics";
+            final brandPreference =
+                item.productDetails.brandPreference ?? "Various Brands";
+            final modelSeries = item.productDetails.modelSeries;
+            return "$typeOfElectronics, $brandPreference${modelSeries != null
+                ? ', $modelSeries'
+                : ''}";
+          }
+          return "Electronics Request";
+
+        case "Consumer Electronics":
+          if (item?.productDetails != null) {
+            final tyreType = item.productDetails.tyreType ?? "Tyres";
+            final tyreWidth = item.productDetails.tyreWidthMm ?? 0;
+            final sidewall = item.productDetails.sidewallProfile ?? "";
+            final rimDiameter =
+                item.productDetails.wheelRimDiameterInches ?? "";
+            final brand = item.moreFields?.preferredBrand ?? "Various Brands";
+            return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
+          }
+          return "Tyre/Rim Request";
+
+        default:
+          return "Request #${_getRequestId(request)}";
+      }
+    } catch (e) {
+      print('Error getting description: $e');
+      return "Request information unavailable3";
+    }
+  }
   String _getRequestId(dynamic request) {
     // Handle ProductRequestItem from API
     if (request is ProductRequestItem) {
@@ -6729,6 +7790,363 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
       default:
         return "0";
     }
+  }
+  void _showConfirmationDialog(
+      BuildContext context,
+      dynamic seller,
+      dynamic request,
+      ) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(24),
+            width: 300,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Constants.ctaColorLight,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    CupertinoIcons.exclamationmark_circle_fill,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  "Are You Sure !",
+                  style: GoogleFonts.manrope(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  "By clicking the pay button you accept the offer made by this seller",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.manrope(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(360),
+                            side: BorderSide(color: Colors.grey[300]!),
+                          ),
+                        ),
+                        child: Text(
+                          "Cancel",
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _showPaymentDialog(context, seller, request);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(360),
+                          ),
+                        ),
+                        child: Text(
+                          "Pay",
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  void _showPaymentDialog(
+      BuildContext context,
+      dynamic seller,
+      dynamic request,
+      ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          width: MediaQuery.of(context).size.width * 0.3,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Payment",
+                    style: GoogleFonts.manrope(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Constants.ftaColorLight,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.close, color: Colors.grey),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+
+              // Credit Card Payments
+              Text(
+                "Credit Card Payments1",
+                style: GoogleFonts.manrope(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Constants.ftaColorLight,
+                ),
+              ),
+              SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildPaymentIcon("lib/assets/images/Visa.png"),
+                  SizedBox(width: 12),
+                  _buildPaymentIcon("lib/assets/images/Mastercard.png"),
+                  SizedBox(width: 12),
+                  _buildPaymentIcon("lib/assets/images/DinnersClub.png"),
+                  SizedBox(width: 12),
+                  _buildPaymentIcon("lib/assets/images/American-Express.png"),
+                ],
+              ),
+              SizedBox(height: 20),
+
+              // Instant EFT
+              Text(
+                "Instant EFT",
+                style: GoogleFonts.manrope(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Constants.ftaColorLight,
+                ),
+              ),
+              SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildPaymentIcon("lib/assets/images/absa.png"),
+                  SizedBox(width: 12),
+                  _buildPaymentIcon("lib/assets/images/sid.png"),
+                  SizedBox(width: 12),
+                  _buildPaymentIcon("lib/assets/images/standard.png"),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  _buildPaymentIcon("lib/assets/images/sid.png"),
+                  SizedBox(width: 12),
+                  _buildPaymentIcon("lib/assets/images/nedbank.png"),
+                ],
+              ),
+              SizedBox(height: 20),
+
+              // QR Code Payments
+              Text(
+                "QR Code Payments",
+                style: GoogleFonts.manrope(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Constants.ftaColorLight,
+                ),
+              ),
+              SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildPaymentIcon("lib/assets/images/zapper.png"),
+                  SizedBox(width: 12),
+                  _buildPaymentIcon("lib/assets/images/snapscan.png"),
+                ],
+              ),
+              SizedBox(height: 20),
+
+              // UPI
+              Text(
+                "UPI",
+                style: GoogleFonts.manrope(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Constants.ftaColorLight,
+                ),
+              ),
+              SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildPaymentIcon("lib/assets/images/applePay.png"),
+                  SizedBox(width: 12),
+                  _buildPaymentIcon("lib/assets/images/GPay.png"),
+                  SizedBox(width: 12),
+                  _buildPaymentIcon("lib/assets/images/SamsungPay.png"),
+                  SizedBox(width: 12),
+                  _buildPaymentIcon("lib/assets/images/mobi.png"),
+                ],
+              ),
+              SizedBox(height: 20),
+
+              // Debit Cards
+              Text(
+                "Debit Cards",
+                style: GoogleFonts.manrope(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Constants.ftaColorLight,
+                ),
+              ),
+              SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildPaymentIcon("lib/assets/images/Mastercard.png"),
+                  SizedBox(width: 12),
+                  _buildPaymentIcon("lib/assets/images/visa2.png"),
+                  SizedBox(width: 12),
+                  _buildPaymentIcon("lib/assets/images/American-Express.png"),
+                ],
+              ),
+              SizedBox(height: 20),
+
+              // Total and Continue Button
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "R${_getBidAmount(seller).toStringAsFixed(2)}",
+                          style: GoogleFonts.manrope(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          "Total Amount",
+                          style: GoogleFonts.manrope(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        Text(
+                          "View Details",
+                          style: GoogleFonts.manrope(
+                            fontSize: 12,
+                            color: Colors.orange,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        // Handle payment completion and order creation
+                        await _processPaymentAndCreateOrder(seller, request);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Constants.ctaColorLight,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(360),
+                        ),
+                      ),
+                      child: Text(
+                        "Continue",
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+  Widget _buildPaymentIcon(String assetPath) {
+    return Container(
+      width: 60,
+      height: 40,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Image.asset(
+          assetPath,
+          width: 40,
+          height: 25,
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
   }
 
   @override
@@ -6884,11 +8302,11 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               "Description -",
@@ -6904,11 +8322,11 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                                 "View Details",
                                                 style: GoogleFonts.manrope(
                                                   color:
-                                                      Constants.ftaColorLight,
+                                                  Constants.ftaColorLight,
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
                                                   decoration:
-                                                      TextDecoration.underline,
+                                                  TextDecoration.underline,
                                                 ),
                                               ),
                                             ),
@@ -7035,7 +8453,12 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                   ),
                                   _buildDetailItem(
                                     "Tyre Size",
-                                    "${widget.rimTyre.productDetails.tyreWidthMm}/${widget.rimTyre.productDetails.sidewallProfile}R${widget.rimTyre.productDetails.wheelRimDiameterInches}",
+                                    "${widget.rimTyre.productDetails
+                                        .tyreWidthMm}/${widget.rimTyre
+                                        .productDetails
+                                        .sidewallProfile}R${widget.rimTyre
+                                        .productDetails
+                                        .wheelRimDiameterInches}",
                                   ),
                                 ],
                               ),
@@ -7097,9 +8520,9 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                   _buildDetailItem(
                                     "Tyre Rotation Required",
                                     widget
-                                            .rimTyre
-                                            .moreFields
-                                            .tyreRotationRequired
+                                        .rimTyre
+                                        .moreFields
+                                        .tyreRotationRequired
                                         ? "Yes"
                                         : "No",
                                   ),
@@ -7108,7 +8531,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                     "",
                                     isProductImages: true,
                                     imageList:
-                                        widget.rimTyre.moreFields.imageUrls,
+                                    widget.rimTyre.moreFields.imageUrls,
                                   ),
                                 ],
                               ),
@@ -7127,62 +8550,333 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
       ),
     );
   }
-
-  String _getRequestDescription(dynamic request, dynamic item) {
+  Future<void> _processPaymentAndCreateOrder(
+      dynamic seller,
+      dynamic request,
+      ) async
+  {
     try {
-      if (request?.category == null) return "No description available";
+      // Show loading indicator
+      ApiService apiService = ApiService();
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(
+          child: Container(
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Constants.ctaColorLight,
+                  ),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Processing Payment...',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      // Extract UID from username by removing 'seller_' prefix
+      final sellerUid = seller.sellerId.username.startsWith('seller_')
+          ? seller.sellerId.username.substring(7)
+          : seller.sellerId.username;
 
-      switch (request.category) {
-        case "Vehicle Spares":
-          if (item?.partDetails?.partName != null &&
-              item?.vehicleDetails?.makeModel != null &&
-              item?.vehicleDetails?.year != null) {
-            return "${item.partDetails.partName}, ${item.vehicleDetails.makeModel}, ${item.vehicleDetails.year}";
+      print("Processing payment for buyer: $sellerUid");
+
+      // Create order data required by backend
+      //ApiService.updateOrderStatus(orderId: '', status: '');
+      final orderData = {
+        'request_id': _getRequestId(request),
+        'quote_id': _getQuoteId(seller),
+        'seller_id': sellerUid,
+        'buyer_id': Constants.currentUser!.uid,
+        // Optionals
+        'delivery_address': null,
+        'special_instructions': null,
+      };
+      print('Order Data: $orderData');
+      print(
+        'Submitting order to: ${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/',
+      );
+
+      // Submit to backend
+      final response = await http.post(
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode(orderData),
+      );
+
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print('Order created successfully: ${response.body}');
+
+        // Parse response to get order ID
+        final responseData = json.decode(response.body);
+        final orderId =
+            responseData['id']?.toString() ??
+                responseData['order_id']?.toString();
+
+        if (orderId != null) {
+          // Update order status to PAID
+          try {
+            final updateResult = await ApiService.updateOrderStatus(
+              orderId: orderId,
+              status: 'PAID',
+              userId: Constants.currentUser?.uid,
+            );
+
+            if (updateResult['success']) {
+              print('Order status updated to PAID successfully');
+
+              // Navigate to Transaction Management tab
+              setState(() {
+                //dashboardIndex = 2; // Transaction Management tab
+              });
+
+              // Show success dialog
+              _showPaymentSuccessfulDialog(context);
+            } else {
+              print('Failed to update order status: ${updateResult['message']}');
+              throw Exception('Failed to update order status: ${updateResult['message']}');
+            }
+          } catch (e) {
+            print('Error updating order status: $e');
+            throw Exception('Error updating order status: $e');
           }
-          return "Vehicle Spares Request";
-
-        case "Vehicle Tyres and Rims":
-          if (item?.productDetails != null) {
-            final typeOfElectronics =
-                item.productDetails.typeOfElectronics ?? "Electronics";
-            final brandPreference =
-                item.productDetails.brandPreference ?? "Various Brands";
-            final modelSeries = item.productDetails.modelSeries;
-            return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
-          }
-          return "Electronics Request";
-
-        case "Consumer Electronics":
-          if (item?.productDetails != null) {
-            final tyreType = item.productDetails.tyreType ?? "Tyres";
-            final tyreWidth = item.productDetails.tyreWidthMm ?? 0;
-            final sidewall = item.productDetails.sidewallProfile ?? "";
-            final rimDiameter =
-                item.productDetails.wheelRimDiameterInches ?? "";
-            final brand = item.moreFields?.preferredBrand ?? "Various Brands";
-            return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
-          }
-          return "Tyre/Rim Request";
-
-        default:
-          return "Request #${_getRequestId(request)}";
+        } else {
+          throw Exception('Order ID not found in response');
+        }
+      } else {
+        throw Exception(
+          'Failed to create order: ${response.statusCode} - ${response.body}',
+        );
       }
     } catch (e) {
-      print('Error getting description: $e');
-      return "Request information unavailable3";
+      // Close loading dialog if still open
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+
+      print('Error processing payment1: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Payment failed: ${_normalizeErrorMessage(e.toString())}',
+          ),
+          backgroundColor: Colors.red[600],
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
   }
-
   String _formatDate(DateTime? date) {
     if (date == null) return "Date unavailable";
-    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+    return "${date.day.toString().padLeft(2, '0')}/${date.month
+        .toString()
+        .padLeft(2, '0')}/${date.year}";
+  }
+  String _getQuoteId(dynamic bid) {
+    if (bid is QuoteItem) {
+      return bid.quoteId?.toString() ?? '';
+    } else if (bid is Seller) {
+      // Seller type may not carry quote_id; return empty
+      return '';
+    } else {
+      // Handle API response format
+      final q = bid['quote_id'];
+      return q != null ? q.toString() : '';
+    }
+  }
+  String _normalizeErrorMessage(String errorMessage) {
+    // Check for specific error patterns and normalize them
+    if (errorMessage.contains(
+      'Cannot create order for request with status: CLOSED',
+    )) {
+      return 'Cannot pay for a bid that has been closed.';
+    }
+
+    // Extract error details from JSON response if present
+    if (errorMessage.contains('Failed to create order:') &&
+        errorMessage.contains('"error"')) {
+      try {
+        // Try to extract the detailed error message
+        final regex = RegExp(r'"message":"([^"]*)"');
+        final match = regex.firstMatch(errorMessage);
+        if (match != null) {
+          String detailedMessage = match.group(1) ?? '';
+          // Further normalize specific messages
+          if (detailedMessage.contains(
+            'Cannot create order for request with status',
+          )) {
+            return 'Cannot pay for a bid that has been closed.';
+          }
+          return detailedMessage;
+        }
+
+        // Try to extract from non_field_errors
+        final nonFieldRegex = RegExp(r'"non_field_errors":\["([^"]*)"');
+        final nonFieldMatch = nonFieldRegex.firstMatch(errorMessage);
+        if (nonFieldMatch != null) {
+          String detailedMessage = nonFieldMatch.group(1) ?? '';
+          if (detailedMessage.contains(
+            'Cannot create order for request with status',
+          )) {
+            return 'Cannot pay for a bid that has been closed.';
+          }
+          return detailedMessage;
+        }
+      } catch (e) {
+        // If parsing fails, fall through to default handling
+      }
+    }
+
+    // Handle other common error patterns
+    if (errorMessage.contains('NetworkException') ||
+        errorMessage.contains('SocketException')) {
+      return 'Network connection error. Please check your internet connection.';
+    }
+
+    if (errorMessage.contains('TimeoutException')) {
+      return 'Request timed out. Please try again.';
+    }
+
+    if (errorMessage.contains('FormatException')) {
+      return 'Invalid response format. Please try again.';
+    }
+
+    // If no specific pattern matches, return a cleaned version
+    // Remove "Exception: " prefix if present
+    String cleanedMessage = errorMessage.replaceFirst('Exception: ', '');
+
+    // Capitalize first letter if needed
+    if (cleanedMessage.isNotEmpty) {
+      cleanedMessage =
+          cleanedMessage[0].toUpperCase() + cleanedMessage.substring(1);
+    }
+
+    return cleanedMessage.isNotEmpty
+        ? cleanedMessage
+        : 'An unexpected error occurred. Please try again.';
+  }
+  void _showPaymentSuccessfulDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(24),
+            width: 300,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: Center(
+                    child: Image.asset(
+                      "lib/assets/images/bag_logo.png",
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: Center(
+                    child: Image.asset(
+                      "lib/assets/images/pay_image.png",
+                      width: 250,
+                      height: 150,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  "Payment Done",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.manrope(
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "Your Payment Has Been Successfully Done",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.manrope(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          setState(() {});
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(360),
+                          ),
+                        ),
+                        child: Text(
+                          "Done",
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  Widget _buildDetailCard(
-    String title,
-    Color borderColor,
-    List<Widget> children,
-  ) {
+  Widget _buildDetailCard(String title,
+      Color borderColor,
+      List<Widget> children,) {
     return CustomCard(
       elevation: 3,
       color: Colors.white,
@@ -7227,13 +8921,12 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
     );
   }
 
-  Widget _buildDetailItem(
-    String label,
-    String value, {
-    bool showImage = false,
-    bool isProductImages = false,
-    List<String>? imageList,
-  }) {
+  Widget _buildDetailItem(String label,
+      String value, {
+        bool showImage = false,
+        bool isProductImages = false,
+        List<String>? imageList,
+      }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16),
       child: Column(
@@ -7393,98 +9086,100 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                   ],
                 ),
               ),
-            ] else ...[
-              // No images available
-              Container(
-                height: 80,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Color(0xFFE0E0E0)),
+            ] else
+              ...[
+                // No images available
+                Container(
+                  height: 80,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Color(0xFFE0E0E0)),
+                  ),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          color: Colors.grey[200],
+                          child: Center(
+                            child: Icon(
+                              Icons.image_not_supported,
+                              color: Colors.grey[400],
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Navigation arrows
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: IconButton(
+                                onPressed: () {
+                                  setState(() {});
+                                },
+                                icon: Icon(
+                                  Icons.arrow_back_ios,
+                                  color: Constants.ftaColorLight,
+                                  size: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: IconButton(
+                                onPressed: () {
+                                  setState(() {});
+                                },
+                                icon: Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: Constants.ftaColorLight,
+                                  size: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        color: Colors.grey[200],
-                        child: Center(
-                          child: Icon(
-                            Icons.image_not_supported,
-                            color: Colors.grey[400],
-                            size: 30,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Navigation arrows
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: IconButton(
-                              onPressed: () {
-                                setState(() {});
-                              },
-                              icon: Icon(
-                                Icons.arrow_back_ios,
-                                color: Constants.ftaColorLight,
-                                size: 12,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: IconButton(
-                              onPressed: () {
-                                setState(() {});
-                              },
-                              icon: Icon(
-                                Icons.arrow_forward_ios,
-                                color: Constants.ftaColorLight,
-                                size: 12,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+              ],
+          ] else
+            if (!showImage) ...[
+              Text(
+                value.isEmpty ? "-" : value,
+                style: GoogleFonts.manrope(
+                  fontSize: 13,
+                  color: Constants.ftaColorLight,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
-          ] else if (!showImage) ...[
-            Text(
-              value.isEmpty ? "-" : value,
-              style: GoogleFonts.manrope(
-                fontSize: 13,
-                color: Constants.ftaColorLight,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
           if (showImage && value.isNotEmpty) ...[
             Text(
               value,
@@ -7656,83 +9351,290 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
     );
   }
 
-  // Helper method to build bid distribution chart
-  Widget _buildBidDistributionChart(Map<String, int> stats) {
-    final total = stats['total']!;
-    if (total == 0) return SizedBox.shrink();
+  Widget _buildSellerBid(dynamic bid, dynamic request) {
+    if (bid == null) return SizedBox.shrink();
 
-    final withBidsPercentage = (stats['withBids']! / total * 100)
-        .roundToDouble();
-    final withoutBidsPercentage = (stats['withoutBids']! / total * 100)
-        .roundToDouble();
+    // Extract data using helper methods to handle both Seller and QuoteItem
+    String sellerName = _getSellerName(bid);
+    double bidAmount = _getBidAmount(bid);
+    DateTime bidTime = _getBidTime(bid);
+    double rating = _getBidRating(bid);
+    String comments = _getBidComments(bid);
+    double distance = _getBidDistance(bid);
 
     return Container(
-      padding: EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 12),
+      width: MediaQuery
+          .of(context)
+          .size
+          .width,
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Constants.ftaColorLight),
+        color: Colors.transparent,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Bid Distribution',
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
-            ),
-          ),
           SizedBox(height: 16),
-          // Pie chart representation
-          SizedBox(
-            height: 150,
-            child: Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 120,
-                    height: 120,
-                    child: CustomPaint(
-                      painter: PieChartPainter(
-                        withBidsPercentage: withBidsPercentage,
-                        withoutBidsPercentage: withoutBidsPercentage,
-                      ),
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    sellerName,
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2B3A5C),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _showConfirmationDialog(context, bid, request);
+                  },
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    shadowColor: Colors.grey.shade400,
+                    backgroundColor: Colors.green,
+                    foregroundColor: Constants.ftaColorLight,
+                    elevation: 3,
+                  ),
+                  child: Text(
+                    "Accept",
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${withBidsPercentage.toStringAsFixed(1)}%',
-                        style: GoogleFonts.manrope(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange[700],
-                        ),
-                      ),
-                      Text(
-                        'With Bids',
-                        style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: Text(
+              _formatBidDateTime(bidTime),
+              style: GoogleFonts.manrope(color: Colors.grey[600], fontSize: 11),
+            ),
+          ),
+          SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: RichText(
+              text: TextSpan(
+                text: 'Bid: ',
+                style: GoogleFonts.manrope(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black54,
+                ),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: " R${bidAmount.toInt()}",
+                    style: GoogleFonts.manrope(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          SizedBox(height: 16),
-          // Legend
+          SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: RichText(
+              text: TextSpan(
+                text: 'Radius/Distance: ',
+                style: GoogleFonts.manrope(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black54,
+                ),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: "${distance.toInt()}Km",
+                    style: GoogleFonts.manrope(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: RichText(
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                text: 'Comments: ',
+                style: GoogleFonts.manrope(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black54,
+                ),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: comments,
+                    style: GoogleFonts.manrope(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 6),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildLegendItem('With Bids', Colors.orange[600]!),
-              SizedBox(width: 24),
-              _buildLegendItem('Without Bids', Colors.orange[600]!),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Constants.ftaColorLight,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(24),
+                      bottomRight: Radius.circular(24),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Rating: ${rating.toInt()}/5",
+                        style: GoogleFonts.manrope(
+                          color: Colors.white,
+                          fontSize: 11,
+                        ),
+                      ),
+                      Spacer(),
+                      OutlinedButton.icon(
+                        onPressed: () async {
+                          // Show loading indicator while creating/getting conversation
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) =>
+                                Center(
+                                  child: Container(
+                                    padding: EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        CircularProgressIndicator(
+                                          valueColor: AlwaysStoppedAnimation<
+                                              Color>(
+                                            Constants.ctaColorLight,
+                                          ),
+                                        ),
+                                        SizedBox(height: 16),
+                                        Text(
+                                          'Loading conversation...',
+                                          style: GoogleFonts.manrope(
+                                            fontSize: 14,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                          );
+
+                          try {
+                            // Create or get conversation for this request (without auth)
+                            final conversationData =
+                            await ChatService.createOrGetConversationForRequest(
+                              _getRequestId(request),
+                            );
+
+                            // Close loading dialog
+                            Navigator.of(context).pop();
+
+                            if (conversationData != null) {
+                              // Navigate to GroupChat with backend integration
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      GroupChatScreen(
+                                        groupChat: GroupChat(
+                                          uuid: _getRequestId(request),
+                                          request: ProductRequest(
+                                            description: _getRequestDescription(
+                                              request,widget.rimTyre
+                                            ),
+                                          ),
+                                          messages:
+                                          [
+                                          ], // Empty - will be loaded from backend
+                                        ),
+                                      ),
+                                ),
+                              );
+                            } else {
+                              // Show error if backend returns null
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Unable to create conversation. Please try again.',
+                                  ),
+                                  backgroundColor: Colors.red,
+                                  duration: Duration(seconds: 3),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            // Close loading dialog and show error
+                            Navigator.of(context).pop();
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Failed to load conversation. Please try again.',
+                                ),
+                                backgroundColor: Colors.red,
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          HugeIcons.strokeRoundedBubbleChat,
+                          color: Constants.ctaColorLight,
+                          size: 18,
+                        ),
+                        label: Text(
+                          "Group Chat",
+                          style: GoogleFonts.manrope(
+                            color: Colors.white,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ],
@@ -7740,117 +9642,149 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
     );
   }
 
-  Widget _buildLegendItem(String label, Color color) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        SizedBox(width: 6),
-        Text(
-          label,
-          style: GoogleFonts.manrope(fontSize: 12, color: Colors.grey[700]),
-        ),
-      ],
-    );
-  }
-}
-
-// Custom painter for pie chart
-class PieChartPainter extends CustomPainter {
-  final double withBidsPercentage;
-  final double withoutBidsPercentage;
-
-  PieChartPainter({
-    required this.withBidsPercentage,
-    required this.withoutBidsPercentage,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-
-    // Paint for with bids
-    final withBidsPaint = Paint()
-      ..color = Colors.orange[600]!
-      ..style = PaintingStyle.fill;
-
-    // Paint for without bids
-    final withoutBidsPaint = Paint()
-      ..color = Colors.orange[600]!
-      ..style = PaintingStyle.fill;
-
-    // Draw with bids arc
-    final withBidsAngle = (withBidsPercentage / 100) * 2 * 3.14159;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -3.14159 / 2, // Start from top
-      withBidsAngle,
-      true,
-      withBidsPaint,
-    );
-
-    // Draw without bids arc
-    final withoutBidsAngle = (withoutBidsPercentage / 100) * 2 * 3.14159;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -3.14159 / 2 + withBidsAngle,
-      withoutBidsAngle,
-      true,
-      withoutBidsPaint,
-    );
+  /// Compact version of seller bid for card display (max 5 visible)
+  double _getBidAmount(dynamic bid) {
+    if (bid is Seller) {
+      return bid.bid?.toDouble() ?? 0.0;
+    } else if (bid is QuoteItem) {
+      return bid.totalAmount ?? 0.0;
+    } else {
+      // Handle API response format
+      return (bid['total_amount'] ?? bid['amount'] ?? 0.0).toDouble();
+    }
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
+  double _getBidRating(dynamic bid) {
+    if (bid is Seller) {
+      return bid.rating.toDouble();
+    } else if (bid is QuoteItem) {
+      // For QuoteItem, assume a default rating or look elsewhere
+      return 5.0; // Default rating for QuoteItem
+    } else {
+      // Handle API response format
+      return (bid['rating'] ?? 5.0).toDouble();
+    }
+  }
 
-Widget _buildStatusDot(String letter, String time) {
-  return Column(
-    children: [
-      Container(
-        width: 30,
-        height: 30,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(
-            color: Constants.ftaColorLight.withOpacity(0.4),
-            width: 2,
+  DateTime _getBidTime(dynamic bid) {
+    if (bid is Seller) {
+      return bid.bidTime ?? DateTime.now();
+    } else if (bid is QuoteItem) {
+      return bid.createdAt ?? DateTime.now();
+    } else {
+      // Handle API response format
+      try {
+        String? timeStr = bid['created_at'] ?? bid['bid_time'];
+        if (timeStr != null) {
+          return DateTime.parse(timeStr);
+        }
+      } catch (e) {
+        print('Error parsing bid time: $e');
+      }
+      return DateTime.now();
+    }
+  }
+
+  String _getSellerName(dynamic bid) {
+    if (bid is Seller) {
+      return bid.name;
+    } else if (bid is QuoteItem) {
+      // Combine username and first/last name if available
+      if (bid.sellerId.firstName != null && bid.sellerId.lastName != null) {
+        return "${bid.sellerId.firstName} ${bid.sellerId.lastName}";
+      }
+      return bid.sellerId.username; // Use username as fallback
+    } else {
+      // Handle API response format
+      if (bid['seller_id'] != null) {
+        if (bid['seller_id']['first_name'] != null &&
+            bid['seller_id']['last_name'] != null) {
+          return "${bid['seller_id']['first_name']} ${bid['seller_id']['last_name']}";
+        }
+        return bid['seller_id']['username'] ??
+            bid['seller_name'] ??
+            "Unknown Seller";
+      }
+      return bid['seller_name'] ?? "Unknown Seller";
+    }
+  }
+
+  String _getBidComments(dynamic bid) {
+    if (bid is Seller) {
+      return bid.comment;
+    } else if (bid is QuoteItem) {
+      // QuoteItem doesn't have notes, use another field or status
+      return "Quote ID: ${bid.quoteId}. Delivery: ${bid.estimatedDeliveryDays ??
+          'Not specified'} days";
+    } else {
+      // Handle API response format
+      return bid['comment'] ?? bid['notes'] ?? bid['comments'] ?? "No comments";
+    }
+  }
+
+  double _getBidDistance(dynamic bid) {
+    if (bid is Seller) {
+      return bid.radius?.toDouble() ?? 0.0;
+    } else if (bid is QuoteItem) {
+      // For QuoteItem, distance might be in delivery details
+      return bid.estimatedDeliveryDays?.toDouble() ??
+          0.0; // Or use a different field
+    } else {
+      // Handle API response format
+      return (bid['distance'] ?? bid['radius'] ?? 0.0).toDouble();
+    }
+  }
+
+  Widget _buildViewAllBidsButton(int totalBids, TypographyConfig typography,
+      SpacingConfig spacing) {
+    return Container(
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: () {
+          // Navigate to all bids view
+        },
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Constants.ctaColorLight,
+          side: BorderSide(color: Constants.ctaColorLight),
+          padding: EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
           ),
-          borderRadius: BorderRadius.circular(360),
-          boxShadow: [
-            BoxShadow(
-              color: Constants.ftaColorLight.withOpacity(0.2),
-              blurRadius: 4,
-              spreadRadius: 1,
-              offset: Offset(0, 1),
-            ),
-          ],
         ),
-        child: Center(
-          child: Text(
-            time,
-            style: GoogleFonts.manrope(
-              color: Colors.black,
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+        child: ResponsiveText(
+          text: "View All $totalBids Bids",
+          type: TextType.medium,
+          fontWeight: FontWeight.w600,
+          color: Constants.ctaColorLight,
         ),
       ),
-      SizedBox(height: 4),
-      Text(
-        letter.toString(),
-        style: GoogleFonts.manrope(
-          color: Constants.ftaColorLight,
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    ],
-  );
+    );
+  }
+
+  List<dynamic> _getSortedBids(dynamic request) {
+    List<dynamic> bids = [];
+
+    if (request?.sellerOffers != null) {
+      bids = List.from(request.sellerOffers);
+      // Sort by total amount (lowest first)
+      bids.sort((a, b) {
+        final aAmount = a?.totalAmount ?? 0.0;
+        final bAmount = b?.totalAmount ?? 0.0;
+        return aAmount.compareTo(bAmount);
+      });
+    }
+
+    return bids;
+  }
+  String _formatBidDateTime(DateTime? bidTime) {
+    if (bidTime == null) return "Time unavailable";
+
+    return "${bidTime.day.toString().padLeft(2, '0')}/${bidTime.month.toString().padLeft(2, '0')}/${bidTime.year} - ${bidTime.hour.toString().padLeft(2, '0')}:${bidTime.minute.toString().padLeft(2, '0')} ${bidTime.hour >= 12 ? 'PM' : 'AM'}";
+  }
+
+  void _navigateToDetailScreen(dynamic request, int index) {
+    // Navigate to detail screen - implement based on your navigation structure
+    print("Navigate to details for request #$index");
+  }
+
 }

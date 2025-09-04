@@ -422,7 +422,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                             children: [
                               SizedBox(width: 32),
                               IconButton(
-                                onPressed: () => Navigator.pop(context),
+                                onPressed: (){
+                                  context.go('/register');
+                                },
                                 style: IconButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   foregroundColor: Constants.ftaColorLight,
