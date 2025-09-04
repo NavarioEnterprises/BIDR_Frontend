@@ -152,7 +152,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
 
   final List<Map<String, String>> categories = [
     {"icon": "lib/assets/images/spares1.png", "icon2": "lib/assets/images/vehicle_light.png","name": "Vehicle\nSpares"},
-    {"icon": "lib/assets/images/rim&type.png","icon2": "lib/assets/images/rims.png", "name": "Vehicle Tyres\nand Rims"},
+    {"icon": "lib/assets/images/rim_and_type.png","icon2": "lib/assets/images/rims.png", "name": "Vehicle Tyres\nand Rims"},
     {
       "icon": "lib/assets/images/consumer.png","icon2": "lib/assets/images/ele_light.png",
       "name": "Consumer \nElectronics",
