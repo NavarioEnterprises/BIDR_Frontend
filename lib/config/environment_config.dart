@@ -86,7 +86,8 @@ class AppConfig {
       chatServiceUrl: "http://74.179.193.18/chat/",
       paymentServiceUrl: "http://74.179.193.18/payments/",
       resolutionServiceUrl: "http://74.179.193.18/resolution/",
-      productsServiceUrl: "http://74.179.193.18/products/",
+      productsServiceUrl:
+          "http://bidr-product-1756960567.westus.azurecontainer.io:8000/",
       notificationsServiceUrl: "http://74.179.193.18/notifications/",
       transactionsServiceUrl: "http://74.179.193.18/transactions/",
       reviewsServiceUrl: "http://74.179.193.18/reviews/",

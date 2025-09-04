@@ -1,20 +1,18 @@
-
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 import '../constants/Constants.dart';
 import '../customWdget/appbar.dart';
 import '../models/alert.dart';
+import '../services/notification_api_service.dart';
 import 'buyer_home.dart';
 
 // Full Notification Page
 class NotificationPage extends StatefulWidget {
   final List<WebNotification> notifications;
 
-  const NotificationPage({
-    Key? key,
-    required this.notifications,
-  }) : super(key: key);
+  const NotificationPage({Key? key, required this.notifications})
+    : super(key: key);
 
   @override
   State<NotificationPage> createState() => _NotificationPageState();
@@ -27,35 +25,65 @@ class _NotificationPageState extends State<NotificationPage>
   late Animation<double> _fadeAnimation;
   String selectedTab = 'Unread'; // Initially select Unread
   bool isLoading = true; // Loading state
+  final NotificationApiService _notificationApiService =
+      NotificationApiService();
 
   @override
   void initState() {
     super.initState();
-    notifications = List.from(widget.notifications);
+    notifications = [];
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
     _animationController.forward();
-    
-    // Simulate loading for 2 seconds
-    Future.delayed(const Duration(seconds: 2), () {
+
+    // Load notifications from backend
+    _loadNotifications();
+  }
+
+  Future<void> _loadNotifications() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      // Use the user's UUID from Constants
+      final userUuid = Constants.currentUser!.uid!;
+      if (userUuid.isNotEmpty) {
+        final fetchedNotifications = await _notificationApiService
+            .getUserNotifications(userUuid);
+        if (mounted) {
+          setState(() {
+            notifications = fetchedNotifications;
+            isLoading = false;
+          });
+        }
+      } else {
+        // If no user UUID, use widget notifications as fallback
+        if (mounted) {
+          setState(() {
+            notifications = List.from(widget.notifications);
+            isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading notifications: $e');
+      // Fallback to widget notifications on error
       if (mounted) {
         setState(() {
+          notifications = List.from(widget.notifications);
           isLoading = false;
         });
       }
-    });
+    }
   }
 
-  void _markAsRead(int id) {
+  void _markAsRead(String id) async {
     setState(() {
       final index = notifications.indexWhere((n) => n.id == id);
       if (index != -1) {
@@ -71,12 +99,26 @@ class _NotificationPageState extends State<NotificationPage>
         );
       }
     });
+
+    // Call API to mark as read in backend
+    try {
+      await _notificationApiService.markAsRead(id);
+    } catch (e) {
+      print('Error marking notification as read: $e');
+    }
   }
 
-  void _deleteNotification(int id) {
+  void _deleteNotification(String id) async {
     setState(() {
       notifications.removeWhere((n) => n.id == id);
     });
+
+    // Call API to delete from backend
+    try {
+      await _notificationApiService.deleteNotification(id);
+    } catch (e) {
+      print('Error deleting notification: $e');
+    }
   }
 
   @override
@@ -146,10 +188,7 @@ class _NotificationPageState extends State<NotificationPage>
               const SizedBox(height: 8),
               Text(
                 'You\'ll see your notifications here when they arrive.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[500],
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
@@ -162,16 +201,17 @@ class _NotificationPageState extends State<NotificationPage>
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Constants.ctaColorLight,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
                 child: const Text(
                   'Go to Dashboard',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -181,7 +221,7 @@ class _NotificationPageState extends State<NotificationPage>
     }
 
     // Show notifications list
-    return  FadeTransition(
+    return FadeTransition(
       opacity: _fadeAnimation,
       child: Padding(
         padding: const EdgeInsets.only(left: 64, right: 64),
@@ -200,16 +240,22 @@ class _NotificationPageState extends State<NotificationPage>
                   ),
                 ),
                 leading: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black),
-                    onPressed: () {
-                      if (Navigator.canPop(context)) {
-                        Navigator.pop(context);
-                      }
+                  icon: const Icon(Icons.arrow_back, color: Colors.black),
+                  onPressed: () {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
                     }
+                  },
                 ),
                 actions: [
+                  IconButton(
+                    icon: Icon(Icons.refresh, color: Constants.ctaColorLight),
+                    onPressed: () async {
+                      await _loadNotifications();
+                    },
+                  ),
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       setState(() {
                         for (var i = 0; i < notifications.length; i++) {
                           final n = notifications[i];
@@ -224,6 +270,16 @@ class _NotificationPageState extends State<NotificationPage>
                           );
                         }
                       });
+
+                      // Call API to mark all as read in backend
+                      try {
+                        final userUuid = Constants.myUid;
+                        if (userUuid.isNotEmpty) {
+                          await _notificationApiService.markAllAsRead(userUuid);
+                        }
+                      } catch (e) {
+                        print('Error marking all notifications as read: $e');
+                      }
                     },
                     child: Text(
                       'Mark all as read',
@@ -235,7 +291,7 @@ class _NotificationPageState extends State<NotificationPage>
                   ),
                 ],
               ),
-              SizedBox(height: 24,),
+              SizedBox(height: 24),
               // Tab buttons
               Row(
                 children: [
@@ -247,7 +303,9 @@ class _NotificationPageState extends State<NotificationPage>
               const SizedBox(height: 24),
               Expanded(
                 child: _buildNotificationList(
-                  selectedTab == 'Unread' ? unreadNotifications : readNotifications,
+                  selectedTab == 'Unread'
+                      ? unreadNotifications
+                      : readNotifications,
                 ),
               ),
             ],
@@ -264,7 +322,7 @@ class _NotificationPageState extends State<NotificationPage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              selectedTab == 'Unread' 
+              selectedTab == 'Unread'
                   ? Icons.mark_email_read_outlined
                   : Icons.drafts_outlined,
               size: 64,
@@ -275,20 +333,14 @@ class _NotificationPageState extends State<NotificationPage>
               selectedTab == 'Unread'
                   ? 'No unread notifications'
                   : 'No read notifications',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Text(
               selectedTab == 'Unread'
                   ? 'All caught up! You have no new notifications.'
                   : 'Your read notifications will appear here.',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
               textAlign: TextAlign.center,
             ),
           ],
@@ -300,14 +352,15 @@ class _NotificationPageState extends State<NotificationPage>
       padding: const EdgeInsets.all(0),
       shrinkWrap: true,
       physics: const ScrollPhysics(),
-      children: notificationList.map((notification) =>
-          _buildNotificationCard(notification)).toList(),
+      children: notificationList
+          .map((notification) => _buildNotificationCard(notification))
+          .toList(),
     );
   }
 
   Widget _buildTabButton(String title, int count) {
     final bool isSelected = selectedTab == title;
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -339,8 +392,8 @@ class _NotificationPageState extends State<NotificationPage>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: isSelected 
-                    ? Colors.white.withOpacity(0.2) 
+                color: isSelected
+                    ? Colors.white.withOpacity(0.2)
                     : Constants.ctaColorLight.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -366,10 +419,7 @@ class _NotificationPageState extends State<NotificationPage>
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(width: 8),
           Container(
@@ -394,7 +444,7 @@ class _NotificationPageState extends State<NotificationPage>
 
   Widget _buildNotificationCard(WebNotification notification) {
     return Dismissible(
-      key: Key(notification.id.toString()),
+      key: Key(notification.id),
       direction: DismissDirection.endToStart,
       background: Container(
         alignment: Alignment.centerRight,
@@ -403,10 +453,7 @@ class _NotificationPageState extends State<NotificationPage>
           color: Colors.red,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Icon(
-          Icons.delete,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (direction) {
         _deleteNotification(notification.id);
@@ -500,20 +547,14 @@ class _NotificationPageState extends State<NotificationPage>
                     const SizedBox(height: 4),
                     Text(
                       notification.body,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       _formatTime(notification.createdAt),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                     ),
                   ],
                 ),
@@ -573,10 +614,7 @@ class _NotificationPageState extends State<NotificationPage>
                       const SizedBox(height: 4),
                       Text(
                         _formatTime(notification.createdAt),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -586,10 +624,7 @@ class _NotificationPageState extends State<NotificationPage>
             const SizedBox(height: 24),
             Text(
               notification.description,
-              style: const TextStyle(
-                fontSize: 16,
-                height: 1.5,
-              ),
+              style: const TextStyle(fontSize: 16, height: 1.5),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -605,10 +640,7 @@ class _NotificationPageState extends State<NotificationPage>
                 ),
                 child: const Text(
                   'Close',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),

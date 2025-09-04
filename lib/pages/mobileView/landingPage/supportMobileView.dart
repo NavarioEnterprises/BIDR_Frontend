@@ -16,6 +16,7 @@ import '../../../customWdget/custom_input2.dart';
 import '../../../models/alert.dart';
 import '../../../models/ticket.dart';
 import '../../../services/ticket_api_service.dart';
+import '../../../services/notification_api_service.dart';
 import '../../notification.dart';
 import '../breakpoints.dart';
 
@@ -2017,6 +2018,8 @@ List<WebNotification> notifications = [];
 class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
+  bool _isLoadingNotifications = false;
+  final NotificationApiService _notificationApiService = NotificationApiService();
 
   @override
   void initState() {
@@ -2029,7 +2032,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
       parent: _animationController,
       curve: Curves.easeInOut,
     );
-    _loadSampleNotifications();
+    _loadNotificationsFromApi();
   }
 
   @override
@@ -2038,11 +2041,48 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
     super.dispose();
   }
 
+  Future<void> _loadNotificationsFromApi() async {
+    setState(() {
+      _isLoadingNotifications = true;
+    });
+
+    try {
+      // Use the user's UUID from Constants
+      final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
+      if (userUuid.isNotEmpty) {
+        final fetchedNotifications = await _notificationApiService.getUserNotifications(userUuid);
+        if (mounted) {
+          setState(() {
+            notifications = fetchedNotifications;
+            _isLoadingNotifications = false;
+          });
+        }
+      } else {
+        // If no user UUID, set empty notifications
+        if (mounted) {
+          setState(() {
+            notifications = [];
+            _isLoadingNotifications = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading notifications from API: $e');
+      // On error, set empty notifications
+      if (mounted) {
+        setState(() {
+          notifications = [];
+          _isLoadingNotifications = false;
+        });
+      }
+    }
+  }
+
   void _loadSampleNotifications() {
     setState(() {
       notifications = [
         WebNotification(
-          id: 1,
+          id: '1',
           title: 'Request Accept',
           body: 'John Doe has accepted the concern. He help...',
           description:
@@ -2052,7 +2092,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
           createdAt: DateTime.now(),
         ),
         WebNotification(
-          id: 2,
+          id: '2',
           title: 'Bank Details Update Succesfully',
           body: 'Lorem ipsum is a placeholder text commonly',
           description:
@@ -2062,7 +2102,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
         ),
         WebNotification(
-          id: 3,
+          id: '3',
           title: 'Your Profile Is Update Succesfully',
           body: 'Lorem ipsum is a placeholder text commonly',
           description:
@@ -2072,7 +2112,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
         ),
         WebNotification(
-          id: 4,
+          id: '4',
           title: 'Seller Profile Update Succesfully',
           body: 'Lorem ipsum is a placeholder text commonly',
           description:
@@ -2082,7 +2122,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
         ),
         WebNotification(
-          id: 5,
+          id: '5',
           title: 'New Order Received',
           body: 'You have received a new order from customer',
           description:
@@ -2092,10 +2132,15 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
           createdAt: DateTime.now().subtract(const Duration(days: 3)),
         ),
       ];
+      _isLoadingNotifications = false;
     });
   }
 
   void _showNotificationDialog() {
+    // Only refresh notifications if we don't have any yet
+    if (notifications.isEmpty && !_isLoadingNotifications) {
+      _loadNotificationsFromApi();
+    }
     _animationController.forward();
     showDialog(
       context: context,
@@ -2172,13 +2217,18 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
   }
 
   Widget _buildAlertStats() {
+    // Calculate stats from actual notifications
+    final totalNotifications = notifications.length;
+    final readNotifications = notifications.where((n) => n.read).length;
+    final unreadNotifications = notifications.where((n) => !n.read).length;
+    
     return Column(
       children: [
-        _buildStatItem('Requests Received', '100'),
+        _buildStatItem('Total Notifications', totalNotifications.toString()),
         const SizedBox(height: 8),
-        _buildStatItem('Requests Answered', '50'),
+        _buildStatItem('Read Notifications', readNotifications.toString()),
         const SizedBox(height: 8),
-        _buildStatItem('Requests Pending', '50'),
+        _buildStatItem('Unread Notifications', unreadNotifications.toString()),
       ],
     );
   }
@@ -2215,6 +2265,61 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
   }
 
   Widget _buildRecentNotifications() {
+    if (_isLoadingNotifications) {
+      return Container(
+        height: 100,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: Constants.ctaColorLight,
+                  strokeWidth: 2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Loading notifications...',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (notifications.isEmpty) {
+      return Container(
+        height: 80,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.notifications_none,
+                color: Colors.grey[400],
+                size: 24,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'No notifications yet',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final recentNotifications = notifications.take(4).toList();
     final groupedNotifications = <String, List<WebNotification>>{};
 

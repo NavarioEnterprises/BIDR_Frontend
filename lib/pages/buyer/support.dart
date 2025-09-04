@@ -19,6 +19,7 @@ import '../mobileView/breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../notification.dart';
+import '../../services/notification_api_service.dart';
 
 class Support extends StatefulWidget {
   @override
@@ -251,17 +252,19 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
               child: Column(
                 children: [
                   Container(
-                    padding: Breakpoints.isTablet(context) 
+                    padding: Breakpoints.isTablet(context)
                         ? EdgeInsets.only(
-                            left: ResponsiveSpacing.getSpacing(context).paddingLarge,
-                            right: ResponsiveSpacing.getSpacing(context).paddingLarge,
-                            top: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                            left: ResponsiveSpacing.getSpacing(
+                              context,
+                            ).paddingLarge,
+                            right: ResponsiveSpacing.getSpacing(
+                              context,
+                            ).paddingLarge,
+                            top: ResponsiveSpacing.getSpacing(
+                              context,
+                            ).paddingLarge,
                           )
-                        : const EdgeInsets.only(
-                            left: 68,
-                            right: 68,
-                            top: 24,
-                          ),
+                        : const EdgeInsets.only(left: 68, right: 68, top: 24),
                     constraints: BoxConstraints(maxWidth: 1600, maxHeight: 600),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2158,11 +2161,18 @@ class BuyerDashboardHeader extends StatefulWidget {
   @override
   State<BuyerDashboardHeader> createState() => _BuyerDashboardHeaderState();
 }
+
 List<WebNotification> notifications = [];
 
-class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with SingleTickerProviderStateMixin {
+class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
+  OverlayEntry? _overlayEntry;
+  bool _isOverlayShown = false;
+  bool _isLoadingNotifications = false;
+  final NotificationApiService _notificationApiService =
+      NotificationApiService();
 
   @override
   void initState() {
@@ -2175,156 +2185,229 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
       parent: _animationController,
       curve: Curves.easeInOut,
     );
-    _loadSampleNotifications();
+    _loadNotificationsFromApi();
   }
 
   @override
   void dispose() {
+    _removeOverlay();
     _animationController.dispose();
     super.dispose();
   }
 
-  void _loadSampleNotifications() {
+  Future<void> _loadNotificationsFromApi() async {
+    if (!mounted) return;
+    
     setState(() {
-      notifications = [
-        WebNotification(
-          id: 1,
-          title: 'Request Accept',
-          body: 'John Doe has accepted the concern. He help...',
-          description:
-          'John Doe has accepted the concern. He will help you with your request.',
-          type: 'accept',
-          read: false,
-          createdAt: DateTime.now(),
-        ),
-        WebNotification(
-          id: 2,
-          title: 'Bank Details Update Succesfully',
-          body: 'Lorem ipsum is a placeholder text commonly',
-          description:
-          'Lorem ipsum is a placeholder text commonly used in the printing industry.',
-          type: 'update',
-          read: false,
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        ),
-        WebNotification(
-          id: 3,
-          title: 'Your Profile Is Update Succesfully',
-          body: 'Lorem ipsum is a placeholder text commonly',
-          description:
-          'Lorem ipsum is a placeholder text commonly used in the printing industry.',
-          type: 'update',
-          read: true,
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        ),
-        WebNotification(
-          id: 4,
-          title: 'Seller Profile Update Succesfully',
-          body: 'Lorem ipsum is a placeholder text commonly',
-          description:
-          'Lorem ipsum is a placeholder text commonly used in the printing industry.',
-          type: 'update',
-          read: true,
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        ),
-        WebNotification(
-          id: 5,
-          title: 'New Order Received',
-          body: 'You have received a new order from customer',
-          description:
-          'You have received a new order from customer. Please check your dashboard.',
-          type: 'order',
-          read: false,
-          createdAt: DateTime.now().subtract(const Duration(days: 3)),
-        ),
-      ];
+      _isLoadingNotifications = true;
     });
+
+    try {
+      // Use the user's UUID from Constants
+      final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
+      print('Loading notifications for user UUID: $userUuid');
+      
+      if (userUuid.isNotEmpty) {
+        final fetchedNotifications = await _notificationApiService
+            .getUserNotifications(userUuid);
+
+        if (mounted) {
+          setState(() {
+            notifications = fetchedNotifications;
+            _isLoadingNotifications = false;
+          });
+        }
+      } else {
+        print('No user UUID found');
+        if (mounted) {
+          setState(() {
+            notifications = [];
+            _isLoadingNotifications = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading notifications from API: $e');
+      // On error, just set empty notifications and stop loading
+      if (mounted) {
+        setState(() {
+          notifications = [];
+          _isLoadingNotifications = false;
+        });
+      }
+    }
   }
 
-  void _showNotificationDialog() {
-    _animationController.forward();
-    showDialog(
-      context: context,
-      barrierDismissible: true,
 
-      barrierColor: Colors.black.withOpacity(0.3),
-      builder: (BuildContext context) {
-        return ScaleTransition(
-          scale: _scaleAnimation,
-          child: Dialog(
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+  void _showNotificationOverlay() {
+    if (_isOverlayShown) {
+      _removeOverlay();
+      return;
+    }
+
+    // Only refresh notifications if we don't have any yet
+    if (notifications.isEmpty && !_isLoadingNotifications) {
+      _loadNotificationsFromApi();
+    }
+
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final Offset offset = renderBox.localToGlobal(Offset.zero);
+    final Size buttonSize = renderBox.size;
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Stack(
+        children: [
+          // Transparent barrier to catch taps outside
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: _removeOverlay,
+              behavior: HitTestBehavior.opaque,
+              child: Container(color: Colors.transparent),
             ),
-            child: Container(
-              width: 320,
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'ALERT',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close, size: 20),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
+          ),
+          // The actual notification overlay
+          Positioned(
+            top: offset.dy + buttonSize.height + 5,
+            right: 68, // Match the padding of the header
+            child: Material(
+              color: Colors.transparent,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                alignment: Alignment.topRight,
+                child: Container(
+                  width: 310,
+                  constraints: BoxConstraints(maxWidth: 310, maxHeight: 6500),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  _buildAlertStats(),
-                  const SizedBox(height: 20),
-                  _buildRecentNotifications(),
-                  const SizedBox(height: 16),
-                  Center(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Constants.buyerAppBarValue = 8;
-                        //appBarValueNotifier.value++;
-                        //sellerHomeValueNotifier.value++;
-                      },
-                      child: Text(
-                        'More Notifications',
-                        style: TextStyle(
-                          color: Constants.ctaColorLight,
-                          fontWeight: FontWeight.w600,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'ALERT',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close, size: 20),
+                                  onPressed: _removeOverlay,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            _buildAlertStats(),
+                            const SizedBox(height: 20),
+                            _buildRecentNotifications(),
+                            const SizedBox(height: 16),
+                            Center(
+                              child: TextButton(
+                                onPressed: () {
+                                  _removeOverlay();
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: true,
+                                    barrierColor: Colors.black.withOpacity(0.5),
+                                    builder: (BuildContext context) {
+                                      return Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        insetPadding: EdgeInsets.all(20),
+                                        child: Container(
+                                          width: 280,
+                                          height: 500,
+                                          constraints: BoxConstraints(
+                                            maxWidth: 280,
+                                            maxHeight: 500,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                            child: NotificationPage(
+                                              notifications: notifications,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Text(
+                                  'View all',
+                                  style: TextStyle(
+                                    color: Constants.ctaColorLight,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
-        );
-      },
-    ).then((_) {
-      _animationController.reset();
-    });
+        ],
+      ),
+    );
+
+    _isOverlayShown = true;
+    _animationController.forward();
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _removeOverlay() {
+    if (_overlayEntry != null) {
+      _animationController.reverse().then((_) {
+        _overlayEntry?.remove();
+        _overlayEntry = null;
+        _isOverlayShown = false;
+      });
+    }
   }
 
   Widget _buildAlertStats() {
+    // Calculate stats from actual notifications
+    final totalNotifications = notifications.length;
+    final readNotifications = notifications.where((n) => n.read).length;
+    final unreadNotifications = notifications.where((n) => !n.read).length;
+
     return Column(
       children: [
-        _buildStatItem('Requests Received', '100'),
+        _buildStatItem('Total Notifications', totalNotifications.toString()),
         const SizedBox(height: 8),
-        _buildStatItem('Requests Answered', '50'),
+        _buildStatItem('Read Notifications', readNotifications.toString()),
         const SizedBox(height: 8),
-        _buildStatItem('Requests Pending', '50'),
+        _buildStatItem('Unread Notifications', unreadNotifications.toString()),
       ],
     );
   }
@@ -2361,6 +2444,51 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
   }
 
   Widget _buildRecentNotifications() {
+    if (_isLoadingNotifications) {
+      return Container(
+        height: 100,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: Constants.ctaColorLight,
+                  strokeWidth: 2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Loading notifications...',
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (notifications.isEmpty) {
+      return Container(
+        height: 80,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.notifications_none, color: Colors.grey[400], size: 24),
+              const SizedBox(height: 4),
+              Text(
+                'No notifications yet',
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final recentNotifications = notifications.take(4).toList();
     final groupedNotifications = <String, List<WebNotification>>{};
 
@@ -2387,7 +2515,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
               ),
             ),
             ...entry.value.map(
-                  (notification) =>
+              (notification) =>
                   _buildNotificationItem(notification, isCompact: true),
             ),
           ],
@@ -2407,9 +2535,9 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
   }
 
   Widget _buildNotificationItem(
-      WebNotification notification, {
-        bool isCompact = false,
-      }) {
+    WebNotification notification, {
+    bool isCompact = false,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -2479,7 +2607,6 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
       padding: EdgeInsets.only(left: 68, right: 68, top: 8, bottom: 8),
       child: Row(
         children: [
-
           Text(
             widget.headerName,
             style: TextStyle(
@@ -2494,10 +2621,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
 
             showBadge: true,
             ignorePointer: false,
-            onTap: () {
-              Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => NotificationPage(notifications: [],)));
-            },
+            onTap: _showNotificationOverlay,
             badgeContent: Text(
               widget.totalAlert.toString(),
               style: TextStyle(

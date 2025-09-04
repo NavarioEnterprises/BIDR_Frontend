@@ -7,13 +7,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
-import 'dart:html' as html;
+import "package:universal_html/html.dart" as html;
 
 import '../../customWdget/appbar.dart';
 import '../../customWdget/dropdownMenu.dart';
 import '../../models/alert.dart';
 import '../../models/request_models.dart';
 import '../../services/chat_service.dart';
+import '../../services/notification_api_service.dart';
 import '../../services/products_management_api_service.dart';
 import '../buyer/share_with_friends.dart';
 import '../buyer/support.dart';
@@ -36,6 +37,8 @@ class _SellerDashboardState extends State<SellerDashboard>
   int tabActiveIndex = 0;
   int selectedSubIndex = 0; // For transaction history tabs
   bool isPinVerifiedSuccessful = false;
+  bool _isLoadingNotifications = false;
+  final NotificationApiService _notificationApiService = NotificationApiService();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _commentsController = TextEditingController();
 
@@ -138,7 +141,7 @@ class _SellerDashboardState extends State<SellerDashboard>
   @override
   void initState() {
     super.initState();
-    _loadSampleNotifications();
+    _loadNotificationsFromApi();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -245,8 +248,7 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   Future<void> _showLocationPermissionDialog({
     bool isPermanentlyDenied = false,
-  }) async
-  {
+  }) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -284,10 +286,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                       ),
                       IconButton(
                         padding: EdgeInsets.zero,
-                        icon: Icon(
-                          Icons.close,
-                          color: Colors.black87,
-                        ),
+                        icon: Icon(Icons.close, color: Colors.black87),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -295,7 +294,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                     ],
                   ),
                   SizedBox(height: 20),
-                  
+
                   // Location icon
                   Center(
                     child: Container(
@@ -319,7 +318,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                     child: Column(
                       children: [
                         Text(
-                          isPermanentlyDenied 
+                          isPermanentlyDenied
                               ? 'Location Permission Denied'
                               : 'Enable Location Services',
                           style: GoogleFonts.manrope(
@@ -563,7 +562,10 @@ class _SellerDashboardState extends State<SellerDashboard>
                 Stack(
                   children: [
                     IconButton(
-                      icon: const Icon(HugeIcons.strokeRoundedNotification01,color: Colors.white,),
+                      icon: const Icon(
+                        HugeIcons.strokeRoundedNotification01,
+                        color: Colors.white,
+                      ),
                       onPressed: _showNotificationDialog,
                     ),
                     if (unreadCount > 0)
@@ -616,7 +618,10 @@ class _SellerDashboardState extends State<SellerDashboard>
                   Padding(
                     padding: const EdgeInsets.only(left: 64, right: 64),
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
                       constraints: BoxConstraints(maxWidth: 1600),
                       decoration: BoxDecoration(
                         color: Constants.ctaColorLight,
@@ -772,8 +777,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                         child: ReviewScreen(),
                       ),
                     ),
-                  ]
-                  else if (tabActiveIndex == 5) ...[
+                  ] else if (tabActiveIndex == 5) ...[
                     Padding(
                       padding: const EdgeInsets.only(left: 64, right: 64),
                       child: Container(
@@ -783,19 +787,17 @@ class _SellerDashboardState extends State<SellerDashboard>
                         child: ProfileManagement(),
                       ),
                     ),
-                  ]
-                    else if (tabActiveIndex == 6) ...[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 64, right: 64),
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            constraints: BoxConstraints(maxWidth: 1600),
-                            //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            child: NotificationPage(notifications: notifications),
-                          ),
-                        ),
-                      ]
-                      else ...[
+                  ] else if (tabActiveIndex == 6) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(left: 64, right: 64),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        constraints: BoxConstraints(maxWidth: 1600),
+                        //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        child: NotificationPage(notifications: notifications),
+                      ),
+                    ),
+                  ] else ...[
                     Container(),
                   ],
                   SizedBox(height: 24),
@@ -809,11 +811,48 @@ class _SellerDashboardState extends State<SellerDashboard>
     );
   }
 
+  Future<void> _loadNotificationsFromApi() async {
+    setState(() {
+      _isLoadingNotifications = true;
+    });
+
+    try {
+      // Use the user's UUID from Constants
+      final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
+      if (userUuid.isNotEmpty) {
+        final fetchedNotifications = await _notificationApiService.getUserNotifications(userUuid);
+        if (mounted) {
+          setState(() {
+            notifications = fetchedNotifications;
+            _isLoadingNotifications = false;
+          });
+        }
+      } else {
+        // If no user UUID, set empty notifications
+        if (mounted) {
+          setState(() {
+            notifications = [];
+            _isLoadingNotifications = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading notifications from API: $e');
+      // On error, set empty notifications
+      if (mounted) {
+        setState(() {
+          notifications = [];
+          _isLoadingNotifications = false;
+        });
+      }
+    }
+  }
+
   void _loadSampleNotifications() {
     setState(() {
       notifications = [
         WebNotification(
-          id: 1,
+          id: '1',
           title: 'Request Accept',
           body: 'John Doe has accepted the concern. He help...',
           description:
@@ -823,7 +862,7 @@ class _SellerDashboardState extends State<SellerDashboard>
           createdAt: DateTime.now(),
         ),
         WebNotification(
-          id: 2,
+          id: '2',
           title: 'Bank Details Update Succesfully',
           body: 'Lorem ipsum is a placeholder text commonly',
           description:
@@ -833,7 +872,7 @@ class _SellerDashboardState extends State<SellerDashboard>
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
         ),
         WebNotification(
-          id: 3,
+          id: '3',
           title: 'Your Profile Is Update Succesfully',
           body: 'Lorem ipsum is a placeholder text commonly',
           description:
@@ -843,7 +882,7 @@ class _SellerDashboardState extends State<SellerDashboard>
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
         ),
         WebNotification(
-          id: 4,
+          id: '4',
           title: 'Seller Profile Update Succesfully',
           body: 'Lorem ipsum is a placeholder text commonly',
           description:
@@ -853,7 +892,7 @@ class _SellerDashboardState extends State<SellerDashboard>
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
         ),
         WebNotification(
-          id: 5,
+          id: '5',
           title: 'New Order Received',
           body: 'You have received a new order from customer',
           description:
@@ -863,10 +902,15 @@ class _SellerDashboardState extends State<SellerDashboard>
           createdAt: DateTime.now().subtract(const Duration(days: 3)),
         ),
       ];
+      _isLoadingNotifications = false;
     });
   }
 
   void _showNotificationDialog() {
+    // Only refresh notifications if we don't have any yet
+    if (notifications.isEmpty && !_isLoadingNotifications) {
+      _loadNotificationsFromApi();
+    }
     _animationController.forward();
     showDialog(
       context: context,
@@ -918,11 +962,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                     child: TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                         tabActiveIndex =6;
+                        tabActiveIndex = 6;
                         sellerHomeValueNotifier.value++;
-                        setState(() {
-
-                        });
+                        setState(() {});
                       },
                       child: Text(
                         'More Notifications',
@@ -945,13 +987,18 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   Widget _buildAlertStats() {
+    // Calculate stats from actual notifications
+    final totalNotifications = notifications.length;
+    final readNotifications = notifications.where((n) => n.read).length;
+    final unreadNotifications = notifications.where((n) => !n.read).length;
+    
     return Column(
       children: [
-        _buildStatItem('Requests Received', '100'),
+        _buildStatItem('Total Notifications', totalNotifications.toString()),
         const SizedBox(height: 8),
-        _buildStatItem('Requests Answered', '50'),
+        _buildStatItem('Read Notifications', readNotifications.toString()),
         const SizedBox(height: 8),
-        _buildStatItem('Requests Pending', '50'),
+        _buildStatItem('Unread Notifications', unreadNotifications.toString()),
       ],
     );
   }
@@ -988,6 +1035,61 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   Widget _buildRecentNotifications() {
+    if (_isLoadingNotifications) {
+      return Container(
+        height: 100,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: Constants.ctaColorLight,
+                  strokeWidth: 2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Loading notifications...',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (notifications.isEmpty) {
+      return Container(
+        height: 80,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.notifications_none,
+                color: Colors.grey[400],
+                size: 24,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'No notifications yet',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final recentNotifications = notifications.take(4).toList();
     final groupedNotifications = <String, List<WebNotification>>{};
 
@@ -4206,7 +4308,7 @@ class _SellerDashboardState extends State<SellerDashboard>
         Row(
           children: [
             SizedBox(
-              width: MediaQuery.of(context).size.width*0.5,
+              width: MediaQuery.of(context).size.width * 0.5,
               child: Column(
                 children: List.generate(
                   3,
@@ -4248,13 +4350,20 @@ class _SellerDashboardState extends State<SellerDashboard>
           padding: EdgeInsets.symmetric(vertical: 24),
           decoration: BoxDecoration(
             color: Colors.transparent,
-            border:Border(bottom: BorderSide(color: isSelected ? Constants.ctaColorLight : Colors.transparent, width: 2.2)),
+            border: Border(
+              bottom: BorderSide(
+                color: isSelected
+                    ? Constants.ctaColorLight
+                    : Colors.transparent,
+                width: 2.2,
+              ),
+            ),
           ),
           child: Text(
             title,
             textAlign: TextAlign.center,
             style: GoogleFonts.manrope(
-              color: isSelected ? Constants.ctaColorLight  : Color(0xFF7F8C8D),
+              color: isSelected ? Constants.ctaColorLight : Color(0xFF7F8C8D),
               fontWeight: FontWeight.w700,
               fontSize: 14,
             ),
@@ -4267,7 +4376,7 @@ class _SellerDashboardState extends State<SellerDashboard>
   Widget _buildTransactionItem() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.only(bottom: 6,top: 6,right: 16,left: 8),
+      padding: EdgeInsets.only(bottom: 6, top: 6, right: 16, left: 8),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade400),
         borderRadius: BorderRadius.circular(360),
@@ -4277,7 +4386,7 @@ class _SellerDashboardState extends State<SellerDashboard>
           Container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color:Colors.transparent,
+              color: Colors.transparent,
 
               border: Border.all(color: Color(0xFF04AD01)),
               shape: BoxShape.circle,
@@ -4436,7 +4545,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                   style: GoogleFonts.manrope(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
-                    color: Constants.ctaColorLight
+                    color: Constants.ctaColorLight,
                   ),
                 ),
                 Spacer(),
