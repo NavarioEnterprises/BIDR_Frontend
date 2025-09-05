@@ -45,31 +45,37 @@ class _SplashScreenState extends State<SplashScreen>
       body: Container(
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          border: Border.all(color: Constants.gtaColorLight, width: 20),
+          border: MediaQuery.of(context).size.width < 800
+              ? null
+              : Border.all(
+                  color: Constants.gtaColorLight,
+                  width: (MediaQuery.of(context).size.width < 800 ? 0 : 20),
+                ),
         ),
 
         child: Row(
           children: [
             // Left side - Background image with overlay
-            Expanded(
-              flex: 2,
-              child: Stack(
-                fit: StackFit.loose,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(0),
-                      topLeft: Radius.circular(0),
+            if (MediaQuery.of(context).size.width > 800)
+              Expanded(
+                flex: 2,
+                child: Stack(
+                  fit: StackFit.loose,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(0),
+                        topLeft: Radius.circular(0),
+                      ),
+                      child: Image.asset(
+                        "lib/assets/covers/Group 1171275363.png",
+                        fit: BoxFit.cover,
+                        height: MediaQuery.of(context).size.height,
+                      ),
                     ),
-                    child: Image.asset(
-                      "lib/assets/covers/Group 1171275363.png",
-                      fit: BoxFit.cover,
-                      height: MediaQuery.of(context).size.height,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
             // Right side - Registration form
             Expanded(
               flex: 5,
@@ -82,176 +88,261 @@ class _SplashScreenState extends State<SplashScreen>
                     topRight: Radius.circular(0),
                   ),
                 ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Logo
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          IconButton(
-                            onPressed: (){
-                              context.go('/login');
-                            },
-                            style: IconButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Constants.ftaColorLight,
-                              elevation: 5,
-                              shadowColor: Colors.black54,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            icon: Icon(
-                              CupertinoIcons.back,
-                              color: Constants.ftaColorLight,
-                            ),
-                          ),
-                          Spacer(),
-                          SizedBox(
-                            width: 180,
-                            height: 180,
-                            child: Image.asset(
-                              "lib/assets/images/bidr_logo_with_text.png",
-                              fit: BoxFit.contain,
-                              width: 180,
-                              height: 180,
-                            ),
-                          ),
-                          Spacer(),
-                          const SizedBox(width: 32),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 40.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Logo
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (MediaQuery.of(context).size.width < 800)
+                              SizedBox(width: 16),
 
-                      // Title
-                      Text(
-                        'How would you like to\nregister your account?',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.manrope(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-
-                      // Account type selection with horizontal layout
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.4,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: accountTypes.asMap().entries.map((entry) {
-                            int index = entry.key;
-                            var accountType = entry.value;
-                            return TweenAnimationBuilder<double>(
-                              tween: Tween<double>(begin: 0.0, end: 1.0),
-                              duration: Duration(
-                                milliseconds: 600 + (index * 200),
-                              ),
-                              curve: Curves.easeOutCubic,
-                              builder: (context, value, child) {
-                                return Transform.translate(
-                                  offset: Offset(0, 30 * (1 - value)),
-                                  child: Opacity(
-                                    opacity: value,
-                                    child: Transform.scale(
-                                      scale: 0.9 + (0.1 * value),
-                                      child: _accountTypeCard(
-                                        accountType["icon"]!,
-                                        accountType["name"]!,
-                                        accountType["description"]!,
-                                        accountType["color"]!,
-                                        accountType["selectedColor"]!,
-                                        accountType["value"]!,
-                                        index,
-                                        selectedIndex,
-                                        () => _onAccountTypeTap(
-                                          index,
-                                          accountType["value"]!,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
+                            IconButton(
+                              onPressed: () {
+                                context.go('/login');
                               },
-                            );
-                          }).toList(),
+                              style: IconButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Constants.ftaColorLight,
+                                elevation: 5,
+                                shadowColor: Colors.black54,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: Icon(
+                                CupertinoIcons.back,
+                                color: Constants.ftaColorLight,
+                              ),
+                            ),
+                            Spacer(),
+                            if (MediaQuery.of(context).size.width > 800)
+                              SizedBox(
+                                width: 180,
+                                height: 180,
+                                child: Image.asset(
+                                  "lib/assets/images/bidr_logo_with_text.png",
+                                  fit: BoxFit.contain,
+                                  width: 180,
+                                  height: 180,
+                                ),
+                              ),
+                            Spacer(),
+                            const SizedBox(width: 32),
+                          ],
                         ),
-                      ),
+                        const SizedBox(height: 24),
 
-                      const SizedBox(height: 20),
+                        // Title
+                        Text(
+                          'How would you like to\nregister your account?',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.manrope(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 40),
 
-                      // Selected account description
-                      Container(
-                        height: 60,
-                        child: selectedIndex != -1
-                            ? AnimatedOpacity(
-                                duration: Duration(milliseconds: 300),
-                                opacity: 1.0,
+                        // Account type selection with horizontal layout
+                        (MediaQuery.of(context).size.width > 800)
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 0.0),
                                 child: Container(
                                   width:
                                       MediaQuery.of(context).size.width * 0.4,
-                                  child: Text(
-                                    accountTypes[selectedIndex]["description"]!,
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 12,
-                                      height: 1.4,
-                                      color: Colors.grey[600],
-                                    ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: accountTypes.asMap().entries.map((
+                                      entry,
+                                    ) {
+                                      int index = entry.key;
+                                      var accountType = entry.value;
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                          top: 12.0,
+                                        ),
+                                        child: TweenAnimationBuilder<double>(
+                                          tween: Tween<double>(
+                                            begin: 0.0,
+                                            end: 1.0,
+                                          ),
+                                          duration: Duration(
+                                            milliseconds: 600 + (index * 200),
+                                          ),
+                                          curve: Curves.easeOutCubic,
+                                          builder: (context, value, child) {
+                                            return Transform.translate(
+                                              offset: Offset(
+                                                0,
+                                                30 * (1 - value),
+                                              ),
+                                              child: Opacity(
+                                                opacity: value,
+                                                child: Transform.scale(
+                                                  scale: 0.9 + (0.1 * value),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                          top: 32.0,
+                                                        ),
+                                                    child: _accountTypeCard(
+                                                      accountType["icon"]!,
+                                                      accountType["name"]!,
+                                                      accountType["description"]!,
+                                                      accountType["color"]!,
+                                                      accountType["selectedColor"]!,
+                                                      accountType["value"]!,
+                                                      index,
+                                                      selectedIndex,
+                                                      () => _onAccountTypeTap(
+                                                        index,
+                                                        accountType["value"]!,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    }).toList(),
                                   ),
                                 ),
                               )
-                            : SizedBox(),
-                      ),
+                            : Container(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: accountTypes.asMap().entries.map((
+                                    entry,
+                                  ) {
+                                    int index = entry.key;
+                                    var accountType = entry.value;
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 8.0,
+                                      ),
+                                      child: TweenAnimationBuilder<double>(
+                                        tween: Tween<double>(
+                                          begin: 0.0,
+                                          end: 1.0,
+                                        ),
+                                        duration: Duration(
+                                          milliseconds: 600 + (index * 200),
+                                        ),
+                                        curve: Curves.easeOutCubic,
+                                        builder: (context, value, child) {
+                                          return Transform.translate(
+                                            offset: Offset(0, 30 * (1 - value)),
+                                            child: Opacity(
+                                              opacity: value,
+                                              child: Transform.scale(
+                                                scale: 0.9 + (0.1 * value),
+                                                child: _accountTypeCard(
+                                                  accountType["icon"]!,
+                                                  accountType["name"]!,
+                                                  accountType["description"]!,
+                                                  accountType["color"]!,
+                                                  accountType["selectedColor"]!,
+                                                  accountType["value"]!,
+                                                  index,
+                                                  selectedIndex,
+                                                  () => _onAccountTypeTap(
+                                                    index,
+                                                    accountType["value"]!,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
 
-                      const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                      // Get Started button
-                      SizedBox(
-                        width: 420,
-                        height: 40,
-                        child: ElevatedButton(
-                          onPressed: selectedIndex != -1
-                              ? () {
-                                  // Handle registration based on selected type
-                                  debugPrint(
-                                    'Selected account type: $selectedAccountType',
-                                  );
-                                  if (selectedAccountType == "seller") {
-                                    context.go('/register/seller');
-                                  } else {
-                                    context.go('/register/buyer');
+                        // Selected account description
+                        Container(
+                          height: 60,
+                          child: selectedIndex != -1
+                              ? AnimatedOpacity(
+                                  duration: Duration(milliseconds: 300),
+                                  opacity: 1.0,
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.4,
+                                    child: Text(
+                                      accountTypes[selectedIndex]["description"]!,
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 12,
+                                        height: 1.4,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // Get Started button
+                        SizedBox(
+                          width: 420,
+                          height: 40,
+                          child: ElevatedButton(
+                            onPressed: selectedIndex != -1
+                                ? () {
+                                    // Handle registration based on selected type
+                                    debugPrint(
+                                      'Selected account type: $selectedAccountType',
+                                    );
+                                    if (selectedAccountType == "seller") {
+                                      context.go('/register/seller');
+                                    } else {
+                                      context.go('/register/buyer');
+                                    }
+                                    setState(() {});
                                   }
-                                  setState(() {});
-                                }
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: selectedIndex != -1
-                                ? Constants.ctaColorLight
-                                : Colors.grey[300],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: selectedIndex != -1
+                                  ? Constants.ctaColorLight
+                                  : Colors.grey[300],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              elevation: selectedIndex != -1 ? 6 : 0,
+                              shadowColor: Colors.black54,
                             ),
-                            elevation: selectedIndex != -1 ? 6 : 0,
-                            shadowColor: Colors.black54,
-                          ),
-                          child: Text(
-                            "Let's Get Started",
-                            style: GoogleFonts.manrope(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: selectedIndex != -1
-                                  ? Colors.white
-                                  : Colors.grey[500],
+                            child: Text(
+                              "Let's Get Started",
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: selectedIndex != -1
+                                    ? Colors.white
+                                    : Colors.grey[500],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

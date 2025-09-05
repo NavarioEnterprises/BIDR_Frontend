@@ -21,6 +21,7 @@ import '../buyer/support.dart';
 import '../buyer_home.dart';
 import '../group_chat.dart';
 import 'enter_pin.dart';
+import 'seller_dashboard_mobile.dart';
 
 enum LeadStatus { open, closed, unsuccessful, pending, inProgress }
 
@@ -540,6 +541,11 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   @override
   Widget build(BuildContext context) {
+    // Show mobile version for screens smaller than 800px
+    if (MediaQuery.of(context).size.width < 800) {
+      return SellerDashboardMobile();
+    }
+    
     final unreadCount = notifications.where((n) => !n.read).length;
     return Scaffold(
       backgroundColor: Colors.white,

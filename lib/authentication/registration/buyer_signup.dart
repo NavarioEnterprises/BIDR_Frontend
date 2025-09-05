@@ -221,15 +221,38 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
   bool _validateForm() {
     // Validate each field using the new validation method
     final fields = [
-      {'name': 'Full Name*', 'value': _fullNameController.text, 'focus': _fullNameFocusNode},
-      {'name': 'Mobile Number*', 'value': _mobileController.text, 'focus': _mobileFocusNode},
-      {'name': 'Email*', 'value': _emailController.text, 'focus': _emailFocusNode},
-      {'name': 'Password*', 'value': _passwordController.text, 'focus': _passwordFocusNode},
-      {'name': 'Confirm Password*', 'value': _confirmPasswordController.text, 'focus': _confirmPasswordFocusNode},
+      {
+        'name': 'Full Name*',
+        'value': _fullNameController.text,
+        'focus': _fullNameFocusNode,
+      },
+      {
+        'name': 'Mobile Number*',
+        'value': _mobileController.text,
+        'focus': _mobileFocusNode,
+      },
+      {
+        'name': 'Email*',
+        'value': _emailController.text,
+        'focus': _emailFocusNode,
+      },
+      {
+        'name': 'Password*',
+        'value': _passwordController.text,
+        'focus': _passwordFocusNode,
+      },
+      {
+        'name': 'Confirm Password*',
+        'value': _confirmPasswordController.text,
+        'focus': _confirmPasswordFocusNode,
+      },
     ];
 
     for (var field in fields) {
-      String? error = _validateField(field['name'] as String, field['value'] as String);
+      String? error = _validateField(
+        field['name'] as String,
+        field['value'] as String,
+      );
       if (error != null) {
         _showFieldError(error, field['focus'] as FocusNode);
         return false;
@@ -290,7 +313,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
           _showFieldError(error, focusNode);
           return;
         }
-        
+
         if (nextFocusNode != null) {
           nextFocusNode.requestFocus();
         } else {
@@ -329,7 +352,8 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
       if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
         return 'Please enter a valid email address';
       }
-    } else if (fieldName.contains('Password') && !fieldName.contains('Confirm')) {
+    } else if (fieldName.contains('Password') &&
+        !fieldName.contains('Confirm')) {
       if (value.isEmpty) {
         return 'Password is required';
       }
@@ -375,31 +399,37 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(0.0),
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-            border: Border.all(color: Constants.gtaColorLight, width: 20),
+            border: MediaQuery.of(context).size.width < 800
+                ? null
+                : Border.all(
+                    color: Constants.gtaColorLight,
+                    width: (MediaQuery.of(context).size.width > 800) ? 20 : 0,
+                  ),
           ),
           child: Row(
             children: [
-              Expanded(
-                flex: 2,
-                child: Stack(
-                  children: [
-                    Image.asset(
-                      "lib/assets/images/sample.jpg",
-                      fit: BoxFit.cover,
-                      height: MediaQuery.of(context).size.height,
-                    ),
-                  ],
+              if (MediaQuery.of(context).size.width > 800)
+                Expanded(
+                  flex: 2,
+                  child: Stack(
+                    children: [
+                      Image.asset(
+                        "lib/assets/images/sample.jpg",
+                        fit: BoxFit.cover,
+                        height: MediaQuery.of(context).size.height,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
               Expanded(
                 flex: 4,
                 child: Container(
-                  height: MediaQuery.of(context).size.height,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -422,7 +452,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                             children: [
                               SizedBox(width: 32),
                               IconButton(
-                                onPressed: (){
+                                onPressed: () {
                                   context.go('/register');
                                 },
                                 style: IconButton.styleFrom(
@@ -440,24 +470,26 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                                 ),
                               ),
                               Spacer(),
-                              Center(
-                                child: Container(
-                                  width: 90,
-                                  height: 90,
-                                  child: Image.asset(
-                                    "lib/assets/images/bidr_logo.png",
-                                    fit: BoxFit.contain,
-                                    width: 90,
-                                    height: 90,
-                                  ),
-                                ),
-                              ),
+                              (MediaQuery.of(context).size.width > 800)
+                                  ? Center(
+                                      child: Container(
+                                        width: 90,
+                                        height: 90,
+                                        child: Image.asset(
+                                          "lib/assets/images/bidr_logo.png",
+                                          fit: BoxFit.contain,
+                                          width: 90,
+                                          height: 90,
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
                               Spacer(),
                               SizedBox(width: 40, height: 40),
                               SizedBox(width: 32),
                             ],
                           ),
-                          const SizedBox(height: 24),
+
                           Center(
                             child: Text(
                               'Sign Up',
@@ -472,24 +504,28 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                           SizedBox(height: 8),
 
                           // Subtitle
-                          Center(
-                            child: Text(
-                              'Create your account to get started in just a few steps',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.manrope(
-                                fontSize: 13,
-                                color: Colors.black45,
+                          (MediaQuery.of(context).size.width > 800)
+                              ? Center(
+                                  child: Text(
+                                    'Create your account to get started in just a few steps',
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 13,
+                                      color: Colors.black45,
 
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                )
+                              : Container(),
                           const SizedBox(height: 24),
 
                           // Full Name input
                           Container(
                             constraints: BoxConstraints(maxWidth: 500),
-                            width: MediaQuery.of(context).size.width * 0.5,
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
                             child: _buildCustomTextField(
                               'Full Name*',
                               _fullNameController,
@@ -503,7 +539,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                           // Mobile Number input
                           Container(
                             constraints: BoxConstraints(maxWidth: 500),
-                            width: MediaQuery.of(context).size.width * 0.5,
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
                             child: _buildCustomTextField(
                               'Mobile Number*',
                               _mobileController,
@@ -517,7 +555,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                           // Email input
                           Container(
                             constraints: BoxConstraints(maxWidth: 500),
-                            width: MediaQuery.of(context).size.width * 0.5,
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
                             child: _buildCustomTextField(
                               'Email*',
                               _emailController,
@@ -530,7 +570,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                           // Password input
                           Container(
                             constraints: BoxConstraints(maxWidth: 500),
-                            width: MediaQuery.of(context).size.width * 0.5,
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
                             child: _buildCustomTextField(
                               'Password*',
                               _passwordController,
@@ -544,7 +586,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                           // Confirm Password input
                           Container(
                             constraints: BoxConstraints(maxWidth: 500),
-                            width: MediaQuery.of(context).size.width * 0.5,
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
                             child: _buildCustomTextField(
                               'Confirm Password*',
                               _confirmPasswordController,
@@ -558,7 +602,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                           // Sign up button
                           Container(
                             constraints: BoxConstraints(maxWidth: 500),
-                            width: MediaQuery.of(context).size.width * 0.5,
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
                             height: 50,
                             child: ElevatedButton(
                               onPressed: _isLoading ? null : _handleSignUp,
@@ -597,7 +643,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                           // Sign in link
                           Container(
                             constraints: BoxConstraints(maxWidth: 500),
-                            width: MediaQuery.of(context).size.width * 0.5,
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
@@ -628,9 +676,13 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                                     backgroundColor: Colors.white,
                                     side: BorderSide.none,
                                     foregroundColor: Constants.ftaColorLight,
-                                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                      vertical: 8,
+                                    ),
                                     minimumSize: Size.zero,
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
                                   ),
                                   child: Text(
                                     'Sign in',

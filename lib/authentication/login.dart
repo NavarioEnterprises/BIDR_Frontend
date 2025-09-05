@@ -125,24 +125,28 @@ class _LoginPageState extends State<LoginPage> {
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-            border: Border.all(color: Constants.gtaColorLight, width: 20),
+            border: Border.all(
+              color: Constants.gtaColorLight,
+              width: (MediaQuery.of(context).size.width > 800) ? 20 : 0,
+            ),
           ),
           child: Row(
             children: [
-              Expanded(
-                flex: 2,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(0),
-                    topLeft: Radius.circular(0),
-                  ),
-                  child: Image.asset(
-                    "lib/assets/covers/Group 1171275363.png",
-                    fit: BoxFit.cover,
-                    height: MediaQuery.of(context).size.height,
+              if (MediaQuery.of(context).size.width > 800)
+                Expanded(
+                  flex: 2,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(0),
+                      topLeft: Radius.circular(0),
+                    ),
+                    child: Image.asset(
+                      "lib/assets/covers/Group 1171275363.png",
+                      fit: BoxFit.cover,
+                      height: MediaQuery.of(context).size.height,
+                    ),
                   ),
                 ),
-              ),
               Expanded(
                 flex: 4,
                 child: Container(
@@ -189,7 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                      
+
                           // Subtitle
                           Center(
                             child: Text(
@@ -202,10 +206,12 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 24),
-                      
+
                           // Email input
                           SizedBox(
-                            width: MediaQuery.of(context).size.height * 0.5,
+                            width: MediaQuery.of(context).size.width > 800
+                                ? MediaQuery.of(context).size.height * 0.5
+                                : MediaQuery.of(context).size.height * 0.8,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -222,10 +228,12 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 24),
-                      
+
                           // Password input
                           SizedBox(
-                            width: MediaQuery.of(context).size.height * 0.5,
+                            width: MediaQuery.of(context).size.width > 800
+                                ? MediaQuery.of(context).size.height * 0.5
+                                : MediaQuery.of(context).size.height * 0.8,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -242,7 +250,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                      
+
                           // Forgot password
                           SizedBox(
                             width: MediaQuery.of(context).size.height * 0.5,
@@ -270,7 +278,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 24),
-                      
+
                           // Sign in button
                           SizedBox(
                             width: MediaQuery.of(context).size.height * 0.5,
@@ -290,9 +298,10 @@ class _LoginPageState extends State<LoginPage> {
                                       height: 20,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.white,
-                                        ),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
                                       ),
                                     )
                                   : Text(
@@ -306,7 +315,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                      
+
                           // Sign up link
                           SizedBox(
                             width: MediaQuery.of(context).size.height * 0.5,

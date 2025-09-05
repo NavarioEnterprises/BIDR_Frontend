@@ -22,6 +22,7 @@ import '../../services/auth_api_service.dart';
 import '../otp_screen.dart';
 import 'complete_business_registration.dart';
 import '../../pages/seller/seller_home_dashboard.dart';
+import 'business_signup_mobile.dart';
 
 class BusinessSignUpPage extends StatefulWidget {
   const BusinessSignUpPage({super.key});
@@ -292,7 +293,10 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       return false;
     }
     if (!_isValidName(_firstNameController.text)) {
-      _showFieldValidationError('First name must contain only letters and spaces', _firstNameFocusNode);
+      _showFieldValidationError(
+        'First name must contain only letters and spaces',
+        _firstNameFocusNode,
+      );
       return false;
     }
     if (_lastNameController.text.trim().isEmpty) {
@@ -300,7 +304,10 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       return false;
     }
     if (!_isValidName(_lastNameController.text)) {
-      _showFieldValidationError('Last name must contain only letters and spaces', _lastNameFocusNode);
+      _showFieldValidationError(
+        'Last name must contain only letters and spaces',
+        _lastNameFocusNode,
+      );
       return false;
     }
     if (_userEmailController.text.trim().isEmpty) {
@@ -308,15 +315,24 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       return false;
     }
     if (!_isValidEmail(_userEmailController.text)) {
-      _showFieldValidationError('Please enter a valid email address', _userEmailFocusNode);
+      _showFieldValidationError(
+        'Please enter a valid email address',
+        _userEmailFocusNode,
+      );
       return false;
     }
     if (_userPhoneController.text.trim().isEmpty) {
-      _showFieldValidationError('Phone number is required', _userPhoneFocusNode);
+      _showFieldValidationError(
+        'Phone number is required',
+        _userPhoneFocusNode,
+      );
       return false;
     }
     if (!_isValidPhoneNumber(_userPhoneController.text)) {
-      _showFieldValidationError('Phone number must be exactly 10 digits', _userPhoneFocusNode);
+      _showFieldValidationError(
+        'Phone number must be exactly 10 digits',
+        _userPhoneFocusNode,
+      );
       return false;
     }
     if (_passwordController.text.isEmpty) {
@@ -324,11 +340,17 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       return false;
     }
     if (_passwordController.text.length < 8) {
-      _showFieldValidationError('Password must be at least 8 characters', _passwordFocusNode);
+      _showFieldValidationError(
+        'Password must be at least 8 characters',
+        _passwordFocusNode,
+      );
       return false;
     }
     if (_confirmPasswordController.text != _passwordController.text) {
-      _showFieldValidationError('Passwords do not match', _confirmPasswordFocusNode);
+      _showFieldValidationError(
+        'Passwords do not match',
+        _confirmPasswordFocusNode,
+      );
       return false;
     }
     return true;
@@ -337,19 +359,32 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   // Company Details Form Validation
   bool _validateCompanyDetailsForm() {
     if (_companyNameController.text.trim().isEmpty) {
-      _showFieldValidationError('Company name is required', focusNodes['companyName']!);
+      _showFieldValidationError(
+        'Company name is required',
+        focusNodes['companyName']!,
+      );
       return false;
     }
     if (_tradingNameController.text.trim().isEmpty) {
-      _showFieldValidationError('Trading name is required', focusNodes['tradingName']!);
+      _showFieldValidationError(
+        'Trading name is required',
+        focusNodes['tradingName']!,
+      );
       return false;
     }
     if (_registrationNumberController.text.trim().isEmpty) {
-      _showFieldValidationError('Registration number is required', focusNodes['registrationNumber']!);
+      _showFieldValidationError(
+        'Registration number is required',
+        focusNodes['registrationNumber']!,
+      );
       return false;
     }
-    if (_vatNumberController.text.trim().isNotEmpty && !_isValidNumbersOnly(_vatNumberController.text, minLength: 10)) {
-      _showFieldValidationError('VAT number must be at least 10 digits', focusNodes['vatNumber']!);
+    if (_vatNumberController.text.trim().isNotEmpty &&
+        !_isValidNumbersOnly(_vatNumberController.text, minLength: 10)) {
+      _showFieldValidationError(
+        'VAT number must be at least 10 digits',
+        focusNodes['vatNumber']!,
+      );
       return false;
     }
     return true;
@@ -358,43 +393,73 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   // Company Address Form Validation
   bool _validateCompanyAddressForm() {
     if (_postalAddressController.text.trim().isEmpty) {
-      _showFieldValidationError('Postal address is required', focusNodes['postalAddress']!);
+      _showFieldValidationError(
+        'Postal address is required',
+        focusNodes['postalAddress']!,
+      );
       return false;
     }
     if (_physicalAddressController.text.trim().isEmpty) {
-      _showFieldValidationError('Physical address is required', focusNodes['physicalAddress']!);
+      _showFieldValidationError(
+        'Physical address is required',
+        focusNodes['physicalAddress']!,
+      );
       return false;
     }
     if (_contactPersonNameController.text.trim().isEmpty) {
-      _showFieldValidationError('Contact person name is required', focusNodes['contactPersonName']!);
+      _showFieldValidationError(
+        'Contact person name is required',
+        focusNodes['contactPersonName']!,
+      );
       return false;
     }
     if (!_isValidName(_contactPersonNameController.text)) {
-      _showFieldValidationError('Contact person name must contain only letters and spaces', focusNodes['contactPersonName']!);
+      _showFieldValidationError(
+        'Contact person name must contain only letters and spaces',
+        focusNodes['contactPersonName']!,
+      );
       return false;
     }
     if (_contactPersonTelephoneController.text.trim().isEmpty) {
-      _showFieldValidationError('Contact person telephone is required', focusNodes['contactPersonTelephone']!);
+      _showFieldValidationError(
+        'Contact person telephone is required',
+        focusNodes['contactPersonTelephone']!,
+      );
       return false;
     }
     if (!_isValidPhoneNumber(_contactPersonTelephoneController.text)) {
-      _showFieldValidationError('Contact telephone must be exactly 10 digits', focusNodes['contactPersonTelephone']!);
+      _showFieldValidationError(
+        'Contact telephone must be exactly 10 digits',
+        focusNodes['contactPersonTelephone']!,
+      );
       return false;
     }
     if (_contactPersonEmailController.text.trim().isEmpty) {
-      _showFieldValidationError('Contact person email is required', focusNodes['contactPersonEmail']!);
+      _showFieldValidationError(
+        'Contact person email is required',
+        focusNodes['contactPersonEmail']!,
+      );
       return false;
     }
     if (!_isValidEmail(_contactPersonEmailController.text)) {
-      _showFieldValidationError('Please enter a valid contact person email', focusNodes['contactPersonEmail']!);
+      _showFieldValidationError(
+        'Please enter a valid contact person email',
+        focusNodes['contactPersonEmail']!,
+      );
       return false;
     }
     if (_platformWorkflowEmailController.text.trim().isEmpty) {
-      _showFieldValidationError('Platform workflow email is required', focusNodes['platformWorkflowEmail']!);
+      _showFieldValidationError(
+        'Platform workflow email is required',
+        focusNodes['platformWorkflowEmail']!,
+      );
       return false;
     }
     if (!_isValidEmail(_platformWorkflowEmailController.text)) {
-      _showFieldValidationError('Please enter a valid platform workflow email', focusNodes['platformWorkflowEmail']!);
+      _showFieldValidationError(
+        'Please enter a valid platform workflow email',
+        focusNodes['platformWorkflowEmail']!,
+      );
       return false;
     }
     return true;
@@ -403,27 +468,54 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   // Bank Account Form Validation
   bool _validateBankAccountForm() {
     if (_bankNameController.text.trim().isEmpty) {
-      _showFieldValidationError('Bank name is required', focusNodes['bankName']!);
+      _showFieldValidationError(
+        'Bank name is required',
+        focusNodes['bankName']!,
+      );
       return false;
     }
     if (_accountNumberController.text.trim().isEmpty) {
-      _showFieldValidationError('Account number is required', focusNodes['accountNumber']!);
+      _showFieldValidationError(
+        'Account number is required',
+        focusNodes['accountNumber']!,
+      );
       return false;
     }
-    if (!_isValidNumbersOnly(_accountNumberController.text, minLength: 8, maxLength: 12)) {
-      _showFieldValidationError('Account number must be between 8-12 digits', focusNodes['accountNumber']!);
+    if (!_isValidNumbersOnly(
+      _accountNumberController.text,
+      minLength: 8,
+      maxLength: 12,
+    )) {
+      _showFieldValidationError(
+        'Account number must be between 8-12 digits',
+        focusNodes['accountNumber']!,
+      );
       return false;
     }
-    if (_branchCodeController.text.trim().isNotEmpty && !_isValidNumbersOnly(_branchCodeController.text, minLength: 6, maxLength: 6)) {
-      _showFieldValidationError('Branch code must be exactly 6 digits', focusNodes['branchCode']!);
+    if (_branchCodeController.text.trim().isNotEmpty &&
+        !_isValidNumbersOnly(
+          _branchCodeController.text,
+          minLength: 6,
+          maxLength: 6,
+        )) {
+      _showFieldValidationError(
+        'Branch code must be exactly 6 digits',
+        focusNodes['branchCode']!,
+      );
       return false;
     }
     if (_accountHolderController.text.trim().isEmpty) {
-      _showFieldValidationError('Account holder name is required', focusNodes['accountHolder']!);
+      _showFieldValidationError(
+        'Account holder name is required',
+        focusNodes['accountHolder']!,
+      );
       return false;
     }
     if (!_isValidName(_accountHolderController.text)) {
-      _showFieldValidationError('Account holder name must contain only letters and spaces', focusNodes['accountHolder']!);
+      _showFieldValidationError(
+        'Account holder name must contain only letters and spaces',
+        focusNodes['accountHolder']!,
+      );
       return false;
     }
     return true;
@@ -444,8 +536,12 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
 
   // Display On Platform Form Validation
   bool _validateDisplayOnPlatformForm() {
-    if (!_isRegisteredNameSelected && _tradingNameController.text.trim().isEmpty) {
-      _showFieldValidationError('Please select registered name or enter trading name', focusNodes['tradingName']!);
+    if (!_isRegisteredNameSelected &&
+        _tradingNameController.text.trim().isEmpty) {
+      _showFieldValidationError(
+        'Please select registered name or enter trading name',
+        focusNodes['tradingName']!,
+      );
       return false;
     }
     return true;
@@ -559,7 +655,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
             duration: Duration(seconds: 2),
           ),
         );
-        
+
         // Navigate to seller dashboard after success message
         _navigateToSellerDashboard();
       } else {
@@ -1047,6 +1143,11 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Show mobile version for screens smaller than 800px
+    if (MediaQuery.of(context).size.width < 800) {
+      return const BusinessSignUpPageMobile();
+    }
+    
     return Scaffold(
       backgroundColor: Constants.gtaColorLight,
       body: Padding(
@@ -1054,7 +1155,9 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-            border: Border.all(color: Constants.gtaColorLight, width: 20),
+            border: MediaQuery.of(context).size.width < 800
+                ? null
+                : Border.all(color: Constants.gtaColorLight, width: 20),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2155,14 +2258,14 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildCustomTextField(
-          hint, 
-          controller, 
-          focusNode, 
+          hint,
+          controller,
+          focusNode,
           null,
           integersOnly: integersOnly,
           isName: isName,
           isEmail: isEmail,
-        )
+        ),
       ],
     );
   }
@@ -2486,12 +2589,13 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         // Validate field before moving to next
         bool isValid = true;
         String? errorMessage;
-        
+
         if (isEmail && value.isNotEmpty && !_isValidEmail(value)) {
           isValid = false;
           errorMessage = 'Please enter a valid email address';
         } else if (integersOnly && value.isNotEmpty) {
-          if (hintText.toLowerCase().contains('phone') || hintText.toLowerCase().contains('telephone')) {
+          if (hintText.toLowerCase().contains('phone') ||
+              hintText.toLowerCase().contains('telephone')) {
             if (!_isValidPhoneNumber(value)) {
               isValid = false;
               errorMessage = 'Phone number must be exactly 10 digits';
@@ -2506,12 +2610,12 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           isValid = false;
           errorMessage = 'This field must contain only letters and spaces';
         }
-        
+
         if (!isValid && errorMessage != null) {
           _showFieldValidationError(errorMessage, focusNode);
           return;
         }
-        
+
         if (nextFocusNode != null) {
           nextFocusNode.requestFocus();
         }

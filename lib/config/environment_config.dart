@@ -83,39 +83,38 @@ class AppConfig {
     EnvironmentType.uat: EnvironmentConfig(
       // Service URLs
       productsServiceUrl:
-          "http://bidr-product-1756960567.westus.azurecontainer.io:8000/",
-      authServiceUrl:
-          "http://bidr-auth-1756961802.westus.azurecontainer.io:8001/",
+          "https://bidr-auth-ssl-1757042867.westus.azurecontainer.io/",
+      authServiceUrl: "https://api.bidr.co.za/",
       chatServiceUrl:
-          "http://bidr-chat-1756963149.westus.azurecontainer.io:8002/",
+          "https://bidr-chat-1756963149.westus.azurecontainer.io:8002/",
       paymentServiceUrl:
-          "http://bidr-payment-1756963524.westus.azurecontainer.io:8003/",
+          "https://bidr-payment-1756963524.westus.azurecontainer.io:8003/",
       resolutionServiceUrl:
-          "http://bidr-resolution-1756963788.westus.azurecontainer.io:8004/",
+          "https://bidr-resolution-1756963788.westus.azurecontainer.io:8004/",
       notificationsServiceUrl:
-          "http://bidr-notifications-1756964056.westus.azurecontainer.io:8005/",
+          "https://bidr-notifications-1756964056.westus.azurecontainer.io:8005/",
       transactionsServiceUrl:
-          "http://bidr-transactions-1756964308.westus.azurecontainer.io:8006/",
+          "https://bidr-transactions-1756964308.westus.azurecontainer.io:8006/",
       reviewsServiceUrl:
-          "http://bidr-reviews-1756964572.westus.azurecontainer.io:8007/",
+          "https://bidr-reviews-1756964572.westus.azurecontainer.io:8007/",
 
       // Admin URLs
       productsAdminUrl:
-          "http://bidr-product-1756960567.westus.azurecontainer.io:8000/admin/",
+          "https://bidr-product-1756960567.westus.azurecontainer.io:8000/admin/",
       authAdminUrl:
-          "http://bidr-auth-1756961802.westus.azurecontainer.io:8001/admin/",
+          "https://bidr-auth-1756961802.westus.azurecontainer.io:8001/admin/",
       chatAdminUrl:
-          "http://bidr-chat-1756963149.westus.azurecontainer.io:8002/admin/",
+          "https://bidr-chat-1756963149.westus.azurecontainer.io:8002/admin/",
       paymentAdminUrl:
-          "http://bidr-payment-1756963524.westus.azurecontainer.io:8003/admin/",
+          "https://bidr-payment-1756963524.westus.azurecontainer.io:8003/admin/",
       resolutionAdminUrl:
-          "http://bidr-resolution-1756963788.westus.azurecontainer.io:8004/admin/",
+          "https://bidr-resolution-1756963788.westus.azurecontainer.io:8004/admin/",
       notificationsAdminUrl:
-          "http://bidr-notifications-1756964056.westus.azurecontainer.io:8005/admin/",
+          "https://bidr-notifications-1756964056.westus.azurecontainer.io:8005/admin/",
       transactionsAdminUrl:
-          "http://bidr-transactions-1756964308.westus.azurecontainer.io:8006/admin/",
+          "https://bidr-transactions-1756964308.westus.azurecontainer.io:8006/admin/",
       reviewsAdminUrl:
-          "http://bidr-reviews-1756964572.westus.azurecontainer.io:8007/admin/",
+          "https://bidr-reviews-1756964572.westus.azurecontainer.io:8007/admin/",
       grafanaUrl: '',
       prometheusUrl: '',
     ),

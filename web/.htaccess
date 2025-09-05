@@ -1,0 +1,38 @@
+# Flutter Web Assets Configuration
+# Enable proper MIME types for web assets
+
+<IfModule mod_mime.c>
+  AddType image/png .png
+  AddType image/jpeg .jpg .jpeg
+  AddType image/gif .gif
+  AddType image/webp .webp
+  AddType image/svg+xml .svg
+  AddType image/avif .avif
+</IfModule>
+
+# Enable CORS for assets
+<IfModule mod_headers.c>
+  <FilesMatch "\.(png|jpg|jpeg|gif|webp|svg|avif)$">
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type"
+  </FilesMatch>
+</IfModule>
+
+# Cache control for assets
+<IfModule mod_expires.c>
+  ExpiresActive on
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/jpg "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/gif "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType image/avif "access plus 1 month"
+</IfModule>
+
+# Prevent access to sensitive files
+<Files "*.dart">
+  Order allow,deny
+  Deny from all
+</Files>

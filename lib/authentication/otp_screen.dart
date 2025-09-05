@@ -346,25 +346,26 @@ class _BidrOTPVerificationScreenState extends State<BidrOTPVerificationScreen>
     return Scaffold(
       body: Row(
         children: [
-          Expanded(
-            flex: 2,
-            child: Stack(
-              fit: StackFit.loose,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(0),
-                    topLeft: Radius.circular(0),
+          if (MediaQuery.of(context).size.width > 800)
+            Expanded(
+              flex: 2,
+              child: Stack(
+                fit: StackFit.loose,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(0),
+                      topLeft: Radius.circular(0),
+                    ),
+                    child: Image.asset(
+                      "lib/assets/images/sample.jpg",
+                      fit: BoxFit.cover,
+                      height: MediaQuery.of(context).size.height,
+                    ),
                   ),
-                  child: Image.asset(
-                    "lib/assets/images/sample.jpg",
-                    fit: BoxFit.cover,
-                    height: MediaQuery.of(context).size.height,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
           Expanded(
             flex: 4,
             child: Container(
@@ -376,131 +377,279 @@ class _BidrOTPVerificationScreenState extends State<BidrOTPVerificationScreen>
                   topRight: Radius.circular(0),
                 ),
               ),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: 40,
-                    right: 40,
-                    bottom: 24,
-                    top: 24,
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            style: IconButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Constants.ftaColorLight,
-                              elevation: 5,
-                              shadowColor: Colors.black54,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+              child: MediaQuery.of(context).size.width < 800
+                  ? Column(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                left: 40,
+                                right: 40,
+                                bottom: 24,
+                                top: 24,
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        style: IconButton.styleFrom(
+                                          backgroundColor: Colors.white,
+                                          foregroundColor:
+                                              Constants.ftaColorLight,
+                                          elevation: 5,
+                                          shadowColor: Colors.black54,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                        ),
+                                        icon: Icon(
+                                          CupertinoIcons.back,
+                                          color: Constants.ftaColorLight,
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      _buildBidrLogo(),
+                                      Spacer(),
+                                      SizedBox(width: 40, height: 40),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 32),
+                                  const Text(
+                                    'Verify OTP',
+                                    style: TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.black,
+                                      letterSpacing: 2,
+                                      fontFamily: 'YuGothic',
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    'Enter the six digit code that we sent to \nyour registered cellphone to verify your account.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 13.5,
+                                      height: 1.5,
+                                      fontFamily: 'YuGothic',
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  // _buildDeliveryMethodToggle(),
+                                  const SizedBox(height: 24),
+                                  _buildOTPInput(),
+                                  const SizedBox(height: 32),
+                                  _buildTimer(),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    _timeLeft > 0 ? '' : 'Code expired',
+                                    style: TextStyle(
+                                      color: _timeLeft > 0
+                                          ? Color(0xFF718096)
+                                          : Colors.red,
+                                      fontSize: 12,
+                                      fontFamily: 'YuGothic',
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text(
+                                        "Didn't Get OTP? ",
+                                        style: TextStyle(
+                                          color: Color(0xFF718096),
+                                          fontSize: 14,
+                                          fontFamily: 'YuGothic',
+                                        ),
+                                      ),
+                                      MouseRegion(
+                                        cursor:
+                                            (_timeLeft == 0 && !_isResending)
+                                            ? SystemMouseCursors.click
+                                            : SystemMouseCursors.basic,
+                                        child: GestureDetector(
+                                          onTap:
+                                              (_timeLeft == 0 && !_isResending)
+                                              ? _showDeliveryMethodDialog
+                                              : null,
+                                          child: _isResending
+                                              ? SizedBox(
+                                                  width: 16,
+                                                  height: 16,
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation<
+                                                          Color
+                                                        >(Color(0xFF4299E1)),
+                                                  ),
+                                                )
+                                              : Text(
+                                                  'Resend OTP',
+                                                  style: TextStyle(
+                                                    color: _timeLeft == 0
+                                                        ? Colors.black
+                                                        : Colors.grey,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                    letterSpacing: 1.2,
+                                                    fontFamily: 'YuGothic',
+                                                  ),
+                                                ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
-                            icon: Icon(
-                              CupertinoIcons.back,
-                              color: Constants.ftaColorLight,
-                            ),
                           ),
-                          Spacer(),
-                          _buildBidrLogo(),
-                          Spacer(),
-                          SizedBox(width: 40, height: 40),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-                      const Text(
-                        'Verify OTP',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                          letterSpacing: 2,
-                          fontFamily: 'YuGothic',
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Enter the six digit code that we sent to \nyour registered cellphone to verify your account.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 13.5,
-                          height: 1.5,
-                          fontFamily: 'YuGothic',
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // _buildDeliveryMethodToggle(),
-                      const SizedBox(height: 24),
-                      _buildOTPInput(),
-                      const SizedBox(height: 32),
-                      _buildTimer(),
-                      const SizedBox(height: 8),
-                      Text(
-                        _timeLeft > 0 ? '' : 'Code expired',
-                        style: TextStyle(
-                          color: _timeLeft > 0 ? Color(0xFF718096) : Colors.red,
-                          fontSize: 12,
-                          fontFamily: 'YuGothic',
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "Didn't Get OTP? ",
-                            style: TextStyle(
-                              color: Color(0xFF718096),
-                              fontSize: 14,
-                              fontFamily: 'YuGothic',
-                            ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 40),
+                          child: Column(
+                            children: [
+                              _buildVerifyButton(),
+                              const SizedBox(height: 50),
+                            ],
                           ),
-                          MouseRegion(
-                            cursor: (_timeLeft == 0 && !_isResending)
-                                ? SystemMouseCursors.click
-                                : SystemMouseCursors.basic,
-                            child: GestureDetector(
-                              onTap: (_timeLeft == 0 && !_isResending)
-                                  ? _showDeliveryMethodDialog
-                                  : null,
-                              child: _isResending
-                                  ? SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                              Color(0xFF4299E1),
-                                            ),
-                                      ),
-                                    )
-                                  : Text(
-                                      'Resend OTP',
-                                      style: TextStyle(
-                                        color: _timeLeft == 0
-                                            ? Colors.black
-                                            : Colors.grey,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 1.2,
-                                        fontFamily: 'YuGothic',
-                                      ),
+                        ),
+                      ],
+                    )
+                  : SingleChildScrollView(
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          left: 40,
+                          right: 40,
+                          bottom: 24,
+                          top: 24,
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                IconButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Constants.ftaColorLight,
+                                    elevation: 5,
+                                    shadowColor: Colors.black54,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
+                                  ),
+                                  icon: Icon(
+                                    CupertinoIcons.back,
+                                    color: Constants.ftaColorLight,
+                                  ),
+                                ),
+                                Spacer(),
+                                _buildBidrLogo(),
+                                Spacer(),
+                                SizedBox(width: 40, height: 40),
+                              ],
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 32),
+                            const Text(
+                              'Verify OTP',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black,
+                                letterSpacing: 2,
+                                fontFamily: 'YuGothic',
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Enter the six digit code that we sent to \nyour registered cellphone to verify your account.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 13.5,
+                                height: 1.5,
+                                fontFamily: 'YuGothic',
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // _buildDeliveryMethodToggle(),
+                            const SizedBox(height: 24),
+                            _buildOTPInput(),
+                            const SizedBox(height: 32),
+                            _buildTimer(),
+                            const SizedBox(height: 8),
+                            Text(
+                              _timeLeft > 0 ? '' : 'Code expired',
+                              style: TextStyle(
+                                color: _timeLeft > 0
+                                    ? Color(0xFF718096)
+                                    : Colors.red,
+                                fontSize: 12,
+                                fontFamily: 'YuGothic',
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  "Didn't Get OTP? ",
+                                  style: TextStyle(
+                                    color: Color(0xFF718096),
+                                    fontSize: 14,
+                                    fontFamily: 'YuGothic',
+                                  ),
+                                ),
+                                MouseRegion(
+                                  cursor: (_timeLeft == 0 && !_isResending)
+                                      ? SystemMouseCursors.click
+                                      : SystemMouseCursors.basic,
+                                  child: GestureDetector(
+                                    onTap: (_timeLeft == 0 && !_isResending)
+                                        ? _showDeliveryMethodDialog
+                                        : null,
+                                    child: _isResending
+                                        ? SizedBox(
+                                            width: 16,
+                                            height: 16,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                    Color(0xFF4299E1),
+                                                  ),
+                                            ),
+                                          )
+                                        : Text(
+                                            'Resend OTP',
+                                            style: TextStyle(
+                                              color: _timeLeft == 0
+                                                  ? Colors.black
+                                                  : Colors.grey,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              letterSpacing: 1.2,
+                                              fontFamily: 'YuGothic',
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 32),
+                            _buildVerifyButton(),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 32),
-                      _buildVerifyButton(),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
             ),
           ),
         ],
@@ -1001,97 +1150,204 @@ class _SellerOTPVerificationScreenState
                 topRight: Radius.circular(0),
               ),
             ),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 24, top: 24),
-                child: Column(
-                  children: [
-                    Text(
-                      'Verify OTP',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black,
-                        letterSpacing: 1.1,
-                        fontFamily: 'YuGothic',
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Enter the six digit code that we sent to your registered cellphone verify your account.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 13,
-                        height: 1.5,
-                        fontFamily: 'YuGothic',
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    _buildOTPInput(),
-                    const SizedBox(height: 32),
-                    _buildTimer(),
-                    const SizedBox(height: 8),
-                    /*  Text(
-                      _timeLeft > 0 ? 'Code expires in:' : 'Code expired',
-                      style: TextStyle(
-                        color: _timeLeft > 0 ? Color(0xFF718096) : Colors.red,
-                        fontSize: 12,
-                        fontFamily: 'YuGothic',
-                      ),
-                    ),*/
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          "Didn't Get OTP? ",
-                          style: TextStyle(
-                            color: Color(0xFF718096),
-                            fontSize: 14,
-                            fontFamily: 'YuGothic',
-                          ),
-                        ),
-                        MouseRegion(
-                          cursor: (_timeLeft == 0 && !_isResending)
-                              ? SystemMouseCursors.click
-                              : SystemMouseCursors.basic,
-                          child: GestureDetector(
-                            onTap: (_timeLeft == 0 && !_isResending)
-                                ? _resendOTP
-                                : null,
-                            child: _isResending
-                                ? SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Color(0xFF4299E1),
+            child: MediaQuery.of(context).size.width < 800
+                ? Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 24, top: 24),
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Verify OTP',
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black,
+                                    letterSpacing: 1.1,
+                                    fontFamily: 'YuGothic',
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Enter the six digit code that we sent to your registered cellphone verify your account.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 13,
+                                    height: 1.5,
+                                    fontFamily: 'YuGothic',
+                                  ),
+                                ),
+                                const SizedBox(height: 40),
+                                _buildOTPInput(),
+                                const SizedBox(height: 32),
+                                _buildTimer(),
+                                const SizedBox(height: 8),
+                                /*  Text(
+                                  _timeLeft > 0 ? 'Code expires in:' : 'Code expired',
+                                  style: TextStyle(
+                                    color: _timeLeft > 0 ? Color(0xFF718096) : Colors.red,
+                                    fontSize: 12,
+                                    fontFamily: 'YuGothic',
+                                  ),
+                                ),*/
+                                const SizedBox(height: 16),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      "Didn't Get OTP? ",
+                                      style: TextStyle(
+                                        color: Color(0xFF718096),
+                                        fontSize: 14,
+                                        fontFamily: 'YuGothic',
                                       ),
                                     ),
-                                  )
-                                : Text(
-                                    'Resend OTP',
-                                    style: TextStyle(
-                                      color: _timeLeft == 0
-                                          ? const Color(0xFF4299E1)
-                                          : const Color(0xFF718096),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      fontFamily: 'YuGothic',
+                                    MouseRegion(
+                                      cursor: (_timeLeft == 0 && !_isResending)
+                                          ? SystemMouseCursors.click
+                                          : SystemMouseCursors.basic,
+                                      child: GestureDetector(
+                                        onTap: (_timeLeft == 0 && !_isResending)
+                                            ? _resendOTP
+                                            : null,
+                                        child: _isResending
+                                            ? SizedBox(
+                                                width: 16,
+                                                height: 16,
+                                                child: CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                        Color
+                                                      >(Color(0xFF4299E1)),
+                                                ),
+                                              )
+                                            : Text(
+                                                'Resend OTP',
+                                                style: TextStyle(
+                                                  color: _timeLeft == 0
+                                                      ? const Color(0xFF4299E1)
+                                                      : const Color(0xFF718096),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontFamily: 'YuGothic',
+                                                ),
+                                              ),
+                                      ),
                                     ),
-                                  ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 40),
+                        child: Column(
+                          children: [
+                            _buildVerifyButton(),
+                            const SizedBox(height: 50),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 24, top: 24),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Verify OTP',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black,
+                              letterSpacing: 1.1,
+                              fontFamily: 'YuGothic',
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Enter the six digit code that we sent to your registered cellphone verify your account.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 13,
+                              height: 1.5,
+                              fontFamily: 'YuGothic',
+                            ),
+                          ),
+                          const SizedBox(height: 40),
+                          _buildOTPInput(),
+                          const SizedBox(height: 32),
+                          _buildTimer(),
+                          const SizedBox(height: 8),
+                          /*  Text(
+                            _timeLeft > 0 ? 'Code expires in:' : 'Code expired',
+                            style: TextStyle(
+                              color: _timeLeft > 0 ? Color(0xFF718096) : Colors.red,
+                              fontSize: 12,
+                              fontFamily: 'YuGothic',
+                            ),
+                          ),*/
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Didn't Get OTP? ",
+                                style: TextStyle(
+                                  color: Color(0xFF718096),
+                                  fontSize: 14,
+                                  fontFamily: 'YuGothic',
+                                ),
+                              ),
+                              MouseRegion(
+                                cursor: (_timeLeft == 0 && !_isResending)
+                                    ? SystemMouseCursors.click
+                                    : SystemMouseCursors.basic,
+                                child: GestureDetector(
+                                  onTap: (_timeLeft == 0 && !_isResending)
+                                      ? _resendOTP
+                                      : null,
+                                  child: _isResending
+                                      ? SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                  Color(0xFF4299E1),
+                                                ),
+                                          ),
+                                        )
+                                      : Text(
+                                          'Resend OTP',
+                                          style: TextStyle(
+                                            color: _timeLeft == 0
+                                                ? const Color(0xFF4299E1)
+                                                : const Color(0xFF718096),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            fontFamily: 'YuGothic',
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 32),
+                          _buildVerifyButton(),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 32),
-                    _buildVerifyButton(),
-                  ],
-                ),
-              ),
-            ),
+                  ),
           ),
         ),
       ],
