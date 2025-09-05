@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: bidr
+  labels:
+    app: auth-service
+    service: auth
+    version: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        service: auth
+        version: production
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8001"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: bidr-service-account
+      containers:
+      - name: auth-service
+        image: bidrnparusuatregistry2024.azurecr.io/bidr-authentication_service:latest
+        ports:
+        - containerPort: 8001
+        env:
+        - name: DJANGO_SETTINGS_MODULE
+          value: "authentication_service.settings"
+        - name: DEBUG
+          value: "False"
+        - name: ALLOWED_HOSTS
+          value: "*"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: DATABASE_URL
+              optional: true
+        - name: POSTGRES_DB
+          value: "bidr_db"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: POSTGRES_USER
+              optional: true
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: POSTGRES_PASSWORD
+              optional: true
+        - name: POSTGRES_HOST
+          value: "postgres-service"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: SECRET_KEY
+              optional: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health/
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/
+            port: 8001
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          failureThreshold: 3
+      imagePullSecrets:
+      - name: acr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: bidr
+  labels:
+    app: auth-service
+spec:
+  type: ClusterIP
+  selector:
+    app: auth-service
+  ports:
+  - port: 8001
+    targetPort: 8001
+    protocol: TCP
+    name: http

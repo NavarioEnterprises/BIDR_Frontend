@@ -1,0 +1,20 @@
+# Reduce Docker context size
+**/.git
+**/node_modules
+**/venv
+**/env
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/.pytest_cache
+**/logs
+**/static
+**/media
+**/db.sqlite3
+**/.idea
+**/.vscode
+**/README.md
+**/DOCUMENTATION.md
+**/TEST_*.md
+**/*.log
+**/cookies.txt

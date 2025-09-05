@@ -1,0 +1,752 @@
+BIDR Inventory Service API Test Report
+Generated at: 2025-08-02 05:06:11.639866
+Base URL: http://localhost:8001
+
+============================================================
+Testing: GET /swagger/
+Description: Swagger UI documentation
+============================================================
+Status Code: 200
+Response Headers: {'Date': 'Sat, 02 Aug 2025 03:06:11 GMT', 'Server': 'WSGIServer/0.2 CPython/3.10.0', 'Content-Type': 'text/html; charset=utf-8', 'Vary': 'Accept, Cookie, origin', 'Allow': 'GET, HEAD, OPTIONS', 'X-Frame-Options': 'DENY', 'Content-Length': '1673', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'Cross-Origin-Opener-Policy': 'same-origin'}
+Response Body (text): 
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>BIDR Inventory Service API</title>
+
+    
+        
+    
+
+    
+        
+        <link rel="icon" type="image/png" href="/static/drf-yasg/swagger-ui-dist/favicon-32x32.png"/>
+    
+
+    
+        <link rel="stylesheet" type="text/css" href="/static/drf-yasg/style.css"/>
+        <link rel="stylesheet" type="text/css" href="/static/drf-yasg/swagger-ui-dist/swagger-ui.css">
+    
+    
+        
+    
+</head>
+
+<body class="swagger-body">
+
+
+    
+
+
+<div id="swagger-ui"></div>
+
+
+    
+
+
+<script id="swagger-settings" type="application/json">{"operationsSorter": "alpha", "tagsSorter": "alpha", "docExpansion": "none", "deepLinking": true, "showExtensions": true, "defaultModelRendering": "model", "defaultModelExpandDepth": 3, "defaultModelsExpandDepth": 3, "showCommonExtensions": true, "supportedSubmitMethods": ["get", "post", "put", "delete", "patch"], "displayOperationId": true, "persistAuth": false, "refetchWithAuth": false, "refetchOnLogout": false, "fetchSchemaWithQuery": true, "csrfCookie": "csrftoken", "csrfHeader": "X-CSRFTOKEN"}</script>
+<script id="oauth2-config" type="application/json">{}</script>
+
+
+    <script src="/static/drf-yasg/swagger-ui-dist/swagger-ui-bundle.js"></script>
+    <script src="/static/drf-yasg/swagger-ui-dist/swagger-ui-standalone-preset.js"></script>
+    <script src="/static/drf-yasg/insQ.min.js"></script>
+    <script src="/static/drf-yasg/immutable.min.js"></script>
+    <script src="/static/drf-yasg/swagger-ui-init.js"></script>
+
+
+    
+
+
+<a id="oauth2-redirect-url" href="/static/drf-yasg/swagger-ui-dist/oauth2-redirect.html" class="hidden"></a>
+
+
+</body>
+
+</html>
+
+
+============================================================
+Testing: GET /redoc/
+Description: ReDoc documentation
+============================================================
+Status Code: 200
+Response Headers: {'Date': 'Sat, 02 Aug 2025 03:06:11 GMT', 'Server': 'WSGIServer/0.2 CPython/3.10.0', 'Content-Type': 'text/html; charset=utf-8', 'Vary': 'Accept, Cookie, origin', 'Allow': 'GET, HEAD, OPTIONS', 'X-Frame-Options': 'DENY', 'Content-Length': '943', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'Cross-Origin-Opener-Policy': 'same-origin'}
+Response Body (text): 
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BIDR Inventory Service API</title>
+
+    
+        
+    
+
+    
+        
+        <link rel="icon" type="image/png" href="/static/drf-yasg/redoc/redoc-logo.png"/>
+    
+
+    
+        <link rel="stylesheet" type="text/css" href="/static/drf-yasg/style.css"/>
+    
+    
+        
+    
+</head>
+<body>
+
+
+    
+
+
+<div id="redoc-placeholder"></div>
+
+
+    
+
+
+<script id="redoc-settings" type="application/json">{"lazyRendering": false, "hideHostname": false, "expandResponses": "all", "pathInMiddlePanel": false, "nativeScrollbars": false, "requiredPropsFirst": false, "fetchSchemaWithQuery": true}</script>
+
+
+    <script src="/static/drf-yasg/insQ.min.js"></script>
+    <script src="/static/drf-yasg/redoc-init.js"></script>
+    <script src="/static/drf-yasg/redoc/redoc.min.js"></script>
+
+
+    
+
+</body>
+</html>
+
+
+============================================================
+Testing: GET /swagger.json
+Description: OpenAPI schema
+============================================================
+Status Code: 200
+Response Headers: {'Date': 'Sat, 02 Aug 2025 03:06:11 GMT', 'Server': 'WSGIServer/0.2 CPython/3.10.0', 'Content-Type': 'application/yaml; charset=utf-8', 'Vary': 'Accept, Cookie, origin', 'Allow': 'GET, HEAD, OPTIONS', 'X-Frame-Options': 'DENY', 'Content-Length': '12384', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'Cross-Origin-Opener-Policy': 'same-origin'}
+Response Body (text): swagger: '2.0'
+info:
+  title: BIDR Inventory Service API
+  description: A comprehensive inventory management system for handling product requests,
+    quotes, transactions, and ratings.
+  termsOfService: https://www.bidr.com/terms/
+  contact:
+    email: contact@bidr.com
+  license:
+    name: BSD License
+  version: v1
+host: localhost:8001
+schemes:
+- http
+basePath: /api/v1/categories
+consumes:
+- application/json
+produces:
+- application/json
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+security:
+- Bearer: []
+paths:
+  /attributes/:
+    get:
+      operationId: attributes_list
+      summary: ViewSet for managing category attributes.
+      description: Defines what attributes products in each category can have.
+      parameters:
+      - name: search
+        in: query
+        description: A search term.
+        required: false
+        type: string
+      - name: ordering
+        in: query
+        description: Which field to use when ordering the results.
+        required: false
+        type: string
+      - name: page
+        in: query
+        description: A page number within the paginated result set.
+        required: false
+        type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+            - count
+            - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/CategoryAttribute'
+      tags:
+      - attributes
+    post:
+      operationId: attributes_create
+      summary: ViewSet for managing category attributes.
+      description: Defines what attributes products in each category can have.
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CategoryAttribute'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/CategoryAttribute'
+      tags:
+      - attributes
+    parameters: []
+  /attributes/{id}/:
+    get:
+      operationId: attributes_read
+      summary: ViewSet for managing category attributes.
+      description: Defines what attributes products in each category can have.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CategoryAttribute'
+      tags:
+      - attributes
+    put:
+      operationId: attributes_update
+      summary: ViewSet for managing category attributes.
+      description: Defines what attributes products in each category can have.
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CategoryAttribute'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CategoryAttribute'
+      tags:
+      - attributes
+    patch:
+      operationId: attributes_partial_update
+      summary: ViewSet for managing category attributes.
+      description: Defines what attributes products in each category can have.
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CategoryAttribute'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CategoryAttribute'
+      tags:
+      - attributes
+    delete:
+      operationId: attributes_delete
+      summary: ViewSet for managing category attributes.
+      description: Defines what attributes products in each category can have.
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - attributes
+    parameters:
+    - name: id
+      in: path
+      description: A UUID string identifying this category attribute.
+      required: true
+      type: string
+      format: uuid
+  /categories/:
+    get:
+      operationId: categories_list
+      description: Get category tree with all descendants
+      parameters:
+      - name: search
+        in: query
+        description: A search term.
+        required: false
+        type: string
+      - name: ordering
+        in: query
+        description: Which field to use when ordering the results.
+        required: false
+        type: string
+      - name: page
+        in: query
+        description: A page number within the paginated result set.
+        required: false
+        type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Category'
+      tags:
+      - categories
+    post:
+      operationId: categories_create
+      summary: ViewSet for managing product categories.
+      description: Provides CRUD operations for hierarchical product categories.
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Category'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Category'
+      tags:
+      - categories
+    parameters: []
+  /categories/{id}/:
+    get:
+      operationId: categories_read
+      summary: ViewSet for managing product categories.
+      description: Provides CRUD operations for hierarchical product categories.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Category'
+      tags:
+      - categories
+    put:
+      operationId: categories_update
+      summary: ViewSet for managing product categories.
+      description: Provides CRUD operations for hierarchical product categories.
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Category'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Category'
+      tags:
+      - categories
+    patch:
+      operationId: categories_partial_update
+      summary: ViewSet for managing product categories.
+      description: Provides CRUD operations for hierarchical product categories.
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Category'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Category'
+      tags:
+      - categories
+    delete:
+      operationId: categories_delete
+      summary: ViewSet for managing product categories.
+      description: Provides CRUD operations for hierarchical product categories.
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - categories
+    parameters:
+    - name: id
+      in: path
+      description: A UUID string identifying this category.
+      required: true
+      type: string
+      format: uuid
+definitions:
+  CategoryAttribute:
+    required:
+    - category
+    - name
+    - attribute_type
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      category:
+        title: Category
+        type: string
+        format: uuid
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+      attribute_type:
+        title: Attribute type
+        type: string
+        enum:
+        - text
+        - number
+        - decimal
+        - boolean
+        - choice
+        - multiple_choice
+        - date
+        - datetime
+        - url
+        - email
+        - phone
+        - color
+        - file
+        - image
+      is_required:
+        title: Is required
+        type: boolean
+      is_filterable:
+        title: Is filterable
+        type: boolean
+      is_searchable:
+        title: Is searchable
+        type: boolean
+      show_in_listing:
+        title: Show in listing
+        type: boolean
+      label:
+        title: Label
+        type: string
+        maxLength: 100
+      display_label:
+        title: Display label
+        type: string
+        readOnly: true
+      help_text:
+        title: Help text
+        type: string
+      placeholder:
+        title: Placeholder
+        type: string
+        maxLength: 100
+      sort_order:
+        title: Sort order
+        type: integer
+        maximum: 9223372036854775807
+        minimum: -9223372036854775808
+      min_value:
+        title: Min value
+        type: number
+        x-nullable: true
+      max_value:
+        title: Max value
+        type: number
+        x-nullable: true
+      min_length:
+        title: Min length
+        type: integer
+        maximum: 9223372036854775807
+        minimum: -9223372036854775808
+        x-nullable: true
+      max_length:
+        title: Max length
+        type: integer
+        maximum: 9223372036854775807
+        minimum: -9223372036854775808
+        x-nullable: true
+      regex_pattern:
+        title: Regex pattern
+        type: string
+        maxLength: 200
+      choices:
+        title: Choices
+        description: List of choices for choice-based attributes
+        type: object
+      default_value:
+        title: Default value
+        type: object
+        x-nullable: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+  Category:
+    required:
+    - name
+    - slug
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+      slug:
+        title: Slug
+        type: string
+        format: slug
+        pattern: ^[-a-zA-Z0-9_]+$
+        maxLength: 120
+        minLength: 1
+      description:
+        title: Description
+        type: string
+      parent:
+        title: Parent
+        type: string
+        format: uuid
+        x-nullable: true
+      children:
+        title: Children
+        type: string
+        readOnly: true
+      icon:
+        title: Icon
+        description: CSS icon class or emoji
+        type: string
+        maxLength: 50
+      image:
+        title: Image
+        type: string
+        readOnly: true
+        x-nullable: true
+        format: uri
+      color:
+        title: Color
+        description: Hex color code
+        type: string
+        maxLength: 7
+      sort_order:
+        title: Sort order
+        type: integer
+        maximum: 9223372036854775807
+        minimum: -9223372036854775808
+      status:
+        title: Status
+        type: string
+        enum:
+        - active
+        - inactive
+        - pending
+        - approved
+        - rejected
+        - cancelled
+        - completed
+        - expired
+        - draft
+      is_featured:
+        title: Is featured
+        type: boolean
+      show_in_menu:
+        title: Show in menu
+        type: boolean
+      meta_title:
+        title: Meta title
+        type: string
+        maxLength: 60
+      meta_description:
+        title: Meta description
+        type: string
+        maxLength: 160
+      commission_rate:
+        title: Commission rate
+        description: Commission rate as percentage
+        type: string
+        format: decimal
+      full_name:
+        title: Full name
+        type: string
+        readOnly: true
+      breadcrumbs:
+        title: Breadcrumbs
+        type: string
+        readOnly: true
+      attributes:
+        type: array
+        items:
+          $ref: '#/definitions/CategoryAttribute'
+        readOnly: true
+      product_count:
+        title: Product count
+        type: string
+        readOnly: true
+      tags:
+        title: Tags
+        type: object
+      notes:
+        title: Notes
+        type: string
+      metadata:
+        title: Metadata
+        type: object
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+
+
+============================================================
+Testing: GET /api/v1/categories/categories/
+Description: List all categories (should be empty initially)
+============================================================
+Status Code: 200
+Response Headers: {'Date': 'Sat, 02 Aug 2025 03:06:11 GMT', 'Server': 'WSGIServer/0.2 CPython/3.10.0', 'Content-Type': 'application/json', 'Vary': 'Accept, Cookie, origin', 'Allow': 'GET, POST, HEAD, OPTIONS', 'X-Frame-Options': 'DENY', 'Content-Length': '52', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'Cross-Origin-Opener-Policy': 'same-origin'}
+Response Body:
+{
+  "count": 0,
+  "next": null,
+  "previous": null,
+  "results": []
+}
+
+============================================================
+Testing: POST /api/v1/categories/categories/
+Description: Create category without authentication (should fail)
+============================================================
+Status Code: 401
+Response Headers: {'Date': 'Sat, 02 Aug 2025 03:06:11 GMT', 'Server': 'WSGIServer/0.2 CPython/3.10.0', 'Content-Type': 'application/json', 'WWW-Authenticate': 'Bearer realm="api"', 'Vary': 'Accept, Cookie, origin', 'Allow': 'GET, POST, HEAD, OPTIONS', 'X-Frame-Options': 'DENY', 'Content-Length': '145', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'Cross-Origin-Opener-Policy': 'same-origin'}
+Response Body:
+{
+  "error": {
+    "code": "client_error",
+    "message": "Request could not be processed",
+    "details": {
+      "detail": "Authentication credentials were not provided."
+    }
+  }
+}
+
+============================================================
+Testing: GET /api/v1/products/
+Description: Products endpoint (empty router)
+============================================================
+Status Code: 401
+Response Headers: {'Date': 'Sat, 02 Aug 2025 03:06:11 GMT', 'Server': 'WSGIServer/0.2 CPython/3.10.0', 'Content-Type': 'application/json', 'WWW-Authenticate': 'Bearer realm="api"', 'Vary': 'Accept, Cookie, origin', 'Allow': 'GET, HEAD, OPTIONS', 'X-Frame-Options': 'DENY', 'Content-Length': '145', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'Cross-Origin-Opener-Policy': 'same-origin'}
+Response Body:
+{
+  "error": {
+    "code": "client_error",
+    "message": "Request could not be processed",
+    "details": {
+      "detail": "Authentication credentials were not provided."
+    }
+  }
+}
+
+============================================================
+Testing: GET /api/v1/requests/
+Description: Product requests endpoint (empty router)
+============================================================
+Status Code: 401
+Response Headers: {'Date': 'Sat, 02 Aug 2025 03:06:11 GMT', 'Server': 'WSGIServer/0.2 CPython/3.10.0', 'Content-Type': 'application/json', 'WWW-Authenticate': 'Bearer realm="api"', 'Vary': 'Accept, Cookie, origin', 'Allow': 'GET, HEAD, OPTIONS', 'X-Frame-Options': 'DENY', 'Content-Length': '145', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'Cross-Origin-Opener-Policy': 'same-origin'}
+Response Body:
+{
+  "error": {
+    "code": "client_error",
+    "message": "Request could not be processed",
+    "details": {
+      "detail": "Authentication credentials were not provided."
+    }
+  }
+}
+
+============================================================
+Testing: GET /api/v1/quotes/
+Description: Quotes endpoint (empty router)
+============================================================
+Status Code: 401
+Response Headers: {'Date': 'Sat, 02 Aug 2025 03:06:11 GMT', 'Server': 'WSGIServer/0.2 CPython/3.10.0', 'Content-Type': 'application/json', 'WWW-Authenticate': 'Bearer realm="api"', 'Vary': 'Accept, Cookie, origin', 'Allow': 'GET, HEAD, OPTIONS', 'X-Frame-Options': 'DENY', 'Content-Length': '145', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'Cross-Origin-Opener-Policy': 'same-origin'}
+Response Body:
+{
+  "error": {
+    "code": "client_error",
+    "message": "Request could not be processed",
+    "details": {
+      "detail": "Authentication credentials were not provided."
+    }
+  }
+}
+
+============================================================
+Testing: GET /api/v1/transactions/
+Description: Transactions endpoint (empty router)
+============================================================
+Status Code: 401
+Response Headers: {'Date': 'Sat, 02 Aug 2025 03:06:11 GMT', 'Server': 'WSGIServer/0.2 CPython/3.10.0', 'Content-Type': 'application/json', 'WWW-Authenticate': 'Bearer realm="api"', 'Vary': 'Accept, Cookie, origin', 'Allow': 'GET, HEAD, OPTIONS', 'X-Frame-Options': 'DENY', 'Content-Length': '145', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'Cross-Origin-Opener-Policy': 'same-origin'}
+Response Body:
+{
+  "error": {
+    "code": "client_error",
+    "message": "Request could not be processed",
+    "details": {
+      "detail": "Authentication credentials were not provided."
+    }
+  }
+}
+
+============================================================
+Testing: GET /api/v1/ratings/
+Description: Ratings endpoint (empty router)
+============================================================
+Status Code: 401
+Response Headers: {'Date': 'Sat, 02 Aug 2025 03:06:11 GMT', 'Server': 'WSGIServer/0.2 CPython/3.10.0', 'Content-Type': 'application/json', 'WWW-Authenticate': 'Bearer realm="api"', 'Vary': 'Accept, Cookie, origin', 'Allow': 'GET, HEAD, OPTIONS', 'X-Frame-Options': 'DENY', 'Content-Length': '145', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'Cross-Origin-Opener-Policy': 'same-origin'}
+Response Body:
+{
+  "error": {
+    "code": "client_error",
+    "message": "Request could not be processed",
+    "details": {
+      "detail": "Authentication credentials were not provided."
+    }
+  }
+}

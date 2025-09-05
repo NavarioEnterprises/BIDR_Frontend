@@ -20,35 +20,35 @@ data:
     # UAT Environment Load Balancer Configuration
     
     upstream auth_service {
-        server bidr-auth-service.bidr.svc.cluster.local:80;
+        server auth-service.bidr.svc.cluster.local:8001;
     }
     
     upstream chat_service {
-        server bidr-chat-service.bidr.svc.cluster.local:80;
+        server chat-service.bidr.svc.cluster.local:8002;
     }
     
     upstream payment_service {
-        server bidr-payment-service.bidr.svc.cluster.local:80;
+        server payment-service.bidr.svc.cluster.local:8003;
     }
     
     upstream product_service {
-        server bidr-product-management-service.bidr.svc.cluster.local:80;
+        server product-management-service.bidr.svc.cluster.local:8004;
     }
     
     upstream notification_service {
-        server bidr-notifications-service.bidr.svc.cluster.local:80;
+        server notifications-service.bidr.svc.cluster.local:8005;
     }
     
     upstream resolution_service {
-        server bidr-resolution-service.bidr.svc.cluster.local:80;
+        server resolution-service.bidr.svc.cluster.local:8008;
     }
     
     upstream transaction_service {
-        server bidr-transactions-service.bidr.svc.cluster.local:80;
+        server transactions-service.bidr.svc.cluster.local:8006;
     }
     
     upstream reviews_service {
-        server bidr-reviews-and-ratings.bidr.svc.cluster.local:80;
+        server reviews-service.bidr.svc.cluster.local:8007;
     }
 
     # Health check endpoint
@@ -105,7 +105,33 @@ data:
             add_header X-Environment 'UAT';
         }
 
-        # Auth service routes
+        # Redirect Django admin URLs to products admin to fix redirect loop
+        location = /admin/ {
+            return 301 /products/admin/;
+        }
+        
+        location = /admin/login/ {
+            return 301 /products/admin/login/$args;
+        }
+        
+        location ~* ^/admin/(.*)$ {
+            return 301 /products/admin/$1$args;
+        }
+
+        # Auth admin interface (must come before general /auth/ to match first)
+        location /auth/admin/ {
+            proxy_pass http://auth_service/admin/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Environment 'UAT';
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # Auth service routes - root path for auth
         location /auth/ {
             proxy_pass http://auth_service/;
             proxy_set_header Host $host;
@@ -117,6 +143,7 @@ data:
             proxy_send_timeout 60s;
             proxy_read_timeout 60s;
         }
+        
 
         # Chat service routes
         location /chat/ {
@@ -149,7 +176,33 @@ data:
             proxy_read_timeout 60s;
         }
 
+        # Product admin interface - specific route MUST come before /products/
+        location /products/admin/ {
+            proxy_pass http://product_service/admin/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Environment 'UAT';
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
         # Product service routes  
+        location /products/ {
+            proxy_pass http://product_service/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Environment 'UAT';
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # Product service routes (legacy /product/ route)
         location /product/ {
             proxy_pass http://product_service/;
             proxy_set_header Host $host;
@@ -214,7 +267,7 @@ data:
             proxy_read_timeout 60s;
         }
 
-        # Default route - auth service
+        # Default route - auth service root
         location / {
             proxy_pass http://auth_service/;
             proxy_set_header Host $host;

@@ -1,0 +1,136 @@
+name: Deploy Authentication Service
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'authentication_service/**'
+      - '.github/workflows/auth-service-deploy.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'authentication_service/**'
+
+env:
+  REGISTRY: bidruatregwe2024.azurecr.io
+  IMAGE_NAME: bidr-authentication_service
+  SERVICE_NAME: auth-service
+  NAMESPACE: bidr
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Log in to Azure Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+    
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./authentication_service
+        file: ./authentication_service/Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        platforms: linux/amd64
+    
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+    
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+        chmod 600 ~/.kube/config
+    
+    - name: Deploy to Kubernetes
+      run: |
+        # Get the built image tag
+        IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
+        echo "Deploying image: $IMAGE_TAG"
+        
+        # Update deployment with new image
+        kubectl set image deployment/${{ env.SERVICE_NAME }} \
+          ${{ env.SERVICE_NAME }}=$IMAGE_TAG \
+          -n ${{ env.NAMESPACE }}
+        
+        # Wait for rollout to complete
+        kubectl rollout status deployment/${{ env.SERVICE_NAME }} \
+          -n ${{ env.NAMESPACE }} \
+          --timeout=300s
+    
+    - name: Verify deployment
+      run: |
+        # Check if pods are running
+        kubectl get pods -n ${{ env.NAMESPACE }} -l app=${{ env.SERVICE_NAME }}
+        
+        # Test service health
+        kubectl wait --for=condition=ready pod \
+          -l app=${{ env.SERVICE_NAME }} \
+          -n ${{ env.NAMESPACE }} \
+          --timeout=120s
+        
+        echo "✅ Authentication service deployed successfully!"
+    
+    - name: Post deployment tests
+      run: |
+        # Get load balancer IP
+        LB_IP=$(kubectl get service nginx-proxy -n ${{ env.NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        
+        if [ -n "$LB_IP" ]; then
+          echo "Load Balancer IP: $LB_IP"
+          
+          # Test endpoints
+          curl -f "http://$LB_IP/health" || echo "Health endpoint test failed"
+          curl -f "http://$LB_IP/auth/" || echo "Auth endpoint test failed"
+          
+          echo "🌐 Service URLs:"
+          echo "  - Auth Service: http://$LB_IP/auth/"
+          echo "  - Admin Panel: http://$LB_IP/auth/admin/"
+        else
+          echo "Load balancer IP not available for testing"
+        fi
+    
+    - name: Cleanup old images (optional)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        # Keep only the 5 most recent images
+        az acr repository show-tags --name $(echo ${{ env.REGISTRY }} | cut -d'.' -f1) \
+          --repository ${{ env.IMAGE_NAME }} \
+          --output table \
+          --orderby time_desc \
+          | tail -n +6 \
+          | awk '{print $1}' \
+          | xargs -I {} az acr repository delete \
+            --name $(echo ${{ env.REGISTRY }} | cut -d'.' -f1) \
+            --image ${{ env.IMAGE_NAME }}:{} \
+            --yes || true
+      env:
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}

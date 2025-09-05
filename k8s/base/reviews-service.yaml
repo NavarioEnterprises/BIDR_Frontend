@@ -8,7 +8,7 @@ metadata:
     service: reviews
     version: dev
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: reviews-service
@@ -22,9 +22,11 @@ spec:
       serviceAccountName: bidr-service-account
       containers:
       - name: reviews-service
-        image: bidrnparusdevregistry2024.azurecr.io/reviews-service:latest
+        image: python:3.11-slim
         ports:
         - containerPort: 8000
+        command: ['sh', '-c']
+        args: ['pip install gunicorn django && cd /app && python -m gunicorn --bind 0.0.0.0:8000 app:application']
         env:
         - name: DEBUG
           value: "False"
@@ -55,25 +57,32 @@ spec:
           value: "http://transactions-service:8006"
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "250m"
+            memory: "128Mi"
+            cpu: "100m"
           limits:
-            memory: "512Mi"
-            cpu: "500m"
+            memory: "256Mi"
+            cpu: "200m"
         livenessProbe:
           httpGet:
-            path: /
+            path: /health/
             port: 8000
           initialDelaySeconds: 60
           periodSeconds: 30
           failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /
+            path: /health/
             port: 8000
           initialDelaySeconds: 30
           periodSeconds: 10
           failureThreshold: 3
+        volumeMounts:
+        - name: app-code
+          mountPath: /app
+      volumes:
+      - name: app-code
+        configMap:
+          name: reviews-app-code
       imagePullSecrets:
       - name: acr-secret
 ---

@@ -4344,3 +4344,126 @@ INFO 2025-09-01 02:10:41,262 basehttp 95688 6197981184 "GET /api/seller/profiles
 INFO 2025-09-01 02:37:45,783 basehttp 95688 6214807552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
 INFO 2025-09-01 02:37:45,793 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
 INFO 2025-09-01 02:37:48,849 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 02:53:46,070 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 02:53:46,071 basehttp 95688 6214807552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 02:53:47,457 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 02:55:05,212 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 02:55:32,331 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 02:55:34,090 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 02:55:35,308 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 02:55:35,851 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 03:01:45,385 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 03:01:45,420 basehttp 95688 6214807552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 03:10:19,019 basehttp 95688 6214807552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 03:10:19,020 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 03:10:34,812 basehttp 95688 6197981184 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-01 03:10:34,966 basehttp 95688 6197981184 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-01 04:11:31,462 basehttp 95688 6197981184 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-01 04:11:31,653 basehttp 95688 6197981184 "POST /login/ HTTP/1.1" 200 995
+INFO 2025-09-01 04:11:34,475 basehttp 95688 6214807552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 04:11:34,532 basehttp 95688 6214807552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 04:12:13,958 basehttp 95688 6214807552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 04:12:17,919 basehttp 95688 6214807552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 05:09:26,908 basehttp 95688 6197981184 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-01 05:09:27,172 basehttp 95688 6197981184 "POST /login/ HTTP/1.1" 200 995
+INFO 2025-09-01 05:09:30,035 basehttp 95688 6214807552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 05:09:30,062 basehttp 95688 6214807552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 05:11:06,228 basehttp 95688 6197981184 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-01 05:11:06,360 basehttp 95688 6197981184 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-01 05:27:24,275 basehttp 95688 6197981184 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-01 05:27:24,456 basehttp 95688 6197981184 "POST /login/ HTTP/1.1" 200 991
+WARNING 2025-09-01 07:21:55,757 log 95688 6197981184 Not Found: /api/seller/profiles/c97f2da1-810c-4f86-98b4-18b722d5eecb/
+WARNING 2025-09-01 07:21:55,759 basehttp 95688 6197981184 "GET /api/seller/profiles/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 404 54
+INFO 2025-09-01 07:21:55,808 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-01 10:21:32,561 basehttp 95688 6197981184 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-01 10:21:32,834 basehttp 95688 6197981184 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-01 13:00:01,313 basehttp 95688 6197981184 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-01 13:00:01,500 basehttp 95688 6197981184 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-01 23:11:56,630 basehttp 95688 6197981184 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-01 23:11:56,814 basehttp 95688 6197981184 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-02 00:02:42,838 basehttp 95688 6197981184 "OPTIONS /login/ HTTP/1.1" 200 0
+WARNING 2025-09-02 00:02:43,028 log 95688 6197981184 Bad Request: /login/
+WARNING 2025-09-02 00:02:43,028 basehttp 95688 6197981184 "POST /login/ HTTP/1.1" 400 71
+WARNING 2025-09-02 00:02:47,902 log 95688 6197981184 Bad Request: /login/
+WARNING 2025-09-02 00:02:47,903 basehttp 95688 6197981184 "POST /login/ HTTP/1.1" 400 71
+INFO 2025-09-02 00:02:57,001 basehttp 95688 6197981184 "POST /login/ HTTP/1.1" 200 995
+INFO 2025-09-02 00:03:00,581 basehttp 95688 6214807552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-02 00:03:00,581 basehttp 95688 6231633920 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-02 00:03:16,745 basehttp 95688 6214807552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-02 00:03:28,417 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-02 00:04:48,689 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-02 00:05:02,822 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-02 00:05:04,839 basehttp 95688 6197981184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 00:44:29,223 autoreload 30978 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-03 00:46:25,969 basehttp 30978 6134394880 "GET / HTTP/1.1" 200 2226
+INFO 2025-09-03 00:52:25,686 autoreload 35492 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-03 00:52:41,518 basehttp 35492 6179991552 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 00:52:41,773 basehttp 35492 6163165184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 00:52:42,215 basehttp 35492 6163165184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 00:52:51,728 basehttp 35492 6163165184 "GET / HTTP/1.1" 200 2226
+INFO 2025-09-03 00:53:01,802 basehttp 35492 6163165184 "OPTIONS /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 0
+INFO 2025-09-03 00:53:01,814 basehttp 35492 6163165184 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 00:53:27,969 basehttp 35492 6163165184 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-03 00:53:28,169 basehttp 35492 6163165184 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-03 01:11:45,184 basehttp 35492 6163165184 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-03 01:11:45,376 basehttp 35492 6163165184 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-03 01:26:51,912 autoreload 47317 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-03 01:27:11,700 basehttp 47317 6129152000 "GET / HTTP/1.1" 200 2226
+INFO 2025-09-03 02:18:03,633 autoreload 63371 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-03 02:18:23,306 basehttp 63371 6126219264 "GET / HTTP/1.1" 200 2226
+INFO 2025-09-03 02:29:02,029 basehttp 63371 6126219264 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-03 02:29:02,372 basehttp 63371 6126219264 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-03 02:38:37,461 basehttp 63371 6126219264 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-03 02:38:51,046 basehttp 63371 6126219264 "OPTIONS /logout/ HTTP/1.1" 200 0
+WARNING 2025-09-03 02:38:51,059 log 63371 6126219264 Unauthorized: /logout/
+WARNING 2025-09-03 02:38:51,059 basehttp 63371 6126219264 "POST /logout/ HTTP/1.1" 401 107
+INFO 2025-09-03 02:39:12,402 basehttp 63371 6126219264 "POST /login/ HTTP/1.1" 200 995
+INFO 2025-09-03 02:39:14,627 basehttp 63371 6159872000 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 02:39:14,628 basehttp 63371 6143045632 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 02:46:27,727 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 02:46:27,910 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 02:46:29,226 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 02:46:30,692 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 02:46:31,598 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 02:48:12,348 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 02:48:13,693 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 02:57:36,151 basehttp 63371 6143045632 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 02:57:36,151 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 02:57:37,036 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 02:57:39,054 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:00:12,306 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:05:23,553 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:05:23,555 basehttp 63371 6143045632 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:05:25,684 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:05:54,255 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:05:55,812 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:06:47,684 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:06:49,219 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:07:53,240 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:07:55,305 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:10:25,837 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:10:25,841 basehttp 63371 6143045632 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:10:27,487 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:13:40,844 basehttp 63371 6126219264 "OPTIONS /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 0
+INFO 2025-09-03 03:13:40,893 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+WARNING 2025-09-03 03:13:43,904 log 63371 6126219264 Unauthorized: /logout/
+WARNING 2025-09-03 03:13:43,905 basehttp 63371 6126219264 "POST /logout/ HTTP/1.1" 401 107
+INFO 2025-09-03 03:14:08,080 basehttp 63371 6126219264 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-03 03:33:17,380 basehttp 63371 6126219264 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-03 03:33:17,620 basehttp 63371 6126219264 "POST /login/ HTTP/1.1" 200 995
+INFO 2025-09-03 03:33:19,837 basehttp 63371 6143045632 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:36:39,413 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:36:39,494 basehttp 63371 6126219264 "GET /api/seller/profiles/by-auth-user-uid/c97f2da1-810c-4f86-98b4-18b722d5eecb/ HTTP/1.1" 200 1797
+INFO 2025-09-03 03:50:03,931 basehttp 63371 6126219264 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-03 03:50:04,199 basehttp 63371 6126219264 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-03 21:46:43,419 basehttp 63371 6126219264 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:46:43,618 basehttp 63371 6126219264 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-04 02:27:49,169 autoreload 73136 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-04 02:28:21,440 basehttp 73136 6134198272 "GET / HTTP/1.1" 200 2226
+INFO 2025-09-04 03:45:33,729 autoreload 4975 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-04 03:46:01,223 basehttp 4975 12918534144 "GET / HTTP/1.1" 200 2226
+INFO 2025-09-04 03:58:01,378 basehttp 4975 12918534144 "OPTIONS /login/ HTTP/1.1" 200 0
+INFO 2025-09-04 03:58:04,094 basehttp 4975 12918534144 "POST /login/ HTTP/1.1" 200 991
+INFO 2025-09-04 12:11:26,681 autoreload 4975 8517256640 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/authentication_service/settings.py changed, reloading.
+INFO 2025-09-04 12:11:28,138 autoreload 58184 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-04 12:11:33,788 autoreload 58184 8517256640 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/authentication_service/authentication_service/settings.py changed, reloading.

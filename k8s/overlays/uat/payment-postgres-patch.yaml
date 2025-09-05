@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: bidr
+spec:
+  template:
+    spec:
+      containers:
+      - name: payment-service
+        envFrom:
+        - secretRef:
+            name: payment-db-secret

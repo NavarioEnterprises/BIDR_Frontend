@@ -13,3 +13,22 @@ INFO 2025-08-10 03:18:49,073 autoreload 79275 8771748224 Watching for file chang
 INFO 2025-08-10 03:18:57,403 autoreload 79275 8771748224 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/resolution_service/resolution_service/settings.py changed, reloading.
 INFO 2025-08-10 03:18:57,605 autoreload 79287 8771748224 Watching for file changes with StatReloader
 INFO 2025-08-29 12:35:00,661 autoreload 61258 8272463296 Watching for file changes with StatReloader
+INFO 2025-09-03 00:21:01,785 autoreload 23908 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-03 00:45:13,841 autoreload 31565 8517256640 Watching for file changes with StatReloader
+WARNING 2025-09-03 00:46:26,039 log 31565 13052751872 Not Found: /
+WARNING 2025-09-03 00:46:26,040 basehttp 31565 13052751872 "GET / HTTP/1.1" 404 3163
+INFO 2025-09-03 00:52:30,928 autoreload 35556 8517256640 Watching for file changes with StatReloader
+WARNING 2025-09-03 00:52:51,784 log 35556 6198423552 Not Found: /
+WARNING 2025-09-03 00:52:51,787 basehttp 35556 6198423552 "GET / HTTP/1.1" 404 3163
+INFO 2025-09-03 01:26:56,070 autoreload 47353 8517256640 Watching for file changes with StatReloader
+WARNING 2025-09-03 01:27:11,749 log 47353 6125645824 Not Found: /
+WARNING 2025-09-03 01:27:11,749 basehttp 47353 6125645824 "GET / HTTP/1.1" 404 3163
+INFO 2025-09-03 02:18:08,166 autoreload 63420 8517256640 Watching for file changes with StatReloader
+WARNING 2025-09-03 02:18:23,351 log 63420 6127431680 Not Found: /
+WARNING 2025-09-03 02:18:23,351 basehttp 63420 6127431680 "GET / HTTP/1.1" 404 3163
+INFO 2025-09-04 02:27:59,056 autoreload 73256 8517256640 Watching for file changes with StatReloader
+WARNING 2025-09-04 02:28:21,514 log 73256 6128300032 Not Found: /
+WARNING 2025-09-04 02:28:21,515 basehttp 73256 6128300032 "GET / HTTP/1.1" 404 3163
+INFO 2025-09-04 03:45:41,735 autoreload 5047 8517256640 Watching for file changes with StatReloader
+WARNING 2025-09-04 03:46:01,380 log 5047 6125350912 Not Found: /
+WARNING 2025-09-04 03:46:01,380 basehttp 5047 6125350912 "GET / HTTP/1.1" 404 3163

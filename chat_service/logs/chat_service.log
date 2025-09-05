@@ -529,3 +529,34 @@ INFO 2025-08-31 22:33:52,813 basehttp 33696 6159921152 "GET /api/v1/chat/convers
 INFO 2025-08-31 22:33:52,832 basehttp 33696 6159921152 "OPTIONS /api/v1/moderation/users/Thulani%20Keith/warnings/?limit=50&offset=0 HTTP/1.1" 200 0
 WARNING 2025-08-31 22:33:52,839 log 33696 6159921152 Not Found: /api/v1/moderation/users/Thulani Keith/warnings/
 WARNING 2025-08-31 22:33:52,839 basehttp 33696 6159921152 "GET /api/v1/moderation/users/Thulani%20Keith/warnings/?limit=50&offset=0 HTTP/1.1" 404 3202
+INFO 2025-09-03 00:21:01,891 autoreload 23910 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-03 00:44:36,597 autoreload 31081 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-03 00:46:25,985 basehttp 31081 6201896960 "GET / HTTP/1.1" 200 450
+INFO 2025-09-03 00:52:28,372 autoreload 35534 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-03 00:52:51,742 basehttp 35534 6156775424 "GET / HTTP/1.1" 200 450
+INFO 2025-09-03 01:12:02,118 basehttp 35534 6156775424 "OPTIONS /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+INFO 2025-09-03 01:12:02,203 basehttp 35534 6156775424 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 201 540
+INFO 2025-09-03 01:12:02,283 basehttp 35534 6156775424 "OPTIONS /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 200 0
+WARNING 2025-09-03 01:12:02,297 log 35534 6156775424 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-09-03 01:12:02,297 basehttp 35534 6156775424 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+INFO 2025-09-03 01:12:02,323 basehttp 35534 6156775424 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 540
+INFO 2025-09-03 01:12:02,340 basehttp 35534 6156775424 "OPTIONS /api/v1/chat/conversations/0807b6d6-3e72-4dbe-abb4-47e7f12d1ae2/messages/ HTTP/1.1" 200 0
+INFO 2025-09-03 01:12:02,346 basehttp 35534 6156775424 "GET /api/v1/chat/conversations/0807b6d6-3e72-4dbe-abb4-47e7f12d1ae2/messages/ HTTP/1.1" 200 2
+INFO 2025-09-03 01:12:02,361 basehttp 35534 6156775424 "OPTIONS /api/v1/moderation/users/thulanik%20aaa/warnings/?limit=50&offset=0 HTTP/1.1" 200 0
+WARNING 2025-09-03 01:12:02,364 log 35534 6156775424 Not Found: /api/v1/moderation/users/thulanik aaa/warnings/
+WARNING 2025-09-03 01:12:02,364 basehttp 35534 6156775424 "GET /api/v1/moderation/users/thulanik%20aaa/warnings/?limit=50&offset=0 HTTP/1.1" 404 3199
+INFO 2025-09-03 01:26:53,407 autoreload 47327 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-03 01:27:11,714 basehttp 47327 6130364416 "GET / HTTP/1.1" 200 450
+INFO 2025-09-03 01:53:19,861 basehttp 47327 6130364416 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 540
+WARNING 2025-09-03 01:53:20,043 log 47327 6130364416 Not Found: /api/v1/moderation/users/thulanik aaa/status/
+WARNING 2025-09-03 01:53:20,044 basehttp 47327 6130364416 "GET /api/v1/moderation/users/thulanik%20aaa/status/ HTTP/1.1" 404 3171
+INFO 2025-09-03 01:53:20,088 basehttp 47327 6130364416 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 540
+INFO 2025-09-03 01:53:20,128 basehttp 47327 6130364416 "GET /api/v1/chat/conversations/0807b6d6-3e72-4dbe-abb4-47e7f12d1ae2/messages/ HTTP/1.1" 200 2
+WARNING 2025-09-03 01:53:20,156 log 47327 6130364416 Not Found: /api/v1/moderation/users/thulanik aaa/warnings/
+WARNING 2025-09-03 01:53:20,156 basehttp 47327 6130364416 "GET /api/v1/moderation/users/thulanik%20aaa/warnings/?limit=50&offset=0 HTTP/1.1" 404 3199
+INFO 2025-09-03 02:18:05,359 autoreload 63384 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-03 02:18:23,318 basehttp 63384 6169702400 "GET / HTTP/1.1" 200 450
+INFO 2025-09-04 02:27:51,996 autoreload 73195 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-04 02:28:21,461 basehttp 73195 6125580288 "GET / HTTP/1.1" 200 450
+INFO 2025-09-04 03:45:36,684 autoreload 5003 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-04 03:46:01,305 basehttp 5003 6169882624 "GET / HTTP/1.1" 200 450

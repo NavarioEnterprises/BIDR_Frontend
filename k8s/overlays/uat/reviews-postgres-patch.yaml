@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-service
+  namespace: bidr
+spec:
+  template:
+    spec:
+      containers:
+      - name: reviews-service
+        envFrom:
+        - secretRef:
+            name: reviews-db-secret

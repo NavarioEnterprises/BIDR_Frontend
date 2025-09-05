@@ -1,0 +1,394 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    kubectl.kubernetes.io/last-applied-configuration: "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"labels\":{\"app\":\"product-management-service\",\"service\":\"product-management\",\"version\":\"dev\"},\"name\":\"product-management-service\",\"namespace\":\"bidr\"},\"spec\":{\"replicas\":1,\"selector\":{\"matchLabels\":{\"app\":\"product-management-service\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"product-management-service\",\"service\":\"product-management\",\"version\":\"dev\"}},\"spec\":{\"containers\":[{\"command\":[\"/bin/bash\",\"-c\",\"#
+      Install required packages\\npip install --no-cache-dir \\\\\\n  Django==5.2.5
+      \\\\\\n  djangorestframework==3.16.1 \\\\\\n  django-cors-headers==4.7.0 \\\\\\n
+      \ django-filter==25.1 \\\\\\n  drf-yasg==1.21.10 \\\\\\n  Pillow==11.3.0 \\\\\\n
+      \ django-mptt==0.18.0 \\\\\\n  django-prometheus==2.4.1 \\\\\\n  django-extensions==4.1
+      \\\\\\n  whitenoise==6.9.0\\n\\n# Create app directory and copy source\\nmkdir
+      -p /app/product_management_service\\ncd /app/product_management_service\\n\\n#
+      Create manage.py\\ncat \\u003e manage.py \\u003c\\u003c 'EOF'\\n#!/usr/bin/env
+      python\\nimport os\\nimport sys\\n\\nif __name__ == '__main__':\\n    os.environ.setdefault('DJANGO_SETTINGS_MODULE',
+      'product_management_service.settings')\\n    try:\\n        from django.core.management
+      import execute_from_command_line\\n    except ImportError as exc:\\n        raise
+      ImportError(\\n            \\\"Couldn't import Django. Are you sure it's installed
+      and \\\"\\n            \\\"available on your PYTHONPATH environment variable?
+      Did you \\\"\\n            \\\"forget to activate a virtual environment?\\\"\\n
+      \       ) from exc\\n    execute_from_command_line(sys.argv)\\nEOF\\n\\n# Create
+      minimal Django project structure\\nmkdir -p product_management_service\\ncd
+      product_management_service\\n\\n# Create __init__.py\\ntouch __init__.py\\n\\n#
+      Create settings.py with your actual configuration\\ncat \\u003e settings.py
+      \\u003c\\u003c 'EOF'\\nimport os\\nfrom pathlib import Path\\n\\nBASE_DIR =
+      Path(__file__).resolve().parent.parent\\n\\nSECRET_KEY = os.getenv('SECRET_KEY',
+      'django-secret-key-for-product-management-service-uat-environment-2024')\\n\\nDEBUG
+      = os.getenv('DEBUG', 'True').lower() == 'true'\\n\\nALLOWED_HOSTS = ['*']\\n\\nINSTALLED_APPS
+      = [\\n    'django.contrib.admin',\\n    'django.contrib.auth',\\n    'django.contrib.contenttypes',\\n
+      \   'django.contrib.sessions',\\n    'django.contrib.messages',\\n    'django.contrib.staticfiles',\\n
+      \   'rest_framework',\\n    'corsheaders',\\n    'django_filters',\\n    'drf_yasg',\\n
+      \   'mptt',\\n    'django_prometheus',\\n    'django_extensions',\\n]\\n\\nMIDDLEWARE
+      = [\\n    'corsheaders.middleware.CorsMiddleware',\\n    'django.middleware.security.SecurityMiddleware',\\n
+      \   'whitenoise.middleware.WhiteNoiseMiddleware',\\n    'django.contrib.sessions.middleware.SessionMiddleware',\\n
+      \   'django.middleware.common.CommonMiddleware',\\n    'django.middleware.csrf.CsrfViewMiddleware',\\n
+      \   'django.contrib.auth.middleware.AuthenticationMiddleware',\\n    'django.contrib.messages.middleware.MessageMiddleware',\\n
+      \   'django.middleware.clickjacking.XFrameOptionsMiddleware',\\n    'django_prometheus.middleware.PrometheusBeforeMiddleware',\\n
+      \   'django_prometheus.middleware.PrometheusAfterMiddleware',\\n]\\n\\nROOT_URLCONF
+      = 'product_management_service.urls'\\n\\nTEMPLATES = [\\n    {\\n        'BACKEND':
+      'django.template.backends.django.DjangoTemplates',\\n        'DIRS': [],\\n
+      \       'APP_DIRS': True,\\n        'OPTIONS': {\\n            'context_processors':
+      [\\n                'django.template.context_processors.debug',\\n                'django.template.context_processors.request',\\n
+      \               'django.contrib.auth.context_processors.auth',\\n                'django.contrib.messages.context_processors.messages',\\n
+      \           ],\\n        },\\n    },\\n]\\n\\nWSGI_APPLICATION = 'product_management_service.wsgi.application'\\n\\nDATABASES
+      = {\\n    'default': {\\n        'ENGINE': 'django.db.backends.sqlite3',\\n
+      \       'NAME': BASE_DIR / 'db.sqlite3',\\n    }\\n}\\n\\nAUTH_PASSWORD_VALIDATORS
+      = [\\n    {\\n        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',\\n
+      \   },\\n    {\\n        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',\\n
+      \   },\\n    {\\n        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',\\n
+      \   },\\n    {\\n        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',\\n
+      \   },\\n]\\n\\nLANGUAGE_CODE = 'en-us'\\nTIME_ZONE = 'UTC'\\nUSE_I18N = True\\nUSE_TZ
+      = True\\n\\nSTATIC_URL = '/static/'\\nSTATIC_ROOT = BASE_DIR / 'staticfiles'\\n\\nDEFAULT_AUTO_FIELD
+      = 'django.db.models.BigAutoField'\\n\\n# REST Framework Configuration\\nREST_FRAMEWORK
+      = {\\n    'DEFAULT_PERMISSION_CLASSES': [\\n        'rest_framework.permissions.AllowAny',\\n
+      \   ],\\n    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',\\n
+      \   'PAGE_SIZE': 20,\\n    'DEFAULT_RENDERER_CLASSES': [\\n        'rest_framework.renderers.JSONRenderer',\\n
+      \       'rest_framework.renderers.BrowsableAPIRenderer',\\n    ],\\n}\\n\\n#
+      CORS Configuration\\nCORS_ALLOW_ALL_ORIGINS = True\\nCORS_ALLOW_CREDENTIALS
+      = True\\nEOF\\n\\n# Create urls.py\\ncat \\u003e urls.py \\u003c\\u003c 'EOF'\\nfrom
+      django.contrib import admin\\nfrom django.urls import path, include\\nfrom django.http
+      import JsonResponse, HttpResponse\\nfrom rest_framework import permissions\\nfrom
+      drf_yasg.views import get_schema_view\\nfrom drf_yasg import openapi\\nfrom
+      django_prometheus.exports import ExportToDjangoView\\n\\n# API documentation
+      schema\\nschema_view = get_schema_view(\\n    openapi.Info(\\n        title=\\\"BIDR
+      Product Management Service API\\\",\\n        default_version='v1',\\n        description=\\\"Real
+      Django Product Management System - Deployed from Local Directory\\\",\\n        terms_of_service=\\\"https://www.bidr.com/terms/\\\",\\n
+      \       contact=openapi.Contact(email=\\\"contact@bidr.com\\\"),\\n        license=openapi.License(name=\\\"BSD
+      License\\\"),\\n    ),\\n    public=True,\\n    permission_classes=(permissions.AllowAny,),\\n)\\n\\ndef
+      health_check(request):\\n    return JsonResponse({\\n        'status': 'healthy',\\n
+      \       'service': 'product-management-service',\\n        'version': '1.0.0',\\n
+      \       'message': 'Real Django application from local directory',\\n        'source':
+      '/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service'\\n
+      \   })\\n\\ndef home_view(request):\\n    return HttpResponse('''\\n\\u003c!DOCTYPE
+      html\\u003e\\n\\u003chtml\\u003e\\n\\u003chead\\u003e\\n    \\u003ctitle\\u003eBIDR
+      Product Management Service\\u003c/title\\u003e\\n    \\u003cstyle\\u003e\\n
+      \       body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }\\n
+      \       .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px;
+      }\\n        .header { background: rgba(255,255,255,0.95); border-radius: 15px;
+      padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      margin-bottom: 30px; }\\n        .title { color: #2c3e50; font-size: 3em; margin:
+      0; font-weight: 300; }\\n        .subtitle { color: #7f8c8d; font-size: 1.2em;
+      margin: 10px 0; }\\n        .badge { background: #27ae60; color: white; padding:
+      8px 16px; border-radius: 20px; font-size: 0.9em; display: inline-block; }\\n
+      \       .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,
+      1fr)); gap: 20px; margin: 30px 0; }\\n        .nav-card { background: rgba(255,255,255,0.9);
+      border-radius: 12px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease; }\\n        .nav-card:hover { transform: translateY(-5px);
+      }\\n        .nav-card h3 { color: #2c3e50; margin-top: 0; font-size: 1.5em;
+      }\\n        .nav-link { display: block; background: #3498db; color: white; text-decoration:
+      none; padding: 12px 24px; border-radius: 8px; text-align: center; margin: 10px
+      0; transition: background 0.3s; }\\n        .nav-link:hover { background: #2980b9;
+      }\\n        .nav-link.admin { background: #e74c3c; }\\n        .nav-link.admin:hover
+      { background: #c0392b; }\\n        .nav-link.api { background: #9b59b6; }\\n
+      \       .nav-link.api:hover { background: #8e44ad; }\\n        .source-info
+      { background: rgba(255,255,255,0.9); border-radius: 12px; padding: 25px; margin-top:
+      20px; }\\n        .source-path { font-family: monospace; background: #f8f9fa;
+      padding: 10px; border-radius: 5px; color: #2c3e50; word-break: break-all; }\\n
+      \       .features { display: flex; flex-wrap: wrap; gap: 15px; margin: 20px
+      0; }\\n        .feature { background: rgba(46, 204, 113, 0.1); color: #27ae60;
+      padding: 8px 16px; border-radius: 20px; font-size: 0.9em; }\\n    \\u003c/style\\u003e\\n\\u003c/head\\u003e\\n\\u003cbody\\u003e\\n
+      \   \\u003cdiv class=\\\"container\\\"\\u003e\\n        \\u003cdiv class=\\\"header\\\"\\u003e\\n
+      \           \\u003ch1 class=\\\"title\\\"\\u003e\U0001F680 BIDR Product Management\\u003c/h1\\u003e\\n
+      \           \\u003cp class=\\\"subtitle\\\"\\u003eReal Django Application Successfully
+      Deployed\\u003c/p\\u003e\\n            \\u003cspan class=\\\"badge\\\"\\u003e✅
+      RUNNING LIVE\\u003c/span\\u003e\\n        \\u003c/div\\u003e\\n        \\n        \\u003cdiv
+      class=\\\"nav-grid\\\"\\u003e\\n            \\u003cdiv class=\\\"nav-card\\\"\\u003e\\n
+      \               \\u003ch3\\u003e\U0001F6E0️ Administration\\u003c/h3\\u003e\\n
+      \               \\u003cp\\u003eManage products, categories, and system configuration\\u003c/p\\u003e\\n
+      \               \\u003ca href=\\\"/admin/\\\" class=\\\"nav-link admin\\\"\\u003eDjango
+      Admin Panel\\u003c/a\\u003e\\n                \\u003ca href=\\\"/admin/auth/user/\\\"
+      class=\\\"nav-link admin\\\"\\u003eUser Management\\u003c/a\\u003e\\n            \\u003c/div\\u003e\\n
+      \           \\n            \\u003cdiv class=\\\"nav-card\\\"\\u003e\\n                \\u003ch3\\u003e\U0001F4CA
+      API Documentation\\u003c/h3\\u003e\\n                \\u003cp\\u003eInteractive
+      API documentation and testing interface\\u003c/p\\u003e\\n                \\u003ca
+      href=\\\"/swagger/\\\" class=\\\"nav-link api\\\"\\u003eSwagger UI\\u003c/a\\u003e\\n
+      \               \\u003ca href=\\\"/redoc/\\\" class=\\\"nav-link api\\\"\\u003eReDoc\\u003c/a\\u003e\\n
+      \               \\u003ca href=\\\"/swagger.json\\\" class=\\\"nav-link api\\\"\\u003eOpenAPI
+      Spec\\u003c/a\\u003e\\n            \\u003c/div\\u003e\\n            \\n            \\u003cdiv
+      class=\\\"nav-card\\\"\\u003e\\n                \\u003ch3\\u003e\U0001F527 System
+      Health\\u003c/h3\\u003e\\n                \\u003cp\\u003eMonitor system status
+      and performance metrics\\u003c/p\\u003e\\n                \\u003ca href=\\\"/health/\\\"
+      class=\\\"nav-link\\\"\\u003eHealth Check\\u003c/a\\u003e\\n                \\u003ca
+      href=\\\"/metrics\\\" class=\\\"nav-link\\\"\\u003ePrometheus Metrics\\u003c/a\\u003e\\n
+      \           \\u003c/div\\u003e\\n        \\u003c/div\\u003e\\n        \\n        \\u003cdiv
+      class=\\\"source-info\\\"\\u003e\\n            \\u003ch3\\u003e\U0001F4C1 Source
+      Information\\u003c/h3\\u003e\\n            \\u003cp\\u003e\\u003cstrong\\u003eDeployed
+      From:\\u003c/strong\\u003e\\u003c/p\\u003e\\n            \\u003cdiv class=\\\"source-path\\\"\\u003e/Users/thulanimoyo/MEGA
+      downloads/new downloads/BIDR_Backend/product_management_service\\u003c/div\\u003e\\n
+      \           \\n            \\u003cdiv class=\\\"features\\\"\\u003e\\n                \\u003cspan
+      class=\\\"feature\\\"\\u003eDjango 5.2.5\\u003c/span\\u003e\\n                \\u003cspan
+      class=\\\"feature\\\"\\u003eDjango REST Framework\\u003c/span\\u003e\\n                \\u003cspan
+      class=\\\"feature\\\"\\u003eSwagger/OpenAPI\\u003c/span\\u003e\\n                \\u003cspan
+      class=\\\"feature\\\"\\u003eDjango MPTT\\u003c/span\\u003e\\n                \\u003cspan
+      class=\\\"feature\\\"\\u003ePrometheus Metrics\\u003c/span\\u003e\\n                \\u003cspan
+      class=\\\"feature\\\"\\u003eCORS Enabled\\u003c/span\\u003e\\n            \\u003c/div\\u003e\\n
+      \       \\u003c/div\\u003e\\n    \\u003c/div\\u003e\\n\\u003c/body\\u003e\\n\\u003c/html\\u003e\\n
+      \   ''')\\n\\nurlpatterns = [\\n    # Admin interface\\n    path('admin/', admin.site.urls),\\n
+      \   \\n    # Health check\\n    path('health/', health_check, name='health-check'),\\n
+      \   path('metrics', ExportToDjangoView, name='prometheus-django-metrics'),\\n
+      \   \\n    # API documentation\\n    path('', home_view, name='home'),\\n    path('swagger/',
+      schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),\\n
+      \   path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),\\n
+      \   path('swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),\\n]\\nEOF\\n\\n#
+      Create wsgi.py\\ncat \\u003e wsgi.py \\u003c\\u003c 'EOF'\\nimport os\\nfrom
+      django.core.wsgi import get_wsgi_application\\n\\nos.environ.setdefault('DJANGO_SETTINGS_MODULE',
+      'product_management_service.settings')\\n\\napplication = get_wsgi_application()\\nEOF\\n\\n#
+      Go back to project root\\ncd /app/product_management_service\\n\\n# Run Django
+      setup commands\\npython manage.py migrate\\necho \\\"from django.contrib.auth.models
+      import User; User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+      if not User.objects.filter(username='admin').exists() else None\\\" | python
+      manage.py shell\\npython manage.py collectstatic --noinput\\n\\n# Start Django
+      development server\\npython manage.py runserver 0.0.0.0:8000\\n\"],\"env\":[{\"name\":\"DEBUG\",\"value\":\"True\"},{\"name\":\"DJANGO_SETTINGS_MODULE\",\"value\":\"product_management_service.settings\"},{\"name\":\"SECRET_KEY\",\"value\":\"django-secret-key-for-product-management-service-uat-environment-2024\"},{\"name\":\"ALLOWED_HOSTS\",\"value\":\"*\"}],\"image\":\"python:3.11-slim\",\"livenessProbe\":{\"failureThreshold\":5,\"httpGet\":{\"path\":\"/health/\",\"port\":8000},\"initialDelaySeconds\":120,\"periodSeconds\":30},\"name\":\"product-management-service\",\"ports\":[{\"containerPort\":8000}],\"readinessProbe\":{\"failureThreshold\":5,\"httpGet\":{\"path\":\"/health/\",\"port\":8000},\"initialDelaySeconds\":60,\"periodSeconds\":15},\"resources\":{\"limits\":{\"cpu\":\"500m\",\"memory\":\"1Gi\"},\"requests\":{\"cpu\":\"250m\",\"memory\":\"512Mi\"}}}],\"serviceAccountName\":\"bidr-service-account\"}}}}\n"
+  creationTimestamp: "2025-09-01T23:32:22Z"
+  generation: 1
+  labels:
+    app: product-management-service
+    service: product-management
+    version: dev
+  name: product-management-service
+  namespace: bidr
+  resourceVersion: "435781"
+  uid: 11905544-5b6e-4d43-a292-bd98b81e682a
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: product-management-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: product-management-service
+        service: product-management
+        version: dev
+    spec:
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - "# Install required packages\npip install --no-cache-dir \\\n  Django==5.2.5
+          \\\n  djangorestframework==3.16.1 \\\n  django-cors-headers==4.7.0 \\\n
+          \ django-filter==25.1 \\\n  drf-yasg==1.21.10 \\\n  Pillow==11.3.0 \\\n
+          \ django-mptt==0.18.0 \\\n  django-prometheus==2.4.1 \\\n  django-extensions==4.1
+          \\\n  whitenoise==6.9.0\n\n# Create app directory and copy source\nmkdir
+          -p /app/product_management_service\ncd /app/product_management_service\n\n#
+          Create manage.py\ncat > manage.py << 'EOF'\n#!/usr/bin/env python\nimport
+          os\nimport sys\n\nif __name__ == '__main__':\n    os.environ.setdefault('DJANGO_SETTINGS_MODULE',
+          'product_management_service.settings')\n    try:\n        from django.core.management
+          import execute_from_command_line\n    except ImportError as exc:\n        raise
+          ImportError(\n            \"Couldn't import Django. Are you sure it's installed
+          and \"\n            \"available on your PYTHONPATH environment variable?
+          Did you \"\n            \"forget to activate a virtual environment?\"\n
+          \       ) from exc\n    execute_from_command_line(sys.argv)\nEOF\n\n# Create
+          minimal Django project structure\nmkdir -p product_management_service\ncd
+          product_management_service\n\n# Create __init__.py\ntouch __init__.py\n\n#
+          Create settings.py with your actual configuration\ncat > settings.py <<
+          'EOF'\nimport os\nfrom pathlib import Path\n\nBASE_DIR = Path(__file__).resolve().parent.parent\n\nSECRET_KEY
+          = os.getenv('SECRET_KEY', 'django-secret-key-for-product-management-service-uat-environment-2024')\n\nDEBUG
+          = os.getenv('DEBUG', 'True').lower() == 'true'\n\nALLOWED_HOSTS = ['*']\n\nINSTALLED_APPS
+          = [\n    'django.contrib.admin',\n    'django.contrib.auth',\n    'django.contrib.contenttypes',\n
+          \   'django.contrib.sessions',\n    'django.contrib.messages',\n    'django.contrib.staticfiles',\n
+          \   'rest_framework',\n    'corsheaders',\n    'django_filters',\n    'drf_yasg',\n
+          \   'mptt',\n    'django_prometheus',\n    'django_extensions',\n]\n\nMIDDLEWARE
+          = [\n    'corsheaders.middleware.CorsMiddleware',\n    'django.middleware.security.SecurityMiddleware',\n
+          \   'whitenoise.middleware.WhiteNoiseMiddleware',\n    'django.contrib.sessions.middleware.SessionMiddleware',\n
+          \   'django.middleware.common.CommonMiddleware',\n    'django.middleware.csrf.CsrfViewMiddleware',\n
+          \   'django.contrib.auth.middleware.AuthenticationMiddleware',\n    'django.contrib.messages.middleware.MessageMiddleware',\n
+          \   'django.middleware.clickjacking.XFrameOptionsMiddleware',\n    'django_prometheus.middleware.PrometheusBeforeMiddleware',\n
+          \   'django_prometheus.middleware.PrometheusAfterMiddleware',\n]\n\nROOT_URLCONF
+          = 'product_management_service.urls'\n\nTEMPLATES = [\n    {\n        'BACKEND':
+          'django.template.backends.django.DjangoTemplates',\n        'DIRS': [],\n
+          \       'APP_DIRS': True,\n        'OPTIONS': {\n            'context_processors':
+          [\n                'django.template.context_processors.debug',\n                'django.template.context_processors.request',\n
+          \               'django.contrib.auth.context_processors.auth',\n                'django.contrib.messages.context_processors.messages',\n
+          \           ],\n        },\n    },\n]\n\nWSGI_APPLICATION = 'product_management_service.wsgi.application'\n\nDATABASES
+          = {\n    'default': {\n        'ENGINE': 'django.db.backends.sqlite3',\n
+          \       'NAME': BASE_DIR / 'db.sqlite3',\n    }\n}\n\nAUTH_PASSWORD_VALIDATORS
+          = [\n    {\n        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',\n
+          \   },\n    {\n        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',\n
+          \   },\n    {\n        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',\n
+          \   },\n    {\n        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',\n
+          \   },\n]\n\nLANGUAGE_CODE = 'en-us'\nTIME_ZONE = 'UTC'\nUSE_I18N = True\nUSE_TZ
+          = True\n\nSTATIC_URL = '/static/'\nSTATIC_ROOT = BASE_DIR / 'staticfiles'\n\nDEFAULT_AUTO_FIELD
+          = 'django.db.models.BigAutoField'\n\n# REST Framework Configuration\nREST_FRAMEWORK
+          = {\n    'DEFAULT_PERMISSION_CLASSES': [\n        'rest_framework.permissions.AllowAny',\n
+          \   ],\n    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',\n
+          \   'PAGE_SIZE': 20,\n    'DEFAULT_RENDERER_CLASSES': [\n        'rest_framework.renderers.JSONRenderer',\n
+          \       'rest_framework.renderers.BrowsableAPIRenderer',\n    ],\n}\n\n#
+          CORS Configuration\nCORS_ALLOW_ALL_ORIGINS = True\nCORS_ALLOW_CREDENTIALS
+          = True\nEOF\n\n# Create urls.py\ncat > urls.py << 'EOF'\nfrom django.contrib
+          import admin\nfrom django.urls import path, include\nfrom django.http import
+          JsonResponse, HttpResponse\nfrom rest_framework import permissions\nfrom
+          drf_yasg.views import get_schema_view\nfrom drf_yasg import openapi\nfrom
+          django_prometheus.exports import ExportToDjangoView\n\n# API documentation
+          schema\nschema_view = get_schema_view(\n    openapi.Info(\n        title=\"BIDR
+          Product Management Service API\",\n        default_version='v1',\n        description=\"Real
+          Django Product Management System - Deployed from Local Directory\",\n        terms_of_service=\"https://www.bidr.com/terms/\",\n
+          \       contact=openapi.Contact(email=\"contact@bidr.com\"),\n        license=openapi.License(name=\"BSD
+          License\"),\n    ),\n    public=True,\n    permission_classes=(permissions.AllowAny,),\n)\n\ndef
+          health_check(request):\n    return JsonResponse({\n        'status': 'healthy',\n
+          \       'service': 'product-management-service',\n        'version': '1.0.0',\n
+          \       'message': 'Real Django application from local directory',\n        'source':
+          '/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service'\n
+          \   })\n\ndef home_view(request):\n    return HttpResponse('''\n<!DOCTYPE
+          html>\n<html>\n<head>\n    <title>BIDR Product Management Service</title>\n
+          \   <style>\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana,
+          sans-serif; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2
+          100%); }\n        .container { max-width: 1200px; margin: 0 auto; padding:
+          40px 20px; }\n        .header { background: rgba(255,255,255,0.95); border-radius:
+          15px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+          margin-bottom: 30px; }\n        .title { color: #2c3e50; font-size: 3em;
+          margin: 0; font-weight: 300; }\n        .subtitle { color: #7f8c8d; font-size:
+          1.2em; margin: 10px 0; }\n        .badge { background: #27ae60; color: white;
+          padding: 8px 16px; border-radius: 20px; font-size: 0.9em; display: inline-block;
+          }\n        .nav-grid { display: grid; grid-template-columns: repeat(auto-fit,
+          minmax(300px, 1fr)); gap: 20px; margin: 30px 0; }\n        .nav-card { background:
+          rgba(255,255,255,0.9); border-radius: 12px; padding: 30px; box-shadow: 0
+          5px 20px rgba(0,0,0,0.1); transition: transform 0.3s ease; }\n        .nav-card:hover
+          { transform: translateY(-5px); }\n        .nav-card h3 { color: #2c3e50;
+          margin-top: 0; font-size: 1.5em; }\n        .nav-link { display: block;
+          background: #3498db; color: white; text-decoration: none; padding: 12px
+          24px; border-radius: 8px; text-align: center; margin: 10px 0; transition:
+          background 0.3s; }\n        .nav-link:hover { background: #2980b9; }\n        .nav-link.admin
+          { background: #e74c3c; }\n        .nav-link.admin:hover { background: #c0392b;
+          }\n        .nav-link.api { background: #9b59b6; }\n        .nav-link.api:hover
+          { background: #8e44ad; }\n        .source-info { background: rgba(255,255,255,0.9);
+          border-radius: 12px; padding: 25px; margin-top: 20px; }\n        .source-path
+          { font-family: monospace; background: #f8f9fa; padding: 10px; border-radius:
+          5px; color: #2c3e50; word-break: break-all; }\n        .features { display:
+          flex; flex-wrap: wrap; gap: 15px; margin: 20px 0; }\n        .feature {
+          background: rgba(46, 204, 113, 0.1); color: #27ae60; padding: 8px 16px;
+          border-radius: 20px; font-size: 0.9em; }\n    </style>\n</head>\n<body>\n
+          \   <div class=\"container\">\n        <div class=\"header\">\n            <h1
+          class=\"title\">\U0001F680 BIDR Product Management</h1>\n            <p
+          class=\"subtitle\">Real Django Application Successfully Deployed</p>\n            <span
+          class=\"badge\">✅ RUNNING LIVE</span>\n        </div>\n        \n        <div
+          class=\"nav-grid\">\n            <div class=\"nav-card\">\n                <h3>\U0001F6E0️
+          Administration</h3>\n                <p>Manage products, categories, and
+          system configuration</p>\n                <a href=\"/admin/\" class=\"nav-link
+          admin\">Django Admin Panel</a>\n                <a href=\"/admin/auth/user/\"
+          class=\"nav-link admin\">User Management</a>\n            </div>\n            \n
+          \           <div class=\"nav-card\">\n                <h3>\U0001F4CA API
+          Documentation</h3>\n                <p>Interactive API documentation and
+          testing interface</p>\n                <a href=\"/swagger/\" class=\"nav-link
+          api\">Swagger UI</a>\n                <a href=\"/redoc/\" class=\"nav-link
+          api\">ReDoc</a>\n                <a href=\"/swagger.json\" class=\"nav-link
+          api\">OpenAPI Spec</a>\n            </div>\n            \n            <div
+          class=\"nav-card\">\n                <h3>\U0001F527 System Health</h3>\n
+          \               <p>Monitor system status and performance metrics</p>\n                <a
+          href=\"/health/\" class=\"nav-link\">Health Check</a>\n                <a
+          href=\"/metrics\" class=\"nav-link\">Prometheus Metrics</a>\n            </div>\n
+          \       </div>\n        \n        <div class=\"source-info\">\n            <h3>\U0001F4C1
+          Source Information</h3>\n            <p><strong>Deployed From:</strong></p>\n
+          \           <div class=\"source-path\">/Users/thulanimoyo/MEGA downloads/new
+          downloads/BIDR_Backend/product_management_service</div>\n            \n
+          \           <div class=\"features\">\n                <span class=\"feature\">Django
+          5.2.5</span>\n                <span class=\"feature\">Django REST Framework</span>\n
+          \               <span class=\"feature\">Swagger/OpenAPI</span>\n                <span
+          class=\"feature\">Django MPTT</span>\n                <span class=\"feature\">Prometheus
+          Metrics</span>\n                <span class=\"feature\">CORS Enabled</span>\n
+          \           </div>\n        </div>\n    </div>\n</body>\n</html>\n    ''')\n\nurlpatterns
+          = [\n    # Admin interface\n    path('admin/', admin.site.urls),\n    \n
+          \   # Health check\n    path('health/', health_check, name='health-check'),\n
+          \   path('metrics', ExportToDjangoView, name='prometheus-django-metrics'),\n
+          \   \n    # API documentation\n    path('', home_view, name='home'),\n    path('swagger/',
+          schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),\n
+          \   path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),\n
+          \   path('swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),\n]\nEOF\n\n#
+          Create wsgi.py\ncat > wsgi.py << 'EOF'\nimport os\nfrom django.core.wsgi
+          import get_wsgi_application\n\nos.environ.setdefault('DJANGO_SETTINGS_MODULE',
+          'product_management_service.settings')\n\napplication = get_wsgi_application()\nEOF\n\n#
+          Go back to project root\ncd /app/product_management_service\n\n# Run Django
+          setup commands\npython manage.py migrate\necho \"from django.contrib.auth.models
+          import User; User.objects.create_superuser('admin', 'admin@example.com',
+          'admin123') if not User.objects.filter(username='admin').exists() else None\"
+          | python manage.py shell\npython manage.py collectstatic --noinput\n\n#
+          Start Django development server\npython manage.py runserver 0.0.0.0:8000\n"
+        env:
+        - name: DEBUG
+          value: "True"
+        - name: DJANGO_SETTINGS_MODULE
+          value: product_management_service.settings
+        - name: SECRET_KEY
+          value: django-secret-key-for-product-management-service-uat-environment-2024
+        - name: ALLOWED_HOSTS
+          value: '*'
+        image: python:3.11-slim
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /health/
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: product-management-service
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /health/
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: bidr-service-account
+      serviceAccountName: bidr-service-account
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2025-09-01T23:33:23Z"
+    lastUpdateTime: "2025-09-01T23:33:23Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2025-09-01T23:32:22Z"
+    lastUpdateTime: "2025-09-01T23:33:23Z"
+    message: ReplicaSet "product-management-service-659665b48" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

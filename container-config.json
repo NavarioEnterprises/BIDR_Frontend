@@ -1,0 +1,73 @@
+{
+  "location": "westus",
+  "properties": {
+    "containers": [
+      {
+        "name": "bidr-auth-service",
+        "properties": {
+          "image": "bidrsimpleregistry.azurecr.io/bidr-authentication-service:latest",
+          "ports": [
+            {
+              "port": 8000,
+              "protocol": "TCP"
+            }
+          ],
+          "environmentVariables": [
+            {
+              "name": "SECRET_KEY",
+              "value": "RZU1QPUcQfUxElNc8yKxVPFH4bCoJ2z3Fe0o2JlhhbI="
+            },
+            {
+              "name": "DEBUG",
+              "value": "False"
+            },
+            {
+              "name": "ALLOWED_HOSTS",
+              "value": "*"
+            },
+            {
+              "name": "DJANGO_SETTINGS_MODULE",
+              "value": "authentication_service.settings"
+            },
+            {
+              "name": "JWT_SECRET_KEY",
+              "value": "gJ8nmLP9pYQWkxjqZIwObz8+UaGZ4IZQvxhG/bV6n3s="
+            },
+            {
+              "name": "CORS_ALLOW_ALL_ORIGINS",
+              "value": "True"
+            }
+          ],
+          "resources": {
+            "requests": {
+              "cpu": 1.0,
+              "memoryInGb": 1.5
+            }
+          }
+        }
+      }
+    ],
+    "imageRegistryCredentials": [
+      {
+        "server": "bidrsimpleregistry.azurecr.io",
+        "username": "bidrsimpleregistry"
+      }
+    ],
+    "ipAddress": {
+      "type": "Public",
+      "dnsNameLabel": "bidr-auth-1756991300",
+      "ports": [
+        {
+          "port": 80,
+          "protocol": "TCP"
+        },
+        {
+          "port": 443,
+          "protocol": "TCP"
+        }
+      ]
+    },
+    "osType": "Linux",
+    "restartPolicy": "OnFailure"
+  }
+}

@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reviews-app-code
+  namespace: bidr
+data:
+  app.py: |
+    from django.conf import settings
+    settings.configure(
+      DEBUG=True,
+      ROOT_URLCONF=__name__,
+      ALLOWED_HOSTS=["*"]
+    )
+
+    from django.http import HttpResponse, JsonResponse
+    from django.urls import path
+
+    def health_check(request):
+        return JsonResponse({"status": "healthy"})
+
+    def reviews_list(request):
+        return JsonResponse({"message": "Reviews Service Running"})
+
+    urlpatterns = [
+        path("health/", health_check),
+        path("", reviews_list),
+    ]
+
+    from django.core.wsgi import get_wsgi_application
+    application = get_wsgi_application()
