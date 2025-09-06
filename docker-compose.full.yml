@@ -9,6 +9,7 @@ volumes:
   redis-data:
   static-volume:
   media-volume:
+  uploads-volume:
 
 services:
   # Database Services
@@ -83,6 +84,7 @@ services:
     volumes:
       - static-volume:/app/staticfiles
       - media-volume:/app/media
+      - ./uploads:/app/uploads
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
@@ -114,6 +116,7 @@ services:
     volumes:
       - static-volume:/app/staticfiles
       - media-volume:/app/media
+      - ./uploads:/app/uploads
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
@@ -147,6 +150,7 @@ services:
     volumes:
       - static-volume:/app/staticfiles
       - media-volume:/app/media
+      - ./uploads:/app/uploads
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
@@ -178,6 +182,7 @@ services:
     volumes:
       - static-volume:/app/staticfiles
       - media-volume:/app/media
+      - ./uploads:/app/uploads
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
@@ -209,6 +214,7 @@ services:
     volumes:
       - static-volume:/app/staticfiles
       - media-volume:/app/media
+      - ./uploads:/app/uploads
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
@@ -245,6 +251,7 @@ services:
     volumes:
       - static-volume:/app/staticfiles
       - media-volume:/app/media
+      - ./uploads:/app/uploads
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
@@ -276,6 +283,7 @@ services:
     volumes:
       - static-volume:/app/staticfiles
       - media-volume:/app/media
+      - ./uploads:/app/uploads
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
@@ -307,6 +315,7 @@ services:
     volumes:
       - static-volume:/app/staticfiles
       - media-volume:/app/media
+      - ./uploads:/app/uploads
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
@@ -326,6 +335,7 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - static-volume:/var/www/static:ro
       - media-volume:/var/www/media:ro
+      - ./flutter_app/build/web:/usr/share/nginx/html:ro
     depends_on:
       - auth-service
       - chat-service

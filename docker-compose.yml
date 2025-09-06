@@ -1,5 +1,8 @@
 version: '3.9'
 
+volumes:
+  uploads-volume:
+
 services:
   web:
     container_name: bidr
@@ -8,4 +11,6 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - .:/app
+      - ./static:/app/static
+      - ./media:/app/media
+      - ./uploads:/app/uploads

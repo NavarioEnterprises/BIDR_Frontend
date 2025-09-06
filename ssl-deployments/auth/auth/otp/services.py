@@ -23,7 +23,7 @@ class OTPDeliveryService:
         self.notification_service_url = getattr(
             settings, 
             'NOTIFICATION_SERVICE_URL', 
-            'http://bidr-auth-1756988136.westus.azurecontainer.io:8000'
+            'https://notifications.bidr.co.za'
         )
     
     def send_otp_email(self, email: str, otp_code: str, user_name: str = '') -> bool:

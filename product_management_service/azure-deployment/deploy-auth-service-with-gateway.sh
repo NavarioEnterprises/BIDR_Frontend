@@ -64,7 +64,7 @@ if [ ! -z "$EXISTING_CONTAINER" ]; then
     echo -e "${GREEN}✅ Old container removed${NC}"
 fi
 
-# Step 5: Deploy to Azure Container Instances (without public DNS)
+# Step 5: Deploy to Azure Container Instances (with public IP for gateway routing)
 echo -e "${YELLOW}Step 4: Deploying to Azure Container Instances...${NC}"
 az container create \
     --resource-group $RESOURCE_GROUP \
@@ -72,6 +72,8 @@ az container create \
     --image $ACR_LOGIN_SERVER/$IMAGE_NAME:latest \
     --ports 8000 \
     --os-type Linux \
+    --ip-address Public \
+    --dns-name-label $CONTAINER_NAME \
     --registry-login-server $ACR_LOGIN_SERVER \
     --registry-username $ACR_USERNAME \
     --registry-password $ACR_PASSWORD \
@@ -150,9 +152,12 @@ echo -e "${BLUE}• Admin Panel: https://api.bidr.co.za/admin/${NC}"
 echo -e "${BLUE}• Health Check: https://api.bidr.co.za/health/${NC}"
 echo ""
 echo -e "${YELLOW}🔧 Management Commands:${NC}"
-echo -e "${YELLOW}• Container Logs: az container logs --resource-group $RESOURCE_GROUP --name $CONTAINER_NAME${NC}"
+echo -e "${YELLOW}• View Logs: az container logs --resource-group $RESOURCE_GROUP --name $CONTAINER_NAME${NC}"
+echo -e "${YELLOW}• Real-time Logs: az container logs --resource-group $RESOURCE_GROUP --name $CONTAINER_NAME --follow${NC}"
 echo -e "${YELLOW}• Container Status: az container show --resource-group $RESOURCE_GROUP --name $CONTAINER_NAME${NC}"
+echo -e "${YELLOW}• Restart Container: az container restart --resource-group $RESOURCE_GROUP --name $CONTAINER_NAME${NC}"
 echo -e "${YELLOW}• Gateway Status: az network application-gateway show --resource-group $RESOURCE_GROUP --name $APPLICATION_GATEWAY${NC}"
+echo -e "${YELLOW}• Interactive Logs: python bidr-deploy-manager.py (Option 5)${NC}"
 echo ""
 echo -e "${GREEN}🎊 Your authentication service is now running with full HTTPS support!${NC}"
 echo -e "${CYAN}========================================${NC}"

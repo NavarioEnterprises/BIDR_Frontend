@@ -10,8 +10,8 @@ from user.models import AppUser, MetadataModel
 
 
 def default_expires_at():
-    """Return a datetime 5 minutes from now."""
-    return now() + timedelta(minutes=5)
+    """Return a datetime 15 minutes from now."""
+    return now() + timedelta(minutes=15)
 
 
 class OTP(MetadataModel):

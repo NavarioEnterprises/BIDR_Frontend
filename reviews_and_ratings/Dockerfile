@@ -28,11 +28,15 @@ COPY services-requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-# Copy project
-COPY . /app/
+# Copy project to correct location
+COPY . /app/reviews_and_ratings/
 
 # Set working directory to reviews and ratings service
 WORKDIR /app/reviews_and_ratings
+
+# Copy and set up entrypoint script (do this before switching to non-root user)
+COPY entrypoint.sh /app/reviews_and_ratings/entrypoint.sh
+RUN chmod +x /app/reviews_and_ratings/entrypoint.sh
 
 # Create necessary directories and set permissions
 RUN mkdir -p /app/staticfiles /app/media /app/logs \
@@ -44,6 +48,9 @@ USER appuser
 # Collect static files (skip if it fails in build)
 RUN python manage.py collectstatic --noinput || echo "Static files collection skipped"
 
+# Run migrations (safe to run multiple times)
+RUN python manage.py migrate || echo "Migration failed, will retry at startup"
+
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health/ || exit 1
@@ -51,17 +58,5 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 # Expose port
 EXPOSE 8000
 
-# Run gunicorn with production settings
-CMD ["gunicorn", \
-     "--bind", "0.0.0.0:8000", \
-     "--workers", "3", \
-     "--worker-class", "sync", \
-     "--worker-connections", "1000", \
-     "--max-requests", "1000", \
-     "--max-requests-jitter", "100", \
-     "--timeout", "30", \
-     "--keep-alive", "5", \
-     "--log-level", "info", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-", \
-     "reviews_and_ratings.wsgi:application"]
+# Use entrypoint script
+ENTRYPOINT ["/app/reviews_and_ratings/entrypoint.sh"]

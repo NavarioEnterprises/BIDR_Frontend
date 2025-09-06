@@ -20,6 +20,16 @@ cryptography>=42.0.0
 # External Service Integrations
 requests>=2.31.0
 
+# Notification Service Dependencies
+celery>=5.4.0
+twilio>=9.4.0
+sendgrid>=6.12.1
+pusher>=3.3.2
+python-dateutil>=2.9.0
+pytz>=2024.2
+django-prometheus>=2.3.1
+pyjwt>=2.10.1
+
 # Production Dependencies
 gunicorn>=21.2.0
 whitenoise>=6.6.0

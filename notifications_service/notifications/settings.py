@@ -24,9 +24,31 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-p!d^q!^$c7bv&y@5kvkgp9j)=)5puv45va)n=(g)189!@q!#ge'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False  # Set to False for production
 
 ALLOWED_HOSTS = ['*']
+
+# HTTPS Configuration for deployment behind Application Gateway
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_TLS = True
+
+# CSRF Configuration for HTTPS deployment
+CSRF_TRUSTED_ORIGINS = [
+    'https://notifications.bidr.co.za',
+    'https://*.bidr.co.za',
+    'https://bidr.co.za'
+]
+
+# Session and CSRF cookies security for HTTPS
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = False  # Application Gateway handles HTTP->HTTPS redirect
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = 'DENY'
 
 
 # Application definition
@@ -163,13 +185,42 @@ REST_FRAMEWORK = {
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
+    'https://notifications.bidr.co.za',
+    'https://api.bidr.co.za',
+    'https://products-management.bidr.co.za',
+    'https://chat-service.bidr.co.za',
+    'https://bidr.co.za',
+    'https://www.bidr.co.za',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = DEBUG
+CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins for microservice communication
+CORS_ALLOW_CREDENTIALS = True
+
+# CORS headers and methods
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 
 # Notification Service Configuration
 NOTIFICATION_SETTINGS = {

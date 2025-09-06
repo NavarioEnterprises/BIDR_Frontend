@@ -1,67 +1,51 @@
 #!/bin/bash
 
 # BIDR Product Management Service Update Script
-# This script rebuilds and redeploys the product management service
-
+# This script rebuilds and redeploys the product management service with enhanced features
 set -e
-
-echo "🔄 Updating BIDR Product Management Service..."
 
 # Configuration
 RESOURCE_GROUP="bidr-simple-rg"
-REGISTRY_NAME="bidrsimpleregistry"
+CONTAINER_REGISTRY="bidrsimpleregistry"
 CONTAINER_NAME="bidr-product-service"
-SERVICE_NAME="bidr-product-service"
 IMAGE_NAME="bidr-product-service"
-SERVICE_PORT=8000
+SERVICE_NAME="Product Management Service"
+SERVICE_PORT=8002
+SERVICE_DIR="/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service"
 
 # Colors for output
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+RED='\033[0;31m'
+CYAN='\033[0;36m'
+NC='\033[0m'
 
-# Function to print colored output
-print_status() {
-    echo -e "${BLUE}$1${NC}"
-}
+echo -e "${GREEN}🚀 Updating BIDR ${SERVICE_NAME}...${NC}"
 
-print_success() {
-    echo -e "${GREEN}✅ $1${NC}"
-}
-
-print_warning() {
-    echo -e "${YELLOW}⚠️  $1${NC}"
-}
-
-print_error() {
-    echo -e "${RED}❌ $1${NC}"
-}
-
-# Check if we're in the correct directory
-if [ ! -f "Dockerfile" ]; then
-    print_error "Dockerfile not found. Please run this script from the product_management_service directory."
+# Step 1: Verify service directory exists
+if [ ! -d "$SERVICE_DIR" ]; then
+    echo -e "${RED}❌ ${SERVICE_NAME} directory not found: $SERVICE_DIR${NC}"
     exit 1
 fi
 
-print_status "Found product management service directory"
+echo -e "${BLUE}✅ Found ${SERVICE_NAME} directory${NC}"
 
-# Step 1: Build and push new image with timestamp tag
+# Step 2: Build and push Docker image with timestamp tag
 TIMESTAMP=$(date +%s)
 NEW_TAG="v${TIMESTAMP}"
-print_status "Step 1: Building and pushing Docker image with tag: ${NEW_TAG}..."
 
+echo -e "${YELLOW}Step 1: Building and pushing Docker image with tag: ${NEW_TAG}...${NC}"
 az acr build \
-    --registry $REGISTRY_NAME \
+    --registry $CONTAINER_REGISTRY \
     --image "${IMAGE_NAME}:${NEW_TAG}" \
     --image "${IMAGE_NAME}:latest" \
-    .
+    "$SERVICE_DIR"
 
-print_success "New image built and pushed with tag: ${NEW_TAG}"
+echo -e "${GREEN}✅ ${SERVICE_NAME} image built and pushed with tags: latest, ${NEW_TAG}${NC}"
 
-# Step 2: Get current container information
-print_status "Step 2: Getting current container information..."
+# Step 3: Get current container information
+echo -e "${YELLOW}Step 2: Getting current container information...${NC}"
 CURRENT_CONTAINER=$(az container show \
     --resource-group $RESOURCE_GROUP \
     --name $CONTAINER_NAME \
@@ -69,35 +53,47 @@ CURRENT_CONTAINER=$(az container show \
     --output json 2>/dev/null || echo '{}')
 
 if [ "$CURRENT_CONTAINER" = "{}" ]; then
-    print_warning "Container not found. This might be the first deployment."
+    echo -e "${YELLOW}⚠️  Container not found. This might be the first deployment.${NC}"
     CURRENT_IP=""
     CURRENT_FQDN=""
 else
     CURRENT_IP=$(echo $CURRENT_CONTAINER | jq -r '.ip // ""')
     CURRENT_FQDN=$(echo $CURRENT_CONTAINER | jq -r '.fqdn // ""')
-    print_status "Current service IP: $CURRENT_IP"
-    print_status "Current service FQDN: $CURRENT_FQDN"
+    echo -e "${BLUE}Current service IP: $CURRENT_IP${NC}"
+    echo -e "${BLUE}Current service FQDN: $CURRENT_FQDN${NC}"
+
+    # Optional: Backup current container logs before deletion
+    echo -e "${YELLOW}Saving current container logs for reference...${NC}"
+    LOGS_DIR="./logs"
+    mkdir -p $LOGS_DIR
+    az container logs \
+        --resource-group $RESOURCE_GROUP \
+        --name $CONTAINER_NAME > "$LOGS_DIR/product-service-logs-$(date +%Y%m%d-%H%M%S).txt" || true
+    echo -e "${GREEN}✅ Logs saved (if available)${NC}"
 fi
 
-# Step 3: Delete existing container
-print_status "Step 3: Stopping existing container..."
+# Step 4: Delete existing container
+echo -e "${YELLOW}Step 3: Stopping existing container...${NC}"
 az container delete \
     --resource-group $RESOURCE_GROUP \
     --name $CONTAINER_NAME \
     --yes \
-    --no-wait 2>/dev/null || print_warning "No existing container to delete"
+    --no-wait 2>/dev/null || echo -e "${YELLOW}⚠️  No existing container to delete${NC}"
 
-# Wait a moment for cleanup
-sleep 10
+# Wait for container deletion to complete
+echo -e "${BLUE}Waiting for container deletion to complete...${NC}"
+sleep 15
 
-# Step 4: Get registry credentials
-print_status "Step 4: Getting registry credentials..."
-REGISTRY_SERVER="${REGISTRY_NAME}.azurecr.io"
-REGISTRY_USERNAME=$(az acr credential show --name $REGISTRY_NAME --query username --output tsv)
-REGISTRY_PASSWORD=$(az acr credential show --name $REGISTRY_NAME --query passwords[0].value --output tsv)
+# Step 5: Get registry credentials
+echo -e "${YELLOW}Step 4: Getting registry credentials...${NC}"
+ACR_LOGIN_SERVER=$(az acr show --name $CONTAINER_REGISTRY --resource-group $RESOURCE_GROUP --query "loginServer" --output tsv)
+ACR_USERNAME=$(az acr credential show --name $CONTAINER_REGISTRY --query "username" --output tsv)
+ACR_PASSWORD=$(az acr credential show --name $CONTAINER_REGISTRY --query "passwords[0].value" --output tsv)
 
-# Step 5: Deploy updated container
-print_status "Step 5: Deploying updated container..."
+echo -e "${BLUE}Registry: $ACR_LOGIN_SERVER${NC}"
+
+# Step 6: Deploy updated container
+echo -e "${YELLOW}Step 5: Deploying updated container...${NC}"
 
 # Generate new DNS label to avoid conflicts
 DNS_LABEL="bidr-prod-$(date +%s)"
@@ -106,19 +102,21 @@ DNS_LABEL="bidr-prod-$(date +%s)"
 SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
 JWT_SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
 
+# Deploy with public IP to avoid 502 errors
 az container create \
     --resource-group $RESOURCE_GROUP \
     --name $CONTAINER_NAME \
-    --image "${REGISTRY_SERVER}/${IMAGE_NAME}:latest" \
-    --registry-login-server $REGISTRY_SERVER \
-    --registry-username $REGISTRY_USERNAME \
-    --registry-password $REGISTRY_PASSWORD \
+    --image "$ACR_LOGIN_SERVER/$IMAGE_NAME:latest" \
+    --registry-login-server $ACR_LOGIN_SERVER \
+    --registry-username $ACR_USERNAME \
+    --registry-password $ACR_PASSWORD \
     --dns-name-label $DNS_LABEL \
     --ports $SERVICE_PORT \
     --cpu 1 \
     --memory 1.5 \
     --restart-policy OnFailure \
     --os-type Linux \
+    --ip-address Public \
     --environment-variables \
         SECRET_KEY="$SECRET_KEY" \
         DEBUG=False \
@@ -126,12 +124,15 @@ az container create \
         DJANGO_SETTINGS_MODULE=product_management_service.settings \
         JWT_SECRET_KEY="$JWT_SECRET_KEY" \
         CORS_ALLOW_ALL_ORIGINS=True \
-    --no-wait
+        SERVICE_NAME_DISPLAY="$SERVICE_NAME" \
+        BIDR_VERSION="$NEW_TAG" \
+        DEPLOYMENT_TIMESTAMP="$(date)"
 
-print_success "Container deployment initiated"
+echo -e "${GREEN}✅ ${SERVICE_NAME} deployment initiated${NC}"
 
-# Step 6: Wait for deployment and get new information
-print_status "Step 6: Waiting for deployment to complete..."
+# Step 7: Wait for deployment and get new information
+echo -e "${YELLOW}Step 6: Waiting for deployment to complete...${NC}"
+echo -e "${BLUE}⌜ This may take 30-60 seconds...${NC}"
 sleep 30
 
 # Get new container information
@@ -168,27 +169,39 @@ echo "API URL: http://${NEW_FQDN}:${SERVICE_PORT}/api/"
 echo "Health Check: http://${NEW_FQDN}:${SERVICE_PORT}/health/"
 echo "========================================"
 
-# Step 8: Test the updated service
-print_status "Step 8: Testing updated service..."
-echo "⏳ Service is starting up, testing API endpoint..."
+# Step 8: Test the service
+echo -e "${YELLOW}Step 7: Testing ${SERVICE_NAME}...${NC}"
+echo -e "${BLUE}⌜ Service is starting up, testing API endpoint...${NC}"
 sleep 15
 
 MAX_RETRIES=5
 RETRY_COUNT=0
+API_AVAILABLE=false
+
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    # Try health check endpoint first
     HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://${NEW_FQDN}:${SERVICE_PORT}/health/" --connect-timeout 10 --max-time 30 || echo "000")
     
     if [ "$HTTP_STATUS" = "200" ]; then
-        print_success "Service is healthy and responding!"
+        echo -e "${GREEN}✅ Service is healthy and responding!${NC}"
+        API_AVAILABLE=true
         break
     else
-        RETRY_COUNT=$((RETRY_COUNT + 1))
-        if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-            print_warning "Service not ready yet (attempt $RETRY_COUNT/$MAX_RETRIES). Waiting 15 seconds..."
-            sleep 15
+        # Try root endpoint as fallback
+        HTTP_STATUS_ROOT=$(curl -s -o /dev/null -w "%{http_code}" "http://${NEW_FQDN}:${SERVICE_PORT}/" --connect-timeout 10 --max-time 30 || echo "000")
+        
+        if [ "$HTTP_STATUS_ROOT" != "000" ] && [ "$HTTP_STATUS_ROOT" != "502" ]; then
+            echo -e "${GREEN}✅ Service is responding on root endpoint (status: $HTTP_STATUS_ROOT)!${NC}"
+            API_AVAILABLE=true
+            break
         else
-            print_warning "Service may still be starting up. Check logs if needed:"
-            echo "az container logs --resource-group $RESOURCE_GROUP --name $CONTAINER_NAME"
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo -e "${YELLOW}⚠️  Service not ready yet (attempt $RETRY_COUNT/$MAX_RETRIES). Waiting 15 seconds...${NC}"
+                sleep 15
+            else
+                echo -e "${YELLOW}⚠️  Service may still be starting up. Check logs if needed.${NC}"
+            fi
         fi
     fi
 done

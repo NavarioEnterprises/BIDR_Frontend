@@ -353,7 +353,7 @@ class UserBasicInfoSerializer(serializers.ModelSerializer):
             'email': instance.email,
             'first_name': instance.get_decrypted_first_name(),
             'last_name': instance.get_decrypted_last_name(),
-            'full_name': self.get_full_name(instance),
+            'full_name': instance.get_full_name(),
             'phone_number': instance.get_decrypted_phone_number(),
             'role': instance.role,
             'profile_picture': instance.profile_picture.url if instance.profile_picture else None,

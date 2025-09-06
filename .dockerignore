@@ -18,3 +18,12 @@
 **/TEST_*.md
 **/*.log
 **/cookies.txt
+
+# Ignore SSL certificates and private keys
+**/*.pem
+**/*.key
+**/*.crt
+**/*.csr
+**/*privkey*
+**/*cert*
+**/*fullchain*

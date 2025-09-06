@@ -219,7 +219,7 @@ class UserRegistrationView(APIView):
             if delivery_method in ['sms', 'both'] and decrypted_phone:
                 try:
                     # Call notifications service to send SMS
-                    notification_service_url = getattr(settings, 'NOTIFICATION_SERVICE_URL', 'http://localhost:8006')
+                    notification_service_url = getattr(settings, 'NOTIFICATION_SERVICE_URL', 'https://notifications.bidr.co.za/')
                     sms_endpoint = f"{notification_service_url}/api/v1/sms/send/otp/"
                     
                     sms_payload = {

@@ -6376,3 +6376,5 @@ INFO 2025-09-04 15:49:18,891 basehttp 5061 13203795968 "GET /static/admin/img/so
 INFO 2025-09-04 15:49:20,875 basehttp 5061 13203795968 "GET /admin/quotes/quote/ HTTP/1.1" 200 34413
 INFO 2025-09-04 15:49:20,888 basehttp 5061 13203795968 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
 INFO 2025-09-05 10:10:44,608 autoreload 69859 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-06 17:58:57,419 autoreload 35280 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-06 17:59:19,896 basehttp 35280 6123024384 "GET / HTTP/1.1" 200 1682

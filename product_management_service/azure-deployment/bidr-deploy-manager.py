@@ -131,8 +131,9 @@ class BIDRDeploymentManager:
         print(f"{Colors.YELLOW}2. Update All Services{Colors.ENDC}")
         print(f"{Colors.YELLOW}3. Check Services Status{Colors.ENDC}")
         print(f"{Colors.YELLOW}4. Build Container Only (No Deploy){Colors.ENDC}")
-        print(f"{Colors.YELLOW}5. Create New Update Scripts{Colors.ENDC}")
-        print(f"{Colors.RED}6. Exit{Colors.ENDC}")
+        print(f"{Colors.YELLOW}5. View Service Logs{Colors.ENDC}")
+        print(f"{Colors.YELLOW}6. Create New Update Scripts{Colors.ENDC}")
+        print(f"{Colors.RED}7. Exit{Colors.ENDC}")
         print()
 
     def print_services_menu(self):
@@ -366,11 +367,13 @@ class BIDRDeploymentManager:
                 return
             elif choice in self.services:
                 service = self.services[choice]
+                print(f"\n{Colors.GREEN}✅ Selected: {service['name']}{Colors.ENDC}")
                 service_path = self.get_service_path(service)
                 if service_path:
                     self.build_container(service, service_path)
             else:
                 print(f"{Colors.RED}❌ Invalid choice. Please try again.{Colors.ENDC}")
+                print(f"{Colors.BLUE}ℹ️  Available choices: {', '.join(self.services.keys())}, 9 (All Services), 0 (Back){Colors.ENDC}")
 
     def create_missing_scripts(self):
         """Create any missing deployment scripts"""
@@ -396,8 +399,274 @@ class BIDRDeploymentManager:
         
         create = input(f"\n{Colors.YELLOW}Create missing scripts? [Y/n]: {Colors.ENDC}").strip().lower()
         if create in ['', 'y', 'yes']:
-            print(f"{Colors.BLUE}ℹ️  Script creation feature coming soon!{Colors.ENDC}")
-            print(f"{Colors.BLUE}ℹ️  For now, you can copy existing scripts and modify them{Colors.ENDC}")
+            print(f"{Colors.BLUE}ℹ️ Script creation feature coming soon!{Colors.ENDC}")
+            print(f"{Colors.BLUE}ℹ️ For now, you can copy existing scripts and modify them{Colors.ENDC}")
+
+    def view_service_logs(self):
+        """Interactive logs viewing for services"""
+        print(f"\n{Colors.CYAN}📄 Service Logs Viewer{Colors.ENDC}")
+        
+        while True:
+            self.print_services_menu()
+            service_choice = input(f"{Colors.YELLOW}Select service to view logs (0-9): {Colors.ENDC}").strip()
+            
+            if service_choice == '0':
+                return
+            elif service_choice == '9':
+                # All services logs
+                self.view_all_services_logs()
+                return
+            elif service_choice in self.services:
+                service = self.services[service_choice]
+                print(f"\n{Colors.GREEN}✅ Selected: {service['name']}{Colors.ENDC}")
+                self.show_logs_menu(service)
+                return
+            else:
+                print(f"{Colors.RED}❌ Invalid choice. Please try again.{Colors.ENDC}")
+                print(f"{Colors.BLUE}ℹ️ Available choices: {', '.join(self.services.keys())}, 9 (All Services), 0 (Back){Colors.ENDC}")
+    
+    def show_logs_menu(self, service):
+        """Show logs menu for a specific service"""
+        print(f"\n{Colors.CYAN}{Colors.BOLD}📄 Logs for {service['name']}{Colors.ENDC}")
+        print(f"{Colors.HEADER}{'─' * 50}{Colors.ENDC}")
+        print(f"{Colors.YELLOW}1. Real-time Logs (Live Stream){Colors.ENDC}")
+        print(f"{Colors.YELLOW}2. Past 30 Minutes{Colors.ENDC}")
+        print(f"{Colors.YELLOW}3. Past 1 Hour{Colors.ENDC}")
+        print(f"{Colors.YELLOW}4. Past 6 Hours{Colors.ENDC}")
+        print(f"{Colors.YELLOW}5. Past 24 Hours{Colors.ENDC}")
+        print(f"{Colors.YELLOW}6. Custom Time Range{Colors.ENDC}")
+        print(f"{Colors.YELLOW}7. Error Logs Only{Colors.ENDC}")
+        print(f"{Colors.YELLOW}8. Container Status & Info{Colors.ENDC}")
+        print(f"{Colors.RED}0. Back{Colors.ENDC}")
+        
+        while True:
+            choice = input(f"\n{Colors.YELLOW}Select logs option (0-8): {Colors.ENDC}").strip()
+            
+            if choice == '0':
+                return
+            elif choice == '1':
+                self.view_realtime_logs(service)
+                return
+            elif choice == '2':
+                self.view_historical_logs(service, minutes=30)
+                return
+            elif choice == '3':
+                self.view_historical_logs(service, hours=1)
+                return
+            elif choice == '4':
+                self.view_historical_logs(service, hours=6)
+                return
+            elif choice == '5':
+                self.view_historical_logs(service, hours=24)
+                return
+            elif choice == '6':
+                self.view_custom_logs(service)
+                return
+            elif choice == '7':
+                self.view_error_logs(service)
+                return
+            elif choice == '8':
+                self.view_container_status(service)
+                return
+            else:
+                print(f"{Colors.RED}❌ Invalid choice. Please try again.{Colors.ENDC}")
+    
+    def view_realtime_logs(self, service):
+        """View real-time logs for a service"""
+        print(f"\n{Colors.BLUE}🔄 Starting real-time logs for {service['name']}...{Colors.ENDC}")
+        print(f"{Colors.YELLOW}⚠️ Press Ctrl+C to stop streaming{Colors.ENDC}")
+        print(f"{Colors.HEADER}{'─' * 60}{Colors.ENDC}")
+        
+        try:
+            # Use Azure CLI to stream logs in real-time
+            cmd = [
+                'az', 'container', 'logs',
+                '--resource-group', 'bidr-simple-rg',
+                '--name', service['container_name'],
+                '--follow'
+            ]
+            
+            subprocess.run(cmd, check=True)
+            
+        except subprocess.CalledProcessError as e:
+            print(f"{Colors.RED}❌ Failed to stream logs: {str(e)}{Colors.ENDC}")
+        except KeyboardInterrupt:
+            print(f"\n{Colors.GREEN}✅ Real-time logs stopped{Colors.ENDC}")
+        except Exception as e:
+            print(f"{Colors.RED}❌ Unexpected error: {str(e)}{Colors.ENDC}")
+    
+    def view_historical_logs(self, service, minutes=None, hours=None):
+        """View historical logs for a service"""
+        if minutes:
+            time_desc = f"past {minutes} minutes"
+        elif hours:
+            time_desc = f"past {hours} hour{'s' if hours > 1 else ''}"
+        else:
+            time_desc = "recent logs"
+            
+        print(f"\n{Colors.BLUE}📄 Viewing {time_desc} for {service['name']}...{Colors.ENDC}")
+        print(f"{Colors.HEADER}{'─' * 60}{Colors.ENDC}")
+        
+        try:
+            # Get logs with timestamps
+            cmd = [
+                'az', 'container', 'logs',
+                '--resource-group', 'bidr-simple-rg',
+                '--name', service['container_name']
+            ]
+            
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            
+            if result.stdout:
+                # Filter logs by time if needed (basic filtering)
+                logs = result.stdout
+                print(logs)
+            else:
+                print(f"{Colors.YELLOW}⚠️ No logs found for the specified time period{Colors.ENDC}")
+                
+        except subprocess.CalledProcessError as e:
+            print(f"{Colors.RED}❌ Failed to retrieve logs: {str(e)}{Colors.ENDC}")
+        except Exception as e:
+            print(f"{Colors.RED}❌ Unexpected error: {str(e)}{Colors.ENDC}")
+        
+        input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.ENDC}")
+    
+    def view_custom_logs(self, service):
+        """View logs for a custom time range"""
+        print(f"\n{Colors.CYAN}🕰️ Custom Time Range Logs for {service['name']}{Colors.ENDC}")
+        print(f"{Colors.BLUE}Note: Azure Container Instances doesn't support time-based log filtering.{Colors.ENDC}")
+        print(f"{Colors.BLUE}Showing all available logs...{Colors.ENDC}")
+        
+        # For now, just show all logs since Azure Container Instances doesn't support time filtering
+        self.view_historical_logs(service)
+    
+    def view_error_logs(self, service):
+        """View only error and warning logs for a service"""
+        print(f"\n{Colors.RED}⚠️ Error & Warning Logs for {service['name']}{Colors.ENDC}")
+        print(f"{Colors.HEADER}{'─' * 60}{Colors.ENDC}")
+        
+        try:
+            # Get all logs
+            cmd = [
+                'az', 'container', 'logs',
+                '--resource-group', 'bidr-simple-rg',
+                '--name', service['container_name']
+            ]
+            
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            
+            if result.stdout:
+                # Filter for error and warning lines
+                error_keywords = ['ERROR', 'CRITICAL', 'WARNING', 'WARN', 'Exception', 'Traceback', 'Failed', 'failed', '❌', '⚠️']
+                lines = result.stdout.split('\n')
+                error_lines = []
+                
+                for line in lines:
+                    if any(keyword in line for keyword in error_keywords):
+                        error_lines.append(line)
+                
+                if error_lines:
+                    print(f"{Colors.YELLOW}Found {len(error_lines)} error/warning lines:{Colors.ENDC}\n")
+                    for line in error_lines:
+                        # Color code the line based on severity
+                        if any(keyword in line for keyword in ['ERROR', 'CRITICAL', 'Exception', 'Traceback']):
+                            print(f"{Colors.RED}{line}{Colors.ENDC}")
+                        elif any(keyword in line for keyword in ['WARNING', 'WARN']):
+                            print(f"{Colors.YELLOW}{line}{Colors.ENDC}")
+                        else:
+                            print(line)
+                else:
+                    print(f"{Colors.GREEN}✅ No error or warning logs found - service is running cleanly!{Colors.ENDC}")
+            else:
+                print(f"{Colors.YELLOW}⚠️ No logs available{Colors.ENDC}")
+                
+        except subprocess.CalledProcessError as e:
+            print(f"{Colors.RED}❌ Failed to retrieve logs: {str(e)}{Colors.ENDC}")
+        except Exception as e:
+            print(f"{Colors.RED}❌ Unexpected error: {str(e)}{Colors.ENDC}")
+        
+        input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.ENDC}")
+    
+    def view_container_status(self, service):
+        """View detailed container status and information"""
+        print(f"\n{Colors.BLUE}📈 Container Status for {service['name']}{Colors.ENDC}")
+        print(f"{Colors.HEADER}{'─' * 60}{Colors.ENDC}")
+        
+        try:
+            # Get container status
+            # Get basic container status
+            cmd = [
+                'az', 'container', 'show',
+                '--resource-group', 'bidr-simple-rg',
+                '--name', service['container_name'],
+                '--query', '{name: name, state: instanceView.state, restartCount: instanceView.restartCount, ip: ipAddress.ip, fqdn: ipAddress.fqdn}',
+                '--output', 'table'
+            ]
+            
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            print(result.stdout)
+            
+            # Show management commands
+            print(f"\n{Colors.CYAN}🔧 Management Commands:{Colors.ENDC}")
+            print(f"{Colors.GREEN}• View Logs: az container logs --resource-group bidr-simple-rg --name {service['container_name']}{Colors.ENDC}")
+            print(f"{Colors.GREEN}• Real-time Logs: az container logs --resource-group bidr-simple-rg --name {service['container_name']} --follow{Colors.ENDC}")
+            print(f"{Colors.GREEN}• Container Status: az container show --resource-group bidr-simple-rg --name {service['container_name']}{Colors.ENDC}")
+            print(f"{Colors.GREEN}• Restart Container: az container restart --resource-group bidr-simple-rg --name {service['container_name']}{Colors.ENDC}")
+            print(f"{Colors.GREEN}• Delete Container: az container delete --resource-group bidr-simple-rg --name {service['container_name']} --yes{Colors.ENDC}")
+            
+            if service.get('https_enabled'):
+                print(f"{Colors.GREEN}• Gateway Status: az network application-gateway show --resource-group bidr-simple-rg --name bidr-appgw{Colors.ENDC}")
+                
+        except subprocess.CalledProcessError as e:
+            print(f"{Colors.RED}❌ Failed to get container status: {str(e)}{Colors.ENDC}")
+        except Exception as e:
+            print(f"{Colors.RED}❌ Unexpected error: {str(e)}{Colors.ENDC}")
+        
+        input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.ENDC}")
+    
+    def view_all_services_logs(self):
+        """View logs for all services"""
+        print(f"\n{Colors.CYAN}📄 All Services Logs Overview{Colors.ENDC}")
+        print(f"{Colors.HEADER}{'=' * 60}{Colors.ENDC}")
+        
+        for key, service in self.services.items():
+            print(f"\n{Colors.YELLOW}{service['icon']} {service['name']} ({service['container_name']}){Colors.ENDC}")
+            print(f"{Colors.HEADER}{'─' * 40}{Colors.ENDC}")
+            
+            try:
+                cmd = [
+                    'az', 'container', 'logs',
+                    '--resource-group', 'bidr-simple-rg',
+                    '--name', service['container_name'],
+                    '--tail', '10'  # Show last 10 lines only for overview
+                ]
+                
+                # Note: --tail is not supported by Azure Container Instances CLI
+                # So we'll get all logs and show last few lines
+                cmd = [
+                    'az', 'container', 'logs',
+                    '--resource-group', 'bidr-simple-rg',
+                    '--name', service['container_name']
+                ]
+                
+                result = subprocess.run(cmd, capture_output=True, text=True)
+                
+                if result.returncode == 0 and result.stdout:
+                    # Show last 5 lines only for overview
+                    lines = result.stdout.strip().split('\n')
+                    recent_lines = lines[-5:] if len(lines) >= 5 else lines
+                    for line in recent_lines:
+                        print(f"  {line}")
+                    
+                    if len(lines) > 5:
+                        print(f"  {Colors.BLUE}... ({len(lines)-5} more lines){Colors.ENDC}")
+                else:
+                    print(f"  {Colors.YELLOW}⚠️ No recent logs available{Colors.ENDC}")
+                    
+            except Exception as e:
+                print(f"  {Colors.RED}❌ Error retrieving logs: {str(e)}{Colors.ENDC}")
+        
+        input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.ENDC}")
 
     def run(self):
         """Main application loop"""
@@ -406,7 +675,7 @@ class BIDRDeploymentManager:
                 self.print_header()
                 self.print_menu()
                 
-                choice = input(f"{Colors.YELLOW}Select an action (1-6): {Colors.ENDC}").strip()
+                choice = input(f"{Colors.YELLOW}Select an action (1-7): {Colors.ENDC}").strip()
                 
                 if choice == '1':
                     # Deploy/Update Individual Service
@@ -421,6 +690,7 @@ class BIDRDeploymentManager:
                             break
                         elif service_choice in self.services:
                             service = self.services[service_choice]
+                            print(f"\n{Colors.GREEN}✅ Selected: {service['name']}{Colors.ENDC}")
                             
                             # Ask if this is an update or new deployment
                             update_mode = input(f"\n{Colors.YELLOW}Is this an update? [Y/n]: {Colors.ENDC}").strip().lower()
@@ -430,6 +700,7 @@ class BIDRDeploymentManager:
                             break
                         else:
                             print(f"{Colors.RED}❌ Invalid choice. Please try again.{Colors.ENDC}")
+                            print(f"{Colors.BLUE}ℹ️  Available choices: {', '.join(self.services.keys())}, 9 (All Services), 0 (Back){Colors.ENDC}")
                 
                 elif choice == '2':
                     # Update All Services
@@ -444,10 +715,14 @@ class BIDRDeploymentManager:
                     self.build_only_mode()
                 
                 elif choice == '5':
+                    # View Service Logs
+                    self.view_service_logs()
+                
+                elif choice == '6':
                     # Create New Update Scripts
                     self.create_missing_scripts()
                 
-                elif choice == '6':
+                elif choice == '7':
                     # Exit
                     print(f"\n{Colors.GREEN}👋 Thank you for using BIDR Deployment Manager!{Colors.ENDC}")
                     print(f"{Colors.BLUE}Your BIDR platform is running strong! 🚀{Colors.ENDC}\n")

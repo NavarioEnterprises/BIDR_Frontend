@@ -21,6 +21,8 @@ from django.utils import timezone
 from django_prometheus.exports import ExportToDjangoView
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework.routers import DefaultRouter
+from reviews.views import TicketViewSet
 
 # Health check endpoint
 def health_check(request):
