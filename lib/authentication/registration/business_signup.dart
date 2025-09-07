@@ -86,6 +86,34 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   final TextEditingController _accountHolderController =
       TextEditingController();
 
+  // Selected bank and branch code
+  String? _selectedBank;
+  String? _selectedBranchCode;
+
+  // South African Banks with branch codes
+  static const Map<String, String> _southAfricanBanks = {
+    'ABSA Bank': '632005',
+    'Standard Bank': '051001',
+    'First National Bank (FNB)': '250655',
+    'Nedbank': '198765',
+    'Capitec Bank': '470010',
+    'African Bank': '430000',
+    'Investec Bank': '580105',
+    'Discovery Bank': '679000',
+    'TymeBank': '678910',
+    'Bidvest Bank': '462005',
+    'Sasfin Bank': '683000',
+    'Mercantile Bank': '450105',
+    'Grindrod Bank': '584000',
+    'Ithala Bank': '410506',
+    'Bank of Athens': '410010',
+    'China Construction Bank': '679001',
+    'Habib Overseas Bank': '587000',
+    'HBZ Bank': '570000',
+    'Albaraka Bank': '800000',
+    'Postbank': '460005',
+  };
+
   // Step 4 - Product Categories 'Oil & Fluids'
   List<String> selectedCategories = [];
   final List<String> availableCategories = [
@@ -267,10 +295,16 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 
-  // Phone number validation helper
+  // Phone number validation helper (allows + and up to 13 digits)
   bool _isValidPhoneNumber(String phone) {
-    final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
-    return cleanPhone.length == 10 && RegExp(r'^[0-9]+$').hasMatch(cleanPhone);
+    // Allow + at the beginning and digits only, max 13 digits total
+    final cleanPhone = phone.replaceAll(RegExp(r'[^0-9+]'), '');
+    if (cleanPhone.startsWith('+')) {
+      final digits = cleanPhone.substring(1);
+      return digits.length >= 10 && digits.length <= 12 && RegExp(r'^[0-9]+$').hasMatch(digits);
+    } else {
+      return cleanPhone.length == 10 && RegExp(r'^[0-9]+$').hasMatch(cleanPhone);
+    }
   }
 
   // Name validation helper (only letters and spaces)
@@ -330,7 +364,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     }
     if (!_isValidPhoneNumber(_userPhoneController.text)) {
       _showFieldValidationError(
-        'Phone number must be exactly 10 digits',
+        'Phone number must be 10 digits or include country code with + (max 13 digits total)',
         _userPhoneFocusNode,
       );
       return false;
@@ -429,7 +463,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     }
     if (!_isValidPhoneNumber(_contactPersonTelephoneController.text)) {
       _showFieldValidationError(
-        'Contact telephone must be exactly 10 digits',
+        'Contact telephone must be 10 digits or include country code with + (max 13 digits total)',
         focusNodes['contactPersonTelephone']!,
       );
       return false;
@@ -467,7 +501,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
 
   // Bank Account Form Validation
   bool _validateBankAccountForm() {
-    if (_bankNameController.text.trim().isEmpty) {
+    if (_selectedBank == null || _selectedBank!.trim().isEmpty) {
       _showFieldValidationError(
         'Bank name is required',
         focusNodes['bankName']!,
@@ -492,14 +526,9 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       );
       return false;
     }
-    if (_branchCodeController.text.trim().isNotEmpty &&
-        !_isValidNumbersOnly(
-          _branchCodeController.text,
-          minLength: 6,
-          maxLength: 6,
-        )) {
+    if (_selectedBranchCode == null || _selectedBranchCode!.trim().isEmpty) {
       _showFieldValidationError(
-        'Branch code must be exactly 6 digits',
+        'Branch code is required',
         focusNodes['branchCode']!,
       );
       return false;
@@ -726,9 +755,9 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           'longitude': _currentLocation?.longitude,
         },
         'banking_info': {
-          'bank_name': _bankNameController.text,
+          'bank_name': _selectedBank ?? '',
           'account_number': _accountNumberController.text,
-          'branch_code': _branchCodeController.text,
+          'branch_code': _selectedBranchCode ?? '',
           'account_holder': _accountHolderController.text,
         },
         'product_categories': selectedCategories,
@@ -1147,7 +1176,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     if (MediaQuery.of(context).size.width < 800) {
       return const BusinessSignUpPageMobile();
     }
-    
+
     return Scaffold(
       backgroundColor: Constants.gtaColorLight,
       body: Padding(
@@ -1968,21 +1997,112 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
 
   // Get coordinates from physical address
 
+  Widget _buildBankDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Bank Name*',
+          style: GoogleFonts.manrope(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[700],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
+            color: Colors.white,
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: _selectedBank,
+              hint: Text(
+                'Select Bank',
+                style: GoogleFonts.manrope(
+                  color: Colors.grey[600],
+                  fontSize: 16,
+                ),
+              ),
+              items: _southAfricanBanks.keys.map((String bank) {
+                return DropdownMenuItem<String>(
+                  value: bank,
+                  child: Text(
+                    bank,
+                    style: GoogleFonts.manrope(
+                      color: Colors.black87,
+                      fontSize: 16,
+                    ),
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedBank = newValue;
+                  _selectedBranchCode = newValue != null ? _southAfricanBanks[newValue] : null;
+                  _bankNameController.text = newValue ?? '';
+                  _branchCodeController.text = _selectedBranchCode ?? '';
+                });
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBranchCodeField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Branch Code*',
+          style: GoogleFonts.manrope(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[700],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
+            color: Colors.grey[50],
+          ),
+          child: Text(
+            _selectedBranchCode ?? 'Select a bank first',
+            style: GoogleFonts.manrope(
+              color: _selectedBranchCode != null ? Colors.black87 : Colors.grey[600],
+              fontSize: 16,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildBankAccountForm() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 32),
-          _buildInputField(
-            'Bank Name',
-            'Enter Bank Name',
-            _bankNameController,
-            focusNodes['bankName']!,
-          ),
+          // Bank Name Dropdown
+          _buildBankDropdown(),
+          const SizedBox(height: 24),
+          // Branch Code (auto-filled, read-only)
+          _buildBranchCodeField(),
           const SizedBox(height: 24),
           _buildInputField(
-            'Account Number',
+            'Account Number*',
             'Enter Account Number',
             _accountNumberController,
             focusNodes['accountNumber']!,
@@ -1990,15 +2110,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           ),
           const SizedBox(height: 24),
           _buildInputField(
-            'Branch Code',
-            'Enter Branch Code',
-            _branchCodeController,
-            focusNodes['branchCode']!,
-            integersOnly: true,
-          ),
-          const SizedBox(height: 24),
-          _buildInputField(
-            'Account Holder Name',
+            'Account Holder Name*',
             'Enter Account Holder Name',
             _accountHolderController,
             focusNodes['accountHolder']!,
@@ -2561,18 +2673,29 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       isPasswordField: isPassword,
       isEditable: !isReadOnly,
       integersOnly: integersOnly,
-      maxLength: integersOnly ? 10 : null,
+      maxLength: integersOnly && (hintText.toLowerCase().contains('phone') || hintText.toLowerCase().contains('telephone')) ? 13 : (integersOnly ? 10 : null),
       suffix: suffixIcon,
       onChanged: (value) {
         // Real-time validation and formatting
         if (integersOnly) {
-          // For number fields, ensure only digits
-          final digitsOnly = value.replaceAll(RegExp(r'[^0-9]'), '');
-          if (digitsOnly != value) {
-            controller.value = TextEditingValue(
-              text: digitsOnly,
-              selection: TextSelection.collapsed(offset: digitsOnly.length),
-            );
+          // For phone number fields, allow + and digits
+          if (hintText.toLowerCase().contains('phone') || hintText.toLowerCase().contains('telephone')) {
+            final phoneAllowed = value.replaceAll(RegExp(r'[^0-9+]'), '');
+            if (phoneAllowed != value) {
+              controller.value = TextEditingValue(
+                text: phoneAllowed,
+                selection: TextSelection.collapsed(offset: phoneAllowed.length),
+              );
+            }
+          } else {
+            // For other number fields, ensure only digits
+            final digitsOnly = value.replaceAll(RegExp(r'[^0-9]'), '');
+            if (digitsOnly != value) {
+              controller.value = TextEditingValue(
+                text: digitsOnly,
+                selection: TextSelection.collapsed(offset: digitsOnly.length),
+              );
+            }
           }
         } else if (isName) {
           // For name fields, only allow letters and spaces
@@ -2598,7 +2721,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
               hintText.toLowerCase().contains('telephone')) {
             if (!_isValidPhoneNumber(value)) {
               isValid = false;
-              errorMessage = 'Phone number must be exactly 10 digits';
+              errorMessage = 'Phone number must be 10 digits or include country code with + (max 13 digits total)';
             }
           } else if (hintText.toLowerCase().contains('account number')) {
             if (!_isValidNumbersOnly(value, minLength: 8, maxLength: 12)) {

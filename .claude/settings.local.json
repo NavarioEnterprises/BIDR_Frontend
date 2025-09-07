@@ -46,7 +46,14 @@
       "Read(/C:\\Users\\linda\\Documents\\Frontend Projects\\BIDR_Frontend\\lib\\pages\\mobileView\\buyerDashboard/**)",
       "Read(/C:\\Users\\linda\\Documents\\Frontend Projects\\BIDR_Frontend\\lib\\pages\\mobileView\\buyerDashboard/**)",
       "Read(/C:\\Users\\linda\\Documents\\Frontend Projects\\BIDR_Frontend\\lib\\pages\\mobileView\\buyerDashboard/**)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "WebFetch(domain:pub.dev)",
+      "Bash(ls:*)",
+      "Bash(python3:*)",
+      "Bash(python manage.py:*)",
+      "Bash(ls:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

@@ -1115,7 +1115,7 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
           hintStyle: GoogleFonts.inter(
             textStyle: TextStyle(
               fontSize: 13,
-              color: Colors.black38,
+              color: Colors.grey.withOpacity(0.35),
               letterSpacing: 0,
               fontWeight: FontWeight.w500,
               fontFamily: 'YuGothic',

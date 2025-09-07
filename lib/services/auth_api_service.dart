@@ -637,4 +637,111 @@ class AuthApiService {
       return {'success': false, 'error': e.toString()};
     }
   }
+
+  Future<Map<String, dynamic>?> getUserProfile({
+    required String accessToken,
+  }) async {
+    var url = Uri.parse('${GlobalVariables.authServiceUrl}profile/comprehensive/');
+    var request = http.Request('GET', url);
+    request.headers['Content-Type'] = 'application/json';
+    request.headers['Authorization'] = 'Bearer $accessToken';
+
+    try {
+      http.StreamedResponse response = await request.send();
+      String responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(responseBody);
+        print('User profile retrieved successfully: $jsonResponse');
+        return jsonResponse;
+      } else {
+        print('Get user profile failed: ${response.statusCode}');
+        print('Response: $responseBody');
+        return {
+          'success': false,
+          'statusCode': response.statusCode,
+          'error': responseBody,
+        };
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+      return {'success': false, 'error': 'Network or parsing error: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>?> sendSupportMessage({
+    required String accessToken,
+    required String subject,
+    required String message,
+  }) async {
+    var url = Uri.parse('${GlobalVariables.authServiceUrl}contact-support/');
+    var request = http.Request('POST', url);
+    request.headers['Content-Type'] = 'application/json';
+    request.headers['Authorization'] = 'Bearer $accessToken';
+    request.body = jsonEncode({
+      'subject': subject,
+      'message': message,
+    });
+
+    try {
+      http.StreamedResponse response = await request.send();
+      String responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(responseBody);
+        print('Support message sent successfully: $jsonResponse');
+        return jsonResponse;
+      } else {
+        print('Send support message failed: ${response.statusCode}');
+        print('Response: $responseBody');
+        return {
+          'success': false,
+          'statusCode': response.statusCode,
+          'error': responseBody,
+        };
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+      return {'success': false, 'error': 'Network or parsing error: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>?> requestQuote({
+    required String accessToken,
+    required String email,
+    required String company,
+    String? projectDetails,
+  }) async {
+    var url = Uri.parse('${GlobalVariables.authServiceUrl}request-quote/');
+    var request = http.Request('POST', url);
+    request.headers['Content-Type'] = 'application/json';
+    request.headers['Authorization'] = 'Bearer $accessToken';
+    request.body = jsonEncode({
+      'email': email,
+      'company': company,
+      'project_details': projectDetails,
+    });
+
+    try {
+      http.StreamedResponse response = await request.send();
+      String responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(responseBody);
+        print('Quote request sent successfully: $jsonResponse');
+        return jsonResponse;
+      } else {
+        print('Quote request failed: ${response.statusCode}');
+        print('Response: $responseBody');
+        return {
+          'success': false,
+          'statusCode': response.statusCode,
+          'error': responseBody,
+        };
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+      return {'success': false, 'error': 'Network or parsing error: $e'};
+    }
+  }
 }

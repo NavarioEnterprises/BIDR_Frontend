@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:bidr/constants/Constants.dart';
+import 'package:bidr/config/environment_config.dart';
 import 'package:bidr/pages/notification.dart';
 import 'package:bidr/pages/seller/profile_management.dart';
 import 'package:bidr/pages/seller/rating_and_review.dart';
@@ -58,6 +61,11 @@ class _SellerDashboardState extends State<SellerDashboard>
   bool isLoadingQuotes = true;
   String? quotesError;
   int totalQuotes = 0;
+
+  // Orders data state variables for approved bids
+  List<dynamic> sellerOrders = [];
+  bool isLoadingOrders = true;
+  String? ordersError;
 
   // Tab and pagination state
   int selectedRequestTab = 0; // 0: New Requests, 1: My Bids
@@ -144,6 +152,7 @@ class _SellerDashboardState extends State<SellerDashboard>
   void initState() {
     super.initState();
     _loadNotificationsFromApi();
+    _loadSellerOrders();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -856,6 +865,62 @@ class _SellerDashboardState extends State<SellerDashboard>
     }
   }
 
+  // API service method to fetch seller orders for approved bids
+  Future<void> _loadSellerOrders() async {
+    setState(() {
+      isLoadingOrders = true;
+      ordersError = null;
+    });
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '${AppConfig.productsServiceUrl}api/v1/product-requests/orders/',
+        ).replace(queryParameters: {'seller_id': Constants.myUid}),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+
+        // Handle different possible response structures
+        List<dynamic> ordersData;
+        if (jsonData is List) {
+          ordersData = jsonData;
+        } else if (jsonData is Map && jsonData.containsKey('results')) {
+          ordersData = jsonData['results'];
+        } else if (jsonData is Map && jsonData.containsKey('orders')) {
+          ordersData = jsonData['orders'];
+        } else {
+          ordersData = [];
+        }
+
+        setState(() {
+          sellerOrders = ordersData;
+          isLoadingOrders = false;
+          print('DEBUG: Loaded ${ordersData.length} seller orders');
+          if (ordersData.isNotEmpty) {
+            print('DEBUG: First order: ${ordersData.first}');
+            print('DEBUG: Order keys: ${ordersData.first.keys.toList()}');
+          }
+        });
+      } else {
+        setState(() {
+          ordersError = 'Failed to load orders: ${response.statusCode}';
+          isLoadingOrders = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        ordersError = 'Error loading orders: $e';
+        isLoadingOrders = false;
+      });
+    }
+  }
+
   void _loadSampleNotifications() {
     setState(() {
       notifications = [
@@ -1310,6 +1375,12 @@ class _SellerDashboardState extends State<SellerDashboard>
                         1,
                         totalQuotes,
                       ),
+                      // Approved Bids Tab
+                      _buildRequestMenuItem(
+                        'Approved Bids',
+                        2,
+                        0, // We'll update this when we have the count
+                      ),
                     ],
                   ),
                 ),
@@ -1322,8 +1393,10 @@ class _SellerDashboardState extends State<SellerDashboard>
                       // Content based on selected tab
                       if (selectedRequestTab == 0)
                         _buildRequestContent(newRequests, 'new requests')
-                      else
-                        _buildQuotesContent(myQuotes, 'my bids'),
+                      else if (selectedRequestTab == 1)
+                        _buildQuotesContent(myQuotes, 'my bids')
+                      else if (selectedRequestTab == 2)
+                        _buildApprovedBidsContent(),
                     ],
                   ),
                 ),
@@ -5543,6 +5616,703 @@ class _SellerDashboardState extends State<SellerDashboard>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // Helper method to safely parse values to double
+  double _parseToDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      return double.tryParse(value) ?? 0.0;
+    }
+    return 0.0;
+  }
+
+  // Build approved bids content - shows paid orders belonging to this seller
+  Widget _buildApprovedBidsContent() {
+    // Show loading state
+    if (isLoadingOrders) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: Constants.ctaColorLight),
+            SizedBox(height: 16),
+            Text(
+              'Loading approved bids...',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: Constants.ftaColorLight,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show error state
+    if (ordersError != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, color: Colors.red, size: 48),
+            SizedBox(height: 16),
+            Text(
+              ordersError!,
+              style: GoogleFonts.manrope(fontSize: 14, color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(onPressed: _loadSellerOrders, child: Text('Retry')),
+          ],
+        ),
+      );
+    }
+
+    // Filter paid orders for this seller that need delivery confirmation
+    print('DEBUG: Current seller ID: ${Constants.myUid}');
+    print('DEBUG: Total seller orders: ${sellerOrders.length}');
+
+    final List<Map<String, dynamic>> approvedBids = sellerOrders
+        .where((order) {
+          print(
+            'DEBUG: Order status: ${order['status']}, seller_id: ${order['seller_id']}',
+          );
+          return (order['status'] == 'PAID' ||
+                  order['status'] == 'Payment Confirmed') &&
+              order['seller_id'] == Constants.myUid;
+        })
+        .map(
+          (order) => {
+            'orderNumber':
+                order['order_number'] ?? order['orderNumber'] ?? 'N/A',
+            'buyerName':
+                order['buyer_name'] ?? order['buyerName'] ?? 'Unknown Buyer',
+            'productName':
+                order['product_name'] ?? order['productName'] ?? 'N/A',
+            'amount': _parseToDouble(
+              order['total_amount'] ?? order['amount'] ?? 0.0,
+            ),
+            'status': order['status'] ?? 'Paid',
+            'orderDate':
+                order['created_at'] ??
+                order['orderDate'] ??
+                DateTime.now().toIso8601String(),
+            'needsConfirmation': true,
+            'order': order, // Keep full order data for API calls
+          },
+        )
+        .toList();
+
+    print('DEBUG: Filtered approved bids: ${approvedBids.length}');
+
+    return Container(
+      height: 500,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Constants.ctaColorLight.withOpacity(0.1),
+                  Constants.ftaColorLight.withOpacity(0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Constants.ctaColorLight.withOpacity(0.2),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Constants.ctaColorLight.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.check_circle,
+                    color: Constants.ctaColorLight,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Approved Bids',
+                        style: GoogleFonts.manrope(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Constants.ftaColorLight,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Paid orders waiting for delivery confirmation',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: 20),
+
+          // Orders list
+          Expanded(
+            child: approvedBids.isEmpty
+                ? Center(child: _buildEmptyApprovedBids())
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: approvedBids.length,
+                    itemBuilder: (context, index) {
+                      final order = approvedBids[index];
+                      return _buildApprovedBidCard(order);
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build empty state for approved bids
+  Widget _buildEmptyApprovedBids() {
+    return Container(
+      padding: EdgeInsets.all(40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.inbox_outlined, size: 80, color: Colors.grey[400]),
+          SizedBox(height: 20),
+          Text(
+            'No Approved Bids',
+            style: GoogleFonts.manrope(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Paid orders waiting for confirmation will appear here',
+            style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[500]),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build individual approved bid card
+  Widget _buildApprovedBidCard(Map<String, dynamic> order) {
+    return Container(
+      height: 240,
+
+      margin: EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header row with order number and status
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Order #${order['orderNumber']}',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Constants.ftaColorLight,
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade100,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    order['status'],
+                    style: GoogleFonts.manrope(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.green.shade800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 12),
+
+            // Product and buyer info
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Product',
+                        style: GoogleFonts.manrope(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        order['productName'],
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Buyer',
+                        style: GoogleFonts.manrope(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        order['buyerName'],
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 12),
+
+            // Amount and date
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Amount',
+                        style: GoogleFonts.manrope(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'R ${order['amount'].toStringAsFixed(2)}',
+                        style: GoogleFonts.manrope(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Constants.ctaColorLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Order Date',
+                        style: GoogleFonts.manrope(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        order['orderDate'],
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 16),
+
+            // Confirm delivery button
+            if (order['needsConfirmation'])
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => _showPinConfirmationDialog(order),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Constants.ctaColorLight,
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Confirm Delivery',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Show PIN confirmation dialog for sellers
+  void _showPinConfirmationDialog(Map<String, dynamic> order) {
+    final TextEditingController pinController = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            width: 400,
+            padding: EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icon
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Constants.ctaColorLight.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: Icon(
+                    Icons.lock_outline,
+                    size: 32,
+                    color: Constants.ctaColorLight,
+                  ),
+                ),
+
+                SizedBox(height: 20),
+
+                // Title
+                Text(
+                  'Confirm Delivery',
+                  style: GoogleFonts.manrope(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Constants.ftaColorLight,
+                  ),
+                ),
+
+                SizedBox(height: 8),
+
+                // Subtitle
+                Text(
+                  'Enter the 4-digit PIN provided by the buyer',
+                  style: GoogleFonts.manrope(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                SizedBox(height: 20),
+
+                // Order info
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Order Number:',
+                            style: GoogleFonts.manrope(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          Text(
+                            order['orderNumber'],
+                            style: GoogleFonts.manrope(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Constants.ftaColorLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Amount:',
+                            style: GoogleFonts.manrope(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          Text(
+                            'R ${order['amount'].toStringAsFixed(2)}',
+                            style: GoogleFonts.manrope(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Constants.ctaColorLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 20),
+
+                // PIN input field
+                TextField(
+                  controller: pinController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 4,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.manrope(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 8,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: '0000',
+                    hintStyle: GoogleFonts.manrope(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 8,
+                      color: Colors.grey[400],
+                    ),
+                    counterText: '',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Constants.ctaColorLight,
+                        width: 2,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey.shade50,
+                    contentPadding: EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+
+                SizedBox(height: 24),
+
+                // Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _confirmDeliveryWithPin(
+                            order,
+                            pinController.text,
+                            context,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Constants.ctaColorLight,
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          'Confirm',
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Confirm delivery with PIN
+  Future<void> _confirmDeliveryWithPin(
+    Map<String, dynamic> order,
+    String pin,
+    BuildContext context,
+  ) async {
+    if (pin.length != 4) {
+      _showErrorMessage('Please enter a 4-digit PIN');
+      return;
+    }
+
+    try {
+      // Call backend API to confirm delivery
+      final response = await http.post(
+        Uri.parse(
+          '${AppConfig.productsServiceUrl}api/v1/product-requests/collection-codes/confirm/',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          // Note: Add proper authentication headers when available
+        },
+        body: json.encode({
+          'order_number':
+              order['order']['order_number'] ?? order['orderNumber'],
+          'pin_code': pin,
+          'seller_id': Constants.myUid,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['success'] == true) {
+          // Success - delivery confirmed
+          Navigator.of(context).pop(); // Close dialog
+
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Delivery confirmed! Order status updated to Purchased.',
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
+          );
+
+          // Refresh the approved bids list to reflect changes
+          _loadSellerOrders();
+        } else {
+          // API returned success=false
+          _showErrorMessage(data['error'] ?? 'Invalid PIN or PIN has expired');
+        }
+      } else {
+        // Non-200 status code
+        _showErrorMessage('Failed to confirm delivery. Please try again.');
+      }
+    } catch (e) {
+      print('Error confirming delivery: $e');
+      _showErrorMessage('Failed to confirm delivery. Please try again.');
+    }
+  }
+
+  // Show error message
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
       ),
     );
   }

@@ -518,6 +518,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   }) {
     if (attachments != null && attachments.isNotEmpty) {
       final attachment = attachments.first;
+      // Use file_url if available (absolute URL), otherwise fallback to constructing URL
+      final imageUrl = attachment['file_url'] != null && attachment['file_url'].toString().startsWith('http')
+          ? attachment['file_url']
+          : '${GlobalVariables.chatServiceUrl}${attachment['file'] ?? attachment['file_url']}';
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -529,7 +533,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 maxHeight: isReply ? 150 : 200,
               ),
               child: Image.network(
-                '${GlobalVariables.chatServiceUrl}${attachment['file']}',
+                imageUrl,
                 fit: BoxFit.cover,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
@@ -926,6 +930,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
   Widget _buildMessageItem(Message message, {bool isReply = false}) {
     final isCurrentUser = message.sender.name == Constants.myDisplayname;
+    final isGenericName = _isGenericSenderName(message.sender.name);
 
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
@@ -975,27 +980,29 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isReply ? 6 : 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: message.sender.role.contains("Seller")
-                              ? Constants.ctaColorLight
-                              : Constants.ftaColorLight,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          message.sender.role,
-                          style: GoogleFonts.manrope(
-                            color: _getUserTextColor(message.sender.role),
-                            fontSize: isReply ? 8 : 10,
-                            fontWeight: FontWeight.w500,
+                      if (!isGenericName) ...[
+                        SizedBox(width: 8),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isReply ? 6 : 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: message.sender.role.contains("Seller")
+                                ? Constants.ctaColorLight
+                                : Constants.ftaColorLight,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            message.sender.role,
+                            style: GoogleFonts.manrope(
+                              color: _getUserTextColor(message.sender.role),
+                              fontSize: isReply ? 8 : 10,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                       Spacer(),
                       Text(
                         _formatTime(message.timestamp),
@@ -1072,8 +1079,20 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     );
   }
 
+  /// Helper function to check if sender name is generic (Seller 1, Buyer 1, etc.)
+  bool _isGenericSenderName(String senderName) {
+    final genericPatterns = [
+      RegExp(r'^Seller\s+\d+$', caseSensitive: false),
+      RegExp(r'^Buyer\s+\d+$', caseSensitive: false),
+      RegExp(r'^User\s+\d+$', caseSensitive: false),
+    ];
+    
+    return genericPatterns.any((pattern) => pattern.hasMatch(senderName.trim()));
+  }
+
   Widget _buildBackendMessageItem(ChatMessage message, {bool isReply = false}) {
     final isCurrentUser = message.senderName == Constants.myDisplayname;
+    final isGenericName = _isGenericSenderName(message.senderName);
 
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
@@ -1124,27 +1143,29 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isReply ? 6 : 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: message.senderRole.contains("Seller")
-                              ? Constants.ctaColorLight
-                              : Constants.ftaColorLight,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          message.senderRole,
-                          style: GoogleFonts.manrope(
-                            color: Colors.white,
-                            fontSize: isReply ? 8 : 10,
-                            fontWeight: FontWeight.w500,
+                      if (!isGenericName) ...[
+                        SizedBox(width: 8),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isReply ? 6 : 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: message.senderRole.contains("Seller")
+                                ? Constants.ctaColorLight
+                                : Constants.ftaColorLight,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            message.senderRole,
+                            style: GoogleFonts.manrope(
+                              color: Colors.white,
+                              fontSize: isReply ? 8 : 10,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                       Spacer(),
                       Text(
                         _formatTime(message.timestamp),

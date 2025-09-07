@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:bidr/constants/Constants.dart';
+import 'package:bidr/global_values.dart';
 import 'package:bidr/pages/buyer_home.dart';
 import 'package:bidr/services/auth_api_service.dart';
 import 'package:bidr/services/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:hugeicons/hugeicons.dart';
 
 import '../../customWdget/custom_input2.dart';
@@ -207,12 +211,55 @@ class _AccountManagementPageState extends State<AccountManagementPage>
   }
 
   void _loadUserData() async {
-    // Load actual user data from SharedPreferences
+    try {
+      // Get access token to fetch fresh user data from backend
+      final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+      
+      if (accessToken != null && accessToken.isNotEmpty) {
+        // Try to get fresh data from backend
+        final response = await _authService.getUserProfile(accessToken: accessToken);
+        
+        if (response != null && response['success'] == true) {
+          final userData = response['data'] ?? response;
+          
+          setState(() {
+            _firstNameController.text = userData['first_name'] ?? '';
+            _lastNameController.text = userData['last_name'] ?? '';
+            _mobileController.text = userData['phone_number'] ?? '';
+            _emailController.text = userData['email'] ?? '';
+          });
+          return;
+        }
+      }
+      
+      // Fallback to SharedPreferences if backend call fails
+      final firstName = await Sharedprefs.getUserNameSharedPreference() ?? '';
+      final email = await Sharedprefs.getUserEmailSharedPreference() ?? '';
+      final phone = await Sharedprefs.getUserCellSharedPreference() ?? '';
+
+      // Split full name into first and last name
+      final nameParts = firstName.split(' ');
+
+      setState(() {
+        _firstNameController.text = nameParts.isNotEmpty ? nameParts[0] : '';
+        _lastNameController.text = nameParts.length > 1
+            ? nameParts.sublist(1).join(' ')
+            : '';
+        _mobileController.text = phone;
+        _emailController.text = email;
+      });
+    } catch (e) {
+      print('Error loading user data: $e');
+      // Continue with SharedPreferences fallback
+      _loadUserDataFromPreferences();
+    }
+  }
+
+  void _loadUserDataFromPreferences() async {
     final firstName = await Sharedprefs.getUserNameSharedPreference() ?? '';
     final email = await Sharedprefs.getUserEmailSharedPreference() ?? '';
     final phone = await Sharedprefs.getUserCellSharedPreference() ?? '';
 
-    // Split full name into first and last name
     final nameParts = firstName.split(' ');
 
     setState(() {
@@ -1405,7 +1452,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     }
   }
 
-  void _requestQuote() {
+  void _requestQuote() async {
     // Validate required fields
     if (_quoteEmailController.text.isEmpty || _companyController.text.isEmpty) {
       _showErrorDialog(
@@ -1415,25 +1462,55 @@ class _AccountManagementPageState extends State<AccountManagementPage>
       return;
     }
 
-    // Implement request quote logic here
+    try {
+      // Get access token
+      final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+      if (accessToken == null || accessToken.isEmpty) {
+        _showErrorDialog(
+          'Authentication Error',
+          'Please log in again to request a quote.',
+        );
+        return;
+      }
 
-    _showSuccessDialog(
-      title: 'Quote Requested!',
-      message: 'Your quote request has been submitted successfully.',
-      icon: Icons.request_quote_outlined,
-      color: Constants.ctaColorLight,
-      additionalInfo:
-          'Our team will review your request and get back to you within 24 hours.',
-      onContinue: () {
-        // Clear form fields
-        _quoteEmailController.clear();
-        _companyController.clear();
-        _projectDetailsController.clear();
-      },
-    );
+      // Call API to request quote
+      final response = await _authService.requestQuote(
+        accessToken: accessToken,
+        email: _quoteEmailController.text.trim(),
+        company: _companyController.text.trim(),
+        projectDetails: _projectDetailsController.text.trim().isEmpty 
+          ? null 
+          : _projectDetailsController.text.trim(),
+      );
+
+      if (response != null && response['success'] == true) {
+        _showSuccessDialog(
+          title: 'Quote Requested!',
+          message: 'Your quote request has been submitted successfully.',
+          icon: Icons.request_quote_outlined,
+          color: Constants.ctaColorLight,
+          additionalInfo:
+              'Our team will review your request and get back to you within 24 hours.',
+          onContinue: () {
+            // Clear form fields
+            _quoteEmailController.clear();
+            _companyController.clear();
+            _projectDetailsController.clear();
+          },
+        );
+      } else {
+        final errorMessage = response?['error']?.toString() ?? 'Failed to submit quote request';
+        _showErrorDialog('Request Failed', errorMessage);
+      }
+    } catch (e) {
+      _showErrorDialog(
+        'Error',
+        'An unexpected error occurred. Please try again.',
+      );
+    }
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     // Validate required fields
     if (_subjectController.text.isEmpty || _messageController.text.isEmpty) {
       _showErrorDialog(
@@ -1443,20 +1520,47 @@ class _AccountManagementPageState extends State<AccountManagementPage>
       return;
     }
 
-    // Implement send message logic here
+    try {
+      // Get access token
+      final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+      if (accessToken == null || accessToken.isEmpty) {
+        _showErrorDialog(
+          'Authentication Error',
+          'Please log in again to send a message.',
+        );
+        return;
+      }
 
-    _showSuccessDialog(
-      title: 'Message Sent!',
-      message: 'Your message has been sent to our support team.',
-      icon: Icons.message_outlined,
-      color: const Color(0xFF9F7AEA),
-      additionalInfo: 'You should receive a response within 2-3 business days.',
-      onContinue: () {
-        // Clear form fields
-        _subjectController.clear();
-        _messageController.clear();
-      },
-    );
+      // Call API to send support message
+      final response = await _authService.sendSupportMessage(
+        accessToken: accessToken,
+        subject: _subjectController.text.trim(),
+        message: _messageController.text.trim(),
+      );
+
+      if (response != null && response['success'] == true) {
+        _showSuccessDialog(
+          title: 'Message Sent!',
+          message: 'Your message has been sent to our support team.',
+          icon: Icons.message_outlined,
+          color: const Color(0xFF9F7AEA),
+          additionalInfo: 'You should receive a response within 2-3 business days.',
+          onContinue: () {
+            // Clear form fields
+            _subjectController.clear();
+            _messageController.clear();
+          },
+        );
+      } else {
+        final errorMessage = response?['error']?.toString() ?? 'Failed to send message';
+        _showErrorDialog('Send Failed', errorMessage);
+      }
+    } catch (e) {
+      _showErrorDialog(
+        'Error',
+        'An unexpected error occurred. Please try again.',
+      );
+    }
   }
 
   void _showErrorDialog(String title, String message) {
@@ -1678,30 +1782,40 @@ class _AccountManagementPageState extends State<AccountManagementPage>
         return;
       }
 
-      final response = await _authService.deleteAccount(
-        accessToken: accessToken,
-      );
+      // Call the new delete account endpoint
+      var url = Uri.parse('${GlobalVariables.authServiceUrl}delete-account/');
+      var request = http.Request('DELETE', url);
+      request.headers['Content-Type'] = 'application/json';
+      request.headers['Authorization'] = 'Bearer $accessToken';
 
-      if (response != null && response['success'] == true) {
-        // Clear all shared preferences
-        await _clearAllUserData();
+      http.StreamedResponse response = await request.send();
+      String responseBody = await response.stream.bytesToString();
 
-        // Show success dialog and navigate to login
-        _showSuccessDialog(
-          title: 'Account Deleted',
-          message: 'Your account has been permanently deleted.',
-          icon: Icons.check_circle_outline,
-          color: Colors.green,
-          additionalInfo:
-              'Thank you for using BIDR. You will be redirected to the login screen.',
-          onContinue: () {
-            // Navigate to login screen
-            context.go('/');
-          },
-        );
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(responseBody);
+        if (jsonResponse['success'] == true) {
+          // Clear all shared preferences
+          await _clearAllUserData();
+
+          // Show success dialog and navigate to login
+          _showSuccessDialog(
+            title: 'Account Deleted',
+            message: 'Your account has been permanently deleted.',
+            icon: Icons.check_circle_outline,
+            color: Colors.green,
+            additionalInfo:
+                'Thank you for using BIDR. You will be redirected to the login screen.',
+            onContinue: () {
+              // Navigate to login screen
+              context.go('/');
+            },
+          );
+        } else {
+          final errorMessage = jsonResponse['error']?.toString() ?? 'Failed to delete account';
+          _showErrorDialog('Deletion Failed', errorMessage);
+        }
       } else {
-        final errorMessage =
-            response?['error']?.toString() ?? 'Failed to delete account';
+        final errorMessage = 'Failed to delete account. Server returned ${response.statusCode}';
         _showErrorDialog('Deletion Failed', errorMessage);
       }
     } catch (e) {

@@ -1,6 +1,6 @@
-import 'dart:io';
-import 'dart:typed_data';
 import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:bidr/pages/seller/seller_home_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -8,19 +8,16 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
-import '../authentication/forgot_password.dart';
 import '../authentication/login.dart';
 import '../constants/Constants.dart';
 import '../models/alert.dart';
 import '../customWdget/appbar.dart';
-import '../customWdget/customCard.dart';
 import '../customWdget/custom_input2.dart';
 import '../services/products_management_api_service.dart';
 import '../notifier/my_notifier.dart';
@@ -1028,6 +1025,137 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   // Dropdown values
   String? _selectedManufacturer;
   String? _selectedMakeModel;
+
+  // Manufacturer to Models mapping
+  final Map<String, List<String>> _manufacturerModels = {
+    'Toyota': [
+      'Select Model',
+      'Corolla',
+      'Camry',
+      'Prius',
+      'RAV4',
+      'Highlander',
+      'Tacoma',
+      'Tundra',
+      'Sienna',
+      'Yaris',
+      'Avalon',
+      'Land Cruiser',
+      'Prado',
+      'Hilux',
+      'Fortuner',
+      'Avanza',
+    ],
+    'Honda': [
+      'Select Model',
+      'Civic',
+      'Accord',
+      'CR-V',
+      'Pilot',
+      'Odyssey',
+      'Fit',
+      'HR-V',
+      'Passport',
+      'Ridgeline',
+      'Insight',
+      'Jazz',
+      'City',
+    ],
+    'Ford': [
+      'Select Model',
+      'Focus',
+      'Mustang',
+      'F-150',
+      'Explorer',
+      'Escape',
+      'Fusion',
+      'Edge',
+      'Expedition',
+      'Bronco',
+      'Transit',
+      'Ranger',
+      'Fiesta',
+      'EcoSport',
+    ],
+    'BMW': [
+      'Select Model',
+      '3 Series',
+      '5 Series',
+      '7 Series',
+      'X1',
+      'X3',
+      'X5',
+      'X7',
+      'Z4',
+      'i3',
+      'i4',
+      'iX',
+      '1 Series',
+      '2 Series',
+      '4 Series',
+      '6 Series',
+      '8 Series',
+    ],
+    'Mercedes': [
+      'Select Model',
+      'A-Class',
+      'C-Class',
+      'E-Class',
+      'S-Class',
+      'GLA',
+      'GLC',
+      'GLE',
+      'GLS',
+      'CLA',
+      'CLS',
+      'AMG GT',
+      'G-Class',
+      'EQA',
+      'EQC',
+      'EQS',
+    ],
+    'Audi': [
+      'Select Model',
+      'A1',
+      'A3',
+      'A4',
+      'A6',
+      'A8',
+      'Q2',
+      'Q3',
+      'Q5',
+      'Q7',
+      'Q8',
+      'TT',
+      'R8',
+      'e-tron GT',
+      'e-tron',
+    ],
+    'Volkswagen': [
+      'Select Model',
+      'Golf',
+      'Passat',
+      'Jetta',
+      'Tiguan',
+      'Atlas',
+      'Arteon',
+      'ID.4',
+      'Touareg',
+      'Amarok',
+      'Polo',
+      'T-Cross',
+      'T-Roc',
+    ],
+  };
+
+  // Get models for selected manufacturer
+  List<String> _getModelsForManufacturer(String? manufacturer) {
+    if (manufacturer == null || manufacturer == 'Select Manufacturer') {
+      return ['Select Makes & Models'];
+    }
+    return _manufacturerModels[manufacturer] ?? ['Select Makes & Models'];
+  }
+
   String? _selectedType;
   String? _selectedNewUsedPart;
   String? _selectedYear;
@@ -1121,6 +1249,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     FocusNode focusNode,
     FocusNode? nextFocusNode, {
     Widget? suffixIcon,
+    bool? integersOnly,
   }) {
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
@@ -1131,6 +1260,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
           ? TextInputAction.next
           : TextInputAction.done,
       isPasswordField: false,
+      integersOnly: integersOnly,
       suffix: suffixIcon,
       onChanged: (value) {},
       onSubmitted: (value) {
@@ -1178,7 +1308,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             hint: Text(
               label.replaceAll('*', ''),
               style: GoogleFonts.manrope(
-                color: Colors.black,
+                color: Colors.grey.withOpacity(0.35),
                 fontSize: 14,
                 fontWeight: FontWeight.w300,
               ),
@@ -1216,6 +1346,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       controller: _maxDistanceController,
       focusNode: _maxDistanceFocus,
       keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
       style: GoogleFonts.manrope(color: Colors.black, fontSize: 16),
       decoration: InputDecoration(
         labelText: label,
@@ -1421,46 +1552,33 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                     },
                   )
                 : _imageBytes.containsKey(image.path)
-                    ? Image.memory(
-                        _imageBytes[image.path]!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          print('Error loading memory image: $error');
-                          return Container(
-                            color: Colors.grey[200],
-                            child: Center(
-                              child: Icon(
-                                Icons.broken_image,
-                                color: Colors.grey[400],
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                    : FutureBuilder<Uint8List>(
-                        future: image.readAsBytes(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            // Cache the bytes for future use
-                            _imageBytes[image.path] = snapshot.data!;
-                            return Image.memory(
-                              snapshot.data!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                print('Error displaying image: $error');
-                                return Container(
-                                  color: Colors.grey[200],
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.broken_image,
-                                      color: Colors.grey[400],
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          } else if (snapshot.hasError) {
-                            print('Error reading image bytes: ${snapshot.error}');
+                ? Image.memory(
+                    _imageBytes[image.path]!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      print('Error loading memory image: $error');
+                      return Container(
+                        color: Colors.grey[200],
+                        child: Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : FutureBuilder<Uint8List>(
+                    future: image.readAsBytes(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        // Cache the bytes for future use
+                        _imageBytes[image.path] = snapshot.data!;
+                        return Image.memory(
+                          snapshot.data!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            print('Error displaying image: $error');
                             return Container(
                               color: Colors.grey[200],
                               child: Center(
@@ -1470,20 +1588,33 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                                 ),
                               ),
                             );
-                          }
-                          return Container(
-                            color: Colors.grey[100],
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.grey,
-                                ),
-                              ),
+                          },
+                        );
+                      } else if (snapshot.hasError) {
+                        print('Error reading image bytes: ${snapshot.error}');
+                        return Container(
+                          color: Colors.grey[200],
+                          child: Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              color: Colors.grey[400],
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      }
+                      return Container(
+                        color: Colors.grey[100],
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.grey,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ),
         Positioned(
@@ -1626,7 +1757,11 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                     'Audi',
                     'Volkswagen',
                   ],
-                  (value) => setState(() => _selectedManufacturer = value),
+                  (value) => setState(() {
+                    _selectedManufacturer = value;
+                    // Reset model selection when manufacturer changes
+                    _selectedMakeModel = null;
+                  }),
                 ),
               ),
               SizedBox(width: 16),
@@ -1634,15 +1769,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 child: _buildCustomDropdown(
                   'Makes & Models*',
                   _selectedMakeModel,
-                  [
-                    'Select Makes & Models',
-                    'Corolla',
-                    'Camry',
-                    'Civic',
-                    'Accord',
-                    'Focus',
-                    'Mustang',
-                  ],
+                  _getModelsForManufacturer(_selectedManufacturer),
                   (value) => setState(() => _selectedMakeModel = value),
                 ),
               ),
@@ -1804,6 +1931,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   _mileageController,
                   _mileageFocus,
                   null,
+                  integersOnly: true,
                 ),
               ),
             ],
@@ -2610,7 +2738,10 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 ),
                 filled: true,
                 fillColor: Colors.white,
-                contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: Colors.grey.shade300,
@@ -2633,10 +2764,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   borderRadius: BorderRadius.circular(36),
                 ),
                 focusedErrorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.red.shade600,
-                    width: 2,
-                  ),
+                  borderSide: BorderSide(color: Colors.red.shade600, width: 2),
                   borderRadius: BorderRadius.circular(36),
                 ),
                 prefixIcon: Container(
@@ -2667,7 +2795,10 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                         onTap: _showLocationPicker,
                         child: Container(
                           margin: EdgeInsets.all(8),
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Constants.ctaColorLight,
                             borderRadius: BorderRadius.circular(360),
@@ -2708,10 +2839,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(
-                    color: Colors.grey.shade200,
-                    width: 0.5,
-                  ),
+                  bottom: BorderSide(color: Colors.grey.shade200, width: 0.5),
                 ),
               ),
               child: Row(
@@ -2734,7 +2862,9 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          suggestion.structuredFormatting?.mainText ?? suggestion.description ?? '',
+                          suggestion.structuredFormatting?.mainText ??
+                              suggestion.description ??
+                              '',
                           style: GoogleFonts.manrope(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -2743,7 +2873,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        if (suggestion.structuredFormatting?.secondaryText != null) ...[
+                        if (suggestion.structuredFormatting?.secondaryText !=
+                            null) ...[
                           SizedBox(height: 2),
                           Text(
                             suggestion.structuredFormatting!.secondaryText!,
@@ -2780,19 +2911,14 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   color: Colors.white,
-                  border: Border.all(
-                    color: Colors.grey.shade200,
-                    width: 1,
-                  ),
+                  border: Border.all(color: Colors.grey.shade200, width: 1),
                 ),
                 child: child,
               ),
             );
           },
           offset: Offset(0, 8),
-          constraints: BoxConstraints(
-            maxHeight: 300,
-          ),
+          constraints: BoxConstraints(maxHeight: 300),
           hideOnEmpty: true,
           hideOnError: true,
           hideOnLoading: false,
@@ -2805,7 +2931,9 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   height: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Constants.ctaColorLight),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Constants.ctaColorLight,
+                    ),
                   ),
                 ),
                 SizedBox(width: 12),
@@ -2823,11 +2951,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             padding: EdgeInsets.all(16),
             child: Row(
               children: [
-                Icon(
-                  Icons.error_outline,
-                  color: Colors.red.shade400,
-                  size: 20,
-                ),
+                Icon(Icons.error_outline, color: Colors.red.shade400, size: 20),
                 SizedBox(width: 12),
                 Text(
                   'Unable to search locations',
@@ -2843,11 +2967,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             padding: EdgeInsets.all(16),
             child: Row(
               children: [
-                Icon(
-                  Icons.search_off,
-                  color: Colors.grey.shade400,
-                  size: 20,
-                ),
+                Icon(Icons.search_off, color: Colors.grey.shade400, size: 20),
                 SizedBox(width: 12),
                 Text(
                   'No locations found',
@@ -2866,7 +2986,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
 
   Widget _buildVinField() {
     return GestureDetector(
-      onTap: _pickVinImages,
+      onTap: _vinImages.isEmpty ? _pickVinImages : _showVinImages,
       child: Container(
         height: 55,
         child: TextField(
@@ -2903,37 +3023,50 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
               borderRadius: BorderRadius.circular(36),
             ),
             prefixIcon: _vinImages.isNotEmpty
-                ? Container(
-                    margin: EdgeInsets.all(8),
-                    padding: EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade50,
-                      borderRadius: BorderRadius.circular(360),
-                      border: Border.all(color: Colors.green.shade300),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.check_circle, color: Colors.green, size: 16),
-                        SizedBox(width: 4),
-                        Text(
-                          '${_vinImages.length} image${_vinImages.length > 1 ? 's' : ''}',
-                          style: GoogleFonts.manrope(
-                            color: Colors.green.shade700,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(width: 4),
-                        GestureDetector(
-                          onTap: _showVinImages,
-                          child: Icon(
-                            Icons.visibility,
-                            color: Colors.green.shade700,
+                ? InkWell(
+                    onTap: _showVinImages,
+                    child: Container(
+                      margin: EdgeInsets.all(8),
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade50,
+                        borderRadius: BorderRadius.circular(360),
+                        border: Border.all(color: Colors.green.shade300),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
                             size: 16,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 4),
+                          Text(
+                            '${_vinImages.length} image${_vinImages.length > 1 ? 's' : ''}',
+                            style: GoogleFonts.manrope(
+                              color: Colors.green.shade700,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(width: 4),
+                          GestureDetector(
+                            child: Container(
+                              padding: EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                color: Colors.green.shade100,
+                              ),
+                              child: Icon(
+                                Icons.visibility,
+                                color: Colors.green.shade700,
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   )
                 : null,
@@ -3134,253 +3267,397 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   void _showVinImages() {
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return Dialog(
+              backgroundColor: Colors.white,
+              elevation: 8,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.8,
+                width: MediaQuery.of(context).size.width * 0.9,
                 constraints: BoxConstraints(
-                  maxWidth: 500,
-                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                  maxWidth: 550,
+                  maxHeight: MediaQuery.of(context).size.height * 0.8,
                 ),
-                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: Offset(0, 10),
+                    ),
+                  ],
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'VIN Images (${_vinImages.length})',
-                          style: GoogleFonts.manrope(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1B3B5C),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: Icon(Icons.close, color: Colors.grey),
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.grey.shade100,
-                            shape: CircleBorder(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-
-                    if (_vinImages.isEmpty)
-                      Container(
-                        height: 200,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.image_outlined,
-                              size: 64,
-                              color: Colors.grey.shade400,
-                            ),
-                            SizedBox(height: 16),
-                            Text(
-                              'No VIN images uploaded',
-                              style: GoogleFonts.manrope(
-                                fontSize: 16,
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
+                    // Modern header with gradient background
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Constants.ctaColorLight.withOpacity(0.1),
+                            Constants.dtaColorLight.withOpacity(0.3),
                           ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      )
-                    else
-                      Flexible(
-                        child: Container(
-                          child: GridView.builder(
-                            shrinkWrap: true,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: _vinImages.length == 1
-                                      ? 1
-                                      : 2,
-                                  crossAxisSpacing: 12,
-                                  mainAxisSpacing: 12,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Constants.ctaColorLight.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.image_outlined,
+                              color: Constants.ctaColorLight,
+                              size: 24,
+                            ),
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'VIN Images',
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w700,
+                                    color: Constants.ftaColorLight,
+                                  ),
                                 ),
-                            itemCount: _vinImages.length,
-                            itemBuilder: (context, index) {
-                              final image = _vinImages[index];
-                              return Stack(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () => _showFullScreenImage(image),
-                                    child: Container(
+                                SizedBox(height: 4),
+                                Text(
+                                  '${_vinImages.length} ${_vinImages.length == 1 ? 'image' : 'images'} uploaded',
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 14,
+                                    color: Constants.gtaColorLight,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            icon: Icon(
+                              Icons.close_rounded,
+                              color: Constants.gtaColorLight,
+                            ),
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Content area with white background
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(24),
+                        child: Column(
+                          children: [
+                            if (_vinImages.isEmpty)
+                              Expanded(
+                                child: Container(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(32),
+                                        decoration: BoxDecoration(
+                                          color: Constants.dtaColorLight
+                                              .withOpacity(0.3),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.image_not_supported_outlined,
+                                          size: 64,
+                                          color: Constants.ctaColorLight
+                                              .withOpacity(0.7),
+                                        ),
+                                      ),
+                                      SizedBox(height: 24),
+                                      Text(
+                                        'No VIN Images Yet',
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600,
+                                          color: Constants.ftaColorLight,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Upload images of your vehicle identification number',
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 14,
+                                          color: Constants.gtaColorLight,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            else
+                              Expanded(
+                                child: GridView.builder(
+                                  padding: EdgeInsets.symmetric(vertical: 8),
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: _vinImages.length == 1
+                                            ? 1
+                                            : 2,
+                                        crossAxisSpacing: 16,
+                                        mainAxisSpacing: 16,
+                                        childAspectRatio: 1.0,
+                                      ),
+                                  itemCount: _vinImages.length,
+                                  itemBuilder: (context, index) {
+                                    final image = _vinImages[index];
+                                    return Container(
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(16),
                                         boxShadow: [
                                           BoxShadow(
                                             color: Colors.black.withOpacity(
-                                              0.1,
+                                              0.05,
                                             ),
-                                            blurRadius: 4,
-                                            offset: Offset(0, 2),
+                                            blurRadius: 10,
+                                            offset: Offset(0, 4),
                                           ),
                                         ],
                                       ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: kIsWeb
-                                            ? Image.network(
-                                                image.path,
-                                                width: double.infinity,
-                                                height: double.infinity,
-                                                fit: BoxFit.cover,
-                                                errorBuilder:
-                                                    (
-                                                      context,
-                                                      error,
-                                                      stackTrace,
-                                                    ) {
-                                                      return Container(
-                                                        color: Colors.grey[200],
-                                                        child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Icon(
-                                                              Icons
-                                                                  .broken_image,
-                                                              color: Colors
-                                                                  .grey[400],
-                                                              size: 40,
-                                                            ),
-                                                            SizedBox(height: 8),
-                                                            Text(
-                                                              'Failed to load',
-                                                              style: GoogleFonts.manrope(
-                                                                color: Colors
-                                                                    .grey[600],
-                                                                fontSize: 12,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    },
-                                              )
-                                            : _vinImageBytes.containsKey(
-                                                image.path,
-                                              )
-                                            ? Image.memory(
-                                                _vinImageBytes[image.path]!,
-                                                width: double.infinity,
-                                                height: double.infinity,
-                                                fit: BoxFit.cover,
-                                              )
-                                            : Container(
-                                                color: Colors.grey[100],
-                                                child: Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                        strokeWidth: 2,
-                                                        color: Constants
-                                                            .ctaColorLight,
-                                                      ),
+                                      child: Stack(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () =>
+                                                _showFullScreenImage(image),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                                border: Border.all(
+                                                  color: Constants.dtaColorLight
+                                                      .withOpacity(0.3),
+                                                  width: 2,
                                                 ),
                                               ),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 8,
-                                    right: 8,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        _removeVinImage(image);
-                                        setDialogState(
-                                          () {},
-                                        ); // Update dialog state
-                                        setState(
-                                          () {},
-                                        ); // Update main widget state
-                                        if (_vinImages.isEmpty) {
-                                          Navigator.of(context).pop();
-                                        }
-                                      },
-                                      child: Container(
-                                        width: 28,
-                                        height: 28,
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          shape: BoxShape.circle,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(
-                                                0.2,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                                child: kIsWeb
+                                                    ? Image.network(
+                                                        image.path,
+                                                        width: double.infinity,
+                                                        height: double.infinity,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder:
+                                                            (
+                                                              context,
+                                                              error,
+                                                              stackTrace,
+                                                            ) {
+                                                              return Container(
+                                                                decoration: BoxDecoration(
+                                                                  color: Constants
+                                                                      .dtaColorLight
+                                                                      .withOpacity(
+                                                                        0.2,
+                                                                      ),
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                        14,
+                                                                      ),
+                                                                ),
+                                                                child: Column(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    Icon(
+                                                                      Icons
+                                                                          .broken_image_outlined,
+                                                                      color: Constants
+                                                                          .ctaColorLight
+                                                                          .withOpacity(
+                                                                            0.7,
+                                                                          ),
+                                                                      size: 40,
+                                                                    ),
+                                                                    SizedBox(
+                                                                      height: 8,
+                                                                    ),
+                                                                    Text(
+                                                                      'Failed to load',
+                                                                      style: GoogleFonts.manrope(
+                                                                        color: Constants
+                                                                            .gtaColorLight,
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            },
+                                                      )
+                                                    : _vinImageBytes
+                                                          .containsKey(
+                                                            image.path,
+                                                          )
+                                                    ? Image.memory(
+                                                        _vinImageBytes[image
+                                                            .path]!,
+                                                        width: double.infinity,
+                                                        height: double.infinity,
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                    : Container(
+                                                        decoration: BoxDecoration(
+                                                          color: Constants
+                                                              .dtaColorLight
+                                                              .withOpacity(0.2),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                14,
+                                                              ),
+                                                        ),
+                                                        child: Center(
+                                                          child: CircularProgressIndicator(
+                                                            strokeWidth: 3,
+                                                            color: Constants
+                                                                .ctaColorLight,
+                                                            backgroundColor:
+                                                                Constants
+                                                                    .dtaColorLight
+                                                                    .withOpacity(
+                                                                      0.3,
+                                                                    ),
+                                                          ),
+                                                        ),
+                                                      ),
                                               ),
-                                              blurRadius: 2,
-                                              offset: Offset(0, 1),
                                             ),
-                                          ],
-                                        ),
-                                        child: Icon(
-                                          Icons.delete_outline,
-                                          size: 16,
-                                          color: Colors.white,
-                                        ),
+                                          ),
+                                          Positioned(
+                                            top: 8,
+                                            right: 8,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                _removeVinImage(image);
+                                                setDialogState(
+                                                  () {},
+                                                ); // Update dialog state
+                                                setState(
+                                                  () {},
+                                                ); // Update main widget state
+                                                if (_vinImages.isEmpty) {
+                                                  Navigator.of(context).pop();
+                                                }
+                                              },
+                                              child: Container(
+                                                width: 32,
+                                                height: 32,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red.shade600,
+                                                  shape: BoxShape.circle,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.red
+                                                          .withOpacity(0.3),
+                                                      blurRadius: 8,
+                                                      offset: Offset(0, 2),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Icon(
+                                                  Icons.close_rounded,
+                                                  size: 18,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
+                                    );
+                                  },
+                                ),
+                              ),
+
+                            // Modern "Add More Images" button
+                            Container(
+                              margin: EdgeInsets.only(top: 20),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton.icon(
+                                  onPressed: () async {
+                                    Navigator.of(context).pop();
+                                    await _pickVinImages();
+                                  },
+                                  icon: Container(
+                                    padding: EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      Icons.add_photo_alternate_outlined,
+                                      color: Colors.white,
+                                      size: 20,
                                     ),
                                   ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-
-                    SizedBox(height: 20),
-
-                    // Action buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              _pickVinImages();
-                            },
-                            icon: Icon(Icons.add_photo_alternate),
-                            label: Text('Add More Images'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Constants.ctaColorLight,
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                  label: Text(
+                                    'Add More Images',
+                                    style: GoogleFonts.manrope(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Constants.ctaColorLight,
+                                    foregroundColor: Colors.white,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 18,
+                                      horizontal: 24,
+                                    ),
+                                    elevation: 3,
+                                    shadowColor: Constants.ctaColorLight
+                                        .withOpacity(0.3),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _pickVinImages,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Constants.ctaColorLight,
-                          padding: EdgeInsets.symmetric(vertical: 36),
-                        ),
-                        child: Text(
-                          'Add More Images',
-                          style: GoogleFonts.manrope(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          ],
                         ),
                       ),
                     ),
@@ -3397,56 +3674,113 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   // Autocomplete method for TypeAhead field
   Future<List<Prediction>> _searchPlacesAutocomplete(String pattern) async {
     if (pattern.length < 3) return [];
-    
-    // Reuse existing search logic
+
+    // Web platform check to prevent CORS errors
+    if (kIsWeb) {
+      // TODO: Implement backend proxy for Google Places API
+      // Direct API calls from Flutter web cause CORS errors.
+      // Solutions:
+      // 1. Create a backend endpoint that proxies Google Places API calls
+      // 2. Use google_maps_flutter_web with JavaScript interop
+      // 3. Use @dart-js interop to call Google Places JavaScript API directly
+      print('Location autocomplete disabled on web due to CORS restrictions. Backend proxy needed.');
+      return [];
+    }
+
     try {
-      List<Prediction> predictions = [];
+      final String baseURL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+      final String request = '$baseURL?input=$pattern&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&components=country:za&language=en';
       
-      // Use geocoding to search for places
-      try {
-        List<Location> locations = await locationFromAddress(pattern);
-        for (var location in locations.take(5)) {
-          // Create a prediction from the location
-          String placeId = 'geocoding_${location.latitude}_${location.longitude}';
-          predictions.add(Prediction(
-            description: pattern,
-            placeId: placeId,
-          ));
+      final response = await http.get(Uri.parse(request));
+      
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        
+        if (data['status'] == 'OK' && data['predictions'] != null) {
+          final List<dynamic> predictions = data['predictions'];
+          
+          return predictions.map((prediction) {
+            return Prediction(
+              description: prediction['description'],
+              placeId: prediction['place_id'],
+              reference: prediction['reference'] ?? '',
+              matchedSubstrings: [],
+              terms: [],
+              types: prediction['types']?.cast<String>() ?? [],
+              structuredFormatting: null,
+            );
+          }).toList();
         }
-      } catch (e) {
-        print('Error with locationFromAddress: $e');
       }
       
-      return predictions;
+      return [];
     } catch (e) {
       print('Error in _searchPlacesAutocomplete: $e');
       return [];
     }
   }
 
-  // Handle location selection from TypeAhead
+  // Handle location selection from TypeAhead - Web compatible
   Future<void> _onLocationSelected(Prediction suggestion) async {
-    if (suggestion.placeId?.startsWith('geocoding_') == true) {
-      final coords = suggestion.placeId!
-          .substring('geocoding_'.length)
-          .split('_');
-      if (coords.length == 2) {
-        final lat = double.tryParse(coords[0]);
-        final lng = double.tryParse(coords[1]);
+    try {
+      if (suggestion.placeId?.startsWith('geocoding_') == true) {
+        // Handle old geocoding format (fallback)
+        final coords = suggestion.placeId!
+            .substring('geocoding_'.length)
+            .split('_');
+        if (coords.length == 2) {
+          final lat = double.tryParse(coords[0]);
+          final lng = double.tryParse(coords[1]);
 
-        if (lat != null && lng != null) {
-          final newLatLng = LatLng(lat, lng);
-
-          setState(() {
-            _selectedLocation = newLatLng;
-            _selectedAddress = suggestion.description ?? '';
-            _locationController.text = suggestion.description ?? '';
-          });
-
-          // Optionally show location picker dialog for confirmation
-          // _showLocationPicker();
+          if (lat != null && lng != null) {
+            final newLatLng = LatLng(lat, lng);
+            setState(() {
+              _selectedLocation = newLatLng;
+              _selectedAddress = suggestion.description ?? '';
+              _locationController.text = suggestion.description ?? '';
+            });
+          }
         }
+      } else if (suggestion.placeId != null) {
+        // Handle Google Places API placeId using HTTP API
+        final String baseURL = 'https://maps.googleapis.com/maps/api/place/details/json';
+        final String request = '$baseURL?place_id=${suggestion.placeId}&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&fields=geometry';
+        
+        final response = await http.get(Uri.parse(request));
+        
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = json.decode(response.body);
+          
+          if (data['status'] == 'OK' && data['result']?['geometry']?['location'] != null) {
+            final location = data['result']['geometry']['location'];
+            final lat = location['lat']?.toDouble();
+            final lng = location['lng']?.toDouble();
+            
+            if (lat != null && lng != null) {
+              final newLatLng = LatLng(lat, lng);
+              
+              setState(() {
+                _selectedLocation = newLatLng;
+                _selectedAddress = suggestion.description ?? '';
+                _locationController.text = suggestion.description ?? '';
+              });
+            }
+          }
+        }
+      } else {
+        // Fallback: just set the description
+        setState(() {
+          _selectedAddress = suggestion.description ?? '';
+          _locationController.text = suggestion.description ?? '';
+        });
       }
+    } catch (e) {
+      print('Error in _onLocationSelected: $e');
+      // Fallback: just set the description
+      setState(() {
+        _selectedAddress = suggestion.description ?? '';
+        _locationController.text = suggestion.description ?? '';
+      });
     }
   }
 }
@@ -3768,6 +4102,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
     FocusNode focusNode,
     FocusNode? nextFocusNode, {
     Widget? suffixIcon,
+    bool? integersOnly,
   }) {
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
@@ -3778,6 +4113,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
           ? TextInputAction.next
           : TextInputAction.done,
       isPasswordField: false,
+      integersOnly: integersOnly,
       suffix: suffixIcon,
       onChanged: (value) {},
       onSubmitted: (value) {
@@ -3825,7 +4161,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
             hint: Text(
               label.replaceAll('*', ''),
               style: GoogleFonts.manrope(
-                color: Colors.black,
+                color: Colors.grey.withOpacity(0.35),
                 fontSize: 14,
                 fontWeight: FontWeight.w300,
               ),
@@ -3930,6 +4266,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                   _quantityController,
                   _quantityFocus,
                   _minPriceFocus,
+                  integersOnly: true,
                 ),
               ),
             ],
@@ -3949,6 +4286,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                   _minPriceController,
                   _minPriceFocus,
                   _maxPriceFocus,
+                  integersOnly: true,
                 ),
               ),
               SizedBox(width: 16),
@@ -3958,6 +4296,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                   _maxPriceController,
                   _maxPriceFocus,
                   null,
+                  integersOnly: true,
                 ),
               ),
             ],
@@ -4638,6 +4977,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     FocusNode focusNode,
     FocusNode? nextFocusNode, {
     Widget? suffixIcon,
+    bool? integersOnly,
   }) {
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
@@ -4648,6 +4988,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
           ? TextInputAction.next
           : TextInputAction.done,
       isPasswordField: false,
+      integersOnly: integersOnly,
       suffix: suffixIcon,
       onChanged: (value) {},
       onSubmitted: (value) {
@@ -4695,7 +5036,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
             hint: Text(
               label.replaceAll('*', ''),
               style: GoogleFonts.manrope(
-                color: Colors.black,
+                color: Colors.grey.withOpacity(0.35),
                 fontSize: 14,
                 fontWeight: FontWeight.w300,
               ),
@@ -4993,6 +5334,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                   _tyreWidthController,
                   _tyreWidthFocus,
                   null,
+                  integersOnly: true,
                 ),
               ),
               SizedBox(width: 16),
@@ -5084,6 +5426,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                   _pcdController,
                   _pcdFocus,
                   null,
+                  integersOnly: true,
                 ),
               ),
             ],
@@ -5986,41 +6329,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
     }
   }
 
-  // Autocomplete method for TypeAhead field
-  Future<List<Prediction>> _searchPlacesAutocomplete(String pattern) async {
-    if (pattern.length < 3) return [];
-    
-    try {
-      final results = await _getPlacePredictions(pattern);
-      return results;
-    } catch (e) {
-      print('Error in _searchPlacesAutocomplete: $e');
-      return [];
-    }
-  }
 
-  // Handle location selection from TypeAhead
-  Future<void> _onLocationSelected(Prediction suggestion) async {
-    if (suggestion.placeId?.startsWith('geocoding_') == true) {
-      final coords = suggestion.placeId!
-          .substring('geocoding_'.length)
-          .split('_');
-      if (coords.length == 2) {
-        final lat = double.tryParse(coords[0]);
-        final lng = double.tryParse(coords[1]);
-
-        if (lat != null && lng != null) {
-          final newLatLng = LatLng(lat, lng);
-
-          setState(() {
-            _selectedLocation = newLatLng;
-            _selectedAddress = suggestion.description ?? '';
-            _searchController.text = suggestion.description ?? '';
-          });
-        }
-      }
-    }
-  }
 
   // TypeAhead-specific methods for LocationPickerDialog
   Future<List<Prediction>> _getPlacePredictionsTypeAhead(String query) async {
@@ -6028,85 +6337,128 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
       return [];
     }
 
+    // Web platform check to prevent CORS errors
+    if (kIsWeb) {
+      // TODO: Implement backend proxy for Google Places API
+      // Direct API calls from Flutter web cause CORS errors.
+      // Solutions:
+      // 1. Create a backend endpoint that proxies Google Places API calls
+      // 2. Use google_maps_flutter_web with JavaScript interop
+      // 3. Use @dart-js interop to call Google Places JavaScript API directly
+      print('Location autocomplete disabled on web due to CORS restrictions. Backend proxy needed.');
+      return [];
+    }
+
     try {
-      List<Prediction> predictions = [];
+      final String baseURL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+      final String request = '$baseURL?input=$query&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&components=country:za&language=en';
       
-      // Use existing _getPlacePredictions method if available, otherwise use geocoding
-      try {
-        List<Location> locations = await locationFromAddress(query);
-        for (var location in locations.take(5)) {
-          // Create a prediction from the location
-          String placeId = 'geocoding_${location.latitude}_${location.longitude}';
+      final response = await http.get(Uri.parse(request));
+      
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        
+        if (data['status'] == 'OK' && data['predictions'] != null) {
+          final List<dynamic> predictions = data['predictions'];
           
-          // Try to get a formatted address
-          try {
-            List<Placemark> placemarks = await placemarkFromCoordinates(
-              location.latitude,
-              location.longitude,
+          return predictions.map((prediction) {
+            return Prediction(
+              description: prediction['description'],
+              placeId: prediction['place_id'],
+              reference: prediction['reference'] ?? '',
+              matchedSubstrings: [],
+              terms: [],
+              types: prediction['types']?.cast<String>() ?? [],
+              structuredFormatting: null,
             );
-            
-            if (placemarks.isNotEmpty) {
-              final placemark = placemarks.first;
-              final formattedAddress = [
-                placemark.street,
-                placemark.locality,
-                placemark.administrativeArea,
-                placemark.country,
-              ].where((s) => s != null && s.isNotEmpty).join(', ');
-              
-              predictions.add(Prediction(
-                description: formattedAddress.isNotEmpty ? formattedAddress : query,
-                placeId: placeId,
-              ));
-            }
-          } catch (e) {
-            // Fallback to original query if reverse geocoding fails
-            predictions.add(Prediction(
-              description: query,
-              placeId: placeId,
-            ));
-          }
+          }).toList();
         }
-      } catch (e) {
-        print('Error with locationFromAddress: $e');
       }
       
-      return predictions;
+      return [];
     } catch (e) {
       print('Error in _getPlacePredictionsTypeAhead: $e');
       return [];
     }
   }
 
-  // Handle location selection from TypeAhead
+  // Handle location selection from TypeAhead - Web compatible
   void _onPlaceSelectedTypeAhead(Prediction prediction) async {
-    if (prediction.placeId?.startsWith('geocoding_') == true) {
-      final coords = prediction.placeId!
-          .substring('geocoding_'.length)
-          .split('_');
-      if (coords.length == 2) {
-        final lat = double.tryParse(coords[0]);
-        final lng = double.tryParse(coords[1]);
+    try {
+      if (prediction.placeId?.startsWith('geocoding_') == true) {
+        // Handle old geocoding format (fallback)
+        final coords = prediction.placeId!
+            .substring('geocoding_'.length)
+            .split('_');
+        if (coords.length == 2) {
+          final lat = double.tryParse(coords[0]);
+          final lng = double.tryParse(coords[1]);
 
-        if (lat != null && lng != null) {
-          final newLatLng = LatLng(lat, lng);
+          if (lat != null && lng != null) {
+            final newLatLng = LatLng(lat, lng);
+            setState(() {
+              _selectedLocation = newLatLng;
+              _selectedAddress = prediction.description ?? '';
+              _searchController.text = prediction.description ?? '';
+            });
 
-          setState(() {
-            _selectedLocation = newLatLng;
-            _selectedAddress = prediction.description ?? '';
-            _searchController.text = prediction.description ?? '';
-          });
-
-          // Move the camera to the new location
-          if (_mapController != null) {
-            await _mapController!.animateCamera(
-              CameraUpdate.newCameraPosition(
-                CameraPosition(target: newLatLng, zoom: 16.0),
-              ),
-            );
+            if (_mapController != null) {
+              await _mapController!.animateCamera(
+                CameraUpdate.newCameraPosition(
+                  CameraPosition(target: newLatLng, zoom: 16.0),
+                ),
+              );
+            }
           }
         }
+      } else if (prediction.placeId != null) {
+        // Handle Google Places API placeId using HTTP API
+        final String baseURL = 'https://maps.googleapis.com/maps/api/place/details/json';
+        final String request = '$baseURL?place_id=${prediction.placeId}&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&fields=geometry';
+        
+        final response = await http.get(Uri.parse(request));
+        
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = json.decode(response.body);
+          
+          if (data['status'] == 'OK' && data['result']?['geometry']?['location'] != null) {
+            final location = data['result']['geometry']['location'];
+            final lat = location['lat']?.toDouble();
+            final lng = location['lng']?.toDouble();
+            
+            if (lat != null && lng != null) {
+              final newLatLng = LatLng(lat, lng);
+              
+              setState(() {
+                _selectedLocation = newLatLng;
+                _selectedAddress = prediction.description ?? '';
+                _searchController.text = prediction.description ?? '';
+              });
+
+              if (_mapController != null) {
+                await _mapController!.animateCamera(
+                  CameraUpdate.newCameraPosition(
+                    CameraPosition(target: newLatLng, zoom: 16.0),
+                  ),
+                );
+              }
+            }
+          }
+        }
+      } else {
+        // Fallback: just set the description
+        setState(() {
+          _selectedAddress = prediction.description ?? '';
+          _searchController.text = prediction.description ?? '';
+        });
       }
+    } catch (e) {
+      print('Error in _onPlaceSelectedTypeAhead: $e');
+      // Fallback: just set the description
+      setState(() {
+        _selectedAddress = prediction.description ?? '';
+        _searchController.text = prediction.description ?? '';
+      });
     }
   }
 
@@ -6235,7 +6587,10 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                           ),
                           filled: true,
                           fillColor: Colors.grey.shade50,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -6246,7 +6601,10 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Constants.ctaColorLight, width: 2),
+                            borderSide: BorderSide(
+                              color: Constants.ctaColorLight,
+                              width: 2,
+                            ),
                           ),
                           prefixIcon: Container(
                             padding: EdgeInsets.all(12),
@@ -6278,7 +6636,10 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                     },
                     itemBuilder: (context, suggestion) {
                       return Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
@@ -6307,8 +6668,11 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    suggestion.structuredFormatting?.mainText ?? 
-                                    suggestion.description?.split(',').first ?? '',
+                                    suggestion.structuredFormatting?.mainText ??
+                                        suggestion.description
+                                            ?.split(',')
+                                            .first ??
+                                        '',
                                     style: GoogleFonts.manrope(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
@@ -6317,10 +6681,15 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  if (suggestion.structuredFormatting?.secondaryText != null) ...[
+                                  if (suggestion
+                                          .structuredFormatting
+                                          ?.secondaryText !=
+                                      null) ...[
                                     SizedBox(height: 2),
                                     Text(
-                                      suggestion.structuredFormatting!.secondaryText!,
+                                      suggestion
+                                          .structuredFormatting!
+                                          .secondaryText!,
                                       style: GoogleFonts.manrope(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400,
@@ -6332,7 +6701,11 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                                   ] else ...[
                                     SizedBox(height: 2),
                                     Text(
-                                      suggestion.description?.split(',').skip(1).join(', ') ?? '',
+                                      suggestion.description
+                                              ?.split(',')
+                                              .skip(1)
+                                              .join(', ') ??
+                                          '',
                                       style: GoogleFonts.manrope(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400,
@@ -6376,9 +6749,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                       );
                     },
                     offset: Offset(0, 4),
-                    constraints: BoxConstraints(
-                      maxHeight: 280,
-                    ),
+                    constraints: BoxConstraints(maxHeight: 280),
                     hideOnEmpty: true,
                     hideOnError: true,
                     hideOnLoading: false,
@@ -6391,7 +6762,9 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Constants.ctaColorLight),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Constants.ctaColorLight,
+                              ),
                             ),
                           ),
                           SizedBox(width: 12),
@@ -6446,7 +6819,6 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),
@@ -6631,8 +7003,9 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
     String hintText,
     TextEditingController controller,
     FocusNode focusNode,
-    Widget? suffixIcon,
-  ) {
+    Widget? suffixIcon, {
+    bool? integersOnly,
+  }) {
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
       labelText: hintText,
@@ -6640,6 +7013,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
       focusNode: focusNode,
       textInputAction: TextInputAction.next,
       isPasswordField: false,
+      integersOnly: integersOnly,
       suffix: suffixIcon,
       onSubmitted: (value) {
         if (value.isNotEmpty) {

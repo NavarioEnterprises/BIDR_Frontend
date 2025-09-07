@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'package:bidr/constants/Constants.dart';
+import 'package:bidr/config/environment_config.dart';
 import 'package:bidr/global_values.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -483,11 +484,29 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                         // Action Buttons
                         Row(
                           children: [
-                            if (order.status.toLowerCase() ==
-                                "Pending Payment".toLowerCase()) ...[
+                            if (order.status.toLowerCase().contains(
+                                  'ongoing',
+                                ) ||
+                                order.status.toLowerCase().contains(
+                                  'pending',
+                                ) ||
+                                order.status.toLowerCase().contains('paid') ||
+                                order.status.toLowerCase().contains(
+                                  'payment confirmed',
+                                ) ||
+                                order.status.toLowerCase().contains(
+                                  'processing',
+                                ) ||
+                                order.status.toLowerCase().contains(
+                                  'shipped',
+                                ) ||
+                                order.status.toLowerCase().contains(
+                                  'completed',
+                                )) ...[
                               Expanded(
                                 child: ElevatedButton.icon(
-                                  onPressed: _showCollectGoodsDialog,
+                                  onPressed: () =>
+                                      _showCollectGoodsDialog(order),
                                   icon: Icon(
                                     CupertinoIcons.cube_box,
                                     size: 18,
@@ -512,8 +531,99 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                               ),
                               SizedBox(width: 12),
                               OutlinedButton.icon(
-                                onPressed: () {
-                                  // Handle chat action
+                                onPressed: () async {
+                                  // Show loading indicator while creating/getting conversation
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (context) => Center(
+                                      child: Container(
+                                        padding: EdgeInsets.all(24),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                        ),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            CircularProgressIndicator(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                    Constants.ctaColorLight,
+                                                  ),
+                                            ),
+                                            SizedBox(height: 16),
+                                            Text(
+                                              'Loading conversation...',
+                                              style: GoogleFonts.manrope(
+                                                fontSize: 14,
+                                                color: Colors.grey[700],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+
+                                  try {
+                                    // Create or get conversation for this request
+                                    final conversationData =
+                                        await ChatService.createOrGetConversationForRequest(
+                                          _getRequestId(order),
+                                        );
+
+                                    // Close loading dialog
+                                    Navigator.of(context).pop();
+
+                                    if (conversationData != null) {
+                                      // Navigate to GroupChat with backend integration
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => GroupChatScreen(
+                                            groupChat: GroupChat(
+                                              uuid: _getRequestId(order),
+                                              request: ProductRequest(
+                                                description:
+                                                    _getRequestDescription(
+                                                      order,
+                                                    ),
+                                              ),
+                                              messages:
+                                                  [], // Empty - will be loaded from backend
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Failed to load conversation. Please try again.',
+                                          ),
+                                          backgroundColor: Colors.red,
+                                          duration: Duration(seconds: 3),
+                                        ),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    // Close loading dialog if still open
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Failed to load conversation. Please try again.',
+                                        ),
+                                        backgroundColor: Colors.red,
+                                        duration: Duration(seconds: 3),
+                                      ),
+                                    );
+                                  }
                                 },
                                 icon: Icon(
                                   CupertinoIcons.chat_bubble_2,
@@ -3178,8 +3288,39 @@ class _TransactionDashboardState extends State<TransactionDashboard>
     'Other',
   ];
 
-  // Method to generate random 4-digit number
-  void _generateUniqueIdentifier() {
+  // Method to get or create collection PIN for the order
+  Future<void> _getCollectionCode(String orderId) async {
+    try {
+      // Call backend API to get or create collection code
+      final response = await http.post(
+        Uri.parse(
+          '${AppConfig.productsServiceUrl}api/v1/product-requests/collection-codes/get-or-create/',
+        ),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'order_id': orderId}),
+      );
+      print("dfggf ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          uniqueIdentifierNumber = data['pin_code'];
+          // Format with spaces for display: "1234" -> "1 2 3 4"
+          uniqueIdentifierNumber = uniqueIdentifierNumber.split('').join(' ');
+        });
+      } else {
+        // Fallback to local generation if API fails
+        _generateLocalPinCode();
+      }
+    } catch (e) {
+      print('Error getting collection code: $e');
+      // Fallback to local generation
+      _generateLocalPinCode();
+    }
+  }
+
+  // Fallback method to generate random 4-digit number locally
+  void _generateLocalPinCode() {
     Random random = Random();
     List<int> digits = [];
     for (int i = 0; i < 4; i++) {
@@ -3193,8 +3334,15 @@ class _TransactionDashboardState extends State<TransactionDashboard>
   }
 
   // Method to show the collect goods dialog
-  void _showCollectGoodsDialog() {
-    _generateUniqueIdentifier(); // Generate new code when dialog opens
+  Future<void> _showCollectGoodsDialog([Order? order]) async {
+    // Get or create collection code when dialog opens
+    if (order != null) {
+      await _getCollectionCode(
+        order.orderNumber,
+      ); // Use order number as identifier and wait for completion
+    } else {
+      _generateLocalPinCode(); // Fallback for cases where no order is provided
+    }
 
     showDialog(
       context: context,
@@ -4441,16 +4589,21 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                       ],
                     ),
                   ),
-                ] else if (order.status.toLowerCase() ==
-                    "Pending Payment".toLowerCase()) ...[
-                  // Collect Goods Button for ongoing orders
+                ] else if (order.status.toLowerCase().contains('ongoing') ||
+                    order.status.toLowerCase().contains('pending') ||
+                    order.status.toLowerCase().contains('paid') ||
+                    order.status.toLowerCase().contains('payment confirmed') ||
+                    order.status.toLowerCase().contains('processing') ||
+                    order.status.toLowerCase().contains('shipped') ||
+                    order.status.toLowerCase().contains('completed')) ...[
+                  // Collect Goods Button for all ongoing orders
                   Padding(
                     padding: const EdgeInsets.only(left: 16, right: 16),
                     child: Row(
                       children: [
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: _showCollectGoodsDialog,
+                            onPressed: () => _showCollectGoodsDialog(order),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Constants.ctaColorLight,
                               padding: EdgeInsets.symmetric(vertical: 12),
