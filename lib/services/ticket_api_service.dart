@@ -6,10 +6,12 @@ import '../models/ticket.dart';
 class TicketApiService {
   /// Fetch tickets for a specific user
   Future<List<Ticket>?> fetchUserTickets(String authUserUid) async {
-    final url = Uri.parse('${GlobalVariables.reviewsServiceUrl}api/tickets/user_tickets/');
-    
+    final url = Uri.parse(
+      '${GlobalVariables.reviewsServiceUrl}api/reviews/router/tickets/user_tickets/',
+    );
+
     final headers = {'Content-Type': 'application/json'};
-    
+
     try {
       final response = await http.get(
         url.replace(queryParameters: {'auth_user_uid': authUserUid}),
@@ -21,7 +23,9 @@ class TicketApiService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = jsonDecode(response.body);
-        final tickets = jsonData.map((ticketJson) => Ticket.fromJson(ticketJson)).toList();
+        final tickets = jsonData
+            .map((ticketJson) => Ticket.fromJson(ticketJson))
+            .toList();
         print('Fetched ${tickets.length} tickets successfully');
         return tickets;
       } else {
@@ -41,8 +45,10 @@ class TicketApiService {
     required String description,
     String priority = 'medium',
   }) async {
-    final url = Uri.parse('${GlobalVariables.reviewsServiceUrl}api/tickets/');
-    
+    final url = Uri.parse(
+      '${GlobalVariables.reviewsServiceUrl}api/reviews/router/tickets/',
+    );
+
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       'auth_user_uid': authUserUid,
@@ -63,13 +69,11 @@ class TicketApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
         print('Ticket created successfully: $jsonResponse');
-        return {
-          'success': true,
-          'data': jsonResponse,
-        };
+        return {'success': true, 'data': jsonResponse};
       } else {
         try {
-          final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+          final jsonResponse =
+              jsonDecode(response.body) as Map<String, dynamic>;
           return {
             'success': false,
             'statusCode': response.statusCode,
@@ -96,13 +100,12 @@ class TicketApiService {
     required String authUserUid,
     required String message,
   }) async {
-    final url = Uri.parse('${GlobalVariables.reviewsServiceUrl}api/tickets/$ticketId/add_message/');
-    
+    final url = Uri.parse(
+      '${GlobalVariables.reviewsServiceUrl}api/reviews/router/tickets/$ticketId/add_message/',
+    );
+
     final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({
-      'auth_user_uid': authUserUid,
-      'message': message,
-    });
+    final body = jsonEncode({'auth_user_uid': authUserUid, 'message': message});
 
     print('Adding message to ticket - URL: $url');
     print('Adding message to ticket - Body: $body');
@@ -116,13 +119,11 @@ class TicketApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
         print('Message added successfully: $jsonResponse');
-        return {
-          'success': true,
-          'data': jsonResponse,
-        };
+        return {'success': true, 'data': jsonResponse};
       } else {
         try {
-          final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+          final jsonResponse =
+              jsonDecode(response.body) as Map<String, dynamic>;
           return {
             'success': false,
             'statusCode': response.statusCode,
@@ -148,12 +149,12 @@ class TicketApiService {
     required int ticketId,
     required String status,
   }) async {
-    final url = Uri.parse('${GlobalVariables.reviewsServiceUrl}api/tickets/$ticketId/update_status/');
-    
+    final url = Uri.parse(
+      '${GlobalVariables.reviewsServiceUrl}api/reviews/router/tickets/$ticketId/update_status/',
+    );
+
     final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({
-      'status': status,
-    });
+    final body = jsonEncode({'status': status});
 
     print('Updating ticket status - URL: $url');
     print('Updating ticket status - Body: $body');
@@ -167,13 +168,11 @@ class TicketApiService {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
         print('Ticket status updated successfully: $jsonResponse');
-        return {
-          'success': true,
-          'data': jsonResponse,
-        };
+        return {'success': true, 'data': jsonResponse};
       } else {
         try {
-          final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+          final jsonResponse =
+              jsonDecode(response.body) as Map<String, dynamic>;
           return {
             'success': false,
             'statusCode': response.statusCode,

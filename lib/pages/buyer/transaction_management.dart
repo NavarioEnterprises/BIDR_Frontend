@@ -109,7 +109,9 @@ class _TransactionDashboardState extends State<TransactionDashboard>
     try {
       // Use the correct API endpoint for orders from product-requests
       final response = await http.get(
-        Uri.parse('${Constants.bidrBaseUrl}api/v1/product-requests/orders/'),
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/',
+        ).replace(queryParameters: {'buyer_id': Constants.currentUser!.uid}),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -181,16 +183,17 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                     order.status.toLowerCase().contains('ongoing') ||
                     order.status.toLowerCase().contains('pending') ||
                     order.status.toLowerCase().contains('paid') ||
+                    order.status.toLowerCase().contains('payment confirmed') ||
                     order.status.toLowerCase().contains('processing') ||
-                    order.status.toLowerCase().contains('shipped'),
+                    order.status.toLowerCase().contains('shipped') ||
+                    order.status.toLowerCase().contains('completed'),
               )
               .toList();
           purchasedOrders = allOrders
               .where(
                 (order) =>
                     order.status.toLowerCase().contains('purchased') ||
-                    order.status.toLowerCase().contains('delivered') ||
-                    order.status.toLowerCase().contains('completed'),
+                    order.status.toLowerCase().contains('delivered'),
               )
               .toList();
           returnsRefundsOrders = allOrders
@@ -2584,7 +2587,9 @@ class _TransactionDashboardState extends State<TransactionDashboard>
 
       // Submit to backend
       final response = await http.post(
-        Uri.parse('${Constants.bidrBaseUrl}api/v1/product-requests/orders/'),
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/',
+        ),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',

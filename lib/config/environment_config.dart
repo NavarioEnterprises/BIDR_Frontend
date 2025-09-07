@@ -82,21 +82,17 @@ class AppConfig {
     ),
     EnvironmentType.uat: EnvironmentConfig(
       // Service URLs
-      productsServiceUrl:
-          "https://bidr-auth-ssl-1757042867.westus.azurecontainer.io/",
+      productsServiceUrl: "https://products-management.bidr.co.za/",
       authServiceUrl: "https://api.bidr.co.za/",
-      chatServiceUrl:
-          "https://bidr-chat-1756963149.westus.azurecontainer.io:8002/",
+      chatServiceUrl: "http://chat-service.bidr.co.za/",
       paymentServiceUrl:
           "https://bidr-payment-1756963524.westus.azurecontainer.io:8003/",
       resolutionServiceUrl:
           "https://bidr-resolution-1756963788.westus.azurecontainer.io:8004/",
-      notificationsServiceUrl:
-          "https://bidr-notifications-1756964056.westus.azurecontainer.io:8005/",
+      notificationsServiceUrl: "https://notifications.bidr.co.za/",
       transactionsServiceUrl:
           "https://bidr-transactions-1756964308.westus.azurecontainer.io:8006/",
-      reviewsServiceUrl:
-          "https://bidr-reviews-1756964572.westus.azurecontainer.io:8007/",
+      reviewsServiceUrl: "https://reviews.bidr.co.za/",
 
       // Admin URLs
       productsAdminUrl:
@@ -120,26 +116,26 @@ class AppConfig {
     ),
     EnvironmentType.prod: EnvironmentConfig(
       // Service URLs (Production URLs)
-      authServiceUrl: "https://bidr.online/auth/",
-      chatServiceUrl: "https://bidr.online/chat/",
-      paymentServiceUrl: "https://bidr.online/payments/",
-      resolutionServiceUrl: "https://bidr.online/resolution/",
-      productsServiceUrl: "https://bidr.online/products/",
-      notificationsServiceUrl: "https://bidr.online/notifications/",
-      transactionsServiceUrl: "https://bidr.online/transactions/",
-      reviewsServiceUrl: "https://bidr.online/reviews/",
+      authServiceUrl: "https://bidr-auth.ngrok.io/",
+      chatServiceUrl: "https://bidr-chat.ngrok.io/",
+      paymentServiceUrl: "https://bidr-payment.ngrok.io/",
+      resolutionServiceUrl: "https://bidr-resolution.ngrok.io/",
+      productsServiceUrl: "https://bidr-products.ngrok.io/",
+      notificationsServiceUrl: "https://bidr-notifications.ngrok.io/",
+      transactionsServiceUrl: "https://bidr-transactions.ngrok.io/",
+      reviewsServiceUrl: "https://bidr-reviews.ngrok.io/",
       // Admin URLs
-      authAdminUrl: "https://bidr.online/auth/admin/",
-      chatAdminUrl: "https://bidr.online/chat/admin/",
-      paymentAdminUrl: "https://bidr.online/payments/admin/",
-      resolutionAdminUrl: "https://bidr.online/resolution/admin/",
-      productsAdminUrl: "https://bidr.online/products/admin/",
-      notificationsAdminUrl: "https://bidr.online/notifications/admin/",
-      transactionsAdminUrl: "https://bidr.online/transactions/admin/",
-      reviewsAdminUrl: "https://bidr.online/reviews/admin/",
+      authAdminUrl: "https://bidr-auth.ngrok.io/admin/",
+      chatAdminUrl: "https://bidr-chat.ngrok.io/admin/",
+      paymentAdminUrl: "https://bidr-payment.ngrok.io/admin/",
+      resolutionAdminUrl: "https://bidr-resolution.ngrok.io/admin/",
+      productsAdminUrl: "https://bidr-products.ngrok.io/admin/",
+      notificationsAdminUrl: "https://bidr-notifications.ngrok.io/admin/",
+      transactionsAdminUrl: "https://bidr-transactions.ngrok.io/admin/",
+      reviewsAdminUrl: "https://bidr-reviews.ngrok.io/admin/",
       // Monitoring
-      grafanaUrl: "https://bidr.online/grafana/",
-      prometheusUrl: "https://bidr.online/prometheus/",
+      grafanaUrl: "https://bidr-grafana.ngrok.io/",
+      prometheusUrl: "https://bidr-prometheus.ngrok.io/",
     ),
   };
 

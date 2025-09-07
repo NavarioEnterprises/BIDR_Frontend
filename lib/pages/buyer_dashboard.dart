@@ -31,7 +31,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   String? _error;
   Map<String, String> _bidSortOptions = {}; // Track sort option per request ID
   Set<String> _cancelledRequests = {}; // Track cancelled request IDs
-  
+
   // Auto-refresh timer
   Timer? _refreshTimer;
   final GlobalKey _transactionKey = GlobalKey();
@@ -64,7 +64,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
   // Start auto-refresh timer for background updates every 20 seconds
   void _startAutoRefresh() {
-    _refreshTimer = Timer.periodic(Duration(seconds: 20), (timer) {
+    _refreshTimer = Timer.periodic(Duration(seconds: 60), (timer) {
       // Only refresh if the widget is still mounted and not loading
       if (mounted) {
         // Refresh data based on current tab
@@ -93,6 +93,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -181,7 +182,11 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                           : dashboardIndex == 2
                           ? Column(
                               children: [
-                                Expanded(child: TransactionDashboard(key: _transactionKey)),
+                                Expanded(
+                                  child: TransactionDashboard(
+                                    key: _transactionKey,
+                                  ),
+                                ),
                               ],
                             )
                           : dashboardIndex == 3
@@ -298,7 +303,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       ],
     );
   }
-
 
   /// Filter and sort requests based on current settings
   List<dynamic> _filterRequests(List<dynamic> requests) {
@@ -1841,8 +1845,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     dynamic request,
     double fixedHeight,
     int index,
-  )
-  {
+  ) {
     final bids = _getSortedBids(request);
     final hasMoreThanTwoBids = bids.length > 2;
     final bidsToShow = bids
@@ -2409,7 +2412,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       ),
     );
   }
-
 
   // View All Bids button
   Widget _buildViewAllBidsButton(int totalBids) {
@@ -3086,8 +3088,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   Future<void> _processPaymentAndCreateOrder(
     dynamic seller,
     dynamic request,
-  ) async
-  {
+  ) async {
     try {
       // Show loading indicator
       ApiService apiService = ApiService();
@@ -3181,7 +3182,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
             if (updateResult['success']) {
               print('Order status updated to PAID successfully');
-              
+
               // Navigate to Transaction Management tab
               setState(() {
                 dashboardIndex = 2; // Transaction Management tab
@@ -3190,8 +3191,12 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
               // Show success dialog
               _showPaymentSuccessfulDialog(context);
             } else {
-              print('Failed to update order status: ${updateResult['message']}');
-              throw Exception('Failed to update order status: ${updateResult['message']}');
+              print(
+                'Failed to update order status: ${updateResult['message']}',
+              );
+              throw Exception(
+                'Failed to update order status: ${updateResult['message']}',
+              );
             }
           } catch (e) {
             print('Error updating order status: $e');
@@ -3795,7 +3800,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       final response = await http
           .get(
             Uri.parse(
-              'http://127.0.0.1:8005/api/v1/product-requests/requests/',
+              '${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/',
             ),
             headers: {'User-Agent': 'Flutter App', 'Accept': '*/*'},
           )
@@ -4365,7 +4370,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       // API call to cancel the request
       final response = await http.delete(
         Uri.parse(
-          'http://127.0.0.1:8005/api/v1/product-requests/requests/$requestId/',
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/$requestId/',
         ),
         headers: {
           'Content-Type': 'application/json',

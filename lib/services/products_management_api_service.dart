@@ -228,7 +228,7 @@ class ApiService {
         };
       }
     } catch (e) {
-      print('Error submitting request: $e');
+      print('Error submitting request1: $e');
       return {
         'success': false,
         'message': 'Network error occurred',
@@ -404,7 +404,7 @@ class ApiService {
         'consumer_electronics_data': jsonEncode(electronicsData),
         'terms_accepted': 'true',
         'contact_consent': 'true',
-        'buyer_id': '2',
+        'buyer_id': Constants.myUid,
         'auth_user_uid': Constants.myUid, // Add auth user UID from Constants
       });
 
@@ -524,7 +524,7 @@ class ApiService {
         'vehicle_tyres_rims_data': jsonEncode(tyresRimsData),
         'terms_accepted': 'true',
         'contact_consent': 'true',
-        'buyer_id': '2',
+        'buyer_id': Constants.myUid,
         'auth_user_uid': Constants.myUid, // Add auth user UID from Constants
       });
 
@@ -686,8 +686,8 @@ class ApiService {
         },
       );
 
-      print('Get requests by seller response status: ${response.statusCode}');
-      print('Get requests by seller response body: ${response.body}');
+      print('Get requests by buyer response status: ${response.statusCode}');
+      print('Get requests by buyer response body: ${response.body}');
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final data = jsonDecode(response.body);

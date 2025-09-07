@@ -39,7 +39,8 @@ class _SellerDashboardState extends State<SellerDashboard>
   int selectedSubIndex = 0; // For transaction history tabs
   bool isPinVerifiedSuccessful = false;
   bool _isLoadingNotifications = false;
-  final NotificationApiService _notificationApiService = NotificationApiService();
+  final NotificationApiService _notificationApiService =
+      NotificationApiService();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _commentsController = TextEditingController();
 
@@ -545,7 +546,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     if (MediaQuery.of(context).size.width < 800) {
       return SellerDashboardMobile();
     }
-    
+
     final unreadCount = notifications.where((n) => !n.read).length;
     return Scaffold(
       backgroundColor: Colors.white,
@@ -826,7 +827,8 @@ class _SellerDashboardState extends State<SellerDashboard>
       // Use the user's UUID from Constants
       final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
       if (userUuid.isNotEmpty) {
-        final fetchedNotifications = await _notificationApiService.getUserNotifications(userUuid);
+        final fetchedNotifications = await _notificationApiService
+            .getUserNotifications(userUuid);
         if (mounted) {
           setState(() {
             notifications = fetchedNotifications;
@@ -997,7 +999,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     final totalNotifications = notifications.length;
     final readNotifications = notifications.where((n) => n.read).length;
     final unreadNotifications = notifications.where((n) => !n.read).length;
-    
+
     return Column(
       children: [
         _buildStatItem('Total Notifications', totalNotifications.toString()),
@@ -1059,10 +1061,7 @@ class _SellerDashboardState extends State<SellerDashboard>
               const SizedBox(height: 8),
               Text(
                 'Loading notifications...',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -1077,18 +1076,11 @@ class _SellerDashboardState extends State<SellerDashboard>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.notifications_none,
-                color: Colors.grey[400],
-                size: 24,
-              ),
+              Icon(Icons.notifications_none, color: Colors.grey[400], size: 24),
               const SizedBox(height: 4),
               Text(
                 'No notifications yet',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -1226,114 +1218,119 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   Widget buildLeadsRequestsWidget() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Header
-        Row(
-          children: [
-            Text(
-              'LEADS/REQUESTS',
-              style: GoogleFonts.manrope(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Constants.ftaColorLight,
-              ),
-            ),
-            Spacer(),
-            if (isLoadingRequests)
-              SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Constants.ftaColorLight,
-                  ),
-                ),
-              ),
-          ],
-        ),
-        SizedBox(height: 16),
-
-        // Error handling
-        if (requestsError != null)
-          Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.red.shade50,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.red.shade200),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.error_outline, color: Colors.red),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    requestsError!,
-                    style: GoogleFonts.manrope(
-                      color: Colors.red.shade800,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                TextButton(onPressed: _fetchRequestsData, child: Text('Retry')),
-              ],
-            ),
-          )
-        // Loading state
-        else if (isLoadingRequests)
-          Center(
-            child: Padding(
-              padding: EdgeInsets.all(32),
-              child: CircularProgressIndicator(),
-            ),
-          )
-        // Main content with tabs
-        else
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Left sidebar with tabs (bookkeeper style)
-              Container(
-                width: 180,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(height: 10),
-                    // New Requests Tab
-                    _buildRequestMenuItem(
-                      'New Requests ($totalNewRequests)',
-                      0,
-                      totalNewRequests,
-                    ),
-                    // My Bids Tab
-                    _buildRequestMenuItem(
-                      'My Bids ($totalQuotes)',
-                      1,
-                      totalQuotes,
-                    ),
-                  ],
+              Text(
+                'LEADS/REQUESTS',
+                style: GoogleFonts.manrope(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: Constants.ftaColorLight,
                 ),
               ),
-              SizedBox(width: 20),
-              // Main content area
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Content based on selected tab
-                    if (selectedRequestTab == 0)
-                      _buildRequestContent(newRequests, 'new requests')
-                    else
-                      _buildQuotesContent(myQuotes, 'my bids'),
-                  ],
+              Spacer(),
+              if (isLoadingRequests)
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Constants.ftaColorLight,
+                    ),
+                  ),
                 ),
-              ),
             ],
           ),
-      ],
+          SizedBox(height: 16),
+
+          // Error handling
+          if (requestsError != null)
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.error_outline, color: Colors.red),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      requestsError!,
+                      style: GoogleFonts.manrope(
+                        color: Colors.red.shade800,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: _fetchRequestsData,
+                    child: Text('Retry'),
+                  ),
+                ],
+              ),
+            )
+          // Loading state
+          else if (isLoadingRequests)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.all(32),
+                child: CircularProgressIndicator(),
+              ),
+            )
+          // Main content with tabs
+          else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left sidebar with tabs (bookkeeper style)
+                Container(
+                  width: 180,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: 10),
+                      // New Requests Tab
+                      _buildRequestMenuItem(
+                        'New Requests ($totalNewRequests)',
+                        0,
+                        totalNewRequests,
+                      ),
+                      // My Bids Tab
+                      _buildRequestMenuItem(
+                        'My Bids ($totalQuotes)',
+                        1,
+                        totalQuotes,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 20),
+                // Main content area
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Content based on selected tab
+                      if (selectedRequestTab == 0)
+                        _buildRequestContent(newRequests, 'new requests')
+                      else
+                        _buildQuotesContent(myQuotes, 'my bids'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 

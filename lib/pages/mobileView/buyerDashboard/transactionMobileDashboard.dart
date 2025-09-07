@@ -29,7 +29,8 @@ class TransactionMobileDashboard extends StatefulWidget {
   const TransactionMobileDashboard({Key? key}) : super(key: key);
 
   @override
-  _TransactionMobileDashboardState createState() => _TransactionMobileDashboardState();
+  _TransactionMobileDashboardState createState() =>
+      _TransactionMobileDashboardState();
 }
 
 class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
@@ -66,11 +67,11 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
 
     _slideAnimation = Tween<Offset>(begin: Offset(0.1, 0), end: Offset.zero)
         .animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutCubic,
-      ),
-    );
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
     _animationController.forward();
     _loadReviewsConditionally();
@@ -110,7 +111,11 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
     try {
       // Use the correct API endpoint for orders from product-requests
       final response = await http.get(
-        Uri.parse('${Constants.bidrBaseUrl}api/v1/product-requests/orders/'),
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/',
+        ).replace(queryParameters: {
+          'buyer_id': Constants.myUid,
+        }),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -179,20 +184,21 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
           onGoingOrders = allOrders
               .where(
                 (order) =>
-            order.status.toLowerCase().contains('ongoing') ||
-                order.status.toLowerCase().contains('pending') ||
-                order.status.toLowerCase().contains('paid') ||
-                order.status.toLowerCase().contains('processing') ||
-                order.status.toLowerCase().contains('shipped'),
-          )
+                    order.status.toLowerCase().contains('ongoing') ||
+                    order.status.toLowerCase().contains('pending') ||
+                    order.status.toLowerCase().contains('paid') ||
+                    order.status.toLowerCase().contains('payment confirmed') ||
+                    order.status.toLowerCase().contains('processing') ||
+                    order.status.toLowerCase().contains('shipped') ||
+                    order.status.toLowerCase().contains('completed'),
+              )
               .toList();
           purchasedOrders = allOrders
               .where(
                 (order) =>
-            order.status.toLowerCase().contains('purchased') ||
-                order.status.toLowerCase().contains('delivered') ||
-                order.status.toLowerCase().contains('completed'),
-          )
+                    order.status.toLowerCase().contains('purchased') ||
+                    order.status.toLowerCase().contains('delivered'),
+              )
               .toList();
           returnsRefundsOrders = allOrders
               .where((order) => order.status.toLowerCase().contains('refund'))
@@ -459,8 +465,8 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
                             order.comments
                                 .map(
                                   (comment) =>
-                                  _buildCommentItem(comment.description),
-                            )
+                                      _buildCommentItem(comment.description),
+                                )
                                 .toList(),
                           ),
                         ] else if (reviews.isNotEmpty) ...[
@@ -469,9 +475,9 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
                             reviews
                                 .map(
                                   (review) => _buildCommentItem(
-                                "${review.comment} (Rating: ${review.rating}/5)",
-                              ),
-                            )
+                                    "${review.comment} (Rating: ${review.rating}/5)",
+                                  ),
+                                )
                                 .toList(),
                           ),
                         ],
@@ -662,10 +668,10 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
   }
 
   Widget _buildDetailItem(
-      String label,
-      String value, {
-        bool isHighlighted = false,
-      }) {
+    String label,
+    String value, {
+    bool isHighlighted = false,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -731,10 +737,10 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
   }
 
   Widget _buildCustomTextField(
-      String hintText,
-      TextEditingController controller,
-      FocusNode focusNode,
-      ) {
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+  ) {
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
       labelText: hintText,
@@ -752,7 +758,7 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
     bool _isSubmitting = false;
     final GlobalKey<FormState> _dialogFormKey = GlobalKey<FormState>();
     final TextEditingController _dialogCommentController =
-    TextEditingController();
+        TextEditingController();
     double _dialogRating = 0.0;
 
     showDialog(
@@ -771,358 +777,358 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
                 padding: const EdgeInsets.all(24.0),
                 child: _isSubmitting
                     ? Container(
-                  height: 200,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Constants.ctaColorLight,
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Submitting Review...',
-                          style: GoogleFonts.manrope(
-                            textStyle: TextStyle(
-                              fontSize: 14,
-                              color: Constants.ftaColorLight.withOpacity(
-                                0.55,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-                    : SingleChildScrollView(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    constraints: BoxConstraints(
-                      maxWidth: 500, // Max width for larger screens
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Rating & Review',
-                              style: GoogleFonts.manrope(
-                                textStyle: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Icon(
-                                Icons.close,
-                                color: Colors.black87,
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 24),
-
-                        // Rating Section
-                        Center(
+                        height: 200,
+                        child: Center(
                           child: Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              RatingBar.builder(
-                                initialRating: _dialogRating,
-                                minRating: 1,
-                                direction: Axis.horizontal,
-                                allowHalfRating: false,
-                                itemCount: 5,
-                                itemSize: 40,
-                                itemPadding: EdgeInsets.symmetric(
-                                  horizontal: 4.0,
+                              CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Constants.ctaColorLight,
                                 ),
-                                itemBuilder: (context, _) =>
-                                    Icon(Icons.star, color: Colors.amber),
-                                onRatingUpdate: (rating) {
-                                  setState(() {
-                                    _dialogRating = rating;
-                                  });
-                                },
                               ),
-                              SizedBox(height: 12),
+                              SizedBox(height: 16),
                               Text(
-                                _getRatingText(_dialogRating),
+                                'Submitting Review...',
                                 style: GoogleFonts.manrope(
                                   textStyle: TextStyle(
                                     fontSize: 14,
-                                    color: _getRatingColor(_dialogRating),
-                                    fontWeight: FontWeight.w600,
+                                    color: Constants.ftaColorLight.withOpacity(
+                                      0.55,
+                                    ),
                                   ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        SizedBox(height: 24),
-
-                        // Review Form
-                        Form(
-                          key: _dialogFormKey,
-                          child: TextFormField(
-                            controller: _dialogCommentController,
-                            maxLines: 5,
-                            maxLength: 500,
-                            decoration: InputDecoration(
-                              labelText: 'Your Review',
-                              labelStyle: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 14,
-                              ),
-                              floatingLabelStyle: TextStyle(
-                                color: Constants.ftaColorLight,
-                                fontSize: 14,
-                              ),
-                              hintText:
-                              'Share your experience with this product...',
-                              hintStyle: TextStyle(
-                                color: Colors.grey[400],
-                                fontSize: 13,
-                              ),
-                              filled: true,
-                              floatingLabelBehavior:
-                              FloatingLabelBehavior.always,
-                              fillColor: Colors.grey[50],
-                              contentPadding: EdgeInsets.all(16),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Constants.ftaColorLight,
-                                  width: 2,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.red[400]!,
-                                  width: 2,
-                                ),
-                              ),
-                              counterText: '',
-                            ),
-                            validator: (value) {
-                              if (_dialogRating == 0) {
-                                return 'Please select a rating';
-                              }
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your review';
-                              } else if (value.trim().length < 10) {
-                                return 'Review must be at least 10 characters';
-                              }
-                              return null;
-                            },
+                      )
+                    : SingleChildScrollView(
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          constraints: BoxConstraints(
+                            maxWidth: 500, // Max width for larger screens
                           ),
-                        ),
-
-                        // Character count
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: ValueListenableBuilder(
-                            valueListenable: _dialogCommentController,
-                            builder: (context, value, child) {
-                              return Text(
-                                '${value.text.length}/500 characters',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 24),
-
-                        // Action buttons
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: Text(
-                                'CANCEL',
-                                style: GoogleFonts.manrope(
-                                  textStyle: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            ElevatedButton(
-                              onPressed: () async {
-                                if (_dialogFormKey.currentState!
-                                    .validate() &&
-                                    _dialogRating > 0) {
-                                  setState(() {
-                                    _isSubmitting = true;
-                                  });
-
-                                  try {
-                                    // Submit to API
-                                    print("gfghhhg ${order.toJson()}");
-
-                                    final result =
-                                    await RewardsService.submitReview(
-                                      authUserUid:
-                                      Constants.myUid.isNotEmpty
-                                          ? Constants.myUid
-                                          : 'anonymous_${DateTime.now().millisecondsSinceEpoch}',
-                                      productId:
-                                      order.productId ?? "",
-                                      requestId: order.requestId!,
-
-                                      sellerId: order
-                                          .sellerId!, // Optional seller ID
-                                      rating: _dialogRating.toInt(),
-                                      content:
-                                      _dialogCommentController
-                                          .text
-                                          .trim(),
-                                      customerName:
-                                      Constants
-                                          .myDisplayname
-                                          .isNotEmpty
-                                          ? Constants.myDisplayname
-                                          : 'Anonymous User',
-                                    );
-
-                                    if (result['success']) {
-                                      // Refresh the reviews list
-                                      _loadOrdersFromAPI(); // You'll need to implement this
-
-                                      Navigator.of(context).pop();
-
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Review submitted successfully!',
-                                          ),
-                                          backgroundColor:
-                                          Colors.green[700],
-                                          behavior:
-                                          SnackBarBehavior.floating,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      throw Exception(result['error']);
-                                    }
-                                  } catch (e) {
-                                    setState(() {
-                                      _isSubmitting = false;
-                                    });
-
-                                    ScaffoldMessenger.of(
-                                      context,
-                                    ).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Failed to submit review: ${e.toString()}',
-                                        ),
-                                        backgroundColor: Colors.red[700],
-                                        behavior:
-                                        SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                          BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                } else if (_dialogRating == 0) {
-                                  ScaffoldMessenger.of(
-                                    context,
-                                  ).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Please select a rating',
-                                      ),
-                                      backgroundColor: Colors.orange[700],
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(10),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Rating & Review',
+                                    style: GoogleFonts.manrope(
+                                      textStyle: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
                                       ),
                                     ),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Constants.ctaColorLight,
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 32,
-                                  vertical: 12,
-                                ),
-                                elevation: 2,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: Text(
-                                'SUBMIT REVIEW',
-                                style: GoogleFonts.manrope(
-                                  textStyle: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 0.5,
                                   ),
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    icon: Icon(
+                                      Icons.close,
+                                      color: Colors.black87,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 24),
+
+                              // Rating Section
+                              Center(
+                                child: Column(
+                                  children: [
+                                    RatingBar.builder(
+                                      initialRating: _dialogRating,
+                                      minRating: 1,
+                                      direction: Axis.horizontal,
+                                      allowHalfRating: false,
+                                      itemCount: 5,
+                                      itemSize: 40,
+                                      itemPadding: EdgeInsets.symmetric(
+                                        horizontal: 4.0,
+                                      ),
+                                      itemBuilder: (context, _) =>
+                                          Icon(Icons.star, color: Colors.amber),
+                                      onRatingUpdate: (rating) {
+                                        setState(() {
+                                          _dialogRating = rating;
+                                        });
+                                      },
+                                    ),
+                                    SizedBox(height: 12),
+                                    Text(
+                                      _getRatingText(_dialogRating),
+                                      style: GoogleFonts.manrope(
+                                        textStyle: TextStyle(
+                                          fontSize: 14,
+                                          color: _getRatingColor(_dialogRating),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 24),
+
+                              // Review Form
+                              Form(
+                                key: _dialogFormKey,
+                                child: TextFormField(
+                                  controller: _dialogCommentController,
+                                  maxLines: 5,
+                                  maxLength: 500,
+                                  decoration: InputDecoration(
+                                    labelText: 'Your Review',
+                                    labelStyle: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                    ),
+                                    floatingLabelStyle: TextStyle(
+                                      color: Constants.ftaColorLight,
+                                      fontSize: 14,
+                                    ),
+                                    hintText:
+                                        'Share your experience with this product...',
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey[400],
+                                      fontSize: 13,
+                                    ),
+                                    filled: true,
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
+                                    fillColor: Colors.grey[50],
+                                    contentPadding: EdgeInsets.all(16),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Constants.ftaColorLight,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.red[400]!,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    counterText: '',
+                                  ),
+                                  validator: (value) {
+                                    if (_dialogRating == 0) {
+                                      return 'Please select a rating';
+                                    }
+                                    if (value == null || value.trim().isEmpty) {
+                                      return 'Please enter your review';
+                                    } else if (value.trim().length < 10) {
+                                      return 'Review must be at least 10 characters';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+
+                              // Character count
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: ValueListenableBuilder(
+                                  valueListenable: _dialogCommentController,
+                                  builder: (context, value, child) {
+                                    return Text(
+                                      '${value.text.length}/500 characters',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              SizedBox(height: 24),
+
+                              // Action buttons
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'CANCEL',
+                                      style: GoogleFonts.manrope(
+                                        textStyle: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      if (_dialogFormKey.currentState!
+                                              .validate() &&
+                                          _dialogRating > 0) {
+                                        setState(() {
+                                          _isSubmitting = true;
+                                        });
+
+                                        try {
+                                          // Submit to API
+                                          print("gfghhhg ${order.toJson()}");
+
+                                          final result =
+                                              await RewardsService.submitReview(
+                                                authUserUid:
+                                                    Constants.myUid.isNotEmpty
+                                                    ? Constants.myUid
+                                                    : 'anonymous_${DateTime.now().millisecondsSinceEpoch}',
+                                                productId:
+                                                    order.productId ?? "",
+                                                requestId: order.requestId!,
+
+                                                sellerId: order
+                                                    .sellerId!, // Optional seller ID
+                                                rating: _dialogRating.toInt(),
+                                                content:
+                                                    _dialogCommentController
+                                                        .text
+                                                        .trim(),
+                                                customerName:
+                                                    Constants
+                                                        .myDisplayname
+                                                        .isNotEmpty
+                                                    ? Constants.myDisplayname
+                                                    : 'Anonymous User',
+                                              );
+
+                                          if (result['success']) {
+                                            // Refresh the reviews list
+                                            _loadOrdersFromAPI(); // You'll need to implement this
+
+                                            Navigator.of(context).pop();
+
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  'Review submitted successfully!',
+                                                ),
+                                                backgroundColor:
+                                                    Colors.green[700],
+                                                behavior:
+                                                    SnackBarBehavior.floating,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            throw Exception(result['error']);
+                                          }
+                                        } catch (e) {
+                                          setState(() {
+                                            _isSubmitting = false;
+                                          });
+
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Failed to submit review: ${e.toString()}',
+                                              ),
+                                              backgroundColor: Colors.red[700],
+                                              behavior:
+                                                  SnackBarBehavior.floating,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      } else if (_dialogRating == 0) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Please select a rating',
+                                            ),
+                                            backgroundColor: Colors.orange[700],
+                                            behavior: SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Constants.ctaColorLight,
+                                      foregroundColor: Colors.white,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 32,
+                                        vertical: 12,
+                                      ),
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'SUBMIT REVIEW',
+                                      style: GoogleFonts.manrope(
+                                        textStyle: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
+                      ),
               ),
             );
           },
@@ -1166,115 +1172,115 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
               color: Colors.white,
               child: Row(
                 children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedTopTab = 0;
-                      _animationController.reset();
-                      _animationController.forward();
-                    });
-                    // Reload orders to ensure fresh data when switching back to Order tab later
-                    _loadOrdersFromAPI();
-                  },
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 300),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: _selectedTopTab == 0
-                          ? Constants.ctaColorLight.withOpacity(0.05)
-                          : Colors.transparent,
-                      border: Border(
-                        bottom: BorderSide(
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedTopTab = 0;
+                          _animationController.reset();
+                          _animationController.forward();
+                        });
+                        // Reload orders to ensure fresh data when switching back to Order tab later
+                        _loadOrdersFromAPI();
+                      },
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 300),
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
                           color: _selectedTopTab == 0
-                              ? Constants.ctaColorLight
-                              : Colors.grey[300]!,
-                          width: _selectedTopTab == 0 ? 2 : 1,
+                              ? Constants.ctaColorLight.withOpacity(0.05)
+                              : Colors.transparent,
+                          border: Border(
+                            bottom: BorderSide(
+                              color: _selectedTopTab == 0
+                                  ? Constants.ctaColorLight
+                                  : Colors.grey[300]!,
+                              width: _selectedTopTab == 0 ? 2 : 1,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    child: Center(
-                      child: ResponsiveText(
-                        text: "Request",
-                        type: TextType.medium,
-                        fontWeight: _selectedTopTab == 0
-                            ? FontWeight.w600
-                            : FontWeight.w500,
-                        color: _selectedTopTab == 0
-                            ? Constants.ctaColorLight
-                            : Colors.grey[500],
+                        child: Center(
+                          child: ResponsiveText(
+                            text: "Request",
+                            type: TextType.medium,
+                            fontWeight: _selectedTopTab == 0
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                            color: _selectedTopTab == 0
+                                ? Constants.ctaColorLight
+                                : Colors.grey[500],
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedTopTab = 1;
-                      _animationController.reset();
-                      _animationController.forward();
-                    });
-                    // Load orders when Order tab is selected
-                    _loadOrdersFromAPI();
-                  },
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 300),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: _selectedTopTab == 1
-                          ? Constants.ctaColorLight.withOpacity(0.05)
-                          : Colors.transparent,
-                      border: Border(
-                        bottom: BorderSide(
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedTopTab = 1;
+                          _animationController.reset();
+                          _animationController.forward();
+                        });
+                        // Load orders when Order tab is selected
+                        _loadOrdersFromAPI();
+                      },
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 300),
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
                           color: _selectedTopTab == 1
-                              ? Constants.ctaColorLight
-                              : Colors.grey[300]!,
-                          width: _selectedTopTab == 1 ? 2 : 1,
+                              ? Constants.ctaColorLight.withOpacity(0.05)
+                              : Colors.transparent,
+                          border: Border(
+                            bottom: BorderSide(
+                              color: _selectedTopTab == 1
+                                  ? Constants.ctaColorLight
+                                  : Colors.grey[300]!,
+                              width: _selectedTopTab == 1 ? 2 : 1,
+                            ),
+                          ),
+                        ),
+                        child: Center(
+                          child: ResponsiveText(
+                            text: "Order",
+                            type: TextType.medium,
+                            fontWeight: _selectedTopTab == 1
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                            color: _selectedTopTab == 1
+                                ? Constants.ctaColorLight
+                                : Colors.grey[500],
+                          ),
                         ),
                       ),
                     ),
-                    child: Center(
-                      child: ResponsiveText(
-                        text: "Order",
-                        type: TextType.medium,
-                        fontWeight: _selectedTopTab == 1
-                            ? FontWeight.w600
-                            : FontWeight.w500,
-                        color: _selectedTopTab == 1
-                            ? Constants.ctaColorLight
-                            : Colors.grey[500],
-                      ),
-                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Show Order Status Tabs only when Order tab is selected
+            if (_selectedTopTab == 1) ...[
+              Container(
+                color: Colors.white,
+                width: MediaQuery.of(context).size.width,
+                height: 50,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildStatusTab("On Going", 0),
+                      _buildStatusTab("Purchased", 1),
+                      _buildStatusTab("Returns/Refunds", 2),
+                      _buildStatusTab("Cancelled", 3),
+                    ],
                   ),
                 ),
               ),
             ],
-          ),
-        ),
 
-        // Show Order Status Tabs only when Order tab is selected
-        if (_selectedTopTab == 1) ...[
-          Container(
-            color: Colors.white,
-            width: MediaQuery.of(context).size.width,
-            height: 50,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildStatusTab("On Going", 0),
-                  _buildStatusTab("Purchased", 1),
-                  _buildStatusTab("Returns/Refunds", 2),
-                  _buildStatusTab("Cancelled", 3),
-                ],
-              ),
-            ),
-          ),
-        ],
-
-        SizedBox(height: 16),
+            SizedBox(height: 16),
             Expanded(
               child: FadeTransition(
                 opacity: _fadeAnimation,
@@ -1284,7 +1290,9 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
                     paddingType: SpacingType.medium,
                     child: _selectedTopTab == 0
                         ? _buildRequestContent(typography, spacing)
-                        : SingleChildScrollView(child: _buildContent(typography, spacing)),
+                        : SingleChildScrollView(
+                            child: _buildContent(typography, spacing),
+                          ),
                   ),
                 ),
               ),
@@ -1324,16 +1332,18 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
                     : Colors.grey.withOpacity(0.3),
                 width: 1,
               ),
-              boxShadow: isSelected ? [
-                BoxShadow(
-                  color: Constants.ctaColorLight.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ] : null,
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: Constants.ctaColorLight.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : null,
             ),
             child: Center(
-              child:Text(
+              child: Text(
                 title,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.manrope(
@@ -1342,7 +1352,6 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
                   color: isSelected ? Colors.white : Colors.black54,
                 ),
               ),
-
             ),
           ),
         );
@@ -1384,7 +1393,10 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
     );
   }*/
 
-  Widget _buildRequestContent(TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildRequestContent(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     List<Widget> cards = _buildAllRequestCards();
 
     return AnimatedSwitcher(
@@ -1404,12 +1416,12 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
       if (GlobalVariables.combinedRequest.autoSparesRequest.isNotEmpty) {
         final autoSpareCards = GlobalVariables.combinedRequest.autoSparesRequest
             .map((spare) {
-          if (spare.status == "Waiting") {
-            return _buildWaitingRequestCard(spare);
-          } else {
-            return _buildActiveRequestCard(spare);
-          }
-        })
+              if (spare.status == "Waiting") {
+                return _buildWaitingRequestCard(spare);
+              } else {
+                return _buildActiveRequestCard(spare);
+              }
+            })
             .toList();
 
         cards.addAll(autoSpareCards);
@@ -1419,7 +1431,7 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
       // Rim Tyre Requests
       if (GlobalVariables.combinedRequest.rimTyreRequest.isNotEmpty) {
         final rimTyreCards = GlobalVariables.combinedRequest.rimTyreRequest.map(
-              (tyre) {
+          (tyre) {
             if (tyre == "Waiting") {
               return _buildWaitingRequestCard(tyre);
             } else {
@@ -1441,12 +1453,12 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
             .combinedRequest
             .consumerElectronicsRequest
             .map((electronics) {
-          if (electronics.status == "Waiting") {
-            return _buildWaitingRequestCard(electronics);
-          } else {
-            return _buildActiveRequestCard(electronics);
-          }
-        })
+              if (electronics.status == "Waiting") {
+                return _buildWaitingRequestCard(electronics);
+              } else {
+                return _buildActiveRequestCard(electronics);
+              }
+            })
             .toList();
 
         cards.addAll(electronicsCards);
@@ -1527,11 +1539,11 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
   }
 
   Widget _buildNavItem(
-      VoidCallback voidCallBack,
-      IconData icon,
-      String title,
-      bool isActive,
-      ) {
+    VoidCallback voidCallBack,
+    IconData icon,
+    String title,
+    bool isActive,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -2360,9 +2372,9 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
                           try {
                             // Create or get conversation for this request
                             final conversationData =
-                            await ChatService.createOrGetConversationForRequest(
-                              request.id.toString(),
-                            );
+                                await ChatService.createOrGetConversationForRequest(
+                                  request.id.toString(),
+                                );
 
                             // Close loading dialog
                             Navigator.of(context).pop();
@@ -2381,7 +2393,7 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
                                         ),
                                       ),
                                       messages:
-                                      [], // Empty - will be loaded from backend
+                                          [], // Empty - will be loaded from backend
                                     ),
                                   ),
                                 ),
@@ -2605,7 +2617,9 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
 
       // Submit to backend
       final response = await http.post(
-        Uri.parse('${Constants.bidrBaseUrl}api/v1/product-requests/orders/'),
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/',
+        ),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -3180,7 +3194,7 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
   // Return and Refund form controllers
   final TextEditingController _returnReasonController = TextEditingController();
   final TextEditingController _returnDescriptionController =
-  TextEditingController();
+      TextEditingController();
   String _selectedReturnReason = '';
   final List<String> _returnReasons = [
     'Product defective/damaged',
@@ -3544,7 +3558,7 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
                             maxLines: 4,
                             decoration: InputDecoration(
                               hintText:
-                              'Please provide detailed information about the issue...',
+                                  'Please provide detailed information about the issue...',
                               hintStyle: GoogleFonts.manrope(
                                 fontSize: 14,
                                 color: Colors.grey[600],
@@ -3709,22 +3723,22 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed:
-                          (_selectedReturnReason.isNotEmpty &&
-                              _returnDescriptionController.text
-                                  .trim()
-                                  .isNotEmpty)
+                              (_selectedReturnReason.isNotEmpty &&
+                                  _returnDescriptionController.text
+                                      .trim()
+                                      .isNotEmpty)
                               ? () {
-                            // Handle return request submission
-                            _submitReturnRequest(order);
-                            Navigator.of(context).pop();
-                          }
+                                  // Handle return request submission
+                                  _submitReturnRequest(order);
+                                  Navigator.of(context).pop();
+                                }
                               : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
-                            (_selectedReturnReason.isNotEmpty &&
-                                _returnDescriptionController.text
-                                    .trim()
-                                    .isNotEmpty)
+                                (_selectedReturnReason.isNotEmpty &&
+                                    _returnDescriptionController.text
+                                        .trim()
+                                        .isNotEmpty)
                                 ? Colors.red[600]
                                 : Colors.grey[400],
                             padding: EdgeInsets.symmetric(vertical: 16),
@@ -3964,674 +3978,674 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
 
   Widget _buildOrderCard(Order order) {
     return order.status ==
-        "Cancelled" //
+            "Cancelled" //
         ? Container(
-      padding: EdgeInsets.all(12),
-      constraints: BoxConstraints(maxWidth: 300),
-      decoration: BoxDecoration(
-        color: Constants.dtaColorLight.withOpacity(0.55),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Constants.ctaColorLight, width: 1.2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header with date and actions
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                _formatDate(order.dateTime),
-                style: GoogleFonts.manrope(
-                  color: Colors.grey.shade700,
-                  fontSize: 12,
-                ),
-              ),
-              Spacer(),
-              GestureDetector(
-                onTap: () {},
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Color(0XFFD62828),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    order.status,
-                    style: GoogleFonts.manrope(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Constants.ftaColorLight,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          // Request title
-          Text(
-            "REQUEST #",
-            style: GoogleFonts.manrope(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Constants.ftaColorLight,
-            ),
-          ),
-          SizedBox(height: 8),
-          // Description label
-          Container(
+            padding: EdgeInsets.all(12),
+            constraints: BoxConstraints(maxWidth: 300),
             decoration: BoxDecoration(
-              border: Border(
-                left: BorderSide(
-                  color: Constants.ctaColorLight,
-                  width: 3,
-                ),
-              ),
+              color: Constants.dtaColorLight.withOpacity(0.55),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Constants.ctaColorLight, width: 1.2),
             ),
-            padding: EdgeInsets.only(left: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                // Header with date and actions
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Description -",
+                      _formatDate(order.dateTime),
                       style: GoogleFonts.manrope(
-                        color: Colors.black,
+                        color: Colors.grey.shade700,
                         fontSize: 12,
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        "View Details",
-                        style: GoogleFonts.manrope(
-                          color: Color(0xFF2B3A5C),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
+                    Spacer(),
+                    GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Color(0XFFD62828),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          order.status,
+                          style: GoogleFonts.manrope(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Constants.ftaColorLight,
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
+                SizedBox(height: 8),
+                // Request title
                 Text(
-                  "${order.product} ${order.vehicle}",
+                  "REQUEST #",
                   style: GoogleFonts.manrope(
-                    fontSize: 13,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // View Details button
-        ],
-      ),
-    )
-        : Container(
-      margin: EdgeInsets.only(bottom: 16),
-      width: 400,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Constants.ftaColorLight.withOpacity(0.35),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Row
-          SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        order.vendorName,
-                        style: GoogleFonts.manrope(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        order.product,
-                        style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      order.orderNumber,
-                      style: GoogleFonts.manrope(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                        order.status.toLowerCase() ==
-                            "Refunded".toLowerCase()
-                            ? Color(0XFF0045BD)
-                            : order.status.toLowerCase() ==
-                            "Cancelled".toLowerCase()
-                            ? Color(0XFFD62828)
-                            : Constants.ctaColorLight.withOpacity(0.25),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        order.status,
-                        style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color:
-                          order.status.toLowerCase() ==
-                              "Refunded".toLowerCase()
-                              ? Colors.white
-                              : Constants.ftaColorLight,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  DateFormat('dd/MM/yyyy - HH:mm').format(order.dateTime),
-                  style: GoogleFonts.manrope(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                     color: Constants.ftaColorLight,
                   ),
                 ),
-                TextButton(
-                  onPressed: () {
-                    _showOrderDetailsDialog(order);
-                  },
-                  child: Text(
-                    "View Details",
-                    style: GoogleFonts.manrope(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: Constants.ftaColorLight,
-                      decoration: TextDecoration.underline,
+                SizedBox(height: 8),
+                // Description label
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: Constants.ctaColorLight,
+                        width: 3,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          SizedBox(height: 8),
-          Divider(),
-          SizedBox(height: 8),
-
-          // Order Details
-          Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: _buildDetailRow(
-              "Purchased Price:",
-              "R${order.price.toInt()}",
-            ),
-          ),
-          SizedBox(height: 6),
-          Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: _buildDetailRow(
-              "Rating:",
-              "${order.rating.toInt()}/5",
-            ),
-          ),
-          SizedBox(height: 6),
-          Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: _buildDetailRow(
-              "Radius/Distance:",
-              "${order.distanceInKm.toInt()}KM",
-            ),
-          ),
-          SizedBox(height: 6),
-          Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: _buildDetailRow("Location:", order.location),
-          ),
-          SizedBox(height: 6),
-
-          // Comments - show order comments or local reviews
-          Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  order.comments.isNotEmpty ? "Comments:" : "Reviews:",
-                  style: GoogleFonts.manrope(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                SizedBox(height: 4),
-                // Show order comments if available, otherwise show local reviews
-                if (order.comments.isNotEmpty) ...[
-                  ...order.comments
-                      .map(
-                        (comment) => Padding(
-                      padding: EdgeInsets.only(left: 8, bottom: 2),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  padding: EdgeInsets.only(left: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "• ",
+                            "Description -",
                             style: GoogleFonts.manrope(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
                               color: Colors.black,
+                              fontSize: 12,
                             ),
                           ),
-                          Expanded(
+                          TextButton(
+                            onPressed: () {},
                             child: Text(
-                              comment.description,
+                              "View Details",
                               style: GoogleFonts.manrope(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: Color(0xFF2B3A5C),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
                               ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  )
-                      .toList(),
-                ] else if (reviews.isNotEmpty) ...[
-                  ...reviews
-                      .map(
-                        (review) => Padding(
-                      padding: EdgeInsets.only(left: 8, bottom: 4),
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.grey[200]!,
-                          ),
+                      Text(
+                        "${order.product} ${order.vehicle}",
+                        style: GoogleFonts.manrope(
+                          fontSize: 13,
+                          color: Colors.black,
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // View Details button
+              ],
+            ),
+          )
+        : Container(
+            margin: EdgeInsets.only(bottom: 16),
+            width: 400,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Constants.ftaColorLight.withOpacity(0.35),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header Row
+                SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
                         child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                ...List.generate(
-                                  5,
-                                      (index) => Icon(
-                                    Icons.star,
-                                    size: 14,
-                                    color: index < review.rating
-                                        ? Constants.ctaColorLight
-                                        : Colors.grey[300],
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Text(
-                                  "${review.rating}/5",
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Constants.ftaColorLight,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              order.vendorName,
+                              style: GoogleFonts.manrope(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.black87,
+                              ),
                             ),
                             SizedBox(height: 4),
                             Text(
-                              review.comment,
+                              order.product,
                               style: GoogleFonts.manrope(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black87,
+                                fontSize: 12,
+                                color: Colors.grey[600],
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  )
-                      .toList(),
-                ] else ...[
-                  Padding(
-                    padding: EdgeInsets.only(left: 8, bottom: 2),
-                    child: Text(
-                      "No reviews available",
-                      style: GoogleFonts.manrope(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-
-          SizedBox(height: 8),
-
-          // Conditional UI based on order status and review state
-          if (order.status.toLowerCase() ==
-              "Delivered".toLowerCase()) ...[
-            // Show rating and reviews
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.star,
-                    color: Constants.ctaColorLight,
-                    size: 16,
-                  ),
-                  Text(
-                    "${_getAverageRating().toStringAsFixed(1)}",
-                    style: GoogleFonts.manrope(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Constants.ftaColorLight,
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Text(
-                    "$totalReviews Reviews",
-                    style: GoogleFonts.manrope(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      _showAddReviewDialog(order);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      side: BorderSide.none,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(360),
-                      ),
-                    ),
-                    child: Text(
-                      "Give Order Review & Rating",
-                      style: GoogleFonts.manrope(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.orange.shade900,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            // Return & Refund button
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Handle return & refund
-                        _showReturnAndRefundDialog(order);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Constants.ctaColorLight,
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(360),
-                        ),
-                      ),
-                      child: Text(
-                        "Return & Refund",
-                        style: GoogleFonts.manrope(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ] else if (order.status.toLowerCase() ==
-              "Pending Payment".toLowerCase()) ...[
-            // Collect Goods Button for ongoing orders
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _showCollectGoodsDialog,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Constants.ctaColorLight,
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(360),
-                        ),
-                      ),
-                      child: Text(
-                        "Collect Goods",
-                        style: GoogleFonts.manrope(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Constants.ctaColorLight,
-                      borderRadius: BorderRadius.circular(360),
-                    ),
-                    child: IconButton(
-                      onPressed: () async {
-                        // Show loading indicator while creating/getting conversation
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (context) => Center(
-                            child: Container(
-                              padding: EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  CircularProgressIndicator(
-                                    valueColor:
-                                    AlwaysStoppedAnimation<Color>(
-                                      Constants.ctaColorLight,
-                                    ),
-                                  ),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    'Loading conversation...',
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 14,
-                                      color: Colors.grey[700],
-                                    ),
-                                  ),
-                                ],
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            order.orderNumber,
+                            style: GoogleFonts.manrope(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  order.status.toLowerCase() ==
+                                      "Refunded".toLowerCase()
+                                  ? Color(0XFF0045BD)
+                                  : order.status.toLowerCase() ==
+                                        "Cancelled".toLowerCase()
+                                  ? Color(0XFFD62828)
+                                  : Constants.ctaColorLight.withOpacity(0.25),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              order.status,
+                              style: GoogleFonts.manrope(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color:
+                                    order.status.toLowerCase() ==
+                                        "Refunded".toLowerCase()
+                                    ? Colors.white
+                                    : Constants.ftaColorLight,
                               ),
                             ),
                           ),
-                        );
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        DateFormat('dd/MM/yyyy - HH:mm').format(order.dateTime),
+                        style: GoogleFonts.manrope(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Constants.ftaColorLight,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          _showOrderDetailsDialog(order);
+                        },
+                        child: Text(
+                          "View Details",
+                          style: GoogleFonts.manrope(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Constants.ftaColorLight,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
-                        try {
-                          // Create or get conversation for this request (without auth)
-                          final conversationData =
-                          await ChatService.createOrGetConversationForRequest(
-                            _getRequestId(order),
-                          );
+                SizedBox(height: 8),
+                Divider(),
+                SizedBox(height: 8),
 
-                          // Close loading dialog
-                          Navigator.of(context).pop();
+                // Order Details
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: _buildDetailRow(
+                    "Purchased Price:",
+                    "R${order.price.toInt()}",
+                  ),
+                ),
+                SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: _buildDetailRow(
+                    "Rating:",
+                    "${order.rating.toInt()}/5",
+                  ),
+                ),
+                SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: _buildDetailRow(
+                    "Radius/Distance:",
+                    "${order.distanceInKm.toInt()}KM",
+                  ),
+                ),
+                SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: _buildDetailRow("Location:", order.location),
+                ),
+                SizedBox(height: 6),
 
-                          if (conversationData != null) {
-                            // Navigate to GroupChat with backend integration
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => GroupChatScreen(
-                                  groupChat: GroupChat(
-                                    uuid: _getRequestId(order),
-                                    request: ProductRequest(
-                                      description: _getRequestDescription(
-                                        order,
+                // Comments - show order comments or local reviews
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        order.comments.isNotEmpty ? "Comments:" : "Reviews:",
+                        style: GoogleFonts.manrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      // Show order comments if available, otherwise show local reviews
+                      if (order.comments.isNotEmpty) ...[
+                        ...order.comments
+                            .map(
+                              (comment) => Padding(
+                                padding: EdgeInsets.only(left: 8, bottom: 2),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "• ",
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
                                       ),
                                     ),
-                                    messages:
-                                    [], // Empty - will be loaded from backend
+                                    Expanded(
+                                      child: Text(
+                                        comment.description,
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ] else if (reviews.isNotEmpty) ...[
+                        ...reviews
+                            .map(
+                              (review) => Padding(
+                                padding: EdgeInsets.only(left: 8, bottom: 4),
+                                child: Container(
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Colors.grey[200]!,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          ...List.generate(
+                                            5,
+                                            (index) => Icon(
+                                              Icons.star,
+                                              size: 14,
+                                              color: index < review.rating
+                                                  ? Constants.ctaColorLight
+                                                  : Colors.grey[300],
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            "${review.rating}/5",
+                                            style: GoogleFonts.manrope(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Constants.ftaColorLight,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        review.comment,
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                            );
-                          } else {
-                            // Show error if backend returns null
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Unable to create conversation. Please try again.',
-                                ),
-                                backgroundColor: Colors.red,
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          // Close loading dialog and show error
-                          Navigator.of(context).pop();
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Failed to load conversation. Please try again.',
-                              ),
-                              backgroundColor: Colors.red,
-                              duration: Duration(seconds: 3),
+                            )
+                            .toList(),
+                      ] else ...[
+                        Padding(
+                          padding: EdgeInsets.only(left: 8, bottom: 2),
+                          child: Text(
+                            "No reviews available",
+                            style: GoogleFonts.manrope(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.grey[500],
                             ),
-                          );
-                        }
-                      },
-                      icon: Icon(
-                        CupertinoIcons.chat_bubble_2_fill,
-                        color: Constants.ftaColorLight,
-                        size: 22,
-                      ),
-                    ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                ],
-              ),
-            ),
-          ] else if (order.status.toLowerCase() ==
-              "Refunded".toLowerCase()) ...[
-            // Show rating for refunded orders
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.star,
-                    color: Constants.ctaColorLight,
-                    size: 16,
-                  ),
-                  Text(
-                    "${_getAverageRating().toStringAsFixed(1)}",
-                    style: GoogleFonts.manrope(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Constants.ftaColorLight,
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Text(
-                    "$totalReviews Reviews",
-                    style: GoogleFonts.manrope(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w300,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+                ),
 
-          SizedBox(height: 16),
-        ],
-      ),
-    );
+                SizedBox(height: 8),
+
+                // Conditional UI based on order status and review state
+                if (order.status.toLowerCase() ==
+                    "Delivered".toLowerCase()) ...[
+                  // Show rating and reviews
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.star,
+                          color: Constants.ctaColorLight,
+                          size: 16,
+                        ),
+                        Text(
+                          "${_getAverageRating().toStringAsFixed(1)}",
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Constants.ftaColorLight,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          "$totalReviews Reviews",
+                          style: GoogleFonts.manrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            _showAddReviewDialog(order);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            side: BorderSide.none,
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(360),
+                            ),
+                          ),
+                          child: Text(
+                            "Give Order Review & Rating",
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.orange.shade900,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  // Return & Refund button
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Handle return & refund
+                              _showReturnAndRefundDialog(order);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Constants.ctaColorLight,
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(360),
+                              ),
+                            ),
+                            child: Text(
+                              "Return & Refund",
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else if (order.status.toLowerCase() ==
+                    "Pending Payment".toLowerCase()) ...[
+                  // Collect Goods Button for ongoing orders
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _showCollectGoodsDialog,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Constants.ctaColorLight,
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(360),
+                              ),
+                            ),
+                            child: Text(
+                              "Collect Goods",
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Constants.ctaColorLight,
+                            borderRadius: BorderRadius.circular(360),
+                          ),
+                          child: IconButton(
+                            onPressed: () async {
+                              // Show loading indicator while creating/getting conversation
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => Center(
+                                  child: Container(
+                                    padding: EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Constants.ctaColorLight,
+                                              ),
+                                        ),
+                                        SizedBox(height: 16),
+                                        Text(
+                                          'Loading conversation...',
+                                          style: GoogleFonts.manrope(
+                                            fontSize: 14,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+
+                              try {
+                                // Create or get conversation for this request (without auth)
+                                final conversationData =
+                                    await ChatService.createOrGetConversationForRequest(
+                                      _getRequestId(order),
+                                    );
+
+                                // Close loading dialog
+                                Navigator.of(context).pop();
+
+                                if (conversationData != null) {
+                                  // Navigate to GroupChat with backend integration
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => GroupChatScreen(
+                                        groupChat: GroupChat(
+                                          uuid: _getRequestId(order),
+                                          request: ProductRequest(
+                                            description: _getRequestDescription(
+                                              order,
+                                            ),
+                                          ),
+                                          messages:
+                                              [], // Empty - will be loaded from backend
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  // Show error if backend returns null
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Unable to create conversation. Please try again.',
+                                      ),
+                                      backgroundColor: Colors.red,
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                // Close loading dialog and show error
+                                Navigator.of(context).pop();
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Failed to load conversation. Please try again.',
+                                    ),
+                                    backgroundColor: Colors.red,
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                );
+                              }
+                            },
+                            icon: Icon(
+                              CupertinoIcons.chat_bubble_2_fill,
+                              color: Constants.ftaColorLight,
+                              size: 22,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else if (order.status.toLowerCase() ==
+                    "Refunded".toLowerCase()) ...[
+                  // Show rating for refunded orders
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.star,
+                          color: Constants.ctaColorLight,
+                          size: 16,
+                        ),
+                        Text(
+                          "${_getAverageRating().toStringAsFixed(1)}",
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Constants.ftaColorLight,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          "$totalReviews Reviews",
+                          style: GoogleFonts.manrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                SizedBox(height: 16),
+              ],
+            ),
+          );
   }
 
   Widget _buildDetailRow(String label, String value) {

@@ -69,7 +69,7 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
       final String baseUrl = GlobalVariables.reviewsServiceUrl;
       final response = await http
           .get(
-            Uri.parse('${baseUrl}api/reviews/router/reviews/'),
+            Uri.parse('${baseUrl}api/reviews/'),
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
@@ -176,11 +176,11 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
   Future<void> _respondToReview(String uuid, String response) async {
     try {
       final String baseUrl = GlobalVariables.reviewsServiceUrl;
-      
+
       // Get the seller's auth_user_uid - you may need to get this from your auth service
       // For now, using a placeholder - replace with actual seller UUID
       final String authUserUid = widget.sellerId; // Or get from auth service
-      
+
       final apiResponse = await http
           .post(
             Uri.parse('${baseUrl}api/reviews/router/respond/'),
@@ -199,29 +199,32 @@ class _RatingReviewWidgetState extends State<RatingReviewWidget> {
       if (apiResponse.statusCode == 200 || apiResponse.statusCode == 201) {
         // Parse the response
         final responseData = json.decode(apiResponse.body);
-        
+
         // Handle successful response
         widget.onRespond?.call(uuid, response);
-        
+
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(responseData['message'] ?? 'Response sent successfully'),
+            content: Text(
+              responseData['message'] ?? 'Response sent successfully',
+            ),
             backgroundColor: Colors.green,
           ),
         );
-        
+
         // Refresh the reviews list to show the new response
         _fetchReviews();
       } else {
         final errorData = json.decode(apiResponse.body);
-        throw Exception(errorData['error'] ?? 'Failed to send response: ${apiResponse.statusCode}');
+        throw Exception(
+          errorData['error'] ??
+              'Failed to send response: ${apiResponse.statusCode}',
+        );
       }
     } catch (e) {
       print('Error responding to review: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error sending response: $e'),
           backgroundColor: Colors.red,

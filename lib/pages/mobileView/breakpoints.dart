@@ -13,7 +13,8 @@ class Breakpoints {
       MediaQuery.of(context).size.width < tabletSmall;
 
   static bool isTablet(BuildContext context) =>
-      MediaQuery.of(context).size.width >= tabletSmall &&  MediaQuery.of(context).size.width <=tabletXLarge;
+      MediaQuery.of(context).size.width >= tabletSmall &&
+      MediaQuery.of(context).size.width <= tabletXLarge;
 }
 
 // Typography for different screen sizes
@@ -21,8 +22,8 @@ class ResponsiveTypography {
   // Mobile Small (320px - 479px)
   static const mobileSmall = TypographyConfig(
     heading: 24,
-    subHeading: 18,
-    normal: 14,
+    subHeading: 15,
+    normal: 12.5,
     medium: 16,
     large: 20,
   );
@@ -30,8 +31,8 @@ class ResponsiveTypography {
   // Mobile Large (480px - 599px)
   static const mobileLarge = TypographyConfig(
     heading: 28,
-    subHeading: 20,
-    normal: 15,
+    subHeading: 16,
+    normal: 13,
     medium: 17,
     large: 22,
   );
@@ -39,8 +40,8 @@ class ResponsiveTypography {
   // Tablet Small (600px - 767px)
   static const tabletSmall = TypographyConfig(
     heading: 32,
-    subHeading: 24,
-    normal: 16,
+    subHeading: 16,
+    normal: 14,
     medium: 18,
     large: 26,
   );
@@ -49,7 +50,7 @@ class ResponsiveTypography {
   static const tabletLarge = TypographyConfig(
     heading: 36,
     subHeading: 26,
-    normal: 16,
+    normal: 15,
     medium: 20,
     large: 28,
   );
@@ -184,10 +185,7 @@ class SpacingConfig {
 class ResponsiveBuilder extends StatelessWidget {
   final Widget Function(BuildContext, TypographyConfig, SpacingConfig) builder;
 
-  const ResponsiveBuilder({
-    Key? key,
-    required this.builder,
-  }) : super(key: key);
+  const ResponsiveBuilder({Key? key, required this.builder}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +219,7 @@ class ResponsiveText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = ResponsiveTypography.getTypography(context);
-    
+
     double fontSize;
     switch (type) {
       case TextType.heading:
@@ -253,13 +251,7 @@ class ResponsiveText extends StatelessWidget {
   }
 }
 
-enum TextType {
-  heading,
-  subHeading,
-  normal,
-  medium,
-  large,
-}
+enum TextType { heading, subHeading, normal, medium, large }
 
 // Example responsive container with dynamic spacing
 class ResponsiveContainer extends StatelessWidget {
@@ -281,7 +273,7 @@ class ResponsiveContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     double padding;
     switch (paddingType) {
       case SpacingType.small:
@@ -322,11 +314,7 @@ class ResponsiveContainer extends StatelessWidget {
   }
 }
 
-enum SpacingType {
-  small,
-  medium,
-  large,
-}
+enum SpacingType { small, medium, large }
 
 // Responsive SizedBox for spacing
 class ResponsiveGap extends StatelessWidget {
@@ -342,7 +330,7 @@ class ResponsiveGap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     double size;
     switch (type) {
       case SpacingType.small:

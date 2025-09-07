@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:file_picker/file_picker.dart';
 import '../global_values.dart';
 import '../models/request_models.dart';
 import '../models/moderation_models.dart';
@@ -86,6 +88,7 @@ class ChatService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
+        print("dfgfg ${data}");
         return data.cast<Map<String, dynamic>>();
       } else {
         print(
@@ -108,8 +111,8 @@ class ChatService {
   }) async {
     try {
       // Use current user if not specified
-      final currentUserId = userId ?? Constants.myDisplayname;
-      
+      final currentUserId = userId ?? Constants.currentUser!.uid;
+
       // First, run content through moderation
       final moderationResult = await ChatModerationService.processMessage(
         content: content,
@@ -133,8 +136,11 @@ class ChatService {
         // Send blocked message notification
         await ChatNotificationService.sendMessageBlockedNotification(
           userId: currentUserId,
-          reason: moderationResult['violations']?.join(', ') ?? 'Content violation',
-          violationTypes: List<String>.from(moderationResult['violations'] ?? []),
+          reason:
+              moderationResult['violations']?.join(', ') ?? 'Content violation',
+          violationTypes: List<String>.from(
+            moderationResult['violations'] ?? [],
+          ),
           conversationId: conversationId,
         );
 
@@ -152,6 +158,14 @@ class ChatService {
       final messageContent = moderationResult['filtered_content'] ?? content;
       final wasFiltered = messageContent != content;
 
+      // Get sender information
+      final senderName =
+          Constants.currentUser!.firstName +
+          " " +
+          Constants.currentUser!.lastName;
+
+      final senderRole = Constants.currentUser!.role;
+
       // Send the message to the backend
       final response = await http.post(
         Uri.parse(
@@ -161,6 +175,9 @@ class ChatService {
         body: json.encode({
           'content': messageContent,
           'message_type': messageType,
+          'sender_name': senderName,
+          'sender_role': senderRole,
+          'sender_id': currentUserId,
           'original_content': wasFiltered ? content : null,
           'was_filtered': wasFiltered,
           'moderation_data': wasFiltered ? moderationResult : null,
@@ -211,6 +228,93 @@ class ChatService {
     }
   }
 
+  /// Send a file attachment to a conversation
+  static Future<Map<String, dynamic>> sendAttachment(
+    String conversationId,
+    dynamic file, { // PlatformFile or File
+    String messageType = 'file',
+  }) async {
+    try {
+      final currentUserId = Constants.currentUser!.uid;
+
+      // Get sender information
+      final senderName =
+          Constants.currentUser!.firstName +
+          " " +
+          Constants.currentUser!.lastName;
+
+      final senderRole = Constants.currentUser!.role;
+
+      // Prepare multipart request
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+          '${GlobalVariables.chatServiceUrl}api/v1/chat/conversations/$conversationId/send_attachment/',
+        ),
+      );
+
+      // Add headers
+      request.headers.addAll(headers);
+
+      // Add form fields
+      request.fields['message_type'] = messageType;
+      request.fields['sender_name'] = senderName;
+      request.fields['sender_role'] = senderRole;
+      request.fields['sender_id'] = currentUserId;
+
+      // Add file to request
+      if (kIsWeb) {
+        // Web platform - use bytes
+        final platformFile = file as PlatformFile;
+        if (platformFile.bytes != null) {
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              'attachment',
+              platformFile.bytes!,
+              filename: platformFile.name,
+            ),
+          );
+        } else {
+          return {'success': false, 'message': 'File data not available'};
+        }
+      } else {
+        // Mobile platform - use file path
+        final platformFile = file as PlatformFile;
+        if (platformFile.path != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'attachment',
+              platformFile.path!,
+              filename: platformFile.name,
+            ),
+          );
+        } else {
+          return {'success': false, 'message': 'File path not available'};
+        }
+      }
+
+      // Send request
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 201) {
+        final messageData = json.decode(responseBody);
+        return {'success': true, 'data': messageData};
+      } else {
+        print(
+          'Error sending attachment: ${response.statusCode} - $responseBody',
+        );
+        return {'success': false, 'message': 'Failed to upload attachment'};
+      }
+    } catch (e) {
+      print('Error sending attachment: $e');
+      return {
+        'success': false,
+        'message': 'An error occurred while uploading the attachment',
+      };
+    }
+  }
+
   /// Handle post-message actions like logging and notifications
   static Future<void> _handlePostMessageActions({
     required String userId,
@@ -240,8 +344,12 @@ class ChatService {
           userId: userId,
           conversationId: conversationId,
           messageId: messageId,
-          violationTypes: List<String>.from(moderationResult['violations'] ?? []),
-          detectedItems: List<String>.from(moderationResult['detected_items'] ?? []),
+          violationTypes: List<String>.from(
+            moderationResult['violations'] ?? [],
+          ),
+          detectedItems: List<String>.from(
+            moderationResult['detected_items'] ?? [],
+          ),
           severity: moderationResult['severity'] ?? 'low',
           originalContent: originalContent,
         );
@@ -249,7 +357,9 @@ class ChatService {
         // Send content filtered notification
         await ChatNotificationService.sendContentFilteredNotification(
           userId: userId,
-          violationTypes: List<String>.from(moderationResult['violations'] ?? []),
+          violationTypes: List<String>.from(
+            moderationResult['violations'] ?? [],
+          ),
           filteredContent: finalContent,
           conversationId: conversationId,
           messageId: messageId,
@@ -283,7 +393,9 @@ class ChatService {
 
     try {
       // Get user's current moderation status
-      final userStatus = await ChatModerationService.getUserModerationStatus(userId);
+      final userStatus = await ChatModerationService.getUserModerationStatus(
+        userId,
+      );
       if (userStatus == null) return;
 
       final strikeCount = userStatus.activeStrikes;
@@ -360,8 +472,10 @@ class ChatService {
       );
 
       if (success) {
-        final suspensionEndDate = DateTime.now().add(Duration(hours: durationHours));
-        
+        final suspensionEndDate = DateTime.now().add(
+          Duration(hours: durationHours),
+        );
+
         // Send suspension notification
         await ChatNotificationService.sendAccountSuspendedNotification(
           userId: userId,
@@ -385,13 +499,18 @@ class ChatService {
   }
 
   /// Get user's moderation status for chat interface
-  static Future<UserModerationStatus?> getUserModerationStatus(String userId) async {
+  static Future<UserModerationStatus?> getUserModerationStatus(
+    String userId,
+  ) async {
     return await ChatModerationService.getUserModerationStatus(userId);
   }
 
   /// Get user's unread moderation warnings
   static Future<List<ModerationWarning>?> getUserWarnings(String userId) async {
-    return await ChatNotificationService.getUserWarnings(userId, unreadOnly: false);
+    return await ChatNotificationService.getUserWarnings(
+      userId,
+      unreadOnly: false,
+    );
   }
 
   /// Get user's unread warnings count
@@ -501,6 +620,7 @@ class ChatMessage {
   final DateTime timestamp;
   final String messageType;
   final bool isFromCurrentUser;
+  final List<dynamic>? attachments;
 
   ChatMessage({
     this.id,
@@ -510,27 +630,51 @@ class ChatMessage {
     required this.timestamp,
     this.messageType = 'text',
     this.isFromCurrentUser = false,
+    this.attachments,
   });
 
   factory ChatMessage.fromJson(
     Map<String, dynamic> json,
     String currentUserName,
   ) {
+    // Handle both nested sender object and flat sender fields
     final sender = json['sender'];
-    final senderName = sender != null
-        ? sender['username'] ?? 'Anonymous'
-        : 'Anonymous';
+    String senderName;
+
+    // Try to get sender name from various possible sources
+    if (json['sender_name'] != null &&
+        json['sender_name'].toString().isNotEmpty) {
+      senderName = json['sender_name'].toString();
+    } else if (sender != null && sender['username'] != null) {
+      senderName = sender['username'].toString();
+    } else if (sender != null && sender['name'] != null) {
+      senderName = sender['name'].toString();
+    } else {
+      senderName = 'Anonymous';
+    }
+
+    // Get sender role from various possible sources
+    String senderRole;
+    if (json['sender_role'] != null &&
+        json['sender_role'].toString().isNotEmpty) {
+      senderRole = json['sender_role'].toString();
+    } else if (sender != null && sender['role'] != null) {
+      senderRole = sender['role'].toString();
+    } else {
+      senderRole = 'user';
+    }
 
     return ChatMessage(
       id: json['id']?.toString(),
-      content: json['content'],
+      content: json['content']?.toString() ?? '',
       senderName: senderName,
-      senderRole:
-          json['sender_role'] ??
-          'User', // You might need to adjust this based on your API
-      timestamp: DateTime.parse(json['created_at']),
-      messageType: json['message_type'] ?? 'text',
+      senderRole: senderRole,
+      timestamp: DateTime.parse(
+        json['created_at'] ?? DateTime.now().toIso8601String(),
+      ),
+      messageType: json['message_type']?.toString() ?? 'text',
       isFromCurrentUser: senderName == currentUserName,
+      attachments: json['attachments'] as List<dynamic>?,
     );
   }
 
@@ -543,6 +687,7 @@ class ChatMessage {
       'timestamp': timestamp.toIso8601String(),
       'message_type': messageType,
       'is_from_current_user': isFromCurrentUser,
+      'attachments': attachments,
     };
   }
 }

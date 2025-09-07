@@ -20,13 +20,13 @@ import '../../../services/notification_api_service.dart';
 import '../../notification.dart';
 import '../breakpoints.dart';
 
-
 class SupportMobile extends StatefulWidget {
   @override
   _SupportMobileState createState() => _SupportMobileState();
 }
 
-class _SupportMobileState extends State<SupportMobile> with TickerProviderStateMixin {
+class _SupportMobileState extends State<SupportMobile>
+    with TickerProviderStateMixin {
   // Controllers
   final TextEditingController _subjectController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -72,13 +72,13 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
 
     _leftSlideAnimation = Tween<Offset>(begin: Offset(-1, 0), end: Offset.zero)
         .animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     _rightSlideAnimation = Tween<Offset>(begin: Offset(1, 0), end: Offset.zero)
         .animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     _fadeController.forward();
     _slideController.forward();
@@ -227,22 +227,10 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
   @override
   Widget build(BuildContext context) {
     final bool isMobile = Breakpoints.isMobile(context);
-    
-    // This widget should ONLY be used on mobile devices
-    if (!isMobile) {
-      return Container(
-        child: Center(
-          child: Text(
-            'This view is only available on mobile devices',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          ),
-        ),
-      );
-    }
-    
+
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Column(
@@ -286,7 +274,10 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
     );
   }
 
-  Widget _buildMobileLayout(TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildMobileLayout(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return Column(
       children: [
         _buildCreateTicketForm(typography, spacing),
@@ -296,8 +287,10 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
     );
   }
 
-
-  Widget _buildMyTicketsList(TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildMyTicketsList(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       decoration: BoxDecoration(
@@ -356,183 +349,206 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
                     ),
                   )
                 : tickets.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.inbox_outlined,
-                              size: 48,
-                              color: Colors.grey[400],
-                            ),
-                            SizedBox(height: spacing.spacingMedium),
-                            Text(
-                              (_authUserUid == null || _authUserUid!.isEmpty)
-                                  ? 'Please login to view tickets'
-                                  : 'No tickets yet',
-                              style: GoogleFonts.manrope(
-                                fontSize: typography.medium,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(height: spacing.spacingSmall),
-                            Text(
-                              (_authUserUid == null || _authUserUid!.isEmpty)
-                                  ? 'Login to access support'
-                                  : 'Create your first support ticket',
-                              style: GoogleFonts.manrope(
-                                fontSize: typography.normal,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          ],
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.inbox_outlined,
+                          size: 48,
+                          color: Colors.grey[400],
                         ),
-                      )
-                    : ListView.builder(
-                        itemCount: tickets.length,
-                        itemBuilder: (context, index) {
-                          final ticket = tickets[index];
-                          return TweenAnimationBuilder<double>(
-                            duration: Duration(
-                              milliseconds: 1000 + (index * 200),
-                            ),
-                            tween: Tween(begin: 0.0, end: 1.0),
-                            builder: (context, value, child) {
-                              return Opacity(
-                                opacity: value,
-                                child: Transform.translate(
-                                  offset: Offset((-30 * (1 - value)).toDouble(), 0),
-                                  child: InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ChatMobileScreen(
-                                            ticket: ticket,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: AnimatedContainer(
-                                      duration: Duration(milliseconds: 200),
-                                      margin: EdgeInsets.only(
-                                        bottom: spacing.spacingSmall,
-                                      ),
-                                      padding: EdgeInsets.all(spacing.paddingMedium),
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Colors.white,
-                                            Colors.grey.shade50,
-                                          ],
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: Constants.ftaColorLight.withOpacity(0.3),
-                                          width: 1.5,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Constants.ftaColorLight.withOpacity(0.1),
-                                            spreadRadius: 1,
-                                            blurRadius: 4,
-                                            offset: Offset(0, 2),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  ticket.title,
-                                                  style: GoogleFonts.manrope(
-                                                    fontSize: typography.normal,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Constants.ftaColorLight,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              SizedBox(width: spacing.spacingSmall),
-                                              TweenAnimationBuilder<double>(
-                                                duration: Duration(milliseconds: 600),
-                                                tween: Tween(begin: 0.0, end: 1.0),
-                                                builder: (context, badgeValue, child) {
-                                                  return Transform.scale(
-                                                    scale: badgeValue,
-                                                    child: Container(
-                                                      padding: EdgeInsets.symmetric(
-                                                        horizontal: spacing.paddingSmall,
-                                                        vertical: spacing.paddingSmall / 2,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        color: ticket.status == 'Pending'
-                                                            ? Colors.grey[400]
-                                                            : Constants.ctaColorLight,
-                                                        borderRadius: BorderRadius.circular(12),
-                                                      ),
-                                                      child: Text(
-                                                        ticket.status,
-                                                        style: GoogleFonts.manrope(
-                                                          color: Colors.white,
-                                                          fontSize: typography.normal * 0.8,
-                                                          fontWeight: FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: spacing.spacingSmall),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  ticket.ticketId,
-                                                  style: GoogleFonts.manrope(
-                                                    fontSize: typography.normal * 0.85,
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w300,
-                                                  ),
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              Text(
-                                                ticket.date,
-                                                style: GoogleFonts.manrope(
-                                                  fontSize: typography.normal * 0.85,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w300,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                        SizedBox(height: spacing.spacingMedium),
+                        Text(
+                          (_authUserUid == null || _authUserUid!.isEmpty)
+                              ? 'Please login to view tickets'
+                              : 'No tickets yet',
+                          style: GoogleFonts.manrope(
+                            fontSize: typography.medium,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: spacing.spacingSmall),
+                        Text(
+                          (_authUserUid == null || _authUserUid!.isEmpty)
+                              ? 'Login to access support'
+                              : 'Create your first support ticket',
+                          style: GoogleFonts.manrope(
+                            fontSize: typography.normal,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: tickets.length,
+                    itemBuilder: (context, index) {
+                      final ticket = tickets[index];
+                      return TweenAnimationBuilder<double>(
+                        duration: Duration(milliseconds: 1000 + (index * 200)),
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        builder: (context, value, child) {
+                          return Opacity(
+                            opacity: value,
+                            child: Transform.translate(
+                              offset: Offset((-30 * (1 - value)).toDouble(), 0),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ChatMobileScreen(ticket: ticket),
                                     ),
+                                  );
+                                },
+                                child: AnimatedContainer(
+                                  duration: Duration(milliseconds: 200),
+                                  margin: EdgeInsets.only(
+                                    bottom: spacing.spacingSmall,
+                                  ),
+                                  padding: EdgeInsets.all(
+                                    spacing.paddingMedium,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.white,
+                                        Colors.grey.shade50,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Constants.ftaColorLight
+                                          .withOpacity(0.3),
+                                      width: 1.5,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Constants.ftaColorLight
+                                            .withOpacity(0.1),
+                                        spreadRadius: 1,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              ticket.title,
+                                              style: GoogleFonts.manrope(
+                                                fontSize: typography.normal,
+                                                fontWeight: FontWeight.w600,
+                                                color: Constants.ftaColorLight,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          SizedBox(width: spacing.spacingSmall),
+                                          TweenAnimationBuilder<double>(
+                                            duration: Duration(
+                                              milliseconds: 600,
+                                            ),
+                                            tween: Tween(begin: 0.0, end: 1.0),
+                                            builder: (context, badgeValue, child) {
+                                              return Transform.scale(
+                                                scale: badgeValue,
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        spacing.paddingSmall,
+                                                    vertical:
+                                                        spacing.paddingSmall /
+                                                        2,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        ticket.status ==
+                                                            'Pending'
+                                                        ? Colors.grey[400]
+                                                        : Constants
+                                                              .ctaColorLight,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12,
+                                                        ),
+                                                  ),
+                                                  child: Text(
+                                                    ticket.status,
+                                                    style: GoogleFonts.manrope(
+                                                      color: Colors.white,
+                                                      fontSize:
+                                                          typography.normal *
+                                                          0.8,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: spacing.spacingSmall),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              ticket.ticketId,
+                                              style: GoogleFonts.manrope(
+                                                fontSize:
+                                                    typography.normal * 0.85,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w300,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Text(
+                                            ticket.date,
+                                            style: GoogleFonts.manrope(
+                                              fontSize:
+                                                  typography.normal * 0.85,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w300,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            },
+                              ),
+                            ),
                           );
                         },
-                      ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCreateTicketForm(TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildCreateTicketForm(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       decoration: BoxDecoration(
@@ -592,8 +608,13 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
                 child: Transform.translate(
                   offset: Offset((20 * (1 - value)).toDouble(), 0),
                   child: _buildAnimatedTextField(
-
-                    label:'Subject',     hintText:'Subject', controller:  _subjectController, focusNode: _subjectFocusNode, icon: HugeIcons.strokeRoundedSubtitle, required: false, delay: 200,
+                    label: 'Subject',
+                    hintText: 'Subject',
+                    controller: _subjectController,
+                    focusNode: _subjectFocusNode,
+                    icon: HugeIcons.strokeRoundedSubtitle,
+                    required: false,
+                    delay: 200,
                   ),
                 ),
               );
@@ -608,9 +629,12 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
                 opacity: value,
                 child: Transform.translate(
                   offset: Offset((20 * (1 - value)).toDouble(), 0),
-                  child:_buildAnimatedMessageField(
-
-                    label:'Description',     hintText:'Enter your description', controller:  _descriptionController, focusNode: _descriptionFocusNode,delay: 200,
+                  child: _buildAnimatedMessageField(
+                    label: 'Description',
+                    hintText: 'Enter your description',
+                    controller: _descriptionController,
+                    focusNode: _descriptionFocusNode,
+                    delay: 200,
                   ),
                 ),
               );
@@ -639,7 +663,9 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
                               borderRadius: BorderRadius.circular(30),
                             ),
                             elevation: 2,
-                            shadowColor: Constants.ctaColorLight.withOpacity(0.3),
+                            shadowColor: Constants.ctaColorLight.withOpacity(
+                              0.3,
+                            ),
                           ),
                           child: _isCreatingTicket
                               ? Row(
@@ -707,7 +733,7 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
           opacity: value,
           child: Transform.translate(
             offset: Offset(30 * (1 - value), 0),
-            child:  CustomInputTransparent4(
+            child: CustomInputTransparent4(
               hintText: hintText,
               labelText: label,
               controller: controller,
@@ -727,7 +753,6 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
       },
     );
   }
-
 
   Widget _buildAnimatedMessageField({
     required String label,
@@ -749,8 +774,6 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-
-
               ),
               child: TextField(
                 controller: controller,
@@ -785,7 +808,6 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
                     fontSize: Breakpoints.isTablet(context)
                         ? ResponsiveTypography.getTypography(context).normal
                         : 14,
-
                   ),
                   floatingLabelBehavior: FloatingLabelBehavior.always,
                   border: OutlineInputBorder(
@@ -797,7 +819,9 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
                     borderSide: BorderSide(color: Color(0xFFF5A623), width: 2),
                   ),
                   contentPadding: Breakpoints.isTablet(context)
-                      ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium)
+                      ? EdgeInsets.all(
+                          ResponsiveSpacing.getSpacing(context).paddingMedium,
+                        )
                       : EdgeInsets.all(16), // More padding for bigger field
                   fillColor: Colors.white,
                   filled: true,
@@ -810,7 +834,6 @@ class _SupportMobileState extends State<SupportMobile> with TickerProviderStateM
     );
   }
 }
-
 
 class SellerSupportMobile extends StatefulWidget {
   @override
@@ -864,13 +887,13 @@ class _SellerSupportMobileState extends State<SellerSupportMobile>
 
     _leftSlideAnimation = Tween<Offset>(begin: Offset(-1, 0), end: Offset.zero)
         .animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     _rightSlideAnimation = Tween<Offset>(begin: Offset(1, 0), end: Offset.zero)
         .animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     _fadeController.forward();
     _slideController.forward();
@@ -1019,22 +1042,10 @@ class _SellerSupportMobileState extends State<SellerSupportMobile>
   @override
   Widget build(BuildContext context) {
     final bool isMobile = Breakpoints.isMobile(context);
-    
-    // This widget should ONLY be used on mobile devices
-    if (!isMobile) {
-      return Container(
-        child: Center(
-          child: Text(
-            'This view is only available on mobile devices',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          ),
-        ),
-      );
-    }
-    
+
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Column(
@@ -1076,7 +1087,10 @@ class _SellerSupportMobileState extends State<SellerSupportMobile>
     );
   }
 
-  Widget _buildMobileLayoutSeller(TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildMobileLayoutSeller(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return Column(
       children: [
         _buildCreateTicketFormSeller(typography, spacing),
@@ -1086,8 +1100,10 @@ class _SellerSupportMobileState extends State<SellerSupportMobile>
     );
   }
 
-
-  Widget _buildMyTicketsListSeller(TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildMyTicketsListSeller(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       decoration: BoxDecoration(
@@ -1146,183 +1162,206 @@ class _SellerSupportMobileState extends State<SellerSupportMobile>
                     ),
                   )
                 : tickets.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.inbox_outlined,
-                              size: 48,
-                              color: Colors.grey[400],
-                            ),
-                            SizedBox(height: spacing.spacingMedium),
-                            Text(
-                              (_authUserUid == null || _authUserUid!.isEmpty)
-                                  ? 'Please login to view tickets'
-                                  : 'No tickets yet',
-                              style: GoogleFonts.manrope(
-                                fontSize: typography.medium,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(height: spacing.spacingSmall),
-                            Text(
-                              (_authUserUid == null || _authUserUid!.isEmpty)
-                                  ? 'Login to access support'
-                                  : 'Create your first support ticket',
-                              style: GoogleFonts.manrope(
-                                fontSize: typography.normal,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          ],
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.inbox_outlined,
+                          size: 48,
+                          color: Colors.grey[400],
                         ),
-                      )
-                    : ListView.builder(
-                        itemCount: tickets.length,
-                        itemBuilder: (context, index) {
-                          final ticket = tickets[index];
-                          return TweenAnimationBuilder<double>(
-                            duration: Duration(
-                              milliseconds: 1000 + (index * 200),
-                            ),
-                            tween: Tween(begin: 0.0, end: 1.0),
-                            builder: (context, value, child) {
-                              return Opacity(
-                                opacity: value,
-                                child: Transform.translate(
-                                  offset: Offset((-30 * (1 - value)).toDouble(), 0),
-                                  child: InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ChatMobileScreen(
-                                            ticket: ticket,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: AnimatedContainer(
-                                      duration: Duration(milliseconds: 200),
-                                      margin: EdgeInsets.only(
-                                        bottom: spacing.spacingSmall,
-                                      ),
-                                      padding: EdgeInsets.all(spacing.paddingMedium),
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Colors.white,
-                                            Colors.grey.shade50,
-                                          ],
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: Constants.ftaColorLight.withOpacity(0.3),
-                                          width: 1.5,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Constants.ftaColorLight.withOpacity(0.1),
-                                            spreadRadius: 1,
-                                            blurRadius: 4,
-                                            offset: Offset(0, 2),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  ticket.title,
-                                                  style: GoogleFonts.manrope(
-                                                    fontSize: typography.normal,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Constants.ftaColorLight,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              SizedBox(width: spacing.spacingSmall),
-                                              TweenAnimationBuilder<double>(
-                                                duration: Duration(milliseconds: 600),
-                                                tween: Tween(begin: 0.0, end: 1.0),
-                                                builder: (context, badgeValue, child) {
-                                                  return Transform.scale(
-                                                    scale: badgeValue,
-                                                    child: Container(
-                                                      padding: EdgeInsets.symmetric(
-                                                        horizontal: spacing.paddingSmall,
-                                                        vertical: spacing.paddingSmall / 2,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        color: ticket.status == 'Pending'
-                                                            ? Colors.grey[400]
-                                                            : Constants.ctaColorLight,
-                                                        borderRadius: BorderRadius.circular(12),
-                                                      ),
-                                                      child: Text(
-                                                        ticket.status,
-                                                        style: GoogleFonts.manrope(
-                                                          color: Colors.white,
-                                                          fontSize: typography.normal * 0.8,
-                                                          fontWeight: FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: spacing.spacingSmall),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  ticket.ticketId,
-                                                  style: GoogleFonts.manrope(
-                                                    fontSize: typography.normal * 0.85,
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w300,
-                                                  ),
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              Text(
-                                                ticket.date,
-                                                style: GoogleFonts.manrope(
-                                                  fontSize: typography.normal * 0.85,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w300,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                        SizedBox(height: spacing.spacingMedium),
+                        Text(
+                          (_authUserUid == null || _authUserUid!.isEmpty)
+                              ? 'Please login to view tickets'
+                              : 'No tickets yet',
+                          style: GoogleFonts.manrope(
+                            fontSize: typography.medium,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: spacing.spacingSmall),
+                        Text(
+                          (_authUserUid == null || _authUserUid!.isEmpty)
+                              ? 'Login to access support'
+                              : 'Create your first support ticket',
+                          style: GoogleFonts.manrope(
+                            fontSize: typography.normal,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: tickets.length,
+                    itemBuilder: (context, index) {
+                      final ticket = tickets[index];
+                      return TweenAnimationBuilder<double>(
+                        duration: Duration(milliseconds: 1000 + (index * 200)),
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        builder: (context, value, child) {
+                          return Opacity(
+                            opacity: value,
+                            child: Transform.translate(
+                              offset: Offset((-30 * (1 - value)).toDouble(), 0),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ChatMobileScreen(ticket: ticket),
                                     ),
+                                  );
+                                },
+                                child: AnimatedContainer(
+                                  duration: Duration(milliseconds: 200),
+                                  margin: EdgeInsets.only(
+                                    bottom: spacing.spacingSmall,
+                                  ),
+                                  padding: EdgeInsets.all(
+                                    spacing.paddingMedium,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.white,
+                                        Colors.grey.shade50,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Constants.ftaColorLight
+                                          .withOpacity(0.3),
+                                      width: 1.5,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Constants.ftaColorLight
+                                            .withOpacity(0.1),
+                                        spreadRadius: 1,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              ticket.title,
+                                              style: GoogleFonts.manrope(
+                                                fontSize: typography.normal,
+                                                fontWeight: FontWeight.w600,
+                                                color: Constants.ftaColorLight,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          SizedBox(width: spacing.spacingSmall),
+                                          TweenAnimationBuilder<double>(
+                                            duration: Duration(
+                                              milliseconds: 600,
+                                            ),
+                                            tween: Tween(begin: 0.0, end: 1.0),
+                                            builder: (context, badgeValue, child) {
+                                              return Transform.scale(
+                                                scale: badgeValue,
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        spacing.paddingSmall,
+                                                    vertical:
+                                                        spacing.paddingSmall /
+                                                        2,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        ticket.status ==
+                                                            'Pending'
+                                                        ? Colors.grey[400]
+                                                        : Constants
+                                                              .ctaColorLight,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12,
+                                                        ),
+                                                  ),
+                                                  child: Text(
+                                                    ticket.status,
+                                                    style: GoogleFonts.manrope(
+                                                      color: Colors.white,
+                                                      fontSize:
+                                                          typography.normal *
+                                                          0.8,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: spacing.spacingSmall),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              ticket.ticketId,
+                                              style: GoogleFonts.manrope(
+                                                fontSize:
+                                                    typography.normal * 0.85,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w300,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Text(
+                                            ticket.date,
+                                            style: GoogleFonts.manrope(
+                                              fontSize:
+                                                  typography.normal * 0.85,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w300,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            },
+                              ),
+                            ),
                           );
                         },
-                      ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCreateTicketFormSeller(TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildCreateTicketFormSeller(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       decoration: BoxDecoration(
@@ -1434,7 +1473,9 @@ class _SellerSupportMobileState extends State<SellerSupportMobile>
                               borderRadius: BorderRadius.circular(30),
                             ),
                             elevation: 2,
-                            shadowColor: Constants.ctaColorLight.withOpacity(0.3),
+                            shadowColor: Constants.ctaColorLight.withOpacity(
+                              0.3,
+                            ),
                           ),
                           child: _isCreatingTicket
                               ? Row(
@@ -1480,18 +1521,17 @@ class _SellerSupportMobileState extends State<SellerSupportMobile>
     );
   }
 
-
   Widget _buildCustomTextField(
-      String hintText,
-      TextEditingController controller,
-      FocusNode focusNode,
-      FocusNode? nextFocusNode, {
-        Widget? suffixIcon,
-        bool isDescription = false,
-      }) {
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocusNode, {
+    Widget? suffixIcon,
+    bool isDescription = false,
+  }) {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1600,7 +1640,8 @@ class ChatMobileScreen extends StatefulWidget {
   _ChatMobileScreenState createState() => _ChatMobileScreenState();
 }
 
-class _ChatMobileScreenState extends State<ChatMobileScreen> with TickerProviderStateMixin {
+class _ChatMobileScreenState extends State<ChatMobileScreen>
+    with TickerProviderStateMixin {
   final TextEditingController _replyController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<Message> _messages = [];
@@ -1647,7 +1688,7 @@ class _ChatMobileScreenState extends State<ChatMobileScreen> with TickerProvider
     _messages.add(
       Message(
         text:
-        "Hello! I've received your ticket and I'm looking into this issue. I'll get back to you with more details soon.",
+            "Hello! I've received your ticket and I'm looking into this issue. I'll get back to you with more details soon.",
         isMe: false,
         timestamp: DateTime.now().subtract(Duration(hours: 2)),
         status: MessageStatus.read,
@@ -1716,7 +1757,7 @@ class _ChatMobileScreenState extends State<ChatMobileScreen> with TickerProvider
     final bool isMobile = Breakpoints.isMobile(context);
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Container(
       margin: EdgeInsets.only(
         left: message.isMe ? spacing.paddingLarge : spacing.paddingMedium,
@@ -1730,7 +1771,7 @@ class _ChatMobileScreenState extends State<ChatMobileScreen> with TickerProvider
         children: [
           Container(
             padding: EdgeInsets.symmetric(
-              horizontal: spacing.paddingMedium, 
+              horizontal: spacing.paddingMedium,
               vertical: spacing.spacingSmall,
             ),
             decoration: BoxDecoration(
@@ -1784,24 +1825,10 @@ class _ChatMobileScreenState extends State<ChatMobileScreen> with TickerProvider
   @override
   Widget build(BuildContext context) {
     final bool isMobile = Breakpoints.isMobile(context);
-    
-    // This widget should ONLY be used on mobile devices
-    if (!isMobile) {
-      return Scaffold(
-        body: Container(
-          child: Center(
-            child: Text(
-              'This view is only available on mobile devices',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
-          ),
-        ),
-      );
-    }
-    
+
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -2049,13 +2076,16 @@ class BuyerDashboardHeader extends StatefulWidget {
   @override
   State<BuyerDashboardHeader> createState() => _BuyerDashboardHeaderState();
 }
+
 List<WebNotification> notifications = [];
 
-class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with SingleTickerProviderStateMixin {
+class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   bool _isLoadingNotifications = false;
-  final NotificationApiService _notificationApiService = NotificationApiService();
+  final NotificationApiService _notificationApiService =
+      NotificationApiService();
 
   @override
   void initState() {
@@ -2086,7 +2116,8 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
       // Use the user's UUID from Constants
       final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
       if (userUuid.isNotEmpty) {
-        final fetchedNotifications = await _notificationApiService.getUserNotifications(userUuid);
+        final fetchedNotifications = await _notificationApiService
+            .getUserNotifications(userUuid);
         if (mounted) {
           setState(() {
             notifications = fetchedNotifications;
@@ -2122,7 +2153,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
           title: 'Request Accept',
           body: 'John Doe has accepted the concern. He help...',
           description:
-          'John Doe has accepted the concern. He will help you with your request.',
+              'John Doe has accepted the concern. He will help you with your request.',
           type: 'accept',
           read: false,
           createdAt: DateTime.now(),
@@ -2132,7 +2163,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
           title: 'Bank Details Update Succesfully',
           body: 'Lorem ipsum is a placeholder text commonly',
           description:
-          'Lorem ipsum is a placeholder text commonly used in the printing industry.',
+              'Lorem ipsum is a placeholder text commonly used in the printing industry.',
           type: 'update',
           read: false,
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -2142,7 +2173,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
           title: 'Your Profile Is Update Succesfully',
           body: 'Lorem ipsum is a placeholder text commonly',
           description:
-          'Lorem ipsum is a placeholder text commonly used in the printing industry.',
+              'Lorem ipsum is a placeholder text commonly used in the printing industry.',
           type: 'update',
           read: true,
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -2152,7 +2183,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
           title: 'Seller Profile Update Succesfully',
           body: 'Lorem ipsum is a placeholder text commonly',
           description:
-          'Lorem ipsum is a placeholder text commonly used in the printing industry.',
+              'Lorem ipsum is a placeholder text commonly used in the printing industry.',
           type: 'update',
           read: true,
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -2162,7 +2193,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
           title: 'New Order Received',
           body: 'You have received a new order from customer',
           description:
-          'You have received a new order from customer. Please check your dashboard.',
+              'You have received a new order from customer. Please check your dashboard.',
           type: 'order',
           read: false,
           createdAt: DateTime.now().subtract(const Duration(days: 3)),
@@ -2257,7 +2288,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
     final totalNotifications = notifications.length;
     final readNotifications = notifications.where((n) => n.read).length;
     final unreadNotifications = notifications.where((n) => !n.read).length;
-    
+
     return Column(
       children: [
         _buildStatItem('Total Notifications', totalNotifications.toString()),
@@ -2319,10 +2350,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
               const SizedBox(height: 8),
               Text(
                 'Loading notifications...',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -2337,18 +2365,11 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.notifications_none,
-                color: Colors.grey[400],
-                size: 24,
-              ),
+              Icon(Icons.notifications_none, color: Colors.grey[400], size: 24),
               const SizedBox(height: 4),
               Text(
                 'No notifications yet',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -2382,7 +2403,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
               ),
             ),
             ...entry.value.map(
-                  (notification) =>
+              (notification) =>
                   _buildNotificationItem(notification, isCompact: true),
             ),
           ],
@@ -2402,9 +2423,9 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
   }
 
   Widget _buildNotificationItem(
-      WebNotification notification, {
-        bool isCompact = false,
-      }) {
+    WebNotification notification, {
+    bool isCompact = false,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -2468,22 +2489,10 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
   @override
   Widget build(BuildContext context) {
     final bool isMobile = Breakpoints.isMobile(context);
-    
-    // This widget should ONLY be used on mobile devices
-    if (!isMobile) {
-      return Container(
-        child: Center(
-          child: Text(
-            'This view is only available on mobile devices',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          ),
-        ),
-      );
-    }
-    
+
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Container(
       height: 60,
       width: MediaQuery.of(context).size.width,
@@ -2510,8 +2519,12 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader> with Single
             showBadge: true,
             ignorePointer: false,
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => NotificationPage(notifications: [],)));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NotificationPage(notifications: []),
+                ),
+              );
             },
             badgeContent: Text(
               widget.totalAlert.toString(),

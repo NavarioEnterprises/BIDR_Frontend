@@ -15,7 +15,7 @@ class HeaderSection extends StatefulWidget {
 
   @override
   State<HeaderSection> createState() => _HeaderSectionState();
-  
+
   static Widget buildDrawer(BuildContext context, Function setState) {
     return _HeaderSectionState().buildMobileDrawer(context, setState);
   }
@@ -27,17 +27,27 @@ final appBarValueNotifier = ValueNotifier<int>(0);
 class _HeaderSectionState extends State<HeaderSection> {
   void initState() {
     myNotifier1 = MyNotifier(appBarValueNotifier, context);
-    appBarValueNotifier.addListener(() {
-      setState(() {});
-    });
+    appBarValueNotifier.addListener(_onValueChanged);
     super.initState();
+  }
+
+  void _onValueChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    appBarValueNotifier.removeListener(_onValueChanged);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isMobile = Breakpoints.isMobile(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Container(
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.symmetric(
@@ -52,23 +62,14 @@ class _HeaderSectionState extends State<HeaderSection> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          if (isMobile)...[
-            _buildMobileMenuIcon(),
-            SizedBox(width: 16,)
-          ],
+          if (isMobile) ...[_buildMobileMenuIcon(), SizedBox(width: 16)],
 
           // Logo - responsive sizing
           _buildResponsiveLogo(context),
 
           // Navigation - show drawer icon on mobile, nav buttons on tablet+
-
-          if (!isMobile)...[
-            Spacer(),
-            _buildDesktopNavigation(),
-
-          ],
+          if (!isMobile) ...[Spacer(), _buildDesktopNavigation()],
           Spacer(),
-
 
           // Authentication buttons - always show but responsive
           _buildAuthenticationButtons(),
@@ -79,7 +80,7 @@ class _HeaderSectionState extends State<HeaderSection> {
 
   Widget _buildResponsiveLogo(BuildContext context) {
     final bool isMobile = Breakpoints.isMobile(context);
-    
+
     return Image.asset(
       "lib/assets/images/bidr_logo1.png",
       fit: BoxFit.contain,
@@ -101,7 +102,7 @@ class _HeaderSectionState extends State<HeaderSection> {
 
   Widget _buildDesktopNavigation() {
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Wrap(
       runSpacing: spacing.spacingMedium,
       children: [
@@ -191,29 +192,28 @@ class _HeaderSectionState extends State<HeaderSection> {
         },
         transitionBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
-            position: Tween<Offset>(
-              begin: Offset(-1, 0),
-              end: Offset(0, 0),
-            ).animate(CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeInOut,
-            )),
+            position: Tween<Offset>(begin: Offset(-1, 0), end: Offset(0, 0))
+                .animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                ),
             child: child,
           );
         },
       );
     }
   }
-  
+
   Widget buildMobileDrawer(BuildContext context, Function setState) {
     final spacing = ResponsiveSpacing.getSpacing(context);
     final typography = ResponsiveTypography.getTypography(context);
-    
-    return Container(
 
+    return Container(
       decoration: BoxDecoration(
-          color: Colors.white,
-        borderRadius: BorderRadius.only(topRight: Radius.circular(16),bottomRight: Radius.circular(16))
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
       ),
       child: SafeArea(
         child: Column(
@@ -224,30 +224,35 @@ class _HeaderSectionState extends State<HeaderSection> {
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
                 border: Border(
-                  bottom: BorderSide(
-                    color: Colors.grey[300]!,
-                    width: 1,
-                  ),
+                  bottom: BorderSide(color: Colors.grey[300]!, width: 1),
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(CupertinoIcons.person_alt_circle_fill,size: 50, color:  Constants.ftaColorLight, weight: 2,),
-                      SizedBox(height: spacing.spacingMedium,),
-                      Text(
-                        Constants.myEmail==""?"guest@gmail.com": Constants.myEmail,
-                        style: GoogleFonts.manrope(
-                          color:  Constants.ftaColorLight,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                  if (Constants.isLoggedIn == true)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          CupertinoIcons.person_alt_circle_fill,
+                          size: 50,
+                          color: Constants.ftaColorLight,
+                          weight: 2,
                         ),
-                      )
-                    ],
-                  ),
+                        SizedBox(height: spacing.spacingMedium),
+                        Text(
+                          Constants.myEmail == ""
+                              ? "guest@gmail.com"
+                              : Constants.myEmail,
+                          style: GoogleFonts.manrope(
+                            color: Constants.ftaColorLight,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   Spacer(),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -260,7 +265,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                 ],
               ),
             ),
-            
+
             // Navigation Items
             Expanded(
               child: ListView(
@@ -354,23 +359,18 @@ class _HeaderSectionState extends State<HeaderSection> {
                 ],
               ),
             ),
-            
+
             // Authentication Button at Bottom
             Container(
               width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.all(spacing.paddingLarge),
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(
-                    color: Colors.grey[300]!,
-                    width: 1,
-                  ),
+                  top: BorderSide(color: Colors.grey[300]!, width: 1),
                 ),
               ),
               child: Row(
-                children: [
-                  Expanded(child: _buildAuthenticationButtons()),
-                ],
+                children: [Expanded(child: _buildAuthenticationButtons())],
               ),
             ),
           ],
@@ -378,7 +378,7 @@ class _HeaderSectionState extends State<HeaderSection> {
       ),
     );
   }
-  
+
   Widget _buildDrawerItem({
     required BuildContext context,
     required IconData icon,
@@ -389,15 +389,20 @@ class _HeaderSectionState extends State<HeaderSection> {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
     final bool isSelected = index == Constants.buyerAppBarValue;
-    
+
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: spacing.marginSmall,
         vertical: 0,
       ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(topRight: Radius.circular(36),bottomRight: Radius.circular(36)),
-        color: isSelected ? Constants.ftaColorLight.withOpacity(0.1) : Colors.transparent,
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(36),
+          bottomRight: Radius.circular(36),
+        ),
+        color: isSelected
+            ? Constants.ftaColorLight.withOpacity(0.1)
+            : Colors.transparent,
       ),
       child: ListTile(
         onTap: onTap,
@@ -432,12 +437,11 @@ class _HeaderSectionState extends State<HeaderSection> {
     );
   }
 
-
   Widget _buildAuthenticationButtons() {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
     final bool isMobile = Breakpoints.isMobile(context);
-    
+
     // Check if user is logged in and get role
     final bool isLoggedIn = Constants.currentUser != null;
     final String? userRole = Constants.currentUser?.role;
@@ -458,10 +462,14 @@ class _HeaderSectionState extends State<HeaderSection> {
               elevation: 3,
               //minimumSize: Size(MediaQuery.of(context).size.width, 45),
               padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? spacing.paddingMedium : spacing.paddingLarge,
+                horizontal: isMobile
+                    ? spacing.paddingMedium
+                    : spacing.paddingLarge,
                 vertical: spacing.paddingSmall,
               ),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
             ),
             child: Text(
               Constants.myDisplayname,
@@ -469,42 +477,57 @@ class _HeaderSectionState extends State<HeaderSection> {
             ),
           );
         case 'buyer':
-          return ElevatedButton(
-            onPressed: () {
-              if (mounted) {
-                Constants.buyerAppBarValue = 6;
-                appBarValueNotifier.value++;
-                buyerHomeValueNotifier.value++;
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Constants.ctaColorLight,
-              foregroundColor: Colors.white,
-              elevation: 3,
-             // minimumSize: Size(MediaQuery.of(context).size.width, 45),
-              padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? spacing.paddingMedium : spacing.paddingLarge,
-                vertical: spacing.paddingSmall,
+          return Container(
+            constraints: BoxConstraints(maxWidth: 250, maxHeight: 55),
+            child: ElevatedButton(
+              onPressed: () {
+                if (mounted) {
+                  Constants.buyerAppBarValue = 6;
+                  appBarValueNotifier.value++;
+                  buyerHomeValueNotifier.value++;
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Constants.ctaColorLight,
+                foregroundColor: Colors.white,
+                elevation: 3,
+                // minimumSize: Size(MediaQuery.of(context).size.width, 45),
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile
+                      ? spacing.paddingMedium
+                      : spacing.paddingLarge,
+                  vertical: spacing.paddingSmall,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
               ),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-            ),
-            child: Text(
-              Constants.myDisplayname,
-              style: GoogleFonts.manrope(fontSize: typography.normal),
+              child: Text(
+                Constants.myDisplayname,
+                style: GoogleFonts.manrope(
+                  fontSize: typography.normal,
+                  color: Colors.black,
+                ),
+                maxLines: 1,
+
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           );
         default:
           return SizedBox(
-              //width: MediaQuery.of(context).size.width,
-              height: 45,
-              child: _buildLoginButton());
+            //width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.width < 800 ? 35 : 40,
+            child: _buildLoginButton(),
+          );
       }
     } else {
       // User is not logged in - show login button
       return SizedBox(
-       // width: MediaQuery.of(context).size.width,
-          height: 45,
-          child: _buildLoginButton());
+        // width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.width < 800 ? 35 : 40,
+        child: _buildLoginButton(),
+      );
     }
   }
 
@@ -512,7 +535,7 @@ class _HeaderSectionState extends State<HeaderSection> {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
     final bool isMobile = Breakpoints.isMobile(context);
-    
+
     return ElevatedButton(
       onPressed: () => context.go('/login'),
       style: ElevatedButton.styleFrom(
@@ -522,12 +545,13 @@ class _HeaderSectionState extends State<HeaderSection> {
           horizontal: isMobile ? spacing.paddingMedium : spacing.paddingLarge,
           vertical: spacing.paddingSmall,
         ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: Text(
         'Login',
         style: GoogleFonts.manrope(
-          color: Colors.white,
+          color: Colors.black,
+          fontWeight: FontWeight.w600,
           fontSize: typography.normal,
         ),
       ),
@@ -557,7 +581,7 @@ class _HeaderSectionState extends State<HeaderSection> {
   Widget _navButton(String text, int index, VoidCallback onPressed) {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: spacing.paddingSmall),
       child: Row(

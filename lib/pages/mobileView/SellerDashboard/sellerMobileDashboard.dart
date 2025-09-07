@@ -1,4 +1,3 @@
-
 import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/pages/mobileView/SellerDashboard/profileManagementMobile.dart';
 import 'package:bidr/pages/mobileView/SellerDashboard/ratingReviewsMobile.dart';
@@ -25,7 +24,6 @@ import '../../buyer_home.dart';
 import '../buyerDashboard/shareMobile.dart';
 import 'enterPinMobile.dart';
 
-
 enum LeadStatus { open, closed, unsuccessful, pending, inProgress }
 
 class SellerDashboard extends StatefulWidget {
@@ -42,7 +40,8 @@ class _SellerDashboardState extends State<SellerDashboard>
   int selectedSubIndex = 0; // For transaction history tabs
   bool isPinVerifiedSuccessful = false;
   bool _isLoadingNotifications = false;
-  final NotificationApiService _notificationApiService = NotificationApiService();
+  final NotificationApiService _notificationApiService =
+      NotificationApiService();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _commentsController = TextEditingController();
 
@@ -168,8 +167,8 @@ class _SellerDashboardState extends State<SellerDashboard>
 
     _slideAnimation = Tween<Offset>(begin: Offset(0.3, 0), end: Offset.zero)
         .animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     _fadeController.forward();
     _slideController.forward();
@@ -635,7 +634,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           _buildNavItem(
-                                () {
+                            () {
                               print('Dashboard tab clicked');
                               setState(() {
                                 tabActiveIndex = 0;
@@ -646,7 +645,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                             tabActiveIndex == 0 ? true : false,
                           ),
                           _buildNavItem(
-                                () {
+                            () {
                               setState(() {
                                 tabActiveIndex = 1;
                               });
@@ -656,7 +655,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                             tabActiveIndex == 1 ? true : false,
                           ),
                           _buildNavItem(
-                                () {
+                            () {
                               setState(() {
                                 tabActiveIndex = 2;
                               });
@@ -666,7 +665,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                             tabActiveIndex == 2 ? true : false,
                           ),
                           _buildNavItem(
-                                () {
+                            () {
                               setState(() {
                                 tabActiveIndex = 3;
                               });
@@ -676,7 +675,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                             tabActiveIndex == 3 ? true : false,
                           ),
                           _buildNavItem(
-                                () {
+                            () {
                               setState(() {
                                 tabActiveIndex = 4;
                               });
@@ -686,7 +685,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                             tabActiveIndex == 4 ? true : false,
                           ),
                           _buildNavItem(
-                                () {
+                            () {
                               setState(() {
                                 tabActiveIndex = 5;
                               });
@@ -824,7 +823,8 @@ class _SellerDashboardState extends State<SellerDashboard>
       // Use the user's UUID from Constants
       final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
       if (userUuid.isNotEmpty) {
-        final fetchedNotifications = await _notificationApiService.getUserNotifications(userUuid);
+        final fetchedNotifications = await _notificationApiService
+            .getUserNotifications(userUuid);
         if (mounted) {
           setState(() {
             notifications = fetchedNotifications;
@@ -860,7 +860,7 @@ class _SellerDashboardState extends State<SellerDashboard>
           title: 'Request Accept',
           body: 'John Doe has accepted the concern. He help...',
           description:
-          'John Doe has accepted the concern. He will help you with your request.',
+              'John Doe has accepted the concern. He will help you with your request.',
           type: 'accept',
           read: false,
           createdAt: DateTime.now(),
@@ -870,7 +870,7 @@ class _SellerDashboardState extends State<SellerDashboard>
           title: 'Bank Details Update Succesfully',
           body: 'Lorem ipsum is a placeholder text commonly',
           description:
-          'Lorem ipsum is a placeholder text commonly used in the printing industry.',
+              'Lorem ipsum is a placeholder text commonly used in the printing industry.',
           type: 'update',
           read: false,
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -880,7 +880,7 @@ class _SellerDashboardState extends State<SellerDashboard>
           title: 'Your Profile Is Update Succesfully',
           body: 'Lorem ipsum is a placeholder text commonly',
           description:
-          'Lorem ipsum is a placeholder text commonly used in the printing industry.',
+              'Lorem ipsum is a placeholder text commonly used in the printing industry.',
           type: 'update',
           read: true,
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -890,7 +890,7 @@ class _SellerDashboardState extends State<SellerDashboard>
           title: 'Seller Profile Update Succesfully',
           body: 'Lorem ipsum is a placeholder text commonly',
           description:
-          'Lorem ipsum is a placeholder text commonly used in the printing industry.',
+              'Lorem ipsum is a placeholder text commonly used in the printing industry.',
           type: 'update',
           read: true,
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -900,7 +900,7 @@ class _SellerDashboardState extends State<SellerDashboard>
           title: 'New Order Received',
           body: 'You have received a new order from customer',
           description:
-          'You have received a new order from customer. Please check your dashboard.',
+              'You have received a new order from customer. Please check your dashboard.',
           type: 'order',
           read: false,
           createdAt: DateTime.now().subtract(const Duration(days: 3)),
@@ -1057,10 +1057,7 @@ class _SellerDashboardState extends State<SellerDashboard>
               const SizedBox(height: 8),
               Text(
                 'Loading notifications...',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -1075,18 +1072,11 @@ class _SellerDashboardState extends State<SellerDashboard>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.notifications_none,
-                color: Colors.grey[400],
-                size: 24,
-              ),
+              Icon(Icons.notifications_none, color: Colors.grey[400], size: 24),
               const SizedBox(height: 4),
               Text(
                 'No notifications yet',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -1120,7 +1110,7 @@ class _SellerDashboardState extends State<SellerDashboard>
               ),
             ),
             ...entry.value.map(
-                  (notification) =>
+              (notification) =>
                   _buildNotificationItem(notification, isCompact: true),
             ),
           ],
@@ -1140,9 +1130,9 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   Widget _buildNotificationItem(
-      WebNotification notification, {
-        bool isCompact = false,
-      }) {
+    WebNotification notification, {
+    bool isCompact = false,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -1548,9 +1538,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                         try {
                           // Create or get conversation for this request
                           final conversationData =
-                          await ChatService.createOrGetConversationForRequest(
-                            uuid,
-                          );
+                              await ChatService.createOrGetConversationForRequest(
+                                uuid,
+                              );
 
                           // Close loading dialog
                           Navigator.of(context).pop();
@@ -1567,7 +1557,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                                       description: description,
                                     ),
                                     messages:
-                                    [], // Empty - will be loaded from backend
+                                        [], // Empty - will be loaded from backend
                                   ),
                                 ),
                               ),
@@ -1799,7 +1789,7 @@ class _SellerDashboardState extends State<SellerDashboard>
           builder: (context, constraints) {
             final double itemWidth =
                 (constraints.maxWidth - 32) /
-                    3; // 3 items per row with 16px spacing
+                3; // 3 items per row with 16px spacing
 
             return Wrap(
               spacing: 16,
@@ -1940,7 +1930,7 @@ class _SellerDashboardState extends State<SellerDashboard>
           builder: (context, constraints) {
             final double itemWidth =
                 (constraints.maxWidth - 32) /
-                    3; // 3 items per row with 16px spacing
+                3; // 3 items per row with 16px spacing
 
             return Wrap(
               spacing: 16,
@@ -1973,10 +1963,10 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   // Updated card design to match screenshot
   Widget _buildOriginalLeadCard(
-      Map<String, dynamic> request,
-      int requestNumber, {
-        String? buttonText,
-      }) {
+    Map<String, dynamic> request,
+    int requestNumber, {
+    String? buttonText,
+  }) {
     final requestId = request['request_id'] ?? '';
     final title = request['title'] ?? "";
     final description = request['description'] ?? '';
@@ -2132,9 +2122,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                         onPressed: _hasUserFlaggedRequest(request)
                             ? () => _viewFlagDialog(context, request)
                             : () {
-                          // Handle flag action
-                          _showFlagDialog(context, request);
-                        },
+                                // Handle flag action
+                                _showFlagDialog(context, request);
+                              },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _hasUserFlaggedRequest(request)
                               ? Color(0xFFFFEBEE)
@@ -2203,9 +2193,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                       try {
                         // Create or get conversation for this request
                         final conversationData =
-                        await ChatService.createOrGetConversationForRequest(
-                          requestId,
-                        );
+                            await ChatService.createOrGetConversationForRequest(
+                              requestId,
+                            );
 
                         // Close loading dialog
                         Navigator.of(context).pop();
@@ -2222,7 +2212,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                                     description: description,
                                   ),
                                   messages:
-                                  [], // Empty - will be loaded from backend
+                                      [], // Empty - will be loaded from backend
                                 ),
                               ),
                             ),
@@ -2981,9 +2971,9 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   Future<void> _handleSubmitBid(
-      BuildContext context,
-      Map<String, dynamic> request,
-      ) async {
+    BuildContext context,
+    Map<String, dynamic> request,
+  ) async {
     // Validate inputs
     final priceText = _priceController.text.trim();
     if (priceText.isEmpty) {
@@ -3171,55 +3161,55 @@ class _SellerDashboardState extends State<SellerDashboard>
                 // Verify button
                 isPinVerifiedSuccessful
                     ? SizedBox(
-                  width: double.infinity,
-                  height: 40,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Constants.ctaColorLight,
-                      foregroundColor: Colors.white,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(36),
-                      ),
-                    ),
-                    child: Text(
-                      'Verify',
-                      style: GoogleFonts.manrope(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                )
+                        width: double.infinity,
+                        height: 40,
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Constants.ctaColorLight,
+                            foregroundColor: Colors.white,
+                            elevation: 3,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(36),
+                            ),
+                          ),
+                          child: Text(
+                            'Verify',
+                            style: GoogleFonts.manrope(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      )
                     : SizedBox(
-                  width: double.infinity,
-                  height: 40,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        isPinVerifiedSuccessful = true;
-                        Navigator.pop(context);
-                        showPinDialog(context: context);
-                      });
-                    },
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      foregroundColor: Constants.ctaColorLight,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(36),
+                        width: double.infinity,
+                        height: 40,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            setState(() {
+                              isPinVerifiedSuccessful = true;
+                              Navigator.pop(context);
+                              showPinDialog(context: context);
+                            });
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Constants.ctaColorLight,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(36),
+                            ),
+                          ),
+                          child: Text(
+                            'Re-Enter the PIN',
+                            style: GoogleFonts.manrope(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Re-Enter the PIN',
-                      style: GoogleFonts.manrope(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -3796,11 +3786,11 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   Widget _buildNavItem(
-      VoidCallback voidCallBack,
-      IconData icon,
-      String title,
-      bool isActive,
-      ) {
+    VoidCallback voidCallBack,
+    IconData icon,
+    String title,
+    bool isActive,
+  ) {
     return GestureDetector(
       onTap: voidCallBack,
       child: Container(
@@ -3825,13 +3815,13 @@ class _SellerDashboardState extends State<SellerDashboard>
             isActive ? SizedBox(width: 8) : SizedBox.shrink(),
             isActive
                 ? Container(
-              height: 12,
-              width: 12,
-              decoration: BoxDecoration(
-                color: Constants.ftaColorLight,
-                shape: BoxShape.circle,
-              ),
-            )
+                    height: 12,
+                    width: 12,
+                    decoration: BoxDecoration(
+                      color: Constants.ftaColorLight,
+                      shape: BoxShape.circle,
+                    ),
+                  )
                 : SizedBox.shrink(),
           ],
         ),
@@ -3886,7 +3876,7 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   Widget _buildMainContent() {
     switch (selectedIndex) {
-    // This is now the first and default widget
+      // This is now the first and default widget
       case 0:
         return _buildRevenueTracker();
       case 1:
@@ -4316,7 +4306,7 @@ class _SellerDashboardState extends State<SellerDashboard>
               child: Column(
                 children: List.generate(
                   3,
-                      (index) => TweenAnimationBuilder<double>(
+                  (index) => TweenAnimationBuilder<double>(
                     tween: Tween<double>(begin: 0, end: 1),
                     duration: Duration(milliseconds: 300 + (index * 100)),
                     curve: Curves.easeOutBack,
@@ -4765,11 +4755,11 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   Widget _buildPricingCard(
-      String title,
-      String price,
-      String period,
-      List<String> features,
-      ) {
+    String title,
+    String price,
+    String period,
+    List<String> features,
+  ) {
     return Container(
       padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -4828,28 +4818,28 @@ class _SellerDashboardState extends State<SellerDashboard>
           ...features
               .map(
                 (feature) => Padding(
-              padding: EdgeInsets.symmetric(vertical: 6),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.check,
-                    color: Constants.ctaColorLight,
-                    size: 16,
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      feature,
-                      style: GoogleFonts.manrope(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+                  padding: EdgeInsets.symmetric(vertical: 6),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check,
+                        color: Constants.ctaColorLight,
+                        size: 16,
                       ),
-                    ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          feature,
+                          style: GoogleFonts.manrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          )
+                ),
+              )
               .toList(),
           SizedBox(height: 24),
           SizedBox(
@@ -4910,9 +4900,9 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   void _showRequestInfoDialog(
-      BuildContext context,
-      Map<String, dynamic> request,
-      ) {
+    BuildContext context,
+    Map<String, dynamic> request,
+  ) {
     final requestId = request['request_id']?.toString() ?? '';
     final title = request['title']?.toString() ?? '';
     final description = request['description']?.toString() ?? '';
@@ -4999,27 +4989,27 @@ class _SellerDashboardState extends State<SellerDashboard>
                               vehicleSparesData.isNotEmpty
                                   ? vehicleSparesData
                                   : {
-                                'VIN Number': 'Not specified',
-                                'Manufacturer': 'Not specified',
-                                'Make & Model': title.isNotEmpty
-                                    ? title
-                                    : 'Not specified',
-                                'Year': 'Not specified',
-                                'Type': 'Not specified',
-                                'Condition':
-                                conditionPreference.isNotEmpty
-                                    ? conditionPreference
-                                    .replaceAll('_', ' ')
-                                    .toLowerCase()
-                                    .split(' ')
-                                    .map(
-                                      (word) => word.isNotEmpty
-                                      ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                      : word,
-                                )
-                                    .join(' ')
-                                    : 'Not specified',
-                              },
+                                      'VIN Number': 'Not specified',
+                                      'Manufacturer': 'Not specified',
+                                      'Make & Model': title.isNotEmpty
+                                          ? title
+                                          : 'Not specified',
+                                      'Year': '',
+                                      'Type': 'Not specified',
+                                      'Condition':
+                                          conditionPreference.isNotEmpty
+                                          ? conditionPreference
+                                                .replaceAll('_', ' ')
+                                                .toLowerCase()
+                                                .split(' ')
+                                                .map(
+                                                  (word) => word.isNotEmpty
+                                                      ? '${word[0].toUpperCase()}${word.substring(1)}'
+                                                      : word,
+                                                )
+                                                .join(' ')
+                                          : 'Not specified',
+                                    },
                             ),
                           ),
                           SizedBox(width: 16),
@@ -5031,11 +5021,11 @@ class _SellerDashboardState extends State<SellerDashboard>
                               Colors.orange,
                               {
                                 'Part Name/Description':
-                                vehicleSparesSummary.isNotEmpty
+                                    vehicleSparesSummary.isNotEmpty
                                     ? vehicleSparesSummary
                                     : (title.isNotEmpty
-                                    ? title
-                                    : 'Not specified'),
+                                          ? title
+                                          : 'Not specified'),
                                 'Quantity': quantity.isNotEmpty
                                     ? quantity
                                     : 'Not specified',
@@ -5044,15 +5034,15 @@ class _SellerDashboardState extends State<SellerDashboard>
                                     : 'Not specified',
                                 'Urgency': urgencyTimeline.isNotEmpty
                                     ? urgencyTimeline
-                                    .replaceAll('_', ' ')
-                                    .toLowerCase()
-                                    .split(' ')
-                                    .map(
-                                      (word) => word.isNotEmpty
-                                      ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                      : word,
-                                )
-                                    .join(' ')
+                                          .replaceAll('_', ' ')
+                                          .toLowerCase()
+                                          .split(' ')
+                                          .map(
+                                            (word) => word.isNotEmpty
+                                                ? '${word[0].toUpperCase()}${word.substring(1)}'
+                                                : word,
+                                          )
+                                          .join(' ')
                                     : 'Not specified',
                                 'Description': description.isNotEmpty
                                     ? description
@@ -5075,9 +5065,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                                 'Request ID': requestNumber,
                                 'Created': createdAt.isNotEmpty
                                     ? DateTime.tryParse(
-                                  createdAt,
-                                )?.toString().split(' ')[0] ??
-                                    createdAt
+                                            createdAt,
+                                          )?.toString().split(' ')[0] ??
+                                          createdAt
                                     : 'Not specified',
                                 'Category': category
                                     .replaceAll('_', ' ')
@@ -5085,9 +5075,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                                     .split(' ')
                                     .map(
                                       (word) => word.isNotEmpty
-                                      ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                      : word,
-                                )
+                                          ? '${word[0].toUpperCase()}${word.substring(1)}'
+                                          : word,
+                                    )
                                     .join(' '),
                               },
                             ),
@@ -5184,8 +5174,8 @@ class _SellerDashboardState extends State<SellerDashboard>
                                   title.isNotEmpty
                                       ? title
                                       : (description.isNotEmpty
-                                      ? description
-                                      : 'No title provided'),
+                                            ? description
+                                            : 'No title provided'),
                                   style: GoogleFonts.manrope(
                                     fontSize: 14,
                                     color: Colors.black87,
@@ -5208,9 +5198,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                                         .split(' ')
                                         .map(
                                           (word) => word.isNotEmpty
-                                          ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                          : word,
-                                    )
+                                              ? '${word[0].toUpperCase()}${word.substring(1)}'
+                                              : word,
+                                        )
                                         .join(' '),
                                     style: GoogleFonts.manrope(
                                       fontSize: 12,
@@ -5247,15 +5237,15 @@ class _SellerDashboardState extends State<SellerDashboard>
                                       'Category',
                                       category.isNotEmpty
                                           ? category
-                                          .replaceAll('_', ' ')
-                                          .toLowerCase()
-                                          .split(' ')
-                                          .map(
-                                            (word) => word.isNotEmpty
-                                            ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                            : word,
-                                      )
-                                          .join(' ')
+                                                .replaceAll('_', ' ')
+                                                .toLowerCase()
+                                                .split(' ')
+                                                .map(
+                                                  (word) => word.isNotEmpty
+                                                      ? '${word[0].toUpperCase()}${word.substring(1)}'
+                                                      : word,
+                                                )
+                                                .join(' ')
                                           : 'Not specified',
                                     ),
                                     if (electronicsData['brand'] != null)
@@ -5274,7 +5264,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                                       _buildDetailItem(
                                         'Tyre Brand',
                                         tyresRimsData['tyre_brand']
-                                            ?.toString() ??
+                                                ?.toString() ??
                                             'Not specified',
                                       ),
                                     _buildDetailItem(
@@ -5292,9 +5282,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                                             .split(' ')
                                             .map(
                                               (word) => word.isNotEmpty
-                                              ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                              : word,
-                                        )
+                                                  ? '${word[0].toUpperCase()}${word.substring(1)}'
+                                                  : word,
+                                            )
                                             .join(' '),
                                       ),
                                   ],
@@ -5332,15 +5322,15 @@ class _SellerDashboardState extends State<SellerDashboard>
                                       'Urgency Required',
                                       urgencyTimeline.isNotEmpty
                                           ? urgencyTimeline
-                                          .replaceAll('_', ' ')
-                                          .toLowerCase()
-                                          .split(' ')
-                                          .map(
-                                            (word) => word.isNotEmpty
-                                            ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                            : word,
-                                      )
-                                          .join(' ')
+                                                .replaceAll('_', ' ')
+                                                .toLowerCase()
+                                                .split(' ')
+                                                .map(
+                                                  (word) => word.isNotEmpty
+                                                      ? '${word[0].toUpperCase()}${word.substring(1)}'
+                                                      : word,
+                                                )
+                                                .join(' ')
                                           : 'Not specified',
                                     ),
                                   ],
@@ -5367,19 +5357,19 @@ class _SellerDashboardState extends State<SellerDashboard>
                                       ...productSpecifications.entries
                                           .map(
                                             (entry) => _buildDetailItem(
-                                          entry.key
-                                              .toString()
-                                              .replaceAll('_', ' ')
-                                              .split(' ')
-                                              .map(
-                                                (word) => word.isNotEmpty
-                                                ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                                : word,
+                                              entry.key
+                                                  .toString()
+                                                  .replaceAll('_', ' ')
+                                                  .split(' ')
+                                                  .map(
+                                                    (word) => word.isNotEmpty
+                                                        ? '${word[0].toUpperCase()}${word.substring(1)}'
+                                                        : word,
+                                                  )
+                                                  .join(' '),
+                                              entry.value.toString(),
+                                            ),
                                           )
-                                              .join(' '),
-                                          entry.value.toString(),
-                                        ),
-                                      )
                                           .toList(),
                                     if (description.isNotEmpty)
                                       _buildDetailItem(
@@ -5459,10 +5449,10 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   Widget _buildVehicleDetailCard(
-      String title,
-      Color titleColor,
-      Map<String, dynamic> data,
-      ) {
+    String title,
+    Color titleColor,
+    Map<String, dynamic> data,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -5511,6 +5501,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      SizedBox(height: 12),
                       Text(
                         entry.key
                             .toString()
@@ -5518,9 +5509,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                             .split(' ')
                             .map(
                               (word) => word.isNotEmpty
-                              ? '${word[0].toUpperCase()}${word.substring(1)}'
-                              : word,
-                        )
+                                  ? '${word[0].toUpperCase()}${word.substring(1)}'
+                                  : word,
+                            )
                             .join(' '),
                         style: GoogleFonts.manrope(
                           fontSize: 12,

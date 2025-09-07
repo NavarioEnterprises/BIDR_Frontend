@@ -120,15 +120,58 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: Padding(
+          padding: EdgeInsets.only(left: 20),
+          child: GestureDetector(
+            onTap: () {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              } else {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/dashboard',
+                  (route) => false,
+                );
+              }
+            },
+            child: Container(
+              margin: EdgeInsets.only(top: 8, bottom: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_new,
+                color: Color(0xFF1B3B5C),
+                size: 18,
+              ),
+            ),
+          ),
+        ),
+
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(0.0),
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-            border: Border.all(
-              color: Constants.gtaColorLight,
-              width: (MediaQuery.of(context).size.width > 800) ? 20 : 0,
-            ),
+            border: MediaQuery.of(context).size.width > 800
+                ? Border.all(
+                    color: Constants.gtaColorLight,
+                    width: (MediaQuery.of(context).size.width > 800) ? 20 : 0,
+                  )
+                : null,
           ),
           child: Row(
             children: [
@@ -417,7 +460,7 @@ class ResponsiveLoginPage extends StatelessWidget {
       builder: (context, constraints) {
         if (constraints.maxWidth < 600) {
           // Mobile layout
-          return const MobileLoginPage();
+          return const LoginPage();
         } else {
           // Desktop/tablet layout
           return const LoginPage();

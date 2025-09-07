@@ -2559,3 +2559,146 @@ class NotificationDialog extends StatelessWidget {
     }
   }
 }
+
+class SellerDashboardGrid extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Text(
+              'Seller Dashboard',
+              style: GoogleFonts.manrope(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1B3B5C),
+              ),
+            ),
+            SizedBox(height: 40),
+
+            // Dashboard Cards Grid
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20,
+                childAspectRatio: 1.2,
+                children: [
+                  _buildDashboardCard(
+                    title: 'My Bookkeeper',
+                    icon: Icons.description,
+                    onTap: () {
+                      // Navigate to bookkeeper
+                    },
+                  ),
+                  _buildDashboardCard(
+                    title: 'Support (BIDR)',
+                    icon: Icons.headset_mic,
+                    onTap: () {
+                      // Navigate to support
+                    },
+                  ),
+                  _buildDashboardCard(
+                    title: 'Refer a Friend/\nBusiness',
+                    icon: Icons.person_add,
+                    onTap: () {
+                      // Navigate to referral
+                    },
+                  ),
+                  _buildDashboardCard(
+                    title: 'Review & Rating\nManager',
+                    icon: Icons.star,
+                    onTap: () {
+                      // Navigate to reviews
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDashboardCard({
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFE8B366), Color(0xFFD4964A)],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Color(0xFFE8B366).withOpacity(0.3),
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top row with icon and arrow
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(icon, color: Colors.white, size: 24),
+                  ),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
+                ],
+              ),
+
+              Spacer(),
+
+              // Title
+              Text(
+                title,
+                style: GoogleFonts.manrope(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  height: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

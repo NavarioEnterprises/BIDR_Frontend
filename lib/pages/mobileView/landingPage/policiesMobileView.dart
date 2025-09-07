@@ -16,49 +16,43 @@ class PoliciesMobileScreen extends StatefulWidget {
   State<PoliciesMobileScreen> createState() => _PoliciesMobileScreenState();
 }
 
-class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with TickerProviderStateMixin {
+class _PoliciesMobileScreenState extends State<PoliciesMobileScreen>
+    with TickerProviderStateMixin {
   late TabController _tabController;
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
-  
+
   int _selectedTab = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    
+
     _fadeController = AnimationController(
       duration: Duration(milliseconds: 800),
       vsync: this,
     );
-    
+
     _slideController = AnimationController(
       duration: Duration(milliseconds: 600),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
-    
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
+
+    _slideAnimation = Tween<Offset>(begin: Offset(0, 0.1), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
+
     _fadeController.forward();
     _slideController.forward();
-    
+
     _tabController.addListener(() {
       setState(() {
         _selectedTab = _tabController.index;
@@ -77,22 +71,10 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
   @override
   Widget build(BuildContext context) {
     final bool isMobile = Breakpoints.isMobile(context);
-    
-    // This widget should ONLY be used on mobile devices
-    if (!isMobile) {
-      return Container(
-        child: Center(
-          child: Text(
-            'This view is only available on mobile devices',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          ),
-        ),
-      );
-    }
-    
+
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Column(
@@ -116,7 +98,7 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
             },
           ),
           SizedBox(height: spacing.spacingLarge),
-          
+
           // Main Content
           Expanded(
             child: SlideTransition(
@@ -178,7 +160,7 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
                         ],
                       ),
                     ),
-                    
+
                     // Tab Selection - Mobile Only
                     Container(
                       margin: EdgeInsets.symmetric(
@@ -187,7 +169,7 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
                       ),
                       child: _buildMobileTabSelector(typography, spacing),
                     ),
-                    
+
                     // Content Area
                     Container(
                       width: MediaQuery.of(context).size.width,
@@ -197,12 +179,16 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
                       constraints: BoxConstraints(maxWidth: 1200),
                       child: AnimatedSwitcher(
                         duration: Duration(milliseconds: 300),
-                        child: _buildTabContent(_selectedTab, typography, spacing),
+                        child: _buildTabContent(
+                          _selectedTab,
+                          typography,
+                          spacing,
+                        ),
                       ),
                     ),
-                    
+
                     SizedBox(height: spacing.spacingLarge * 2),
-                    
+
                     // Footer
                     TweenAnimationBuilder<double>(
                       duration: Duration(milliseconds: 1200),
@@ -212,7 +198,9 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
                           opacity: value,
                           child: Transform.translate(
                             offset: Offset(0, 20 * (1 - value)),
-                            child: FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
+                            child: FooterSection(
+                              logo: "lib/assets/images/bidr_logo2.png",
+                            ),
                           ),
                         );
                       },
@@ -227,7 +215,10 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
     );
   }
 
-  Widget _buildMobileTabSelector(TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildMobileTabSelector(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return Container(
       height: 40,
       decoration: BoxDecoration(
@@ -240,7 +231,7 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         itemBuilder: (context, index) {
           final isSelected = _selectedTab == index;
           final labels = ['Terms', 'Privacy', 'Returns', 'Sellers'];
-          
+
           return GestureDetector(
             onTap: () {
               _tabController.animateTo(index);
@@ -253,7 +244,9 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
                 vertical: spacing.paddingSmall,
               ),
               decoration: BoxDecoration(
-                color: isSelected ? Constants.ctaColorLight : Colors.transparent,
+                color: isSelected
+                    ? Constants.ctaColorLight
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(36),
               ),
               child: Center(
@@ -273,8 +266,11 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
     );
   }
 
-
-  Widget _buildTabContent(int index, TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildTabContent(
+    int index,
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     switch (index) {
       case 0:
         return _buildTermsOfService(typography, spacing);
@@ -289,7 +285,10 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
     }
   }
 
-  Widget _buildTermsOfService(TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildTermsOfService(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -303,7 +302,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedCheckmarkBadge01,
           title: '1. Acceptance of Terms',
-          content: 'By accessing and using BIDR marketplace platform, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.',
+          content:
+              'By accessing and using BIDR marketplace platform, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.',
           typography: typography,
           spacing: spacing,
           delay: 0,
@@ -311,7 +311,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedUser,
           title: '2. User Registration',
-          content: '• You must provide accurate and complete information during registration\n'
+          content:
+              '• You must provide accurate and complete information during registration\n'
               '• You are responsible for maintaining the security of your account\n'
               '• Email verification is mandatory for platform access\n'
               '• Business sellers must complete additional verification',
@@ -322,7 +323,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedComputer,
           title: '3. Platform Usage',
-          content: '• BIDR facilitates connections between buyers and sellers\n'
+          content:
+              '• BIDR facilitates connections between buyers and sellers\n'
               '• We do not own or control products listed on the platform\n'
               '• Users must comply with all applicable laws and regulations\n'
               '• Prohibited activities include fraud, spam, and harassment',
@@ -333,7 +335,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedShoppingCart01,
           title: '4. Transaction Process',
-          content: '• All transactions use our secure PIN verification system\n'
+          content:
+              '• All transactions use our secure PIN verification system\n'
               '• Payments are held in escrow until PIN exchange\n'
               '• Both parties must complete PIN exchange for payment release\n'
               '• Escrow periods: 7 days (parts), 14 days (electronics), 21 days (custom items)',
@@ -344,7 +347,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedMoney01,
           title: '5. Fees and Payments',
-          content: '• Sellers pay a commission on successful transactions\n'
+          content:
+              '• Sellers pay a commission on successful transactions\n'
               '• Payment processing fees may apply\n'
               '• All fees are clearly disclosed before transaction completion\n'
               '• Payments processed through PayFast/Stripe',
@@ -355,7 +359,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedJusticeScale01,
           title: '6. Dispute Resolution',
-          content: '• Disputes should first be resolved between buyer and seller\n'
+          content:
+              '• Disputes should first be resolved between buyer and seller\n'
               '• BIDR provides mediation services when needed\n'
               '• Admin decisions on disputes are final\n'
               '• Evidence including chat history and photos may be reviewed',
@@ -366,7 +371,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedAlert02,
           title: '7. Limitation of Liability',
-          content: 'BIDR is not liable for:\n'
+          content:
+              'BIDR is not liable for:\n'
               '• Quality or condition of products\n'
               '• Actions of users on the platform\n'
               '• Indirect or consequential damages\n'
@@ -378,7 +384,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedCancel01,
           title: '8. Termination',
-          content: '• We may suspend or terminate accounts for violations\n'
+          content:
+              '• We may suspend or terminate accounts for violations\n'
               '• Users may close their accounts at any time\n'
               '• Outstanding transactions must be completed before closure\n'
               '• Some data may be retained for legal compliance',
@@ -390,7 +397,10 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
     );
   }
 
-  Widget _buildPrivacyPolicy(TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildPrivacyPolicy(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -404,7 +414,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedDatabase,
           title: '1. Information We Collect',
-          content: '• Personal Information: Name, email, phone number, address\n'
+          content:
+              '• Personal Information: Name, email, phone number, address\n'
               '• Business Information: Company details, tax information\n'
               '• Transaction Data: Purchase history, quotes, communications\n'
               '• Technical Data: IP address, browser type, device information',
@@ -415,7 +426,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedDataRecovery,
           title: '2. How We Use Your Information',
-          content: '• To facilitate transactions between buyers and sellers\n'
+          content:
+              '• To facilitate transactions between buyers and sellers\n'
               '• To verify user identity and prevent fraud\n'
               '• To send transaction-related communications\n'
               '• To improve our services and user experience\n'
@@ -427,7 +439,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedShare01,
           title: '3. Information Sharing',
-          content: 'We share information with:\n'
+          content:
+              'We share information with:\n'
               '• Other users (as necessary for transactions)\n'
               '• Payment processors (PayFast/Stripe)\n'
               '• Azure services for infrastructure\n'
@@ -439,7 +452,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedLock,
           title: '4. Data Security',
-          content: '• We use industry-standard encryption\n'
+          content:
+              '• We use industry-standard encryption\n'
               '• JWT tokens for authentication\n'
               '• Secure Azure infrastructure\n'
               '• Regular security audits and updates\n'
@@ -451,7 +465,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedUserSettings01,
           title: '5. Your Rights',
-          content: '• Access your personal information\n'
+          content:
+              '• Access your personal information\n'
               '• Correct inaccurate data\n'
               '• Request data deletion (subject to legal requirements)\n'
               '• Opt-out of marketing communications\n'
@@ -463,7 +478,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedCookie,
           title: '6. Cookies and Tracking',
-          content: '• We use cookies for authentication and preferences\n'
+          content:
+              '• We use cookies for authentication and preferences\n'
               '• Analytics to improve services\n'
               '• You can control cookie settings in your browser\n'
               '• Essential cookies required for platform functionality',
@@ -474,7 +490,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedClock01,
           title: '7. Data Retention',
-          content: '• Active account data retained while account is open\n'
+          content:
+              '• Active account data retained while account is open\n'
               '• Transaction records kept for 7 years (legal requirement)\n'
               '• Chat history retained for 1 year\n'
               '• Deleted account data removed after 30 days',
@@ -485,7 +502,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedMail01,
           title: '8. Contact Us',
-          content: 'For privacy concerns or requests:\n'
+          content:
+              'For privacy concerns or requests:\n'
               'Email: privacy@bidr.co.za\n'
               'Phone: Support line available Mon-Fri 9AM-5PM\n'
               'Address: BIDR Privacy Office, South Africa',
@@ -497,7 +515,10 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
     );
   }
 
-  Widget _buildReturnPolicy(TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildReturnPolicy(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -511,7 +532,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedReturnRequest,
           title: '1. Return Eligibility',
-          content: '• Returns must be initiated within the escrow period\n'
+          content:
+              '• Returns must be initiated within the escrow period\n'
               '• Vehicle Parts: 7 days from PIN exchange\n'
               '• Electronics: 14 days from PIN exchange\n'
               '• Custom/High-value items: 21 days from PIN exchange\n'
@@ -523,7 +545,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedCheckUnread02,
           title: '2. Valid Return Reasons',
-          content: '• Item not as described in listing\n'
+          content:
+              '• Item not as described in listing\n'
               '• Defective or damaged product\n'
               '• Wrong item delivered\n'
               '• Missing parts or accessories\n'
@@ -535,7 +558,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedWorkflowSquare03,
           title: '3. Return Process',
-          content: '1. Initiate return in the app within escrow period\n'
+          content:
+              '1. Initiate return in the app within escrow period\n'
               '2. Provide detailed reason for return\n'
               '3. Upload photos documenting the issue\n'
               '4. Coordinate return shipping with seller\n'
@@ -548,7 +572,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedDeliveryBox01,
           title: '4. Return Shipping',
-          content: '• Buyer pays return shipping for change of mind\n'
+          content:
+              '• Buyer pays return shipping for change of mind\n'
               '• Seller pays return shipping for defective items\n'
               '• Original shipping costs non-refundable\n'
               '• Use tracked shipping for protection\n'
@@ -560,7 +585,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedMoneyReceive01,
           title: '5. Refund Process',
-          content: '• Refunds processed after seller confirms receipt\n'
+          content:
+              '• Refunds processed after seller confirms receipt\n'
               '• Full refund for defective or wrong items\n'
               '• Partial refunds may apply for other reasons\n'
               '• Refunds issued to original payment method\n'
@@ -572,7 +598,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedCancelCircle,
           title: '6. Non-Returnable Items',
-          content: '• Custom-made or personalized items\n'
+          content:
+              '• Custom-made or personalized items\n'
               '• Items damaged due to misuse\n'
               '• Installed parts (unless defective)\n'
               '• Items returned after escrow period\n'
@@ -584,7 +611,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedComplaint,
           title: '7. Dispute Resolution',
-          content: '• Seller has 48 hours to respond to return request\n'
+          content:
+              '• Seller has 48 hours to respond to return request\n'
               '• If no agreement reached, escalate to BIDR admin\n'
               '• Admin reviews evidence from both parties\n'
               '• Admin decision is final and binding\n'
@@ -596,7 +624,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedShield02,
           title: '8. Warranty Claims',
-          content: '• Manufacturer warranties handled separately\n'
+          content:
+              '• Manufacturer warranties handled separately\n'
               '• Seller warranties as specified in listing\n'
               '• Keep all documentation for warranty claims\n'
               '• BIDR facilitates but doesn\'t guarantee warranties',
@@ -608,7 +637,10 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
     );
   }
 
-  Widget _buildSellerAgreement(TypographyConfig typography, SpacingConfig spacing) {
+  Widget _buildSellerAgreement(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -622,7 +654,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedStore01,
           title: '1. Seller Requirements',
-          content: '• Must complete business verification\n'
+          content:
+              '• Must complete business verification\n'
               '• Provide accurate tax information\n'
               '• Maintain valid business licenses\n'
               '• Respond to buyer inquiries within 24 hours\n'
@@ -634,7 +667,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedTag01,
           title: '2. Listing Standards',
-          content: '• Accurate product descriptions required\n'
+          content:
+              '• Accurate product descriptions required\n'
               '• Clear, high-quality product images\n'
               '• Honest condition assessment\n'
               '• Competitive and fair pricing\n'
@@ -646,7 +680,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedPercentCircle,
           title: '3. Commission Structure',
-          content: '• Standard commission: 8% of transaction value\n'
+          content:
+              '• Standard commission: 8% of transaction value\n'
               '• High-volume sellers: Reduced rates available\n'
               '• Commission charged on successful transactions only\n'
               '• Monthly invoicing for fees\n'
@@ -658,7 +693,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedAgreement01,
           title: '4. Transaction Obligations',
-          content: '• Complete PIN verification at delivery\n'
+          content:
+              '• Complete PIN verification at delivery\n'
               '• Provide receipt and documentation\n'
               '• Package items securely\n'
               '• Meet agreed delivery timelines\n'
@@ -670,7 +706,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedStar,
           title: '5. Quality Standards',
-          content: '• Minimum 4-star rating to remain active\n'
+          content:
+              '• Minimum 4-star rating to remain active\n'
               '• Response rate above 80%\n'
               '• Low dispute rate required\n'
               '• Regular performance reviews\n'
@@ -682,7 +719,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedAlertCircle,
           title: '6. Prohibited Conduct',
-          content: '• No fake reviews or ratings manipulation\n'
+          content:
+              '• No fake reviews or ratings manipulation\n'
               '• No direct contact outside platform\n'
               '• No discriminatory practices\n'
               '• No counterfeit or stolen goods\n'
@@ -694,7 +732,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedShieldUser,
           title: '7. Seller Protection',
-          content: '• Payment guaranteed after PIN verification\n'
+          content:
+              '• Payment guaranteed after PIN verification\n'
               '• Dispute resolution support\n'
               '• Fraud protection measures\n'
               '• Business analytics and insights\n'
@@ -706,7 +745,8 @@ class _PoliciesMobileScreenState extends State<PoliciesMobileScreen> with Ticker
         _buildAnimatedSection(
           icon: HugeIcons.strokeRoundedUserRemove01,
           title: '8. Account Termination',
-          content: '• 30-day notice for voluntary termination\n'
+          content:
+              '• 30-day notice for voluntary termination\n'
               '• Immediate suspension for serious violations\n'
               '• Complete pending transactions before closure\n'
               '• Final fee settlement required\n'

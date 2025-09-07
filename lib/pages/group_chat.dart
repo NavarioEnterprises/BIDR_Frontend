@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+import '../global_values.dart';
 import '../models/request_models.dart';
 import '../models/moderation_models.dart';
 import '../services/chat_service.dart';
@@ -28,6 +31,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   List<ChatMessage> _backendMessages = [];
   bool _isLoading = false;
   bool _useBackend = true; // Toggle between backend and local messages
+
+  // File attachment handling
+  bool _isUploadingAttachment = false;
+  static const int maxFileSize = 10 * 1024 * 1024; // 10MB in bytes
 
   // Moderation state
   UserModerationStatus? _userModerationStatus;
@@ -281,6 +288,620 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     _messageController.clear();
   }
 
+  // Handle file attachment
+  Future<void> _handleAttachment() async {
+    try {
+      // Show file type selection dialog
+      final String? selectedType = await _showAttachmentTypeDialog();
+      if (selectedType == null) return;
+
+      FilePickerResult? result;
+      List<String> allowedExtensions = [];
+      String messageType = 'file';
+
+      switch (selectedType) {
+        case 'image':
+          allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+          messageType = 'image';
+          result = await FilePicker.platform.pickFiles(
+            type: FileType.custom,
+            allowedExtensions: allowedExtensions,
+            allowMultiple: false,
+          );
+          break;
+        case 'document':
+          allowedExtensions = ['pdf', 'doc', 'docx', 'txt', 'rtf'];
+          messageType = 'file';
+          result = await FilePicker.platform.pickFiles(
+            type: FileType.custom,
+            allowedExtensions: allowedExtensions,
+            allowMultiple: false,
+          );
+          break;
+        case 'audio':
+          allowedExtensions = ['mp3', 'wav', 'aac', 'm4a', 'ogg'];
+          messageType = 'audio';
+          result = await FilePicker.platform.pickFiles(
+            type: FileType.custom,
+            allowedExtensions: allowedExtensions,
+            allowMultiple: false,
+          );
+          break;
+        default:
+          return;
+      }
+
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.first;
+
+        // Check file size (10MB limit)
+        if (file.size > maxFileSize) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('File size must be less than 10MB'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+
+        // Check if file extension is allowed
+        final fileExtension = file.extension?.toLowerCase();
+        if (fileExtension == null ||
+            !allowedExtensions.contains(fileExtension)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('File type not supported'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+
+        await _uploadAttachment(file, messageType);
+      }
+    } catch (e) {
+      print('Error picking file: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error selecting file. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // Upload attachment to backend
+  Future<void> _uploadAttachment(PlatformFile file, String messageType) async {
+    setState(() {
+      _isUploadingAttachment = true;
+    });
+
+    try {
+      if (_useBackend && _backendConversation != null) {
+        // Upload to backend
+        final result = await ChatService.sendAttachment(
+          _backendConversation!.id,
+          file,
+          messageType: messageType,
+        );
+
+        if (result['success'] == true) {
+          // Reload messages to get the new attachment message
+          await _loadMessages();
+          _scrollToBottom();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Failed to upload attachment'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
+        // Fallback to local message (for demo purposes)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Attachment uploaded (local mode)'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error uploading attachment: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to upload attachment. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isUploadingAttachment = false;
+      });
+    }
+  }
+
+  // Show dialog to select attachment type
+  Future<String?> _showAttachmentTypeDialog() async {
+    return await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Select Attachment Type',
+            style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.image, color: Colors.blue),
+                title: Text('Images'),
+                subtitle: Text('JPG, PNG, GIF (Max 10MB)'),
+                onTap: () => Navigator.of(context).pop('image'),
+              ),
+              ListTile(
+                leading: Icon(Icons.description, color: Colors.red),
+                title: Text('Documents'),
+                subtitle: Text('PDF, DOC, TXT (Max 10MB)'),
+                onTap: () => Navigator.of(context).pop('document'),
+              ),
+              ListTile(
+                leading: Icon(Icons.audiotrack, color: Colors.green),
+                title: Text('Audio'),
+                subtitle: Text('MP3, WAV, M4A (Max 10MB)'),
+                onTap: () => Navigator.of(context).pop('audio'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Build message content based on message type
+  Widget _buildMessageContent(
+    String content,
+    String messageType, {
+    bool isReply = false,
+    List<dynamic>? attachments,
+  }) {
+    switch (messageType.toLowerCase()) {
+      case 'image':
+        return _buildImageContent(
+          content,
+          isReply: isReply,
+          attachments: attachments,
+        );
+      case 'file':
+        return _buildFileContent(
+          content,
+          isReply: isReply,
+          attachments: attachments,
+        );
+      case 'audio':
+        return _buildAudioContent(
+          content,
+          isReply: isReply,
+          attachments: attachments,
+        );
+      case 'video':
+        return _buildVideoContent(
+          content,
+          isReply: isReply,
+          attachments: attachments,
+        );
+      default:
+        return Text(
+          content,
+          style: GoogleFonts.manrope(
+            color: Colors.black87,
+            fontSize: isReply ? 12 : 14,
+            fontWeight: FontWeight.w400,
+          ),
+        );
+    }
+  }
+
+  // Build image attachment content
+  Widget _buildImageContent(
+    String content, {
+    bool isReply = false,
+    List<dynamic>? attachments,
+  }) {
+    if (attachments != null && attachments.isNotEmpty) {
+      final attachment = attachments.first;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: isReply ? 200 : 300,
+                maxHeight: isReply ? 150 : 200,
+              ),
+              child: Image.network(
+                '${GlobalVariables.chatServiceUrl}${attachment['file']}',
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    height: isReply ? 150 : 200,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: isReply ? 100 : 150,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.broken_image,
+                          size: 40,
+                          color: Colors.grey[400],
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Image failed to load',
+                          style: GoogleFonts.manrope(
+                            color: Colors.grey[600],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          if (content.contains('Attachment:')) ...[
+            SizedBox(height: 4),
+            Text(
+              content.replaceAll('Attachment: ', ''),
+              style: GoogleFonts.manrope(
+                color: Colors.grey[600],
+                fontSize: isReply ? 10 : 12,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ],
+      );
+    }
+
+    // Fallback for image messages without attachments
+    return Row(
+      children: [
+        Icon(Icons.image, color: Colors.blue, size: isReply ? 16 : 20),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            content,
+            style: GoogleFonts.manrope(
+              color: Colors.black87,
+              fontSize: isReply ? 12 : 14,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Build file attachment content
+  Widget _buildFileContent(
+    String content, {
+    bool isReply = false,
+    List<dynamic>? attachments,
+  }) {
+    if (attachments != null && attachments.isNotEmpty) {
+      final attachment = attachments.first;
+      final fileType = attachment['file_type'] ?? 'document';
+      final fileName = attachment['filename'] ?? 'Unknown file';
+      final fileSize = attachment['file_size_display'] ?? '';
+
+      IconData fileIcon;
+      Color iconColor;
+
+      switch (fileType) {
+        case 'document':
+          fileIcon = Icons.description;
+          iconColor = Colors.red;
+          break;
+        case 'archive':
+          fileIcon = Icons.archive;
+          iconColor = Colors.orange;
+          break;
+        default:
+          fileIcon = Icons.attach_file;
+          iconColor = Colors.grey;
+      }
+
+      return Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey[300]!),
+        ),
+        child: Row(
+          children: [
+            Icon(fileIcon, color: iconColor, size: isReply ? 20 : 24),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    fileName,
+                    style: GoogleFonts.manrope(
+                      color: Colors.black87,
+                      fontSize: isReply ? 12 : 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (fileSize.isNotEmpty) ...[
+                    SizedBox(height: 2),
+                    Text(
+                      fileSize,
+                      style: GoogleFonts.manrope(
+                        color: Colors.grey[600],
+                        fontSize: isReply ? 10 : 12,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Icon(
+              Icons.download,
+              color: Colors.grey[600],
+              size: isReply ? 16 : 20,
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Fallback for file messages without attachments
+    return Row(
+      children: [
+        Icon(Icons.attach_file, color: Colors.grey, size: isReply ? 16 : 20),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            content,
+            style: GoogleFonts.manrope(
+              color: Colors.black87,
+              fontSize: isReply ? 12 : 14,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Build audio attachment content
+  Widget _buildAudioContent(
+    String content, {
+    bool isReply = false,
+    List<dynamic>? attachments,
+  }) {
+    if (attachments != null && attachments.isNotEmpty) {
+      final attachment = attachments.first;
+      final fileName = attachment['filename'] ?? 'Unknown audio';
+      final fileSize = attachment['file_size_display'] ?? '';
+      final duration = attachment['duration'];
+
+      return Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.green[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.green[300]!),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.audiotrack,
+              color: Colors.green,
+              size: isReply ? 20 : 24,
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    fileName,
+                    style: GoogleFonts.manrope(
+                      color: Colors.black87,
+                      fontSize: isReply ? 12 : 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 2),
+                  Row(
+                    children: [
+                      if (duration != null) ...[
+                        Text(
+                          '${duration}s',
+                          style: GoogleFonts.manrope(
+                            color: Colors.grey[600],
+                            fontSize: isReply ? 10 : 12,
+                          ),
+                        ),
+                        if (fileSize.isNotEmpty)
+                          Text(
+                            ' • ',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                      ],
+                      if (fileSize.isNotEmpty)
+                        Text(
+                          fileSize,
+                          style: GoogleFonts.manrope(
+                            color: Colors.grey[600],
+                            fontSize: isReply ? 10 : 12,
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.play_arrow,
+              color: Colors.green,
+              size: isReply ? 20 : 24,
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Fallback for audio messages without attachments
+    return Row(
+      children: [
+        Icon(Icons.audiotrack, color: Colors.green, size: isReply ? 16 : 20),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            content,
+            style: GoogleFonts.manrope(
+              color: Colors.black87,
+              fontSize: isReply ? 12 : 14,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Build video attachment content
+  Widget _buildVideoContent(
+    String content, {
+    bool isReply = false,
+    List<dynamic>? attachments,
+  }) {
+    if (attachments != null && attachments.isNotEmpty) {
+      final attachment = attachments.first;
+      final fileName = attachment['filename'] ?? 'Unknown video';
+      final fileSize = attachment['file_size_display'] ?? '';
+      final duration = attachment['duration'];
+
+      return Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.purple[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.purple[300]!),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.videocam, color: Colors.purple, size: isReply ? 20 : 24),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    fileName,
+                    style: GoogleFonts.manrope(
+                      color: Colors.black87,
+                      fontSize: isReply ? 12 : 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 2),
+                  Row(
+                    children: [
+                      if (duration != null) ...[
+                        Text(
+                          '${duration}s',
+                          style: GoogleFonts.manrope(
+                            color: Colors.grey[600],
+                            fontSize: isReply ? 10 : 12,
+                          ),
+                        ),
+                        if (fileSize.isNotEmpty)
+                          Text(
+                            ' • ',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                      ],
+                      if (fileSize.isNotEmpty)
+                        Text(
+                          fileSize,
+                          style: GoogleFonts.manrope(
+                            color: Colors.grey[600],
+                            fontSize: isReply ? 10 : 12,
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.play_arrow,
+              color: Colors.purple,
+              size: isReply ? 20 : 24,
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Fallback for video messages without attachments
+    return Row(
+      children: [
+        Icon(Icons.videocam, color: Colors.purple, size: isReply ? 16 : 20),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            content,
+            style: GoogleFonts.manrope(
+              color: Colors.black87,
+              fontSize: isReply ? 12 : 14,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Color _getUserColor(String role) {
     switch (role) {
       case "Buyer":
@@ -403,13 +1024,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         width: 1,
                       ),
                     ),
-                    child: Text(
+                    child: _buildMessageContent(
                       message.content,
-                      style: GoogleFonts.manrope(
-                        color: Colors.black87,
-                        fontSize: isReply ? 12 : 14,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      'text', // Local messages are always text for now
+                      isReply: isReply,
+                      attachments:
+                          null, // Local messages don't have attachments yet
                     ),
                   ),
 
@@ -553,13 +1173,11 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         width: 1,
                       ),
                     ),
-                    child: Text(
+                    child: _buildMessageContent(
                       message.content,
-                      style: GoogleFonts.manrope(
-                        color: Colors.black87,
-                        fontSize: isReply ? 12 : 14,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      message.messageType,
+                      isReply: isReply,
+                      attachments: message.attachments,
                     ),
                   ),
                 ],
@@ -643,7 +1261,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       ],
                     ),
                     Text(
-                      "UUID: ${widget.groupChat.uuid}",
+                      "UUID: ${(widget.groupChat.uuid?.isNotEmpty == true ? widget.groupChat.uuid!.substring(0, widget.groupChat.uuid!.length < 8 ? widget.groupChat.uuid!.length : 8) : 'N/A').toUpperCase()}",
                       style: GoogleFonts.manrope(
                         color: Constants.ftaColorLight,
                         fontSize: 16,
@@ -719,14 +1337,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         children: [
                           // Attachment Button
                           IconButton(
-                            onPressed: () {
-                              // Handle attachment
-                            },
-                            icon: Icon(
-                              Icons.attach_file,
-                              color: Colors.grey[600],
-                              size: 20,
-                            ),
+                            onPressed: _isUploadingAttachment
+                                ? null
+                                : _handleAttachment,
+                            icon: _isUploadingAttachment
+                                ? SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.grey[600],
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.attach_file,
+                                    color: Colors.grey[600],
+                                    size: 20,
+                                  ),
                           ),
 
                           // Text Input

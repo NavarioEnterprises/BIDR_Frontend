@@ -203,15 +203,19 @@ Let's grow together and enjoy exclusive benefits! 💰
               children: [
                 Expanded(
                   child: isLoading
-                      ? SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Constants.ftaColorLight,
+                      ? Row(
+                          children: [
+                            SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Constants.ftaColorLight,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         )
                       : Text(
                           _referralCode?.code ?? 'Loading...',

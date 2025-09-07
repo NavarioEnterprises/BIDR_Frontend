@@ -125,7 +125,7 @@ class ApiService {
         'product_specifications': jsonEncode(vehicleSparesData),
         'terms_accepted': 'true',
         'contact_consent': 'true',
-        'buyer_id': '2', // Use testuser ID for now
+        'buyer_id': Constants.myUid, // Use testuser ID for now
         'auth_user_uid': Constants.myUid,
       });
 
@@ -393,7 +393,7 @@ class ApiService {
         'consumer_electronics_data': jsonEncode(electronicsData),
         'terms_accepted': 'true',
         'contact_consent': 'true',
-        'buyer_id': '2',
+        'buyer_id': Constants.myUid,
         'auth_user_uid': Constants.myUid, // Add auth user UID from Constants
       });
 

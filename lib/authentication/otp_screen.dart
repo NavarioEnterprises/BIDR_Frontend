@@ -394,7 +394,7 @@ class _BidrOTPVerificationScreenState extends State<BidrOTPVerificationScreen>
                                   Row(
                                     children: [
                                       IconButton(
-                                        onPressed: () => Navigator.pop(context),
+                                        onPressed: () => Navigator.pop(context, {'action': 'back'}),
                                         style: IconButton.styleFrom(
                                           backgroundColor: Colors.white,
                                           foregroundColor:
@@ -536,7 +536,7 @@ class _BidrOTPVerificationScreenState extends State<BidrOTPVerificationScreen>
                             Row(
                               children: [
                                 IconButton(
-                                  onPressed: () => Navigator.pop(context),
+                                  onPressed: () => Navigator.pop(context, {'action': 'back'}),
                                   style: IconButton.styleFrom(
                                     backgroundColor: Colors.white,
                                     foregroundColor: Constants.ftaColorLight,

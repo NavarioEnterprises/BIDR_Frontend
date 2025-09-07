@@ -1,5 +1,3 @@
-
-
 import 'dart:async';
 import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/customWdget/customCard.dart';
@@ -65,32 +63,37 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
   int dashboardIndex = 0;
   bool isActive = false;
   bool _isSidebarCollapsed = true;
-  
+
   // Pagination for requests grid
   int _currentPage = 0;
   final int _itemsPerPage = 2;
 
-  
   List<dynamic> get _paginatedRequests {
     List<dynamic> allRequests = [
       ...GlobalVariables.combinedRequest.autoSparesRequest,
       ...GlobalVariables.combinedRequest.rimTyreRequest,
       ...GlobalVariables.combinedRequest.consumerElectronicsRequest,
     ];
-    
+
     final startIndex = _currentPage * _itemsPerPage;
     final endIndex = (startIndex + _itemsPerPage).clamp(0, allRequests.length);
-    
-    return allRequests.sublist(startIndex.clamp(0, allRequests.length), endIndex);
+
+    return allRequests.sublist(
+      startIndex.clamp(0, allRequests.length),
+      endIndex,
+    );
   }
-  
+
   int get _totalPages {
-    List<dynamic> allRequests =[
+    List<dynamic> allRequests = [
       ...GlobalVariables.combinedRequest.autoSparesRequest,
       ...GlobalVariables.combinedRequest.rimTyreRequest,
       ...GlobalVariables.combinedRequest.consumerElectronicsRequest,
     ];
-    return (allRequests.length / _itemsPerPage).ceil().clamp(1, double.infinity).toInt();
+    return (allRequests.length / _itemsPerPage)
+        .ceil()
+        .clamp(1, double.infinity)
+        .toInt();
   }
 
   // Start auto-refresh timer for background updates every 20 seconds
@@ -124,178 +127,43 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
       builder: (context, typography, spacing) {
-        return Stack(
-          children: [
-            // Main Content Area (Full Width)
-            Positioned.fill(
-              child: ResponsiveContainer(
-                paddingType: SpacingType.medium,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header with Menu Toggle
-                    _buildMobileHeader(typography, spacing),
-                    ResponsiveGap(type: SpacingType.medium),
-                    
-                    // Content
-                    Expanded(
-                      child: _buildContent(dashboardIndex,typography, spacing),
-                    ),
-                  ],
-                ),
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(height: 580, child: MobileBuyerDashboardGrid()),
+              Container(
+                height: 800,
+                child: _buildContent(dashboardIndex, typography, spacing),
               ),
-            ),
-            
-            // Drawer Sidebar Overlay
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 300),
-              left: _isSidebarCollapsed ? -220 : 0,
-              top: 0,
-              bottom: 0,
-              width: 220,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Constants.ftaColorLight,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 15,
-                      offset: const Offset(2, 0),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    ResponsiveGap(type: SpacingType.large),
-                    
-                    // Sidebar Header
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: spacing.paddingMedium,
-                        vertical: spacing.paddingSmall,
-                      ),
-                      child: Row(
-                        children: [
-                          ResponsiveText(
-                            text: 'Menu',
-                            type: TextType.medium,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                          const Spacer(),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                _isSidebarCollapsed = true;
-                              });
-                            },
-                            icon: Icon(
-                              HugeIcons.strokeRoundedCancel01,
-                              color: Colors.white70,
-                              size: 18,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                    ResponsiveGap(type: SpacingType.small),
-                    
-                    // Navigation Items
-                    _buildSidebarNavItem(
-                      () {
-                        setState(() {
-                          dashboardIndex = 0;
-                          _currentPage = 0; // Reset pagination
-                          _isSidebarCollapsed = true; // Close drawer
-                        });
-                        _fetchProductRequests();
-                      },
-                      HugeIcons.strokeRoundedDashboardSquare01,
-                      "My Dashboard",
-                      dashboardIndex == 0,
-                    ),
-                    _buildSidebarNavItem(
-                      () {
-                        setState(() {
-                          dashboardIndex = 1;
-                          _isSidebarCollapsed = true; // Close drawer
-                        });
-                      },
-                      HugeIcons.strokeRoundedShare01,
-                      "Share",
-                      dashboardIndex == 1,
-                    ),
-                    _buildSidebarNavItem(
-                      () {
-                        setState(() {
-                          dashboardIndex = 2;
-                          _isSidebarCollapsed = true; // Close drawer
-                        });
-                        _refreshTransactionManagement();
-                      },
-                      HugeIcons.strokeRoundedTransaction,
-                      "Transactions",
-                      dashboardIndex == 2,
-                    ),
-                    _buildSidebarNavItem(
-                      () {
-                        setState(() {
-                          dashboardIndex = 3;
-                          _isSidebarCollapsed = true; // Close drawer
-                        });
-                      },
-                      HugeIcons.strokeRoundedUserAccount,
-                      "Account",
-                      dashboardIndex == 3,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            
-            // Overlay when sidebar is open
-            /*if (!_isSidebarCollapsed)
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isSidebarCollapsed = true;
-                    });
-                  },
-                  child: Container(
-                    color: Colors.black.withOpacity(0.3),
-                  ),
-                ),
-              ),*/
-          ],
+            ],
+          ),
         );
       },
     );
   }
-  
+
   // Drawer toggle moved to header - old collapse button removed
-  
+
   Widget _buildSidebarNavItem(
-      VoidCallback onTap,
-      IconData icon,
-      String title,
-      bool isSelected,
-      ) {
+    VoidCallback onTap,
+    IconData icon,
+    String title,
+    bool isSelected,
+  ) {
     final Color iconColor = isSelected ? Colors.white : Colors.white70;
-    final Color backgroundColor = isSelected 
-        ? Colors.white.withOpacity(0.15) 
+    final Color backgroundColor = isSelected
+        ? Colors.white.withOpacity(0.15)
         : Colors.transparent;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: _isSidebarCollapsed 
-          ? BorderRadius.circular(360) 
+      borderRadius: _isSidebarCollapsed
+          ? BorderRadius.circular(360)
           : BorderRadius.only(
               topRight: Radius.circular(36),
               bottomRight: Radius.circular(36),
@@ -305,24 +173,20 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: _isSidebarCollapsed 
-              ? BorderRadius.circular(360) 
+          borderRadius: _isSidebarCollapsed
+              ? BorderRadius.circular(360)
               : BorderRadius.only(
                   topRight: Radius.circular(36),
                   bottomRight: Radius.circular(36),
                 ),
-          border: isSelected 
+          border: isSelected
               ? Border.all(color: Colors.white.withOpacity(0.2), width: 1)
               : null,
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: iconColor,
-              size: 20,
-            ),
-            if (!_isSidebarCollapsed)...[
+            Icon(icon, color: iconColor, size: 20),
+            if (!_isSidebarCollapsed) ...[
               SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -340,12 +204,15 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       ),
     );
   }
-  
-  Widget _buildMobileHeader(TypographyConfig typography, SpacingConfig spacing) {
+
+  Widget _buildMobileHeader(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     String title = '';
     switch (dashboardIndex) {
       case 0:
-        title = 'My Dashboard';
+        title = 'My Dashboard1';
         break;
       case 1:
         title = 'Refer a Friend/Business';
@@ -357,7 +224,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
         title = 'Account';
         break;
     }
-    
+
     return Row(
       children: [
         // Hamburger Menu Icon
@@ -373,14 +240,11 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
             size: 18,
           ),
           padding: EdgeInsets.all(spacing.paddingSmall),
-          constraints: BoxConstraints(
-            minWidth: 35,
-            minHeight: 35,
-          ),
+          constraints: BoxConstraints(minWidth: 35, minHeight: 35),
         ),
-        
+
         SizedBox(width: spacing.spacingSmall),
-        
+
         // Title
         Expanded(
           child: ResponsiveText(
@@ -393,8 +257,12 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       ],
     );
   }
-  
-  Widget _buildContent(int index, TypographyConfig typography, SpacingConfig spacing) {
+
+  Widget _buildContent(
+    int index,
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     switch (index) {
       case 0:
         return _buildMobileRequestsGrid(typography, spacing);
@@ -408,8 +276,11 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
         return Container();
     }
   }
-  
-  Widget _buildMobileRequestsGrid(TypographyConfig typography, SpacingConfig spacing) {
+
+  Widget _buildMobileRequestsGrid(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     if (_isLoading) {
       return Center(
         child: Column(
@@ -497,10 +368,11 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
     return Column(
       children: [
         // Filter and Sort Controls (if needed)
-        if (allRequests.length > _itemsPerPage) _buildPaginationInfo(typography),
-        
+        if (allRequests.length > _itemsPerPage)
+          _buildPaginationInfo(typography),
+
         ResponsiveGap(type: SpacingType.medium),
-        
+
         // Requests List (Vertical, up to 2 items)
         Expanded(
           child: ListView.builder(
@@ -509,27 +381,35 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
               final request = paginatedRequests[index];
               // Calculate global index for request numbering
               final globalIndex = (_currentPage * _itemsPerPage) + index + 1;
-              return _buildMobileRequestCard(request, globalIndex, typography, spacing);
+              return _buildMobileRequestCard(
+                request,
+                globalIndex,
+                typography,
+                spacing,
+              );
             },
           ),
         ),
-        
+
         // Pagination Controls
         if (totalPages > 1) _buildPaginationControls(typography, spacing),
       ],
     );
   }
-  
+
   Widget _buildPaginationInfo(TypographyConfig typography) {
     List<dynamic> allRequests = [
       ...GlobalVariables.combinedRequest.autoSparesRequest,
       ...GlobalVariables.combinedRequest.rimTyreRequest,
       ...GlobalVariables.combinedRequest.consumerElectronicsRequest,
     ];
-    
+
     final start = (_currentPage * _itemsPerPage) + 1;
-    final end = ((_currentPage + 1) * _itemsPerPage).clamp(1, allRequests.length);
-    
+    final end = ((_currentPage + 1) * _itemsPerPage).clamp(
+      1,
+      allRequests.length,
+    );
+
     return ResponsiveText(
       text: '$start-$end of ${allRequests.length} requests',
       type: TextType.normal,
@@ -537,8 +417,11 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       fontWeight: FontWeight.w300,
     );
   }
-  
-  Widget _buildPaginationControls(TypographyConfig typography, SpacingConfig spacing) {
+
+  Widget _buildPaginationControls(
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return ResponsiveContainer(
       paddingType: SpacingType.small,
       child: Row(
@@ -546,16 +429,18 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
         children: [
           // Previous Button
           _buildPaginationButton(
-            onTap: _currentPage > 0 ? () {
-              setState(() {
-                _currentPage--;
-              });
-            } : null,
+            onTap: _currentPage > 0
+                ? () {
+                    setState(() {
+                      _currentPage--;
+                    });
+                  }
+                : null,
             icon: HugeIcons.strokeRoundedArrowLeft02,
             typography: typography,
             spacing: spacing,
           ),
-          
+
           // Page Info
           ResponsiveText(
             text: '${_currentPage + 1} of $_totalPages',
@@ -563,14 +448,16 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
             fontWeight: FontWeight.w400,
             color: Constants.ctaColorLight,
           ),
-          
+
           // Next Button
           _buildPaginationButton(
-            onTap: _currentPage < _totalPages - 1 ? () {
-              setState(() {
-                _currentPage++;
-              });
-            } : null,
+            onTap: _currentPage < _totalPages - 1
+                ? () {
+                    setState(() {
+                      _currentPage++;
+                    });
+                  }
+                : null,
             icon: HugeIcons.strokeRoundedArrowRight02,
             typography: typography,
             spacing: spacing,
@@ -580,7 +467,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       ),
     );
   }
-  
+
   Widget _buildPaginationButton({
     required VoidCallback? onTap,
     required IconData icon,
@@ -589,7 +476,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
     bool isNext = false,
   }) {
     final isEnabled = onTap != null;
-    
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -599,17 +486,21 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
           vertical: spacing.paddingSmall,
         ),
         decoration: BoxDecoration(
-          color: isEnabled ? Constants.ctaColorLight.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+          color: isEnabled
+              ? Constants.ctaColorLight.withOpacity(0.1)
+              : Colors.grey.withOpacity(0.1),
           borderRadius: BorderRadius.circular(360),
           border: Border.all(
-            color: isEnabled ? Constants.ctaColorLight : Colors.grey.withOpacity(0.3),
+            color: isEnabled
+                ? Constants.ctaColorLight
+                : Colors.grey.withOpacity(0.3),
             width: 1,
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (!isNext)...[
+            if (!isNext) ...[
               Icon(
                 icon,
                 size: 16,
@@ -617,7 +508,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
               ),
               SizedBox(width: spacing.spacingSmall),
             ],
-            if (isNext)...[
+            if (isNext) ...[
               SizedBox(width: spacing.spacingSmall),
               Icon(
                 icon,
@@ -630,8 +521,13 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       ),
     );
   }
-  
-  Widget _buildMobileRequestCard(dynamic request, int index, TypographyConfig typography, SpacingConfig spacing) {
+
+  Widget _buildMobileRequestCard(
+    dynamic request,
+    int index,
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     final bids = _getSortedBids(request);
     final hasMoreThanTwoBids = bids.length > 2;
     final bidsToShow = bids.take(2).toList();
@@ -701,17 +597,13 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                     ),
                   SizedBox(width: 12),
                   // Sort dropdown placeholder for mobile
-                  Icon(
-                    Icons.sort,
-                    color: Colors.grey.shade600,
-                    size: 20,
-                  ),
+                  Icon(Icons.sort, color: Colors.grey.shade600, size: 20),
                 ],
               ),
             ],
           ),
           ResponsiveGap(type: SpacingType.small),
-          
+
           // Description section with orange border
           IntrinsicHeight(
             child: Row(
@@ -744,7 +636,8 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                           ),
                           Spacer(),
                           GestureDetector(
-                            onTap: () => _navigateToDetailScreen(request, index),
+                            onTap: () =>
+                                _navigateToDetailScreen(request, index),
                             child: ResponsiveText(
                               text: "View Details",
                               type: TextType.normal,
@@ -775,9 +668,9 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
               ],
             ),
           ),
-          
+
           ResponsiveGap(type: SpacingType.large),
-          
+
           // Countdown Timer
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -787,7 +680,6 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
               _buildTimerCircle(
                 _getElapsedTime(request.createdAt, 'hours'),
                 "H",
-
               ),
               SizedBox(width: 12),
               _buildTimerCircle(
@@ -798,25 +690,21 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
               _buildTimerCircle(
                 _getElapsedTime(request.createdAt, 'seconds'),
                 "S",
-
               ),
             ],
           ),
-          
+
           ResponsiveGap(type: SpacingType.large),
-          
+
           // Seller Bids Section
           if (bidsToShow.isNotEmpty) ...[
             ...bidsToShow.asMap().entries.map(
-              (entry) => _buildModernSellerBid(
-                entry.value,
-                request,
-                entry.key + 1,
-              ),
+              (entry) =>
+                  _buildModernSellerBid(entry.value, request, entry.key + 1),
             ),
             if (hasMoreThanTwoBids) ...[
               ResponsiveGap(type: SpacingType.medium),
-              _buildViewAllBidsButton(bids.length,),
+              _buildViewAllBidsButton(bids.length),
             ],
           ] else ...[
             Container(
@@ -834,6 +722,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       ),
     );
   }
+
   String _getRequestDescription(dynamic request) {
     try {
       if (request?.category == null) return "No description available";
@@ -865,10 +754,10 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
         if (request.consumerElectronics?.productDetails != null) {
           final typeOfElectronics =
               request.consumerElectronics.productDetails.typeOfElectronics ??
-                  "Electronics";
+              "Electronics";
           final brandPreference =
               request.consumerElectronics.productDetails.brandPreference ??
-                  "Various Brands";
+              "Various Brands";
           final modelSeries =
               request.consumerElectronics.productDetails.modelSeries;
           return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
@@ -879,7 +768,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       // Handle API response category strings
       switch (request.category) {
         case "VEHICLE_SPARES":
-        // Use vehicle_spares_summary from API or fallback to title/description
+          // Use vehicle_spares_summary from API or fallback to title/description
           if (request.vehicleSparesSummary != null &&
               request.vehicleSparesSummary.isNotEmpty) {
             return request.vehicleSparesSummary;
@@ -889,7 +778,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
           return "Vehicle Spares Request";
 
         case "TYRES_RIMS":
-        // Use tyres_rims_summary from API or fallback to title/description
+          // Use tyres_rims_summary from API or fallback to title/description
           if (request.tyresRimsSummary != null &&
               request.tyresRimsSummary.isNotEmpty) {
             return "${request.tyresRimsSummary} - ${request.title ?? 'Tyre/Rim Request'}";
@@ -899,7 +788,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
           return "Tyre/Rim Request";
 
         case "ELECTRONICS":
-        // Use consumer_electronics_summary from API or fallback to title/description
+          // Use consumer_electronics_summary from API or fallback to title/description
           if (request.consumerElectronicsSummary != null &&
               request.consumerElectronicsSummary.isNotEmpty) {
             return request.consumerElectronicsSummary;
@@ -908,7 +797,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
           }
           return "Electronics Request";
 
-      // Legacy categories for backward compatibility
+        // Legacy categories for backward compatibility
         case "Vehicle Spares":
           if (request?.partDetails?.partName != null &&
               request?.vehicleDetails?.makeModel != null &&
@@ -942,7 +831,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
           return "Tyre/Rim Request";
 
         default:
-        // Fallback to title and description from API
+          // Fallback to title and description from API
           if (request.title != null && request.title.isNotEmpty) {
             return "${request.title} - ${request.description ?? 'Request'}";
           }
@@ -953,7 +842,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       return "Request information unavailable";
     }
   }
-  
+
   Color _getStatusColor(String? status) {
     switch (status?.toLowerCase()) {
       case 'active':
@@ -969,7 +858,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
         return Colors.grey;
     }
   }
-  
+
   String _formatDate(String? dateTime) {
     if (dateTime == null) return 'No date';
     try {
@@ -979,12 +868,12 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       return 'Invalid date';
     }
   }
-  
+
   void _handleRequestTap(dynamic request) {
     // Handle request tap - navigate to details or show modal
     final requestId = _getRequestId(request);
     final hasOffers = request?.sellerOffers?.isNotEmpty ?? false;
-    
+
     if (hasOffers) {
       // Show offers modal or navigate to offers view
       _showOffersModal(request);
@@ -993,14 +882,14 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       _showRequestDetailsModal(request);
     }
   }
-  
+
   // Helper method to get lowest bid text
   String _getLowestBidText(dynamic request) {
     try {
       if (request?.sellerOffers == null || request.sellerOffers.isEmpty) {
         return 'No offers yet';
       }
-      
+
       // Sort offers by price to get lowest
       final offers = List.from(request.sellerOffers);
       offers.sort((a, b) {
@@ -1008,14 +897,14 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
         final priceB = double.tryParse(b?.unitPrice?.toString() ?? '0') ?? 0;
         return priceA.compareTo(priceB);
       });
-      
+
       final lowestPrice = offers.first?.unitPrice ?? 0;
       return 'Lowest: \$${lowestPrice.toString()}';
     } catch (e) {
       return 'View offers';
     }
   }
-  
+
   // Show offers modal
   void _showOffersModal(dynamic request) {
     showModalBottomSheet(
@@ -1058,7 +947,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       ),
     );
   }
-  
+
   // Show request details modal
   void _showRequestDetailsModal(dynamic request) {
     showModalBottomSheet(
@@ -1101,12 +990,12 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       ),
     );
   }
-  
+
   String _getRequestDisplayTitle(dynamic request) {
     try {
       // Use category as the main title, or generate a descriptive title
       String category = request?.category ?? 'Product Request';
-      
+
       // Make the category more readable
       switch (category.toLowerCase()) {
         case 'vehicle spares':
@@ -1284,7 +1173,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
           final bidsB = b.sellerOffers?.length ?? 0;
           return bidsA.compareTo(bidsB);
         case 'urgent':
-        // Sort by urgency level
+          // Sort by urgency level
           final urgencyOrder = {
             'ASAP': 0,
             '24_HOURS': 1,
@@ -1312,7 +1201,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       builder: (context, constraints) {
         final double cardWidth =
             (constraints.maxWidth - (horizontalSpacing * (cardsPerRow - 1))) /
-                cardsPerRow;
+            cardsPerRow;
 
         return SingleChildScrollView(
           child: Column(
@@ -1331,12 +1220,12 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
 
   /// Build rows of cards with dynamic heights
   List<Widget> _buildRows(
-      List<dynamic> requests,
-      int cardsPerRow,
-      double cardWidth,
-      double horizontalSpacing,
-      double verticalSpacing,
-      ) {
+    List<dynamic> requests,
+    int cardsPerRow,
+    double cardWidth,
+    double horizontalSpacing,
+    double verticalSpacing,
+  ) {
     List<Widget> rows = [];
 
     for (int i = 0; i < requests.length; i += cardsPerRow) {
@@ -1479,12 +1368,12 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
               'withBids': allRequests
                   .where(
                     (r) => r.sellerOffers != null && r.sellerOffers.isNotEmpty,
-              )
+                  )
                   .length,
               'withoutBids': allRequests
                   .where(
                     (r) => r.sellerOffers == null || r.sellerOffers.isEmpty,
-              )
+                  )
                   .length,
               'vehicleSpares': allRequests
                   .where((r) => r.category == 'VEHICLE_SPARES')
@@ -1569,7 +1458,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                               children: [
                                 Row(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceEvenly,
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Column(
                                       children: [
@@ -1671,24 +1560,24 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                             spacing: 8,
                             runSpacing: 8,
                             children:
-                            [
-                              'All Categories',
-                              'Vehicle Spares',
-                              'Tyres & Rims',
-                              'Electronics',
-                            ]
-                                .map(
-                                  (category) => _buildModernFilterChip(
-                                category,
-                                tempSelectedCategory == category,
-                                    (selected) {
-                                  setDialogState(() {
-                                    tempSelectedCategory = category;
-                                  });
-                                },
-                              ),
-                            )
-                                .toList(),
+                                [
+                                      'All Categories',
+                                      'Vehicle Spares',
+                                      'Tyres & Rims',
+                                      'Electronics',
+                                    ]
+                                    .map(
+                                      (category) => _buildModernFilterChip(
+                                        category,
+                                        tempSelectedCategory == category,
+                                        (selected) {
+                                          setDialogState(() {
+                                            tempSelectedCategory = category;
+                                          });
+                                        },
+                                      ),
+                                    )
+                                    .toList(),
                           ),
 
                           SizedBox(height: 24),
@@ -1715,7 +1604,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                                   title: 'All Status',
                                   count: bidStatistics['total']!,
                                   isSelected:
-                                  tempSelectedStatus == 'All Status',
+                                      tempSelectedStatus == 'All Status',
                                   onTap: () {
                                     setDialogState(() {
                                       tempSelectedStatus = 'All Status';
@@ -1752,7 +1641,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                                   title: 'Without Bids',
                                   count: bidStatistics['withoutBids']!,
                                   isSelected:
-                                  tempSelectedStatus == 'Without Bids',
+                                      tempSelectedStatus == 'Without Bids',
                                   onTap: () {
                                     setDialogState(() {
                                       tempSelectedStatus = 'Without Bids';
@@ -1905,7 +1794,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                   'Newest First',
                   'Show most recent requests first',
                   _sortBy == 'newest',
-                      () {
+                  () {
                     _sortRequests('newest');
                     Navigator.of(context).pop();
                   },
@@ -1915,7 +1804,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                   'Oldest First',
                   'Show oldest requests first',
                   _sortBy == 'oldest',
-                      () {
+                  () {
                     _sortRequests('oldest');
                     Navigator.of(context).pop();
                   },
@@ -1925,7 +1814,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                   'By Category',
                   'Group by request category',
                   _sortBy == 'category',
-                      () {
+                  () {
                     _sortRequests('category');
                     Navigator.of(context).pop();
                   },
@@ -1935,7 +1824,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                   'By Status',
                   'Group by request status',
                   _sortBy == 'status',
-                      () {
+                  () {
                     _sortRequests('status');
                     Navigator.of(context).pop();
                   },
@@ -1949,12 +1838,12 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
   }
 
   Widget _buildModernSortOption(
-      IconData icon,
-      String title,
-      String subtitle,
-      bool isSelected,
-      VoidCallback onTap,
-      ) {
+    IconData icon,
+    String title,
+    String subtitle,
+    bool isSelected,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -2016,10 +1905,10 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
   }
 
   Widget _buildModernFilterChip(
-      String label,
-      bool isSelected,
-      Function(bool) onSelected,
-      ) {
+    String label,
+    bool isSelected,
+    Function(bool) onSelected,
+  ) {
     return GestureDetector(
       onTap: () => onSelected(!isSelected),
       child: Container(
@@ -2157,7 +2046,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       // Filter by category
       bool categoryMatch =
           _selectedCategory == 'All Categories' ||
-              _getCategoryDisplayName(request.category) == _selectedCategory;
+          _getCategoryDisplayName(request.category) == _selectedCategory;
 
       // Filter by status
       bool statusMatch =
@@ -2482,7 +2371,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  _getRequestDescription(request,),
+                  _getRequestDescription(request),
                   style: GoogleFonts.manrope(fontSize: 13, color: Colors.black),
                 ),
                 SizedBox(height: 8),
@@ -2604,17 +2493,17 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
     const double bidCardHeight = 88.0; // Height per bid card in new design
     final double dynamicHeight =
         baseHeight +
-            (bidsToShow.length * bidCardHeight) +
-            (hasMoreThanTwoBids ? 50.0 : 0.0);
+        (bidsToShow.length * bidCardHeight) +
+        (hasMoreThanTwoBids ? 50.0 : 0.0);
 
     return _buildActiveRequestCardWithHeight(request, dynamicHeight, index);
   }
 
   Widget _buildActiveRequestCardWithHeight(
-      dynamic request,
-      double fixedHeight,
-      int index,
-      ) {
+    dynamic request,
+    double fixedHeight,
+    int index,
+  ) {
     final bids = _getSortedBids(request);
     final hasMoreThanTwoBids = bids.length > 2;
     final bidsToShow = bids
@@ -2823,7 +2712,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                   children: [
                     if (bidsToShow.isNotEmpty) ...[
                       ...bidsToShow.asMap().entries.map(
-                            (entry) => _buildModernSellerBid(
+                        (entry) => _buildModernSellerBid(
                           entry.value,
                           request,
                           entry.key + 1,
@@ -3104,9 +2993,9 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                     try {
                       // Create or get conversation for this request (without auth)
                       final conversationData =
-                      await ChatService.createOrGetConversationForRequest(
-                        _getRequestId(request),
-                      );
+                          await ChatService.createOrGetConversationForRequest(
+                            _getRequestId(request),
+                          );
 
                       // Close loading dialog
                       Navigator.of(context).pop();
@@ -3123,7 +3012,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                                   description: _getRequestDescription(request),
                                 ),
                                 messages:
-                                [], // Empty - will be loaded from backend
+                                    [], // Empty - will be loaded from backend
                               ),
                             ),
                           ),
@@ -3499,8 +3388,6 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
     }
   }
 
-
-
   String _getElapsedTime(DateTime? createdAt, String unit) {
     if (createdAt == null) return "0";
 
@@ -3510,15 +3397,15 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       case 'days':
         return difference.inDays.toString();
       case 'hours':
-      // Hours remaining after accounting for days (0-23)
+        // Hours remaining after accounting for days (0-23)
         final remainingHours = difference.inHours % 24;
         return remainingHours.toString();
       case 'minutes':
-      // Minutes remaining after accounting for hours (0-59)
+        // Minutes remaining after accounting for hours (0-59)
         final remainingMinutes = difference.inMinutes % 60;
         return remainingMinutes.toString();
       case 'seconds':
-      // Seconds remaining after accounting for minutes (0-59)
+        // Seconds remaining after accounting for minutes (0-59)
         final remainingSeconds = difference.inSeconds % 60;
         return remainingSeconds.toString();
       default:
@@ -3733,9 +3620,9 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                           try {
                             // Create or get conversation for this request (without auth)
                             final conversationData =
-                            await ChatService.createOrGetConversationForRequest(
-                              _getRequestId(request),
-                            );
+                                await ChatService.createOrGetConversationForRequest(
+                                  _getRequestId(request),
+                                );
 
                             // Close loading dialog
                             Navigator.of(context).pop();
@@ -3754,7 +3641,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                                         ),
                                       ),
                                       messages:
-                                      [], // Empty - will be loaded from backend
+                                          [], // Empty - will be loaded from backend
                                     ),
                                   ),
                                 ),
@@ -4098,9 +3985,9 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
 
   // Payment processing and order creation
   Future<void> _processPaymentAndCreateOrder(
-      dynamic seller,
-      dynamic request,
-      ) async {
+    dynamic seller,
+    dynamic request,
+  ) async {
     try {
       // Show loading indicator
       ApiService apiService = ApiService();
@@ -4181,7 +4068,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
         final responseData = json.decode(response.body);
         final orderId =
             responseData['id']?.toString() ??
-                responseData['order_id']?.toString();
+            responseData['order_id']?.toString();
 
         if (orderId != null) {
           // Update order status to PAID
@@ -4203,8 +4090,12 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
               // Show success dialog
               _showPaymentSuccessfulDialog(context);
             } else {
-              print('Failed to update order status: ${updateResult['message']}');
-              throw Exception('Failed to update order status: ${updateResult['message']}');
+              print(
+                'Failed to update order status: ${updateResult['message']}',
+              );
+              throw Exception(
+                'Failed to update order status: ${updateResult['message']}',
+              );
             }
           } catch (e) {
             print('Error updating order status: $e');
@@ -4239,10 +4130,10 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
 
   // Confirmation Dialog
   void _showConfirmationDialog(
-      BuildContext context,
-      dynamic seller,
-      dynamic request,
-      ) {
+    BuildContext context,
+    dynamic seller,
+    dynamic request,
+  ) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -4445,10 +4336,10 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
 
   // Payment Dialog
   void _showPaymentDialog(
-      BuildContext context,
-      dynamic seller,
-      dynamic request,
-      ) {
+    BuildContext context,
+    dynamic seller,
+    dynamic request,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -4774,14 +4665,14 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
     try {
       final response = await http
           .get(
-        Uri.parse(
-          'http://108.141.192.60/api/v1/product-requests/requests/',
-        ),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      )
+            Uri.parse(
+              'http://108.141.192.60/api/v1/product-requests/requests/',
+            ),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          )
           .timeout(Duration(seconds: 5));
       print('Without /products/ - Status: ${response.statusCode}');
       if (response.statusCode == 200) {
@@ -4807,11 +4698,11 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
     try {
       final response = await http
           .get(
-        Uri.parse(
-          'http://127.0.0.1:8005/api/v1/product-requests/requests/',
-        ),
-        headers: {'User-Agent': 'Flutter App', 'Accept': '*/*'},
-      )
+            Uri.parse(
+              '${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/',
+            ),
+            headers: {'User-Agent': 'Flutter App', 'Accept': '*/*'},
+          )
           .timeout(Duration(seconds: 5));
       print(
         'Original URL with different headers - Status: ${response.statusCode}',
@@ -4829,7 +4720,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
   void _populateGlobalVariables(ProductRequestItem item) {
     switch (item.category) {
       case 'VEHICLE_SPARES':
-      // Convert API item to AutoSparesRequest
+        // Convert API item to AutoSparesRequest
         final autoSparesRequest = _createAutoSparesRequest(item);
         GlobalVariables.combinedRequest.autoSparesRequest.add(
           autoSparesRequest,
@@ -4837,13 +4728,13 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
         break;
 
       case 'TYRES_RIMS':
-      // Convert API item to RimTyreRequest
+        // Convert API item to RimTyreRequest
         final rimTyreRequest = _createRimTyreRequest(item);
         GlobalVariables.combinedRequest.rimTyreRequest.add(rimTyreRequest);
         break;
 
       case 'ELECTRONICS':
-      // Convert API item to ConsumerElectronicsRequest
+        // Convert API item to ConsumerElectronicsRequest
         final electronicsRequest = _createElectronicsRequest(item);
         GlobalVariables.combinedRequest.consumerElectronicsRequest.add(
           electronicsRequest,
@@ -4949,8 +4840,8 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
   }
 
   ConsumerElectronicsRequest _createElectronicsRequest(
-      ProductRequestItem item,
-      ) {
+    ProductRequestItem item,
+  ) {
     // Parse consumer electronics summary
     final parts =
         item.consumerElectronicsSummary?.split(' - ') ?? [item.title, ''];
@@ -5032,7 +4923,6 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
     }
     return 'Unknown';
   }
-
 
   String? _extractModelFromSummary(String? summary) {
     if (summary == null) return null;
@@ -5379,7 +5269,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       // API call to cancel the request
       final response = await http.delete(
         Uri.parse(
-          'http://127.0.0.1:8005/api/v1/product-requests/requests/$requestId/',
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/requests/$requestId/',
         ),
         headers: {
           'Content-Type': 'application/json',
@@ -5570,12 +5460,12 @@ class SparesDetailScreen extends StatefulWidget {
   State<SparesDetailScreen> createState() => _SparesDetailScreenState();
 
   static void showAsDialog(
-      BuildContext context, {
-        required int index,
-        required AutoSparesRequest request,
-        required AutoSpares autoSpare,
-        required List<dynamic> bids,
-      }) {
+    BuildContext context, {
+    required int index,
+    required AutoSparesRequest request,
+    required AutoSpares autoSpare,
+    required List<dynamic> bids,
+  }) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -5883,11 +5773,11 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               "Description -",
@@ -5903,11 +5793,11 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                                 "View Details",
                                                 style: GoogleFonts.manrope(
                                                   color:
-                                                  Constants.ftaColorLight,
+                                                      Constants.ftaColorLight,
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
                                                   decoration:
-                                                  TextDecoration.underline,
+                                                      TextDecoration.underline,
                                                 ),
                                               ),
                                             ),
@@ -6180,10 +6070,10 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
   }
 
   Widget _buildDetailCard(
-      String title,
-      Color borderColor,
-      List<Widget> children,
-      ) {
+    String title,
+    Color borderColor,
+    List<Widget> children,
+  ) {
     return CustomCard(
       elevation: 3,
       color: Colors.white,
@@ -6229,11 +6119,11 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
   }
 
   Widget _buildDetailItem(
-      String label,
-      String value, {
-        bool showImage = false,
-        bool isProductImages = false,
-      }) {
+    String label,
+    String value, {
+    bool showImage = false,
+    bool isProductImages = false,
+  }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16),
       child: Column(
@@ -6540,12 +6430,12 @@ class ConsumerElectronicsDetailScreen extends StatefulWidget {
       _ConsumerElectronicsDetailScreenState();
 
   static void showAsDialog(
-      BuildContext context, {
-        required int index,
-        required ConsumerElectronicsRequest request,
-        required ConsumerElectronics consumerElectronics,
-        required List<dynamic> bids,
-      }) {
+    BuildContext context, {
+    required int index,
+    required ConsumerElectronicsRequest request,
+    required ConsumerElectronics consumerElectronics,
+    required List<dynamic> bids,
+  }) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -6854,11 +6744,11 @@ class _ConsumerElectronicsDetailScreenState
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               "Description -",
@@ -6874,11 +6764,11 @@ class _ConsumerElectronicsDetailScreenState
                                                 "View Details",
                                                 style: GoogleFonts.manrope(
                                                   color:
-                                                  Constants.ftaColorLight,
+                                                      Constants.ftaColorLight,
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
                                                   decoration:
-                                                  TextDecoration.underline,
+                                                      TextDecoration.underline,
                                                 ),
                                               ),
                                             ),
@@ -6988,9 +6878,9 @@ class _ConsumerElectronicsDetailScreenState
                                   _buildDetailItem(
                                     "Model Series",
                                     widget
-                                        .consumerElectronics
-                                        .productDetails
-                                        .modelSeries ??
+                                            .consumerElectronics
+                                            .productDetails
+                                            .modelSeries ??
                                         "-",
                                   ),
                                   _buildDetailItem(
@@ -7028,20 +6918,20 @@ class _ConsumerElectronicsDetailScreenState
                                   _buildDetailItem(
                                     "Min Price",
                                     widget
-                                        .consumerElectronics
-                                        .budgetTimeline
-                                        .minPrice !=
-                                        null
+                                                .consumerElectronics
+                                                .budgetTimeline
+                                                .minPrice !=
+                                            null
                                         ? "\$${widget.consumerElectronics.budgetTimeline.minPrice!.toStringAsFixed(2)}"
                                         : "-",
                                   ),
                                   _buildDetailItem(
                                     "Max Price",
                                     widget
-                                        .consumerElectronics
-                                        .budgetTimeline
-                                        .maxPrice !=
-                                        null
+                                                .consumerElectronics
+                                                .budgetTimeline
+                                                .maxPrice !=
+                                            null
                                         ? "\$${widget.consumerElectronics.budgetTimeline.maxPrice!.toStringAsFixed(2)}"
                                         : "-",
                                   ),
@@ -7055,9 +6945,9 @@ class _ConsumerElectronicsDetailScreenState
                                   _buildDetailItem(
                                     "Needs Installation",
                                     widget
-                                        .consumerElectronics
-                                        .budgetTimeline
-                                        .needsInstallation
+                                            .consumerElectronics
+                                            .budgetTimeline
+                                            .needsInstallation
                                         ? "Yes"
                                         : "No",
                                   ),
@@ -7074,17 +6964,17 @@ class _ConsumerElectronicsDetailScreenState
                                   _buildDetailItem(
                                     "Required Features",
                                     widget
-                                        .consumerElectronics
-                                        .featuresAndSpecs
-                                        .requiredFeatures ??
+                                            .consumerElectronics
+                                            .featuresAndSpecs
+                                            .requiredFeatures ??
                                         "-",
                                   ),
                                   _buildDetailItem(
                                     "Additional Comments",
                                     widget
-                                        .consumerElectronics
-                                        .featuresAndSpecs
-                                        .additionalComments ??
+                                            .consumerElectronics
+                                            .featuresAndSpecs
+                                            .additionalComments ??
                                         "-",
                                   ),
                                   _buildDetailItem(
@@ -7165,10 +7055,10 @@ class _ConsumerElectronicsDetailScreenState
   }
 
   Widget _buildDetailCard(
-      String title,
-      Color borderColor,
-      List<Widget> children,
-      ) {
+    String title,
+    Color borderColor,
+    List<Widget> children,
+  ) {
     return CustomCard(
       elevation: 3,
       color: Colors.white,
@@ -7214,12 +7104,12 @@ class _ConsumerElectronicsDetailScreenState
   }
 
   Widget _buildDetailItem(
-      String label,
-      String value, {
-        bool showImage = false,
-        bool isProductImages = false,
-        List<String>? imageList,
-      }) {
+    String label,
+    String value, {
+    bool showImage = false,
+    bool isProductImages = false,
+    List<String>? imageList,
+  }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16),
       child: Column(
@@ -7585,12 +7475,12 @@ class RimTyreDetailScreen extends StatefulWidget {
   State<RimTyreDetailScreen> createState() => _RimTyreDetailScreenState();
 
   static void showAsDialog(
-      BuildContext context, {
-        required int index,
-        required RimTyreRequest request,
-        required RimTyre rimTyre,
-        required List<dynamic> bids,
-      }) {
+    BuildContext context, {
+    required int index,
+    required RimTyreRequest request,
+    required RimTyre rimTyre,
+    required List<dynamic> bids,
+  }) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -7624,8 +7514,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
           if (item?.partDetails?.partName != null &&
               item?.vehicleDetails?.makeModel != null &&
               item?.vehicleDetails?.year != null) {
-            return "${item.partDetails.partName}, ${item.vehicleDetails
-                .makeModel}, ${item.vehicleDetails.year}";
+            return "${item.partDetails.partName}, ${item.vehicleDetails.makeModel}, ${item.vehicleDetails.year}";
           }
           return "Vehicle Spares Request";
 
@@ -7636,9 +7525,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
             final brandPreference =
                 item.productDetails.brandPreference ?? "Various Brands";
             final modelSeries = item.productDetails.modelSeries;
-            return "$typeOfElectronics, $brandPreference${modelSeries != null
-                ? ', $modelSeries'
-                : ''}";
+            return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
           }
           return "Electronics Request";
 
@@ -7662,6 +7549,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
       return "Request information unavailable3";
     }
   }
+
   String _getRequestId(dynamic request) {
     // Handle ProductRequestItem from API
     if (request is ProductRequestItem) {
@@ -7791,11 +7679,12 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
         return "0";
     }
   }
+
   void _showConfirmationDialog(
-      BuildContext context,
-      dynamic seller,
-      dynamic request,
-      ) {
+    BuildContext context,
+    dynamic seller,
+    dynamic request,
+  ) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -7900,11 +7789,12 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
       },
     );
   }
+
   void _showPaymentDialog(
-      BuildContext context,
-      dynamic seller,
-      dynamic request,
-      ) {
+    BuildContext context,
+    dynamic seller,
+    dynamic request,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -8130,6 +8020,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
       },
     );
   }
+
   Widget _buildPaymentIcon(String assetPath) {
     return Container(
       width: 60,
@@ -8302,11 +8193,11 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               "Description -",
@@ -8322,11 +8213,11 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                                 "View Details",
                                                 style: GoogleFonts.manrope(
                                                   color:
-                                                  Constants.ftaColorLight,
+                                                      Constants.ftaColorLight,
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
                                                   decoration:
-                                                  TextDecoration.underline,
+                                                      TextDecoration.underline,
                                                 ),
                                               ),
                                             ),
@@ -8453,12 +8344,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                   ),
                                   _buildDetailItem(
                                     "Tyre Size",
-                                    "${widget.rimTyre.productDetails
-                                        .tyreWidthMm}/${widget.rimTyre
-                                        .productDetails
-                                        .sidewallProfile}R${widget.rimTyre
-                                        .productDetails
-                                        .wheelRimDiameterInches}",
+                                    "${widget.rimTyre.productDetails.tyreWidthMm}/${widget.rimTyre.productDetails.sidewallProfile}R${widget.rimTyre.productDetails.wheelRimDiameterInches}",
                                   ),
                                 ],
                               ),
@@ -8520,9 +8406,9 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                   _buildDetailItem(
                                     "Tyre Rotation Required",
                                     widget
-                                        .rimTyre
-                                        .moreFields
-                                        .tyreRotationRequired
+                                            .rimTyre
+                                            .moreFields
+                                            .tyreRotationRequired
                                         ? "Yes"
                                         : "No",
                                   ),
@@ -8531,7 +8417,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                     "",
                                     isProductImages: true,
                                     imageList:
-                                    widget.rimTyre.moreFields.imageUrls,
+                                        widget.rimTyre.moreFields.imageUrls,
                                   ),
                                 ],
                               ),
@@ -8550,11 +8436,11 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
       ),
     );
   }
+
   Future<void> _processPaymentAndCreateOrder(
-      dynamic seller,
-      dynamic request,
-      ) async
-  {
+    dynamic seller,
+    dynamic request,
+  ) async {
     try {
       // Show loading indicator
       ApiService apiService = ApiService();
@@ -8635,7 +8521,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
         final responseData = json.decode(response.body);
         final orderId =
             responseData['id']?.toString() ??
-                responseData['order_id']?.toString();
+            responseData['order_id']?.toString();
 
         if (orderId != null) {
           // Update order status to PAID
@@ -8657,8 +8543,12 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
               // Show success dialog
               _showPaymentSuccessfulDialog(context);
             } else {
-              print('Failed to update order status: ${updateResult['message']}');
-              throw Exception('Failed to update order status: ${updateResult['message']}');
+              print(
+                'Failed to update order status: ${updateResult['message']}',
+              );
+              throw Exception(
+                'Failed to update order status: ${updateResult['message']}',
+              );
             }
           } catch (e) {
             print('Error updating order status: $e');
@@ -8690,12 +8580,12 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
       );
     }
   }
+
   String _formatDate(DateTime? date) {
     if (date == null) return "Date unavailable";
-    return "${date.day.toString().padLeft(2, '0')}/${date.month
-        .toString()
-        .padLeft(2, '0')}/${date.year}";
+    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
   }
+
   String _getQuoteId(dynamic bid) {
     if (bid is QuoteItem) {
       return bid.quoteId?.toString() ?? '';
@@ -8708,6 +8598,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
       return q != null ? q.toString() : '';
     }
   }
+
   String _normalizeErrorMessage(String errorMessage) {
     // Check for specific error patterns and normalize them
     if (errorMessage.contains(
@@ -8779,6 +8670,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
         ? cleanedMessage
         : 'An unexpected error occurred. Please try again.';
   }
+
   void _showPaymentSuccessfulDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -8874,9 +8766,11 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
     );
   }
 
-  Widget _buildDetailCard(String title,
-      Color borderColor,
-      List<Widget> children,) {
+  Widget _buildDetailCard(
+    String title,
+    Color borderColor,
+    List<Widget> children,
+  ) {
     return CustomCard(
       elevation: 3,
       color: Colors.white,
@@ -8921,12 +8815,13 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
     );
   }
 
-  Widget _buildDetailItem(String label,
-      String value, {
-        bool showImage = false,
-        bool isProductImages = false,
-        List<String>? imageList,
-      }) {
+  Widget _buildDetailItem(
+    String label,
+    String value, {
+    bool showImage = false,
+    bool isProductImages = false,
+    List<String>? imageList,
+  }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16),
       child: Column(
@@ -9086,100 +8981,98 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                   ],
                 ),
               ),
-            ] else
-              ...[
-                // No images available
-                Container(
-                  height: 80,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Color(0xFFE0E0E0)),
-                  ),
-                  child: Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Container(
-                          color: Colors.grey[200],
-                          child: Center(
-                            child: Icon(
-                              Icons.image_not_supported,
-                              color: Colors.grey[400],
-                              size: 30,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Navigation arrows
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 8),
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: IconButton(
-                                onPressed: () {
-                                  setState(() {});
-                                },
-                                icon: Icon(
-                                  Icons.arrow_back_ios,
-                                  color: Constants.ftaColorLight,
-                                  size: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: IconButton(
-                                onPressed: () {
-                                  setState(() {});
-                                },
-                                icon: Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: Constants.ftaColorLight,
-                                  size: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+            ] else ...[
+              // No images available
+              Container(
+                height: 80,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Color(0xFFE0E0E0)),
                 ),
-              ],
-          ] else
-            if (!showImage) ...[
-              Text(
-                value.isEmpty ? "-" : value,
-                style: GoogleFonts.manrope(
-                  fontSize: 13,
-                  color: Constants.ftaColorLight,
-                  fontWeight: FontWeight.w600,
+                child: Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        color: Colors.grey[200],
+                        child: Center(
+                          child: Icon(
+                            Icons.image_not_supported,
+                            color: Colors.grey[400],
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Navigation arrows
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: IconButton(
+                              onPressed: () {
+                                setState(() {});
+                              },
+                              icon: Icon(
+                                Icons.arrow_back_ios,
+                                color: Constants.ftaColorLight,
+                                size: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: IconButton(
+                              onPressed: () {
+                                setState(() {});
+                              },
+                              icon: Icon(
+                                Icons.arrow_forward_ios,
+                                color: Constants.ftaColorLight,
+                                size: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
+          ] else if (!showImage) ...[
+            Text(
+              value.isEmpty ? "-" : value,
+              style: GoogleFonts.manrope(
+                fontSize: 13,
+                color: Constants.ftaColorLight,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
           if (showImage && value.isNotEmpty) ...[
             Text(
               value,
@@ -9364,10 +9257,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
 
     return Container(
       margin: EdgeInsets.only(bottom: 12),
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
+      width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Constants.ftaColorLight),
@@ -9529,43 +9419,41 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                           showDialog(
                             context: context,
                             barrierDismissible: false,
-                            builder: (context) =>
-                                Center(
-                                  child: Container(
-                                    padding: EdgeInsets.all(24),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        CircularProgressIndicator(
-                                          valueColor: AlwaysStoppedAnimation<
-                                              Color>(
-                                            Constants.ctaColorLight,
-                                          ),
-                                        ),
-                                        SizedBox(height: 16),
-                                        Text(
-                                          'Loading conversation...',
-                                          style: GoogleFonts.manrope(
-                                            fontSize: 14,
-                                            color: Colors.grey[700],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                            builder: (context) => Center(
+                              child: Container(
+                                padding: EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Constants.ctaColorLight,
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    Text(
+                                      'Loading conversation...',
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           );
 
                           try {
                             // Create or get conversation for this request (without auth)
                             final conversationData =
-                            await ChatService.createOrGetConversationForRequest(
-                              _getRequestId(request),
-                            );
+                                await ChatService.createOrGetConversationForRequest(
+                                  _getRequestId(request),
+                                );
 
                             // Close loading dialog
                             Navigator.of(context).pop();
@@ -9575,20 +9463,19 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      GroupChatScreen(
-                                        groupChat: GroupChat(
-                                          uuid: _getRequestId(request),
-                                          request: ProductRequest(
-                                            description: _getRequestDescription(
-                                              request,widget.rimTyre
-                                            ),
-                                          ),
-                                          messages:
-                                          [
-                                          ], // Empty - will be loaded from backend
+                                  builder: (context) => GroupChatScreen(
+                                    groupChat: GroupChat(
+                                      uuid: _getRequestId(request),
+                                      request: ProductRequest(
+                                        description: _getRequestDescription(
+                                          request,
+                                          widget.rimTyre,
                                         ),
                                       ),
+                                      messages:
+                                          [], // Empty - will be loaded from backend
+                                    ),
+                                  ),
                                 ),
                               );
                             } else {
@@ -9714,8 +9601,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
       return bid.comment;
     } else if (bid is QuoteItem) {
       // QuoteItem doesn't have notes, use another field or status
-      return "Quote ID: ${bid.quoteId}. Delivery: ${bid.estimatedDeliveryDays ??
-          'Not specified'} days";
+      return "Quote ID: ${bid.quoteId}. Delivery: ${bid.estimatedDeliveryDays ?? 'Not specified'} days";
     } else {
       // Handle API response format
       return bid['comment'] ?? bid['notes'] ?? bid['comments'] ?? "No comments";
@@ -9735,8 +9621,11 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
     }
   }
 
-  Widget _buildViewAllBidsButton(int totalBids, TypographyConfig typography,
-      SpacingConfig spacing) {
+  Widget _buildViewAllBidsButton(
+    int totalBids,
+    TypographyConfig typography,
+    SpacingConfig spacing,
+  ) {
     return Container(
       width: double.infinity,
       child: OutlinedButton(
@@ -9747,9 +9636,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
           foregroundColor: Constants.ctaColorLight,
           side: BorderSide(color: Constants.ctaColorLight),
           padding: EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: ResponsiveText(
           text: "View All $totalBids Bids",
@@ -9776,6 +9663,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
 
     return bids;
   }
+
   String _formatBidDateTime(DateTime? bidTime) {
     if (bidTime == null) return "Time unavailable";
 
@@ -9786,5 +9674,296 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
     // Navigate to detail screen - implement based on your navigation structure
     print("Navigate to details for request #$index");
   }
+}
 
+class MobileBuyerDashboardGrid extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          // Orange header section
+          Container(
+            height: 210,
+            child: Stack(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: Constants.ctaColorLight.withOpacity(0.75),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(45),
+                      bottomRight: Radius.circular(45),
+                    ),
+                  ),
+                  child: SafeArea(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
+                      child: Column(
+                        children: [
+                          // Top row with BIDR logo, title, and notification
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16.0,
+                    right: 16,
+                    top: 16,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'BIDR',
+                        style: GoogleFonts.manrope(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1B3B5C),
+                        ),
+                      ),
+                      Text(
+                        'Buyer Dashboard',
+                        style: GoogleFonts.manrope(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1B3B5C),
+                        ),
+                      ),
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF1B3B5C),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.notifications,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 40),
+
+                // Top row cards
+                Padding(
+                  padding: const EdgeInsets.only(top: 100.0),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _buildDashboardCard(
+                            title: 'Profile',
+                            icon: Icons.person,
+                            onTap: () {
+                              // Navigate to profile
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: _buildDashboardCard(
+                            title: 'Categories',
+                            icon: Icons.grid_view,
+                            onTap: () {
+                              // Navigate to categories
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // White background section with remaining cards
+          Expanded(
+            child: Container(
+              color: Colors.white,
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    // Refer a Friend card
+                    _buildFullWidthCard(
+                      title: 'Refer A Friend / Business',
+                      icon: Icons.person_add,
+                      onTap: () {
+                        // Navigate to referral
+                      },
+                    ),
+                    SizedBox(height: 16),
+
+                    // Transaction Management card
+                    _buildFullWidthCard(
+                      title: 'Transaction Management',
+                      icon: Icons.check_box,
+                      onTap: () {
+                        // Navigate to transactions
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDashboardCard({
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 120,
+        decoration: BoxDecoration(
+          color: Color(0xFF1B3B5C),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top row with icon and arrow
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(icon, color: Colors.white, size: 20),
+                  ),
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward,
+                      color: Color(0xFF1B3B5C),
+                      size: 16,
+                    ),
+                  ),
+                ],
+              ),
+
+              Spacer(),
+
+              // Title
+              Text(
+                title,
+                style: GoogleFonts.manrope(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFullWidthCard({
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: 80,
+        decoration: BoxDecoration(
+          color: Color(0xFF1B3B5C),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
+            children: [
+              // Icon
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: Colors.white, size: 22),
+              ),
+
+              SizedBox(width: 16),
+
+              // Title
+              Expanded(
+                child: Text(
+                  title,
+                  style: GoogleFonts.manrope(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+
+              // Arrow
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.arrow_forward,
+                  color: Color(0xFF1B3B5C),
+                  size: 18,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

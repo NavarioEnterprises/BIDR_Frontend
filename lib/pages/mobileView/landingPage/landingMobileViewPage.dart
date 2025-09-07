@@ -36,7 +36,7 @@ import '../buyerDashboard/buyerMobileDashboard.dart';
 import 'blogcardMobileView.dart';
 import 'contactUsMobileView.dart';
 import 'faqMobileView.dart';
-
+import 'mobileBuyerLandingPage.dart';
 
 class BuyerHomeMobilePage extends StatefulWidget {
   @override
@@ -55,6 +55,12 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
   int selectedIndex = -1;
   int index = 0;
   List<WebNotification> notifications = [];
+
+  // Accordion expansion state
+  Map<String, bool> _expandedSections = {
+    'About Us': false,
+    'How It Works': false,
+  };
 
   // Animation Controllers
   late AnimationController _fadeController;
@@ -107,8 +113,8 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
 
     _slideAnimation = Tween<Offset>(begin: Offset(0, 0.5), end: Offset.zero)
         .animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.elasticOut),
-    );
+          CurvedAnimation(parent: _slideController, curve: Curves.elasticOut),
+        );
 
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(parent: _scaleController, curve: Curves.bounceOut),
@@ -156,10 +162,19 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
   }
 
   final List<Map<String, String>> categories = [
-    {"icon": "lib/assets/images/spares1.png", "icon2": "lib/assets/images/vehicle_light.png","name": "Vehicle\nSpares"},
-    {"icon": "lib/assets/images/rim&type.png","icon2": "lib/assets/images/rims.png", "name": "Vehicle Tyres\nand Rims"},
     {
-      "icon": "lib/assets/images/consumer.png","icon2": "lib/assets/images/ele_light.png",
+      "icon": "lib/assets/images/spares1.png",
+      "icon2": "lib/assets/images/vehicle_light.png",
+      "name": "Vehicle\nSpares",
+    },
+    {
+      "icon": "lib/assets/images/rim&type.png",
+      "icon2": "lib/assets/images/rims.png",
+      "name": "Vehicle Tyres\nand Rims",
+    },
+    {
+      "icon": "lib/assets/images/consumer.png",
+      "icon2": "lib/assets/images/ele_light.png",
       "name": "Consumer \nElectronics",
     },
   ];
@@ -175,14 +190,18 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Animated Header Section
-            SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
+            SizedBox(
+              height: ResponsiveSpacing.getSpacing(context).spacingLarge,
+            ),
             FadeTransition(
               opacity: _fadeAnimation,
               child: SlideTransition(
                 position: _slideAnimation,
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                    horizontal: ResponsiveSpacing.getSpacing(
+                      context,
+                    ).paddingLarge,
                   ), //BlogCardsScreen
                   child: HeaderSection(),
                 ),
@@ -191,209 +210,237 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
 
             Constants.buyerAppBarValue == 0
                 ? Expanded(
-              child: Container(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        constraints: BoxConstraints(maxWidth: 1600),
+                    child: Container(
+                      child: SingleChildScrollView(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-
-                            // Animated Banner Section
-                            ScaleTransition(
-                              scale: _scaleAnimation,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: ResponsiveSpacing.getSpacing(context).paddingLarge * 2,
-                                ),
-                                child: Center(
-                                  child: _buildAnimatedBannerSection(
-                                    "lib/assets/images/competitive.png",
+                            Container(
+                              constraints: BoxConstraints(maxWidth: 1600),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    height: ResponsiveSpacing.getSpacing(
+                                      context,
+                                    ).spacingLarge,
                                   ),
-                                ),
-                              ),
-                            ),
 
-                            SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-
-                            // Animated Category Section
-                            Center(
-                              child: SlideTransition(
-                                position: _slideAnimation,
-                                child: FadeTransition(
-                                  opacity: _categoryAnimation,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 16,
-                                      right: 16,
+                                  // Animated Banner Section
+                                  ScaleTransition(
+                                    scale: _scaleAnimation,
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal:
+                                            ResponsiveSpacing.getSpacing(
+                                              context,
+                                            ).paddingLarge *
+                                            2,
+                                      ),
+                                      child: Center(
+                                        child: _buildAnimatedBannerSection(
+                                          "lib/assets/images/competitive.png",
+                                          true,
+                                        ),
+                                      ),
                                     ),
+                                  ),
+
+                                  SizedBox(
+                                    height: ResponsiveSpacing.getSpacing(
+                                      context,
+                                    ).spacingLarge,
+                                  ),
+
+                                  // Animated Category Section
+                                  Center(
+                                    child: SlideTransition(
+                                      position: _slideAnimation,
+                                      child: FadeTransition(
+                                        opacity: _categoryAnimation,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 16,
+                                            right: 16,
+                                          ),
+                                          child: Center(
+                                            child: _buildCategoryItems(),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  // Animated Form Section
+                                  AnimatedSwitcher(
+                                    duration: Duration(milliseconds: 500),
+                                    transitionBuilder:
+                                        (
+                                          Widget child,
+                                          Animation<double> animation,
+                                        ) {
+                                          return SlideTransition(
+                                            position: Tween<Offset>(
+                                              begin: Offset(0.0, 0.3),
+                                              end: Offset.zero,
+                                            ).animate(animation),
+                                            child: FadeTransition(
+                                              opacity: animation,
+                                              child: child,
+                                            ),
+                                          );
+                                        },
                                     child: Center(
-                                      child: _buildCategoryItems(),
+                                      key: ValueKey(selectedIndex),
+                                      child: selectedIndex == 0
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 16,
+                                                right: 16,
+                                              ),
+                                              child:
+                                                  VehicleDetailsQuoteMobileForm(),
+                                            )
+                                          : selectedIndex == 1
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 16,
+                                                right: 16,
+                                              ),
+                                              child:
+                                                  TireProductQuoteMobileForm(),
+                                            )
+                                          : selectedIndex == 2
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 16,
+                                                right: 16,
+                                              ),
+                                              child: ProductQuoteMobileForm(),
+                                            )
+                                          : SizedBox.shrink(),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
 
-                            // Animated Form Section
-                            AnimatedSwitcher(
-                              duration: Duration(milliseconds: 500),
-                              transitionBuilder:
-                                  (
-                                  Widget child,
-                                  Animation<double> animation,
-                                  ) {
-                                return SlideTransition(
-                                  position: Tween<Offset>(
-                                    begin: Offset(0.0, 0.3),
-                                    end: Offset.zero,
-                                  ).animate(animation),
-                                  child: FadeTransition(
-                                    opacity: animation,
-                                    child: child,
+                            // Animated About Us Section
+                            SizedBox(
+                              height: ResponsiveSpacing.getSpacing(
+                                context,
+                              ).spacingLarge,
+                            ),
+                            TweenAnimationBuilder<double>(
+                              tween: Tween<double>(begin: 0.0, end: 1.0),
+                              duration: Duration(milliseconds: 1000),
+                              builder: (context, value, child) {
+                                return Transform.translate(
+                                  offset: Offset(0, 50 * (1 - value)),
+                                  child: Opacity(
+                                    opacity: value,
+                                    child: Center(
+                                      child: _buildAboutUsSection(),
+                                    ),
                                   ),
                                 );
                               },
+                            ),
+
+                            SizedBox(
+                              height: ResponsiveSpacing.getSpacing(
+                                context,
+                              ).spacingLarge,
+                            ),
+
+                            // Animated Bottom Banner
+                            FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                //height: 800,
+                                constraints: BoxConstraints(maxWidth: 1600),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 0,
+                                    right: 0,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildAnimatedBannerSection(
+                                          "lib/assets/images/mask_group.png",
+                                          false,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(
+                              height: ResponsiveSpacing.getSpacing(
+                                context,
+                              ).spacingLarge,
+                            ),
+
+                            // Animated Footer
+                            SlideTransition(
+                              position: Tween<Offset>(
+                                begin: Offset(0, 1),
+                                end: Offset.zero,
+                              ).animate(_slideController),
                               child: Center(
-                                key: ValueKey(selectedIndex),
-                                child: selectedIndex == 0
-                                    ? Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 16,
-                                    right: 16,
-                                  ),
-                                  child: VehicleDetailsQuoteMobileForm(),
-                                )
-                                    : selectedIndex == 1
-                                    ? Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 16,
-                                    right: 16,
-                                  ),
-                                  child:TireProductQuoteMobileForm(), 
-                                )
-                                    : selectedIndex == 2
-                                    ? Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 16,
-                                    right: 16,
-                                  ),
-                                  child: ProductQuoteMobileForm(),
-                                )
-                                    : SizedBox.shrink(),
+                                child: FooterSection(
+                                  logo: "lib/assets/images/bidr_logo2.png",
+                                  onFooterLinkTap: (String text) {
+                                    switch (text) {
+                                      case 'Home':
+                                        setState(() {
+                                          Constants.buyerAppBarValue = 0;
+                                          buyerHomeValueNotifier.value++;
+                                        });
+                                        break;
+                                      case 'Support':
+                                        setState(() {
+                                          Constants.buyerAppBarValue = 1;
+                                          buyerHomeValueNotifier.value++;
+                                        });
+                                        break;
+                                      case 'FAQs':
+                                        setState(() {
+                                          Constants.buyerAppBarValue = 2;
+                                          buyerHomeValueNotifier.value++;
+                                        });
+                                        break;
+                                      case 'Policies':
+                                        setState(() {
+                                          Constants.buyerAppBarValue = 3;
+                                          buyerHomeValueNotifier.value++;
+                                        });
+                                        break;
+                                      case 'Blogs':
+                                        setState(() {
+                                          Constants.buyerAppBarValue = 4;
+                                          buyerHomeValueNotifier.value++;
+                                        });
+                                        break;
+                                      case 'Contact Us':
+                                        setState(() {
+                                          Constants.buyerAppBarValue = 5;
+                                          buyerHomeValueNotifier.value++;
+                                        });
+                                        break;
+                                    }
+                                  },
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-
-                      // Animated About Us Section
-                      SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                      TweenAnimationBuilder<double>(
-                        tween: Tween<double>(begin: 0.0, end: 1.0),
-                        duration: Duration(milliseconds: 1000),
-                        builder: (context, value, child) {
-                          return Transform.translate(
-                            offset: Offset(0, 50 * (1 - value)),
-                            child: Opacity(
-                              opacity: value,
-                              child: Center(
-                                child: _buildAboutUsSection(),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-
-                      SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-
-                      // Animated Bottom Banner
-                      FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          //height: 800,
-                          constraints: BoxConstraints(maxWidth: 1600),
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 16,
-                              right: 16,
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: _buildAnimatedBannerSection(
-                                    "lib/assets/images/mask_group.png",
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-
-                      // Animated Footer
-                      SlideTransition(
-                        position: Tween<Offset>(
-                          begin: Offset(0, 1),
-                          end: Offset.zero,
-                        ).animate(_slideController),
-                        child: Center(
-                          child:  FooterSection(
-                            logo: "lib/assets/images/bidr_logo2.png",
-                            onFooterLinkTap: (String text) {
-                              switch (text) {
-                                case 'Home':
-                                  setState(() {
-                                    Constants.buyerAppBarValue = 0;
-                                    buyerHomeValueNotifier.value++;
-                                  });
-                                  break;
-                                case 'Support':
-                                  setState(() {
-                                    Constants.buyerAppBarValue = 1;
-                                    buyerHomeValueNotifier.value++;
-                                  });
-                                  break;
-                                case 'FAQs':
-                                  setState(() {
-                                    Constants.buyerAppBarValue = 2;
-                                    buyerHomeValueNotifier.value++;
-                                  });
-                                  break;
-                                case 'Policies':
-                                  setState(() {
-                                    Constants.buyerAppBarValue = 3;
-                                    buyerHomeValueNotifier.value++;
-                                  });
-                                  break;
-                                case 'Blogs':
-                                  setState(() {
-                                    Constants.buyerAppBarValue = 4;
-                                    buyerHomeValueNotifier.value++;
-                                  });
-                                  break;
-                                case 'Contact Us':
-                                  setState(() {
-                                    Constants.buyerAppBarValue = 5;
-                                    buyerHomeValueNotifier.value++;
-                                  });
-                                  break;
-                              }
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            )
+                    ),
+                  )
                 : Constants.buyerAppBarValue == 1
                 ? Expanded(child: SupportMobile())
                 : Constants.buyerAppBarValue == 2
@@ -410,8 +457,8 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                 ? Expanded(child: SellerDashboard())
                 : Constants.buyerAppBarValue == 8
                 ? Expanded(
-              child: NotificationPage(notifications: notifications),
-            )
+                    child: NotificationPage(notifications: notifications),
+                  )
                 : Container(),
           ],
         ),
@@ -422,25 +469,13 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
   Widget _buildAboutUsSection() {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 1200,
-      constraints: BoxConstraints(minHeight:980 ),
+      // constraints: BoxConstraints(minHeight: 0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Stack(
+      child: Column(
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width,
-                //height: 800,
-                constraints: BoxConstraints(minHeight:550 ),
-                color: Constants.ftaColorLight,
-              ),
-            ],
-          ),
           Center(
             child: Container(
               constraints: BoxConstraints(maxWidth: 1600),
@@ -449,19 +484,62 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  _buildAnimatedVideoSection(
+                  _buildAccordionSection(
                     "About Us",
                     "Created in 2024, BIDR™ is South Africa's newest e-commerce platform. Our unique buyer centric service makes searching for the best price for common goods easy. Headquartered in Johannesburg, we currently serve all of SA.BIDR was born out of its founders' frustrations of always trying to source the best deals for commonly required items such as vehicle tyres or spares, expensive mobile bills, and countless hours trying to negotiate with sellers to get the best deals.We have now taken our expertise and automated the process for you. Why not consider registering as a buyer or seller (as the case may be) and see how our system can save you time, money and stress.",
                     "Why Join As A Buyer?",
                     0,
                   ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildAnimatedVideoSection(
+                  SizedBox(
+                    height: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                  ),
+                  _buildAccordionSection(
                     "How It Works",
                     "Unlike catalogue-based online shops, BIDR allows buyers to send out a single request to multiple sellers that are registered on our platform.The buyer simply specifies the area to search and all sellers within that area are notified of therequest. If the seller has the product (or similar products), they will make an offer. The sellers are continuously updated of the current market price offered by other sellers in the area, and should they opt to do so, they will have the opportunity of revising their bid with a best and final offer. No more long repetitive phone calls, waiting in queues, or countless hours browsing for special deals. With BIDR the sellers come to you with their best price.",
                     "Why Join As A Business?",
                     1,
                   ),
+                  SizedBox(height: 16),
+                  _buildActionButton("Why Join As A Buyer?", () {
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            MobileBuyerLandingPage(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: Offset(1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              );
+                            },
+                      ),
+                    );
+                  }),
+                  SizedBox(height: 12),
+                  _buildActionButton("Why Join As A Business?", () {
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            BusinessLandingPage(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: Offset(1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              );
+                            },
+                      ),
+                    );
+                  }),
+                  SizedBox(height: 16),
                 ],
               ),
             ),
@@ -471,242 +549,181 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
     );
   }
 
-  Widget _buildAnimatedVideoSection(
-      String title,
-      String description,
-      String buttonTitle,
-      int index,
-      ) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 800 + (index * 200)),
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: 0.8 + (0.2 * value),
-          child: Opacity(
-            opacity: value,
-            child: Padding(
-              padding: EdgeInsets.only(
-                left: ResponsiveSpacing.getSpacing(context).paddingLarge,
-                right: ResponsiveSpacing.getSpacing(context).paddingLarge,
-                bottom: ResponsiveSpacing.getSpacing(context).paddingLarge,
-              ),
-              child: Column(
-                children: [
-                  Container(
-                      width: MediaQuery.of(context).size.width,
+  Widget _buildAccordionSection(
+    String title,
+    String description,
+    String buttonTitle,
+    int index,
+  ) {
+    // Determine if this is an expandable section (About Us, How It Works)
+    bool isExpandable = title == "About Us" || title == "How It Works";
+    bool isExpanded = _expandedSections[title] ?? false;
 
-                      padding: EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium),
-                      decoration: BoxDecoration(
-                        color: Constants.dtaColorLight,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Constants.ctaColorLight),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            blurRadius: 2,
-                            spreadRadius: 1,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
+    // Determine button style based on title
+    bool isDarkButton = title.contains("Buyer") || title.contains("Business");
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: ResponsiveSpacing.getSpacing(context).paddingLarge,
+        right: ResponsiveSpacing.getSpacing(context).paddingLarge,
+        bottom: ResponsiveSpacing.getSpacing(context).paddingMedium,
+      ),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: isDarkButton ? Color(0xFF1B3B5C) : Color(0xFFFFF5E6),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isDarkButton ? Color(0xFF1B3B5C) : Color(0xFFE8B366),
+            width: 2,
+          ),
+        ),
+        child: Column(
+          children: [
+            InkWell(
+              onTap: isExpandable
+                  ? () {
+                      setState(() {
+                        _expandedSections[title] = !isExpanded;
+                      });
+                    }
+                  : null,
+              borderRadius: BorderRadius.circular(25),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: GoogleFonts.manrope(
+                          fontSize: ResponsiveTypography.getTypography(
+                            context,
+                          ).subHeading,
+                          fontWeight: FontWeight.bold,
+                          color: isDarkButton
+                              ? Colors.white
+                              : Color(0xFF1B3B5C),
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: GoogleFonts.manrope(
-                              fontSize: ResponsiveTypography.getTypography(context).subHeading,
-                              fontWeight: FontWeight.bold,
-                              color: Constants.ftaColorLight,
-                            ),
+                    ),
+                    if (isExpandable) ...[
+                      // Dropdown arrow for expandable sections
+                      AnimatedRotation(
+                        duration: Duration(milliseconds: 200),
+                        turns: isExpanded ? 0.5 : 0,
+                        child: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: isDarkButton
+                              ? Colors.white
+                              : Color(0xFF1B3B5C),
+                          size: 24,
+                        ),
+                      ),
+                    ] else ...[
+                      // Arrow button for action sections
+                      Container(
+                        height: 32,
+                        width: 32,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          onPressed: () {
+                            if (title.contains("Business")) {
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (
+                                        context,
+                                        animation,
+                                        secondaryAnimation,
+                                      ) => BusinessLandingPage(),
+                                  transitionsBuilder:
+                                      (
+                                        context,
+                                        animation,
+                                        secondaryAnimation,
+                                        child,
+                                      ) {
+                                        return SlideTransition(
+                                          position: Tween<Offset>(
+                                            begin: Offset(1.0, 0.0),
+                                            end: Offset.zero,
+                                          ).animate(animation),
+                                          child: child,
+                                        );
+                                      },
+                                ),
+                              );
+                            } else if (title.contains("Buyer")) {}
+                            setState(() {});
+                          },
+                          style: IconButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size(32, 32),
                           ),
-                          SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                          Row(
+                          icon: Icon(
+                            Icons.arrow_forward,
+                            color: Color(0xFF1B3B5C),
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            // Expandable content section
+            if (isExpandable)
+              AnimatedSize(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: Container(
+                  width: double.infinity,
+                  child: isExpanded
+                      ? Padding(
+                          padding: EdgeInsets.fromLTRB(24, 0, 24, 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: Text(
-                                  description,
-                                  textAlign: TextAlign.justify,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 8,
-                                  style: GoogleFonts.manrope(
-                                    fontSize: ResponsiveTypography.getTypography(context).normal,
-                                    fontWeight: FontWeight.w500,
-                                    color: Constants.ftaColorLight.withOpacity(
-                                      0.65,
-                                    ),
-                                  ),
+                              Container(
+                                height: 1,
+                                color: isDarkButton
+                                    ? Colors.white.withOpacity(0.2)
+                                    : Color(0xFFE8B366).withOpacity(0.3),
+                                margin: EdgeInsets.only(bottom: 16),
+                              ),
+                              Text(
+                                description,
+                                style: GoogleFonts.manrope(
+                                  fontSize: ResponsiveTypography.getTypography(
+                                    context,
+                                  ).normal,
+                                  color: isDarkButton
+                                      ? Colors.white.withOpacity(0.9)
+                                      : Color(0xFF1B3B5C),
+                                  height: 1.6,
                                 ),
                               ),
                             ],
                           ),
-                          SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                          if (title == "About Us") ...[
-                            SizedBox(
-                              height: 180,
-                              width: MediaQuery.of(context).size.width,
-                              child: CustomVideoPlayerWidget(
-                                videoUrl:
-                                'assets/videos/4058080-sd_426_226_25fps.mp4',
-                                autoPlay: false,
-                                looping: true,
-                                placeholder: 'Loading awesome video...',
-                              ),
-                            ),
-                            SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                            SizedBox(
-                              height: 180,
-                              width: MediaQuery.of(context).size.width,
-                              child: CustomVideoPlayerWidget(
-                                videoUrl:
-                                'assets/videos/5585948-hd_1920_1080_25fps.mp4',
-                                autoPlay: false,
-                                looping: true,
-                                placeholder: 'Loading awesome video...',
-                              ),
-                            ),
-                          ],
-                          if (title == "How It Works") ...[
-                            SizedBox(
-                              height: 180,
-                              width: MediaQuery.of(context).size.width,
-                              child: CustomVideoPlayerWidget(
-                                videoUrl:
-                                'assets/videos/6353353-hd_1080_1920_30fps.mp4',
-                                autoPlay: false,
-                                looping: true,
-                                placeholder: 'Loading awesome video...',
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  SizedBox(height: 24),
-                  AnimatedContainer(
-                    duration: Duration(milliseconds: 300),
-                    padding: EdgeInsets.only(left: 12, right: 12),
-                    height: 45,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(360),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            buttonTitle,
-                            style: GoogleFonts.manrope(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: Constants.ftaColorLight,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Container(
-                          height: 23,
-                          width: 23,
-                          child: Center(
-                            child: AnimatedContainer(
-                              duration: Duration(milliseconds: 200),
-                              child: IconButton(
-                                onPressed: () {
-                                  if (title == "How It Works") {
-                                    Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder:
-                                            (
-                                            context,
-                                            animation,
-                                            secondaryAnimation,
-                                            ) => BusinessLandingPage(),
-                                        transitionsBuilder:
-                                            (
-                                            context,
-                                            animation,
-                                            secondaryAnimation,
-                                            child,
-                                            ) {
-                                          return SlideTransition(
-                                            position: Tween<Offset>(
-                                              begin: Offset(1.0, 0.0),
-                                              end: Offset.zero,
-                                            ).animate(animation),
-                                            child: child,
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  } else {
-                                    Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder:
-                                            (
-                                            context,
-                                            animation,
-                                            secondaryAnimation,
-                                            ) => BuyerLandingPage(),
-                                        transitionsBuilder:
-                                            (
-                                            context,
-                                            animation,
-                                            secondaryAnimation,
-                                            child,
-                                            ) {
-                                          return SlideTransition(
-                                            position: Tween<Offset>(
-                                              begin: Offset(1.0, 0.0),
-                                              end: Offset.zero,
-                                            ).animate(animation),
-                                            child: child,
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  }
-                                  setState(() {});
-                                },
-                                style: IconButton.styleFrom(
-                                  backgroundColor: Constants.ftaColorLight,
-                                ),
-                                icon: Center(
-                                  child: Icon(
-                                    size: 10,
-                                    Icons.arrow_forward,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                        )
+                      : SizedBox.shrink(),
+                ),
               ),
-            ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildAnimatedBannerSection(String image) {
+  Widget _buildAnimatedBannerSection(String image, bool? contain) {
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.0, end: 1.0),
       duration: Duration(milliseconds: 600),
@@ -717,10 +734,10 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
             opacity: value,
             child: Container(
               width: MediaQuery.of(context).size.width,
-              height: 400,
+              height: 180,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
@@ -730,12 +747,12 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(12),
                 child: Image.asset(
                   image,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   width: MediaQuery.of(context).size.width,
-                  height: 400,
+                  height: 180,
                 ),
               ),
             ),
@@ -817,14 +834,14 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                       opacity: value,
                       child: Container(
                         width:
-                        (MediaQuery.of(context).size.width - 48 - 48) /2.9,
+                            (MediaQuery.of(context).size.width - 48 - 48) / 2.9,
                         child: _categoryCard(
                           category["icon"]!,
                           category["icon2"]!,
                           category["name"]!,
                           index,
                           selectedIndex,
-                              () => _onCategoryTap(index),
+                          () => _onCategoryTap(index),
                         ),
                       ),
                     ),
@@ -840,13 +857,13 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
   }
 
   Widget _categoryCard(
-      String iconImage,
-      String iconImage2,
-      String name,
-      int index,
-      int selectedIndex,
-      VoidCallback onPressed,
-      ) {
+    String iconImage,
+    String iconImage2,
+    String name,
+    int index,
+    int selectedIndex,
+    VoidCallback onPressed,
+  ) {
     final bool isSelected = index == selectedIndex;
 
     return AnimatedContainer(
@@ -871,21 +888,26 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
 
                   boxShadow: isSelected
                       ? [
-                    BoxShadow(
-                      color: Colors.orange.withOpacity(0.05),
-                      blurRadius: 6,
-                      offset: Offset(0, 1),
-                    ),
-                  ]
+                          BoxShadow(
+                            color: Colors.orange.withOpacity(0.05),
+                            blurRadius: 6,
+                            offset: Offset(0, 1),
+                          ),
+                        ]
                       : [],
                 ),
                 child: AnimatedScale(
                   scale: isSelected ? 0.82 : 0.8,
                   duration: Duration(milliseconds: 200),
-                  child: Image.asset(isSelected?iconImage:iconImage2, fit: BoxFit.contain),
+                  child: Image.asset(
+                    isSelected ? iconImage : iconImage2,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
-              SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
+              SizedBox(
+                height: ResponsiveSpacing.getSpacing(context).spacingLarge,
+              ),
               AnimatedDefaultTextStyle(
                 duration: Duration(milliseconds: 200),
                 style: GoogleFonts.manrope(
@@ -907,6 +929,60 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
       ),
     );
   }
+
+  Widget _buildActionButton(String title, VoidCallback onPressed) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: ResponsiveSpacing.getSpacing(context).paddingLarge,
+      ),
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        height: 50,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFF1B3B5C), // Dark blue color
+            foregroundColor: Colors.white,
+            elevation: 2,
+            shadowColor: Colors.black.withOpacity(0.1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(35),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: GoogleFonts.manrope(
+                    fontSize: ResponsiveTypography.getTypography(
+                      context,
+                    ).subHeading,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              Container(
+                height: 35,
+                width: 35,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.arrow_forward,
+                  color: Color(0xFF1B3B5C),
+                  size: 18,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class VehicleDetailsQuoteMobileForm extends StatefulWidget {
@@ -915,7 +991,8 @@ class VehicleDetailsQuoteMobileForm extends StatefulWidget {
       _VehicleDetailsQuoteMobileFormState();
 }
 
-class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobileForm> {
+class _VehicleDetailsQuoteMobileFormState
+    extends State<VehicleDetailsQuoteMobileForm> {
   // Controllers
   final TextEditingController _vinController = TextEditingController();
   final TextEditingController _partNameController = TextEditingController();
@@ -1029,12 +1106,12 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
   }
 
   Widget _buildCustomTextField(
-      String hintText,
-      TextEditingController controller,
-      FocusNode focusNode,
-      FocusNode? nextFocusNode, {
-        Widget? suffixIcon,
-      }) {
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocusNode, {
+    Widget? suffixIcon,
+  }) {
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
       labelText: hintText,
@@ -1055,14 +1132,14 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
   }
 
   Widget _buildCustomDropdown(
-      String label,
-      String? value,
-      List<String> items,
-      Function(String?) onChanged,
-      ) {
+    String label,
+    String? value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Container(
       width: double.infinity,
       height: 48,
@@ -1075,7 +1152,10 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
             fontWeight: FontWeight.w500,
             fontFamily: 'YuGothic',
           ),
-          contentPadding: EdgeInsets.symmetric(horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium, vertical: ResponsiveSpacing.getSpacing(context).paddingSmall),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium,
+            vertical: ResponsiveSpacing.getSpacing(context).paddingSmall,
+          ),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Constants.ftaColorLight),
             borderRadius: BorderRadius.circular(36),
@@ -1108,7 +1188,9 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                   item,
                   style: GoogleFonts.manrope(
                     color: Colors.black,
-                    fontSize: ResponsiveTypography.getTypography(context).normal,
+                    fontSize: ResponsiveTypography.getTypography(
+                      context,
+                    ).normal,
                     fontWeight: FontWeight.w300,
                   ),
                 ),
@@ -1122,12 +1204,12 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
   }
 
   Widget _buildSliderField(
-      String label,
-      double value,
-      double min,
-      double max,
-      Function(double) onChanged,
-      ) {
+    String label,
+    double value,
+    double min,
+    double max,
+    Function(double) onChanged,
+  ) {
     return TextField(
       controller: _maxDistanceController,
       focusNode: _maxDistanceFocus,
@@ -1228,71 +1310,71 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                 // Content area
                 _selectedImages.isEmpty
                     ? Container(
-                  height: 60,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.cloud_upload_outlined,
-                          size: 24,
-                          color: Colors.grey[500],
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Tap to select images',
-                          style: GoogleFonts.manrope(
-                            color: Colors.grey[600],
-                            fontSize: 12,
+                        height: 60,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.cloud_upload_outlined,
+                                size: 24,
+                                color: Colors.grey[500],
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Tap to select images',
+                                style: GoogleFonts.manrope(
+                                  color: Colors.grey[600],
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                )
+                      )
                     : Column(
-                  children: [
-                    Container(
-                      constraints: BoxConstraints(maxHeight: 250),
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                        SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                          childAspectRatio: 1.0,
-                        ),
-                        itemCount: _selectedImages.length,
-                        itemBuilder: (context, index) {
-                          return _buildImagePreview(
-                            _selectedImages[index],
-                          );
-                        },
+                        children: [
+                          Container(
+                            constraints: BoxConstraints(maxHeight: 250),
+                            child: GridView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    crossAxisSpacing: 8,
+                                    mainAxisSpacing: 8,
+                                    childAspectRatio: 1.0,
+                                  ),
+                              itemCount: _selectedImages.length,
+                              itemBuilder: (context, index) {
+                                return _buildImagePreview(
+                                  _selectedImages[index],
+                                );
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6),
+                              color: Constants.ctaColorLight,
+                            ),
+                            child: Text(
+                              'Add More Images',
+                              style: GoogleFonts.manrope(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(6),
-                        color: Constants.ctaColorLight,
-                      ),
-                      child: Text(
-                        'Add More Images',
-                        style: GoogleFonts.manrope(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -1302,7 +1384,10 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
             padding: EdgeInsets.only(top: 8),
             child: Text(
               '${_selectedImages.length} image(s) selected',
-              style: GoogleFonts.manrope(color: Colors.grey[600], fontSize: ResponsiveTypography.getTypography(context).normal),
+              style: GoogleFonts.manrope(
+                color: Colors.grey[600],
+                fontSize: ResponsiveTypography.getTypography(context).normal,
+              ),
             ),
           ),
       ],
@@ -1401,7 +1486,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
   Widget _buildSection(String title, List<Widget> children) {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(spacing.paddingLarge),
@@ -1437,54 +1522,21 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
   @override
   Widget build(BuildContext context) {
     final bool isMobile = Breakpoints.isMobile(context);
-    
+
     return Column(
       children: [
         // Vehicle Details Section
         _buildSection('Vehicle Details', [
-          isMobile 
-            ? Column(
-                children: [
-                  _buildVinField(),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Manufacturer*',
-                    _selectedManufacturer,
-                    [
-                      'Select Manufacturer',
-                      'Toyota',
-                      'Honda',
-                      'Ford',
-                      'BMW',
-                      'Mercedes',
-                      'Audi',
-                      'Volkswagen',
-                    ],
-                    (value) => setState(() => _selectedManufacturer = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Makes & Models*',
-                    _selectedMakeModel,
-                    [
-                      'Select Makes & Models',
-                      'Corolla',
-                      'Camry',
-                      'Civic',
-                      'Accord',
-                      'Focus',
-                      'Mustang',
-                    ],
-                    (value) => setState(() => _selectedMakeModel = value),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(child: _buildVinField()),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+          isMobile
+              ? Column(
+                  children: [
+                    _buildVinField(),
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Manufacturer*',
                       _selectedManufacturer,
                       [
@@ -1499,10 +1551,12 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       ],
                       (value) => setState(() => _selectedManufacturer = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Makes & Models*',
                       _selectedMakeModel,
                       [
@@ -1516,57 +1570,58 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       ],
                       (value) => setState(() => _selectedMakeModel = value),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(child: _buildVinField()),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Manufacturer*',
+                        _selectedManufacturer,
+                        [
+                          'Select Manufacturer',
+                          'Toyota',
+                          'Honda',
+                          'Ford',
+                          'BMW',
+                          'Mercedes',
+                          'Audi',
+                          'Volkswagen',
+                        ],
+                        (value) =>
+                            setState(() => _selectedManufacturer = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Makes & Models*',
+                        _selectedMakeModel,
+                        [
+                          'Select Makes & Models',
+                          'Corolla',
+                          'Camry',
+                          'Civic',
+                          'Accord',
+                          'Focus',
+                          'Mustang',
+                        ],
+                        (value) => setState(() => _selectedMakeModel = value),
+                      ),
+                    ),
+                  ],
+                ),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomDropdown(
-                    'Type*',
-                    _selectedType,
-                    [
-                      'Select Type',
-                      'Sedan',
-                      'SUV',
-                      'Hatchback',
-                      'Coupe',
-                      'Truck',
-                      'Van',
-                    ],
-                    (value) => setState(() => _selectedType = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'New/Used Part*',
-                    _selectedNewUsedPart,
-                    ['Select New/Used Part', 'New', 'Used', 'Refurbished'],
-                    (value) => setState(() => _selectedNewUsedPart = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Year*',
-                    _selectedYear,
-                    [
-                      'Select Year',
-                      '2024',
-                      '2023',
-                      '2022',
-                      '2021',
-                      '2020',
-                      '2019',
-                      '2018',
-                      '2017',
-                    ],
-                    (value) => setState(() => _selectedYear = value),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomDropdown(
+              ? Column(
+                  children: [
+                    _buildCustomDropdown(
                       'Type*',
                       _selectedType,
                       [
@@ -1580,19 +1635,23 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       ],
                       (value) => setState(() => _selectedType = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'New/Used Part*',
                       _selectedNewUsedPart,
                       ['Select New/Used Part', 'New', 'Used', 'Refurbished'],
                       (value) => setState(() => _selectedNewUsedPart = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Year*',
                       _selectedYear,
                       [
@@ -1608,106 +1667,157 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       ],
                       (value) => setState(() => _selectedYear = value),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Type*',
+                        _selectedType,
+                        [
+                          'Select Type',
+                          'Sedan',
+                          'SUV',
+                          'Hatchback',
+                          'Coupe',
+                          'Truck',
+                          'Van',
+                        ],
+                        (value) => setState(() => _selectedType = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'New/Used Part*',
+                        _selectedNewUsedPart,
+                        ['Select New/Used Part', 'New', 'Used', 'Refurbished'],
+                        (value) => setState(() => _selectedNewUsedPart = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Year*',
+                        _selectedYear,
+                        [
+                          'Select Year',
+                          '2024',
+                          '2023',
+                          '2022',
+                          '2021',
+                          '2020',
+                          '2019',
+                          '2018',
+                          '2017',
+                        ],
+                        (value) => setState(() => _selectedYear = value),
+                      ),
+                    ),
+                  ],
+                ),
         ]),
         SizedBox(height: 24),
 
         // Part Details Section
         _buildSection('Part Details', [
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomTextField(
-                    'Part Name/Description*',
-                    _partNameController,
-                    _partNameFocus,
-                    _locationFocus,
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Quantity*',
-                    _selectedQuantity,
-                    ['Select Quantity', '1', '2', '3', '4', '5', '6', '7', '8'],
-                    (value) => setState(() => _selectedQuantity = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildLocationField(),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomTextField(
+              ? Column(
+                  children: [
+                    _buildCustomTextField(
                       'Part Name/Description*',
                       _partNameController,
                       _partNameFocus,
                       _locationFocus,
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Quantity*',
                       _selectedQuantity,
-                      ['Select Quantity', '1', '2', '3', '4', '5', '6', '7', '8'],
+                      [
+                        'Select Quantity',
+                        '1',
+                        '2',
+                        '3',
+                        '4',
+                        '5',
+                        '6',
+                        '7',
+                        '8',
+                      ],
                       (value) => setState(() => _selectedQuantity = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(child: _buildLocationField()),
-                ],
-              ),
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildLocationField(),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Part Name/Description*',
+                        _partNameController,
+                        _partNameFocus,
+                        _locationFocus,
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Quantity*',
+                        _selectedQuantity,
+                        [
+                          'Select Quantity',
+                          '1',
+                          '2',
+                          '3',
+                          '4',
+                          '5',
+                          '6',
+                          '7',
+                          '8',
+                        ],
+                        (value) => setState(() => _selectedQuantity = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(child: _buildLocationField()),
+                  ],
+                ),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           isMobile
-            ? Column(
-                children: [
-                  _buildSliderField(
-                    'Max Distance You Want to Travel (km)*',
-                    _maxDistance,
-                    0,
-                    200,
-                    (value) => setState(() => _maxDistance = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'How Soon Do You Need To Buy This Product?*',
-                    _selectedTimeframe,
-                    [
-                      'Select Time',
-                      '12 Hours',
-                      '24 Hours',
-                      '2-3 Days',
-                      '1 Week',
-                      '2 Weeks',
-                      'Within a Month',
-                    ],
-                    (value) => setState(() => _selectedTimeframe = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomTextField(
-                    'Description of the Product*',
-                    _descriptionController,
-                    _descriptionFocus,
-                    null,
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildSliderField(
+              ? Column(
+                  children: [
+                    _buildSliderField(
                       'Max Distance You Want to Travel (km)*',
                       _maxDistance,
                       0,
                       200,
                       (value) => setState(() => _maxDistance = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'How Soon Do You Need To Buy This Product?*',
                       _selectedTimeframe,
                       [
@@ -1721,18 +1831,62 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       ],
                       (value) => setState(() => _selectedTimeframe = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomTextField(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomTextField(
                       'Description of the Product*',
                       _descriptionController,
                       _descriptionFocus,
                       null,
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildSliderField(
+                        'Max Distance You Want to Travel (km)*',
+                        _maxDistance,
+                        0,
+                        200,
+                        (value) => setState(() => _maxDistance = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'How Soon Do You Need To Buy This Product?*',
+                        _selectedTimeframe,
+                        [
+                          'Select Time',
+                          '12 Hours',
+                          '24 Hours',
+                          '2-3 Days',
+                          '1 Week',
+                          '2 Weeks',
+                          'Within a Month',
+                        ],
+                        (value) => setState(() => _selectedTimeframe = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Description of the Product*',
+                        _descriptionController,
+                        _descriptionFocus,
+                        null,
+                      ),
+                    ),
+                  ],
+                ),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           _buildImageUploadSection(),
         ]),
@@ -1741,49 +1895,20 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
         // More Fields Section
         _buildSection('More Fields', [
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomTextField(
-                    'Part Number',
-                    _partNumberController,
-                    _partNumberFocus,
-                    _mileageFocus,
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Transmission Type (Manual/Auto)',
-                    _selectedTransmissionType,
-                    [
-                      'Select Type',
-                      'Manual',
-                      'Automatic',
-                      'CVT',
-                      'Semi-Automatic',
-                    ],
-                    (value) => setState(() => _selectedTransmissionType = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomTextField(
-                    'Mileage of Vehicle',
-                    _mileageController,
-                    _mileageFocus,
-                    null,
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomTextField(
+              ? Column(
+                  children: [
+                    _buildCustomTextField(
                       'Part Number',
                       _partNumberController,
                       _partNumberFocus,
                       _mileageFocus,
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Transmission Type (Manual/Auto)',
                       _selectedTransmissionType,
                       [
@@ -1793,59 +1918,68 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                         'CVT',
                         'Semi-Automatic',
                       ],
-                      (value) => setState(() => _selectedTransmissionType = value),
+                      (value) =>
+                          setState(() => _selectedTransmissionType = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomTextField(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomTextField(
                       'Mileage of Vehicle',
                       _mileageController,
                       _mileageFocus,
                       null,
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Part Number',
+                        _partNumberController,
+                        _partNumberFocus,
+                        _mileageFocus,
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Transmission Type (Manual/Auto)',
+                        _selectedTransmissionType,
+                        [
+                          'Select Type',
+                          'Manual',
+                          'Automatic',
+                          'CVT',
+                          'Semi-Automatic',
+                        ],
+                        (value) =>
+                            setState(() => _selectedTransmissionType = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Mileage of Vehicle',
+                        _mileageController,
+                        _mileageFocus,
+                        null,
+                      ),
+                    ),
+                  ],
+                ),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomDropdown(
-                    'Fuel Type',
-                    _selectedFuelType,
-                    [
-                      'Select Type',
-                      'Petrol',
-                      'Diesel',
-                      'Electric',
-                      'Hybrid',
-                      'LPG',
-                    ],
-                    (value) => setState(() => _selectedFuelType = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Body Type',
-                    _selectedBodyType,
-                    [
-                      'Select Type',
-                      'Sedan',
-                      'Hatchback',
-                      'SUV',
-                      'Coupe',
-                      'Convertible',
-                      'Wagon',
-                      'Pickup',
-                    ],
-                    (value) => setState(() => _selectedBodyType = value),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomDropdown(
+              ? Column(
+                  children: [
+                    _buildCustomDropdown(
                       'Fuel Type',
                       _selectedFuelType,
                       [
@@ -1858,10 +1992,12 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       ],
                       (value) => setState(() => _selectedFuelType = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Body Type',
                       _selectedBodyType,
                       [
@@ -1876,18 +2012,60 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                       ],
                       (value) => setState(() => _selectedBodyType = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(child: Container()), // Empty space for alignment
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Fuel Type',
+                        _selectedFuelType,
+                        [
+                          'Select Type',
+                          'Petrol',
+                          'Diesel',
+                          'Electric',
+                          'Hybrid',
+                          'LPG',
+                        ],
+                        (value) => setState(() => _selectedFuelType = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Body Type',
+                        _selectedBodyType,
+                        [
+                          'Select Type',
+                          'Sedan',
+                          'Hatchback',
+                          'SUV',
+                          'Coupe',
+                          'Convertible',
+                          'Wagon',
+                          'Pickup',
+                        ],
+                        (value) => setState(() => _selectedBodyType = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(child: Container()), // Empty space for alignment
+                  ],
+                ),
         ]),
         SizedBox(height: 24),
 
         // Checkboxes
         Container(
           width: double.infinity,
-          padding: EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingLarge),
+          padding: EdgeInsets.all(
+            ResponsiveSpacing.getSpacing(context).paddingLarge,
+          ),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -1958,18 +2136,18 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
             onPressed: _isSubmitting
                 ? null
                 : () {
-              if (_agreeToTerms && _consentToContact) {
-                _submitForm();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Please agree to terms and consent to contact.',
-                    ),
-                  ),
-                );
-              }
-            },
+                    if (_agreeToTerms && _consentToContact) {
+                      _submitForm();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Please agree to terms and consent to contact.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
             style: ElevatedButton.styleFrom(
               backgroundColor: _isSubmitting
                   ? Colors.grey
@@ -1981,21 +2159,23 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
             ),
             child: _isSubmitting
                 ? SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            )
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
                 : Text(
-              'Submit',
-              style: GoogleFonts.manrope(
-                fontSize: ResponsiveTypography.getTypography(context).normal,
-                fontWeight: FontWeight.w300,
-                color: Colors.white,
-              ),
-            ),
+                    'Submit',
+                    style: GoogleFonts.manrope(
+                      fontSize: ResponsiveTypography.getTypography(
+                        context,
+                      ).normal,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.white,
+                    ),
+                  ),
           ),
         ),
       ],
@@ -2033,7 +2213,9 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
               Text(
                 'Login Required',
                 style: GoogleFonts.manrope(
-                  fontSize: ResponsiveTypography.getTypography(context).subHeading,
+                  fontSize: ResponsiveTypography.getTypography(
+                    context,
+                  ).subHeading,
                   fontWeight: FontWeight.bold,
                   color: Constants.ftaColorLight,
                 ),
@@ -2042,7 +2224,10 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
           ),
           content: Text(
             'You need to be logged in to submit a request. Would you like to login now?',
-            style: GoogleFonts.manrope(fontSize: ResponsiveTypography.getTypography(context).normal, color: Colors.grey[700]),
+            style: GoogleFonts.manrope(
+              fontSize: ResponsiveTypography.getTypography(context).normal,
+              color: Colors.grey[700],
+            ),
           ),
           actions: [
             TextButton(
@@ -2271,25 +2456,33 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     size: 50,
                   ),
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                SizedBox(
+                  height: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                ),
 
                 // Success Title
                 Text(
                   'Request Submitted Successfully!',
                   style: GoogleFonts.manrope(
-                    fontSize: ResponsiveTypography.getTypography(context).heading,
+                    fontSize: ResponsiveTypography.getTypography(
+                      context,
+                    ).heading,
                     fontWeight: FontWeight.bold,
                     color: Constants.ftaColorLight,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                SizedBox(
+                  height: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                ),
 
                 // Success Message
                 Text(
                   'Your vehicle spare parts request has been submitted successfully. You will receive quotes from suppliers soon.',
                   style: GoogleFonts.manrope(
-                    fontSize: ResponsiveTypography.getTypography(context).medium,
+                    fontSize: ResponsiveTypography.getTypography(
+                      context,
+                    ).medium,
                     color: Colors.grey[700],
                     height: 1.5,
                   ),
@@ -2324,7 +2517,9 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                         ),
                       ),
                     ),
-                    SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
@@ -2337,9 +2532,7 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                             Constants.buyerAppBarValue = 6;
                             appBarValueNotifier.value++;
                             buyerHomeValueNotifier.value++;
-                            setState(() {
-
-                            });
+                            setState(() {});
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -2509,7 +2702,10 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
             ),
             filled: true,
             fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium, vertical: ResponsiveSpacing.getSpacing(context).paddingSmall),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium,
+              vertical: ResponsiveSpacing.getSpacing(context).paddingSmall,
+            ),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black),
               borderRadius: BorderRadius.circular(36),
@@ -2576,7 +2772,10 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
             ),
             filled: true,
             fillColor: Colors.grey.shade50,
-            contentPadding: EdgeInsets.symmetric(horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium, vertical: ResponsiveSpacing.getSpacing(context).paddingSmall),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium,
+              vertical: ResponsiveSpacing.getSpacing(context).paddingSmall,
+            ),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black),
               borderRadius: BorderRadius.circular(36),
@@ -2591,38 +2790,38 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
             ),
             prefixIcon: _vinImages.isNotEmpty
                 ? Container(
-              margin: EdgeInsets.all(8),
-              padding: EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: Colors.green.shade50,
-                borderRadius: BorderRadius.circular(360),
-                border: Border.all(color: Colors.green.shade300),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.check_circle, color: Colors.green, size: 16),
-                  SizedBox(width: 4),
-                  Text(
-                    '${_vinImages.length} image${_vinImages.length > 1 ? 's' : ''}',
-                    style: GoogleFonts.manrope(
-                      color: Colors.green.shade700,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                    margin: EdgeInsets.all(8),
+                    padding: EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(360),
+                      border: Border.all(color: Colors.green.shade300),
                     ),
-                  ),
-                  SizedBox(width: 4),
-                  GestureDetector(
-                    onTap: _showVinImages,
-                    child: Icon(
-                      Icons.visibility,
-                      color: Colors.green.shade700,
-                      size: 16,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          '${_vinImages.length} image${_vinImages.length > 1 ? 's' : ''}',
+                          style: GoogleFonts.manrope(
+                            color: Colors.green.shade700,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(width: 4),
+                        GestureDetector(
+                          onTap: _showVinImages,
+                          child: Icon(
+                            Icons.visibility,
+                            color: Colors.green.shade700,
+                            size: 16,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            )
+                  )
                 : null,
             suffixIcon: GestureDetector(
               onTap: _pickVinImages,
@@ -2680,93 +2879,93 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
             ),
             child: _vinImages.isEmpty
                 ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt, size: 40, color: Colors.grey[400]),
-                SizedBox(height: 8),
-                Text(
-                  'Upload VIN Images',
-                  style: GoogleFonts.manrope(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Tap to add images of VIN number',
-                  style: GoogleFonts.manrope(
-                    color: Colors.grey[500],
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            )
-                : Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _vinImages
-                    .map(
-                      (image) => Stack(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.grey[300]!,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            image.path,
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (context, error, stackTrace) {
-                              return Container(
-                                width: 80,
-                                height: 80,
-                                color: Colors.grey[200],
-                                child: Icon(
-                                  Icons.image,
-                                  color: Colors.grey[400],
-                                ),
-                              );
-                            },
-                          ),
+                      Icon(Icons.camera_alt, size: 40, color: Colors.grey[400]),
+                      SizedBox(height: 8),
+                      Text(
+                        'Upload VIN Images',
+                        style: GoogleFonts.manrope(
+                          color: Colors.grey[600],
+                          fontSize: 14,
                         ),
                       ),
-                      Positioned(
-                        top: -5,
-                        right: -5,
-                        child: GestureDetector(
-                          onTap: () => _removeVinImage(image),
-                          child: Container(
-                            width: 18,
-                            height: 18,
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.close,
-                              size: 12,
-                              color: Colors.white,
-                            ),
-                          ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Tap to add images of VIN number',
+                        style: GoogleFonts.manrope(
+                          color: Colors.grey[500],
+                          fontSize: 12,
                         ),
                       ),
                     ],
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _vinImages
+                          .map(
+                            (image) => Stack(
+                              children: [
+                                Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      image.path,
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Container(
+                                              width: 80,
+                                              height: 80,
+                                              color: Colors.grey[200],
+                                              child: Icon(
+                                                Icons.image,
+                                                color: Colors.grey[400],
+                                              ),
+                                            );
+                                          },
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: -5,
+                                  right: -5,
+                                  child: GestureDetector(
+                                    onTap: () => _removeVinImage(image),
+                                    child: Container(
+                                      width: 18,
+                                      height: 18,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.close,
+                                        size: 12,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                          .toList(),
+                    ),
                   ),
-                )
-                    .toList(),
-              ),
-            ),
           ),
         ),
       ],
@@ -2799,7 +2998,9 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     ),
                   ],
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                SizedBox(
+                  height: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                ),
                 Container(
                   height: 300,
                   child: GridView.builder(
@@ -2869,7 +3070,9 @@ class _VehicleDetailsQuoteMobileFormState extends State<VehicleDetailsQuoteMobil
                     },
                   ),
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                SizedBox(
+                  height: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                ),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -3009,59 +3212,59 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
             ),
             child: _selectedImages.isEmpty
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.cloud_upload_outlined,
-                    size: 24,
-                    color: Colors.grey[500],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Upload Documents or Images',
-                    style: GoogleFonts.manrope(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            )
-                : Padding(
-              padding: EdgeInsets.all(8),
-              child: Column(
-                children: [
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _selectedImages
-                        .map((image) => _buildImagePreview(image))
-                        .toList(),
-                  ),
-                  SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Constants.ctaColorLight),
-                      borderRadius: BorderRadius.circular(6),
-                      color: Colors.white,
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Add More Images',
-                        style: GoogleFonts.manrope(
-                          color: Constants.ctaColorLight,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.cloud_upload_outlined,
+                          size: 24,
+                          color: Colors.grey[500],
                         ),
-                      ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Upload Documents or Images',
+                          style: GoogleFonts.manrope(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      children: [
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _selectedImages
+                              .map((image) => _buildImagePreview(image))
+                              .toList(),
+                        ),
+                        SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Constants.ctaColorLight),
+                            borderRadius: BorderRadius.circular(6),
+                            color: Colors.white,
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Add More Images',
+                              style: GoogleFonts.manrope(
+                                color: Constants.ctaColorLight,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
           ),
         ),
         if (_selectedImages.isNotEmpty)
@@ -3069,7 +3272,10 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
             padding: EdgeInsets.only(top: 8),
             child: Text(
               '${_selectedImages.length} image(s) selected',
-              style: GoogleFonts.manrope(color: Colors.grey[600], fontSize: ResponsiveTypography.getTypography(context).normal),
+              style: GoogleFonts.manrope(
+                color: Colors.grey[600],
+                fontSize: ResponsiveTypography.getTypography(context).normal,
+              ),
             ),
           ),
       ],
@@ -3164,12 +3370,12 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
   }
 
   Widget _buildCustomTextField(
-      String hintText,
-      TextEditingController controller,
-      FocusNode focusNode,
-      FocusNode? nextFocusNode, {
-        Widget? suffixIcon,
-      }) {
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocusNode, {
+    Widget? suffixIcon,
+  }) {
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
       labelText: hintText,
@@ -3190,14 +3396,14 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
   }
 
   Widget _buildCustomDropdown(
-      String label,
-      String? value,
-      List<String> items,
-      Function(String?) onChanged,
-      ) {
+    String label,
+    String? value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Container(
       width: double.infinity,
       height: 48,
@@ -3210,7 +3416,10 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
             fontWeight: FontWeight.w500,
             fontFamily: 'YuGothic',
           ),
-          contentPadding: EdgeInsets.symmetric(horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium, vertical: ResponsiveSpacing.getSpacing(context).paddingSmall),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium,
+            vertical: ResponsiveSpacing.getSpacing(context).paddingSmall,
+          ),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Constants.ftaColorLight),
             borderRadius: BorderRadius.circular(36),
@@ -3243,7 +3452,9 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                   item,
                   style: GoogleFonts.manrope(
                     color: Colors.black,
-                    fontSize: ResponsiveTypography.getTypography(context).normal,
+                    fontSize: ResponsiveTypography.getTypography(
+                      context,
+                    ).normal,
                     fontWeight: FontWeight.w300,
                   ),
                 ),
@@ -3259,7 +3470,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
   Widget _buildSection(String title, List<Widget> children) {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(spacing.paddingLarge),
@@ -3295,90 +3506,102 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
   @override
   Widget build(BuildContext context) {
     final bool isMobile = Breakpoints.isMobile(context);
-    
+
     return Column(
       children: [
         // Product Details Section
         _buildSection('Product Details', [
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomTextField(
-                    'Type of Electronics',
-                    _typeController,
-                    _typeFocus,
-                    _brandFocus,
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomTextField(
-                    'Brand Preference',
-                    _brandController,
-                    _brandFocus,
-                    _modelFocus,
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomTextField(
+              ? Column(
+                  children: [
+                    _buildCustomTextField(
                       'Type of Electronics',
                       _typeController,
                       _typeFocus,
                       _brandFocus,
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomTextField(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomTextField(
                       'Brand Preference',
                       _brandController,
                       _brandFocus,
                       _modelFocus,
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Type of Electronics',
+                        _typeController,
+                        _typeFocus,
+                        _brandFocus,
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Brand Preference',
+                        _brandController,
+                        _brandFocus,
+                        _modelFocus,
+                      ),
+                    ),
+                  ],
+                ),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomTextField(
-                    'Model/Series (if known)',
-                    _modelController,
-                    _modelFocus,
-                    _quantityFocus,
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomTextField(
-                    'Quantity Needed',
-                    _quantityController,
-                    _quantityFocus,
-                    _minPriceFocus,
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomTextField(
+              ? Column(
+                  children: [
+                    _buildCustomTextField(
                       'Model/Series (if known)',
                       _modelController,
                       _modelFocus,
                       _quantityFocus,
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomTextField(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomTextField(
                       'Quantity Needed',
                       _quantityController,
                       _quantityFocus,
                       _minPriceFocus,
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Model/Series (if known)',
+                        _modelController,
+                        _modelFocus,
+                        _quantityFocus,
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Quantity Needed',
+                        _quantityController,
+                        _quantityFocus,
+                        _minPriceFocus,
+                      ),
+                    ),
+                  ],
+                ),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           _buildLocationField(),
         ]),
@@ -3387,73 +3610,55 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
         // Budget And Timeline Section
         _buildSection('Budget And Timeline', [
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomTextField(
-                    'Min Price',
-                    _minPriceController,
-                    _minPriceFocus,
-                    _maxPriceFocus,
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomTextField(
-                    'Max Price',
-                    _maxPriceController,
-                    _maxPriceFocus,
-                    null,
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomTextField(
+              ? Column(
+                  children: [
+                    _buildCustomTextField(
                       'Min Price',
                       _minPriceController,
                       _minPriceFocus,
                       _maxPriceFocus,
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomTextField(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomTextField(
                       'Max Price',
                       _maxPriceController,
                       _maxPriceFocus,
                       null,
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Min Price',
+                        _minPriceController,
+                        _minPriceFocus,
+                        _maxPriceFocus,
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Max Price',
+                        _maxPriceController,
+                        _maxPriceFocus,
+                        null,
+                      ),
+                    ),
+                  ],
+                ),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomDropdown(
-                    'How Soon Do You Need the Product?',
-                    _selectedTimeframe,
-                    [
-                      'Within a week',
-                      'Within 2 weeks',
-                      'Within a month',
-                      'Within 3 months',
-                      'No rush',
-                    ],
-                    (value) => setState(() => _selectedTimeframe = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Do You Need Installation Services?',
-                    _selectedInstallation,
-                    ['Yes', 'No', 'Maybe'],
-                    (value) => setState(() => _selectedInstallation = value),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomDropdown(
+              ? Column(
+                  children: [
+                    _buildCustomDropdown(
                       'How Soon Do You Need the Product?',
                       _selectedTimeframe,
                       [
@@ -3465,18 +3670,49 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                       ],
                       (value) => setState(() => _selectedTimeframe = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Do You Need Installation Services?',
                       _selectedInstallation,
                       ['Yes', 'No', 'Maybe'],
                       (value) => setState(() => _selectedInstallation = value),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'How Soon Do You Need the Product?',
+                        _selectedTimeframe,
+                        [
+                          'Within a week',
+                          'Within 2 weeks',
+                          'Within a month',
+                          'Within 3 months',
+                          'No rush',
+                        ],
+                        (value) => setState(() => _selectedTimeframe = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Do You Need Installation Services?',
+                        _selectedInstallation,
+                        ['Yes', 'No', 'Maybe'],
+                        (value) =>
+                            setState(() => _selectedInstallation = value),
+                      ),
+                    ),
+                  ],
+                ),
         ]),
         SizedBox(height: 24),
 
@@ -3517,37 +3753,9 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
           ),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomDropdown(
-                    'Condition Preference',
-                    _selectedCondition,
-                    [
-                      'New / Refurbished',
-                      'New only',
-                      'Refurbished only',
-                      'Used acceptable',
-                    ],
-                    (value) => setState(() => _selectedCondition = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Purpose of Purchase',
-                    _selectedPurpose,
-                    [
-                      'Home Use',
-                      'Business Use',
-                      'Commercial Use',
-                      'Industrial Use',
-                    ],
-                    (value) => setState(() => _selectedPurpose = value),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomDropdown(
+              ? Column(
+                  children: [
+                    _buildCustomDropdown(
                       'Condition Preference',
                       _selectedCondition,
                       [
@@ -3558,10 +3766,12 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                       ],
                       (value) => setState(() => _selectedCondition = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Purpose of Purchase',
                       _selectedPurpose,
                       [
@@ -3572,9 +3782,41 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                       ],
                       (value) => setState(() => _selectedPurpose = value),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Condition Preference',
+                        _selectedCondition,
+                        [
+                          'New / Refurbished',
+                          'New only',
+                          'Refurbished only',
+                          'Used acceptable',
+                        ],
+                        (value) => setState(() => _selectedCondition = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Purpose of Purchase',
+                        _selectedPurpose,
+                        [
+                          'Home Use',
+                          'Business Use',
+                          'Commercial Use',
+                          'Industrial Use',
+                        ],
+                        (value) => setState(() => _selectedPurpose = value),
+                      ),
+                    ),
+                  ],
+                ),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           _buildImageUploadSection(),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
@@ -3617,7 +3859,9 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
         // Checkboxes
         Container(
           width: double.infinity,
-          padding: EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingLarge),
+          padding: EdgeInsets.all(
+            ResponsiveSpacing.getSpacing(context).paddingLarge,
+          ),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -3688,18 +3932,18 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
             onPressed: _isSubmitting
                 ? null
                 : () {
-              if (_agreeToTerms && _consentToContact) {
-                _submitElectronicsForm();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Please agree to terms and consent to contact.',
-                    ),
-                  ),
-                );
-              }
-            },
+                    if (_agreeToTerms && _consentToContact) {
+                      _submitElectronicsForm();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Please agree to terms and consent to contact.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
             style: ElevatedButton.styleFrom(
               backgroundColor: _isSubmitting
                   ? Colors.grey
@@ -3711,21 +3955,21 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
             ),
             child: _isSubmitting
                 ? SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            )
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
                 : Text(
-              'Submit',
-              style: GoogleFonts.manrope(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
+                    'Submit',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
           ),
         ),
       ],
@@ -3824,7 +4068,9 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                     size: 50,
                   ),
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                SizedBox(
+                  height: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                ),
 
                 // Success Title
                 Text(
@@ -3836,13 +4082,17 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                SizedBox(
+                  height: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                ),
 
                 // Success Message
                 Text(
                   'Your electronics request has been submitted successfully. Suppliers will contact you with their best offers.',
                   style: GoogleFonts.manrope(
-                    fontSize: ResponsiveTypography.getTypography(context).medium,
+                    fontSize: ResponsiveTypography.getTypography(
+                      context,
+                    ).medium,
                     color: Colors.grey[700],
                     height: 1.5,
                   ),
@@ -3877,7 +4127,9 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                         ),
                       ),
                     ),
-                    SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
@@ -3890,9 +4142,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
                             Constants.buyerAppBarValue = 6;
                             appBarValueNotifier.value++;
                             buyerHomeValueNotifier.value++;
-                            setState(() {
-
-                            });
+                            setState(() {});
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -4027,7 +4277,10 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
             ),
             filled: true,
             fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium, vertical: ResponsiveSpacing.getSpacing(context).paddingSmall),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium,
+              vertical: ResponsiveSpacing.getSpacing(context).paddingSmall,
+            ),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black),
               borderRadius: BorderRadius.circular(36),
@@ -4076,15 +4329,17 @@ Widget? _buildFormLabel(String hintText) {
 
 class TireProductQuoteMobileForm extends StatefulWidget {
   @override
-  _TireProductQuoteMobileFormState createState() => _TireProductQuoteMobileFormState();
+  _TireProductQuoteMobileFormState createState() =>
+      _TireProductQuoteMobileFormState();
 }
 
-class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm> {
+class _TireProductQuoteMobileFormState
+    extends State<TireProductQuoteMobileForm> {
   // Controllers
   final TextEditingController _tyreWidthController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _preferredBrandController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController _pcdController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
 
@@ -4106,10 +4361,10 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
   String? _selectedWheelRimDiameter;
   String? _selectedTyresRims;
   String? _selectedQuantity;
-  String? _selectedTimeframe ;
+  String? _selectedTimeframe;
   String? _selectedVehicleType;
   String? _selectedTyreConstruction;
-  String? _selectedFitmentRequired ;
+  String? _selectedFitmentRequired;
   String? _selectedBalancingRequired;
   String? _selectedTyreRotation;
 
@@ -4150,12 +4405,12 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
   }
 
   Widget _buildCustomTextField(
-      String hintText,
-      TextEditingController controller,
-      FocusNode focusNode,
-      FocusNode? nextFocusNode, {
-        Widget? suffixIcon,
-      }) {
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocusNode, {
+    Widget? suffixIcon,
+  }) {
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
       labelText: hintText,
@@ -4176,14 +4431,14 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
   }
 
   Widget _buildCustomDropdown(
-      String label,
-      String? value,
-      List<String> items,
-      Function(String?) onChanged,
-      ) {
+    String label,
+    String? value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Container(
       width: double.infinity,
       height: 48,
@@ -4196,7 +4451,10 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
             fontWeight: FontWeight.w500,
             fontFamily: 'YuGothic',
           ),
-          contentPadding: EdgeInsets.symmetric(horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium, vertical: ResponsiveSpacing.getSpacing(context).paddingSmall),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium,
+            vertical: ResponsiveSpacing.getSpacing(context).paddingSmall,
+          ),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Constants.ftaColorLight),
             borderRadius: BorderRadius.circular(36),
@@ -4229,7 +4487,9 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                   item,
                   style: GoogleFonts.manrope(
                     color: Colors.black,
-                    fontSize: ResponsiveTypography.getTypography(context).normal,
+                    fontSize: ResponsiveTypography.getTypography(
+                      context,
+                    ).normal,
                     fontWeight: FontWeight.w300,
                   ),
                 ),
@@ -4270,67 +4530,67 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
             ),
             child: _selectedImages.isEmpty
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.cloud_upload_outlined,
-                    size: 32,
-                    color: Colors.grey[500],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Upload Images',
-                    style: GoogleFonts.manrope(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Tap to select images from gallery',
-                    style: GoogleFonts.manrope(
-                      color: Colors.grey[500],
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            )
-                : Padding(
-              padding: EdgeInsets.all(8),
-              child: Column(
-                children: [
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _selectedImages
-                        .map((image) => _buildImagePreview(image))
-                        .toList(),
-                  ),
-                  SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Constants.ctaColorLight),
-                      borderRadius: BorderRadius.circular(6),
-                      color: Colors.white,
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Add More Images',
-                        style: GoogleFonts.manrope(
-                          color: Constants.ctaColorLight,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.cloud_upload_outlined,
+                          size: 32,
+                          color: Colors.grey[500],
                         ),
-                      ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Upload Images',
+                          style: GoogleFonts.manrope(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Tap to select images from gallery',
+                          style: GoogleFonts.manrope(
+                            color: Colors.grey[500],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      children: [
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _selectedImages
+                              .map((image) => _buildImagePreview(image))
+                              .toList(),
+                        ),
+                        SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Constants.ctaColorLight),
+                            borderRadius: BorderRadius.circular(6),
+                            color: Colors.white,
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Add More Images',
+                              style: GoogleFonts.manrope(
+                                color: Constants.ctaColorLight,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
           ),
         ),
         if (_selectedImages.isNotEmpty)
@@ -4338,7 +4598,10 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
             padding: EdgeInsets.only(top: 8),
             child: Text(
               '${_selectedImages.length} image(s) selected',
-              style: GoogleFonts.manrope(color: Colors.grey[600], fontSize: ResponsiveTypography.getTypography(context).normal),
+              style: GoogleFonts.manrope(
+                color: Colors.grey[600],
+                fontSize: ResponsiveTypography.getTypography(context).normal,
+              ),
             ),
           ),
       ],
@@ -4435,7 +4698,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
   Widget _buildSection(String title, List<Widget> children) {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
-    
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(spacing.paddingLarge),
@@ -4471,121 +4734,131 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
   @override
   Widget build(BuildContext context) {
     final bool isMobile = Breakpoints.isMobile(context);
-    
+
     return Column(
       children: [
         // Product Details Section
         _buildSection('Product Details', [
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomTextField(
-                    'Tyre width (mm)*',
-                    _tyreWidthController,
-                    _tyreWidthFocus,
-                    null,
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Sidewall Profile*',
-                    _selectedSidewallProfile,
-                    ['35', '40', '45', '50', '55', '60', '65', '70', '75'],
-                    (value) => setState(() => _selectedSidewallProfile = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Wheel Rim Diameter (inches)*',
-                    _selectedWheelRimDiameter,
-                    ['13', '14', '15', '16', '17', '18', '19', '20', '21', '22'],
-                    (value) => setState(() => _selectedWheelRimDiameter = value),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomTextField(
+              ? Column(
+                  children: [
+                    _buildCustomTextField(
                       'Tyre width (mm)*',
                       _tyreWidthController,
                       _tyreWidthFocus,
                       null,
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Sidewall Profile*',
                       _selectedSidewallProfile,
                       ['35', '40', '45', '50', '55', '60', '65', '70', '75'],
-                      (value) => setState(() => _selectedSidewallProfile = value),
+                      (value) =>
+                          setState(() => _selectedSidewallProfile = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Wheel Rim Diameter (inches)*',
                       _selectedWheelRimDiameter,
-                      ['13', '14', '15', '16', '17', '18', '19', '20', '21', '22'],
-                      (value) => setState(() => _selectedWheelRimDiameter = value),
+                      [
+                        '13',
+                        '14',
+                        '15',
+                        '16',
+                        '17',
+                        '18',
+                        '19',
+                        '20',
+                        '21',
+                        '22',
+                      ],
+                      (value) =>
+                          setState(() => _selectedWheelRimDiameter = value),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Tyre width (mm)*',
+                        _tyreWidthController,
+                        _tyreWidthFocus,
+                        null,
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Sidewall Profile*',
+                        _selectedSidewallProfile,
+                        ['35', '40', '45', '50', '55', '60', '65', '70', '75'],
+                        (value) =>
+                            setState(() => _selectedSidewallProfile = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Wheel Rim Diameter (inches)*',
+                        _selectedWheelRimDiameter,
+                        [
+                          '13',
+                          '14',
+                          '15',
+                          '16',
+                          '17',
+                          '18',
+                          '19',
+                          '20',
+                          '21',
+                          '22',
+                        ],
+                        (value) =>
+                            setState(() => _selectedWheelRimDiameter = value),
+                      ),
+                    ),
+                  ],
+                ),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomDropdown(
-                    'Select Tyres/Rims*',
-                    _selectedTyresRims,
-                    ['Tyres', 'Rims', 'Tyres & Rims'],
-                    (value) => setState(() => _selectedTyresRims = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Quantity*',
-                    _selectedQuantity,
-                    ['1', '2', '3', '4', '5', '6', '7', '8'],
-                    (value) => setState(() => _selectedQuantity = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'How Soon Do You Need To Buy This Product?*',
-                    _selectedTimeframe,
-                    [
-                      '12 Hours',
-                      '24 Hours',
-                      '2-3 Days',
-                      '1 Week',
-                      '2 Weeks',
-                      'Within a Month',
-                    ],
-                    (value) => setState(() => _selectedTimeframe = value),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomDropdown(
+              ? Column(
+                  children: [
+                    _buildCustomDropdown(
                       'Select Tyres/Rims*',
                       _selectedTyresRims,
                       ['Tyres', 'Rims', 'Tyres & Rims'],
                       (value) => setState(() => _selectedTyresRims = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Quantity*',
                       _selectedQuantity,
                       ['1', '2', '3', '4', '5', '6', '7', '8'],
                       (value) => setState(() => _selectedQuantity = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'How Soon Do You Need To Buy This Product?*',
                       _selectedTimeframe,
                       [
@@ -4598,192 +4871,312 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                       ],
                       (value) => setState(() => _selectedTimeframe = value),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Select Tyres/Rims*',
+                        _selectedTyresRims,
+                        ['Tyres', 'Rims', 'Tyres & Rims'],
+                        (value) => setState(() => _selectedTyresRims = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Quantity*',
+                        _selectedQuantity,
+                        ['1', '2', '3', '4', '5', '6', '7', '8'],
+                        (value) => setState(() => _selectedQuantity = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'How Soon Do You Need To Buy This Product?*',
+                        _selectedTimeframe,
+                        [
+                          '12 Hours',
+                          '24 Hours',
+                          '2-3 Days',
+                          '1 Week',
+                          '2 Weeks',
+                          'Within a Month',
+                        ],
+                        (value) => setState(() => _selectedTimeframe = value),
+                      ),
+                    ),
+                  ],
+                ),
         ]),
         SizedBox(height: 24),
 
         // More Fields Section
         _buildSection('More Fields', [
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomTextField(
-                    'Description Of Item',
-                    _descriptionController,
-                    _descriptionFocus,
-                    _preferredBrandFocus,
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Vehicle Type',
-                    _selectedVehicleType,
-                    ['Passenger Car', 'SUV', 'Truck', 'Van', 'Motorcycle', 'Bus'],
-                    (value) => setState(() => _selectedVehicleType = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomTextField(
-                    'Pitch Circle Diameter (PCD)',
-                    _pcdController,
-                    _pcdFocus,
-                    null,
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomTextField(
+              ? Column(
+                  children: [
+                    _buildCustomTextField(
                       'Description Of Item',
                       _descriptionController,
                       _descriptionFocus,
                       _preferredBrandFocus,
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Vehicle Type',
                       _selectedVehicleType,
-                      ['Passenger Car', 'SUV', 'Truck', 'Van', 'Motorcycle', 'Bus'],
+                      [
+                        'Passenger Car',
+                        'SUV',
+                        'Truck',
+                        'Van',
+                        'Motorcycle',
+                        'Bus',
+                      ],
                       (value) => setState(() => _selectedVehicleType = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomTextField(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomTextField(
                       'Pitch Circle Diameter (PCD)',
                       _pcdController,
                       _pcdFocus,
                       null,
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Description Of Item',
+                        _descriptionController,
+                        _descriptionFocus,
+                        _preferredBrandFocus,
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Vehicle Type',
+                        _selectedVehicleType,
+                        [
+                          'Passenger Car',
+                          'SUV',
+                          'Truck',
+                          'Van',
+                          'Motorcycle',
+                          'Bus',
+                        ],
+                        (value) => setState(() => _selectedVehicleType = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Pitch Circle Diameter (PCD)',
+                        _pcdController,
+                        _pcdFocus,
+                        null,
+                      ),
+                    ),
+                  ],
+                ),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomTextField(
-                    'Preferred Brand',
-                    _preferredBrandController,
-                    _preferredBrandFocus,
-                    null,
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Tyre Construction Type',
-                    _selectedTyreConstruction,
-                    ['Radial', 'Bias', 'Bias-Belted'],
-                    (value) => setState(() => _selectedTyreConstruction = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Fitment Required',
-                    _selectedFitmentRequired,
-                    ['Yes', 'No'],
-                    (value) => setState(() => _selectedFitmentRequired = value),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: _buildCustomTextField(
+              ? Column(
+                  children: [
+                    _buildCustomTextField(
                       'Preferred Brand',
                       _preferredBrandController,
                       _preferredBrandFocus,
                       null,
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Tyre Construction Type',
                       _selectedTyreConstruction,
                       ['Radial', 'Bias', 'Bias-Belted'],
-                      (value) => setState(() => _selectedTyreConstruction = value),
+                      (value) =>
+                          setState(() => _selectedTyreConstruction = value),
                     ),
-                  ),
-                  SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Expanded(
-                    child: _buildCustomDropdown(
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
                       'Fitment Required',
                       _selectedFitmentRequired,
                       ['Yes', 'No'],
-                      (value) => setState(() => _selectedFitmentRequired = value),
+                      (value) =>
+                          setState(() => _selectedFitmentRequired = value),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: _buildCustomTextField(
+                        'Preferred Brand',
+                        _preferredBrandController,
+                        _preferredBrandFocus,
+                        null,
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Tyre Construction Type',
+                        _selectedTyreConstruction,
+                        ['Radial', 'Bias', 'Bias-Belted'],
+                        (value) =>
+                            setState(() => _selectedTyreConstruction = value),
+                      ),
+                    ),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
+                    Expanded(
+                      child: _buildCustomDropdown(
+                        'Fitment Required',
+                        _selectedFitmentRequired,
+                        ['Yes', 'No'],
+                        (value) =>
+                            setState(() => _selectedFitmentRequired = value),
+                      ),
+                    ),
+                  ],
+                ),
           SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
           isMobile
-            ? Column(
-                children: [
-                  _buildCustomDropdown(
-                    'Balancing Required',
-                    _selectedBalancingRequired,
-                    ['Yes', 'No'],
-                    (value) => setState(() => _selectedBalancingRequired = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildCustomDropdown(
-                    'Tyre Rotation Required',
-                    _selectedTyreRotation,
-                    ['Yes', 'No'],
-                    (value) => setState(() => _selectedTyreRotation = value),
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildImageUploadSection(),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  _buildLocationField(),
-                ],
-              )
-            : Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildCustomDropdown(
-                          'Balancing Required',
-                          _selectedBalancingRequired,
-                          ['Yes', 'No'],
-                          (value) => setState(() => _selectedBalancingRequired = value),
+              ? Column(
+                  children: [
+                    _buildCustomDropdown(
+                      'Balancing Required',
+                      _selectedBalancingRequired,
+                      ['Yes', 'No'],
+                      (value) =>
+                          setState(() => _selectedBalancingRequired = value),
+                    ),
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildCustomDropdown(
+                      'Tyre Rotation Required',
+                      _selectedTyreRotation,
+                      ['Yes', 'No'],
+                      (value) => setState(() => _selectedTyreRotation = value),
+                    ),
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildImageUploadSection(),
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    _buildLocationField(),
+                  ],
+                )
+              : Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildCustomDropdown(
+                            'Balancing Required',
+                            _selectedBalancingRequired,
+                            ['Yes', 'No'],
+                            (value) => setState(
+                              () => _selectedBalancingRequired = value,
+                            ),
+                          ),
                         ),
-                      ),
-                      SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                      Expanded(
-                        child: _buildCustomDropdown(
-                          'Tyre Rotation Required',
-                          _selectedTyreRotation,
-                          ['Yes', 'No'],
-                          (value) => setState(() => _selectedTyreRotation = value),
+                        SizedBox(
+                          width: ResponsiveSpacing.getSpacing(
+                            context,
+                          ).spacingLarge,
                         ),
-                      ),
-                      SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                      Expanded(child: _buildImageUploadSection()),
-                    ],
-                  ),
-                  SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                  Row(
-                    children: [
-                      Expanded(child: _buildLocationField()),
-                      SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                      Expanded(child: Container()),
-                      SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
-                      Expanded(child: Container()),
-                    ],
-                  ),
-                ],
-              ),
+                        Expanded(
+                          child: _buildCustomDropdown(
+                            'Tyre Rotation Required',
+                            _selectedTyreRotation,
+                            ['Yes', 'No'],
+                            (value) =>
+                                setState(() => _selectedTyreRotation = value),
+                          ),
+                        ),
+                        SizedBox(
+                          width: ResponsiveSpacing.getSpacing(
+                            context,
+                          ).spacingLarge,
+                        ),
+                        Expanded(child: _buildImageUploadSection()),
+                      ],
+                    ),
+                    SizedBox(
+                      height: ResponsiveSpacing.getSpacing(
+                        context,
+                      ).spacingLarge,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(child: _buildLocationField()),
+                        SizedBox(
+                          width: ResponsiveSpacing.getSpacing(
+                            context,
+                          ).spacingLarge,
+                        ),
+                        Expanded(child: Container()),
+                        SizedBox(
+                          width: ResponsiveSpacing.getSpacing(
+                            context,
+                          ).spacingLarge,
+                        ),
+                        Expanded(child: Container()),
+                      ],
+                    ),
+                  ],
+                ),
         ]),
         SizedBox(height: 24),
 
         // Checkboxes
         Container(
           width: double.infinity,
-          padding: EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingLarge),
+          padding: EdgeInsets.all(
+            ResponsiveSpacing.getSpacing(context).paddingLarge,
+          ),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -4854,18 +5247,18 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
             onPressed: _isSubmitting
                 ? null
                 : () {
-              if (_agreeToTerms && _consentToContact) {
-                _submitTyresRimsForm();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Please agree to terms and consent to contact.',
-                    ),
-                  ),
-                );
-              }
-            },
+                    if (_agreeToTerms && _consentToContact) {
+                      _submitTyresRimsForm();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Please agree to terms and consent to contact.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
             style: ElevatedButton.styleFrom(
               backgroundColor: _isSubmitting
                   ? Colors.grey
@@ -4877,21 +5270,23 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
             ),
             child: _isSubmitting
                 ? SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            )
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
                 : Text(
-              'Submit',
-              style: GoogleFonts.manrope(
-                fontSize: ResponsiveTypography.getTypography(context).normal,
-                fontWeight: FontWeight.w300,
-                color: Colors.white,
-              ),
-            ),
+                    'Submit',
+                    style: GoogleFonts.manrope(
+                      fontSize: ResponsiveTypography.getTypography(
+                        context,
+                      ).normal,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.white,
+                    ),
+                  ),
           ),
         ),
       ],
@@ -4992,7 +5387,9 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                     size: 50,
                   ),
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                SizedBox(
+                  height: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                ),
 
                 // Success Title
                 Text(
@@ -5004,13 +5401,17 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                SizedBox(
+                  height: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                ),
 
                 // Success Message
                 Text(
                   'Your tyres and rims request has been submitted successfully. Suppliers will provide you with competitive quotes soon.',
                   style: GoogleFonts.manrope(
-                    fontSize: ResponsiveTypography.getTypography(context).medium,
+                    fontSize: ResponsiveTypography.getTypography(
+                      context,
+                    ).medium,
                     color: Colors.grey[700],
                     height: 1.5,
                   ),
@@ -5045,7 +5446,9 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                         ),
                       ),
                     ),
-                    SizedBox(width: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                    SizedBox(
+                      width: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                    ),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
@@ -5058,9 +5461,7 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
                             Constants.buyerAppBarValue = 6;
                             appBarValueNotifier.value++;
                             buyerHomeValueNotifier.value++;
-                            setState(() {
-
-                            });
+                            setState(() {});
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -5201,7 +5602,10 @@ class _TireProductQuoteMobileFormState extends State<TireProductQuoteMobileForm>
             ),
             filled: true,
             fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium, vertical: ResponsiveSpacing.getSpacing(context).paddingSmall),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: ResponsiveSpacing.getSpacing(context).paddingMedium,
+              vertical: ResponsiveSpacing.getSpacing(context).paddingSmall,
+            ),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black),
               borderRadius: BorderRadius.circular(36),
@@ -5248,8 +5652,11 @@ class FooterMobileSection extends StatelessWidget {
   final String logo;
   final Function(String)? onFooterLinkTap;
 
-  const FooterMobileSection({Key? key, required this.logo, this.onFooterLinkTap})
-      : super(key: key);
+  const FooterMobileSection({
+    Key? key,
+    required this.logo,
+    this.onFooterLinkTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -5263,7 +5670,9 @@ class FooterMobileSection extends StatelessWidget {
             child: Column(
               children: [
                 Image.asset(logo, fit: BoxFit.contain),
-                SizedBox(height: ResponsiveSpacing.getSpacing(context).spacingLarge),
+                SizedBox(
+                  height: ResponsiveSpacing.getSpacing(context).spacingLarge,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -5394,10 +5803,12 @@ class LocationPickerMobileDialog extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<LocationPickerMobileDialog> createState() => _LocationPickerMobileDialogState();
+  State<LocationPickerMobileDialog> createState() =>
+      _LocationPickerMobileDialogState();
 }
 
-class _LocationPickerMobileDialogState extends State<LocationPickerMobileDialog> {
+class _LocationPickerMobileDialogState
+    extends State<LocationPickerMobileDialog> {
   GoogleMapController? _mapController;
   LatLng _selectedLocation = const LatLng(-26.2041, 28.0473);
   String _selectedAddress = '';
@@ -5518,13 +5929,13 @@ class _LocationPickerMobileDialogState extends State<LocationPickerMobileDialog>
       } else {
         setState(() {
           _selectedAddress =
-          '${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)}';
+              '${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)}';
         });
       }
     } catch (e) {
       setState(() {
         _selectedAddress =
-        '${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)}';
+            '${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)}';
       });
       print('Geocoding error: $e');
     }
@@ -5585,14 +5996,20 @@ class _LocationPickerMobileDialogState extends State<LocationPickerMobileDialog>
             // Search bar
             Padding(
               padding: const EdgeInsets.all(16),
-              child: _buildCustomTextField("Search for a location...",_searchController,searchFocusNode,_searchController.text.isNotEmpty?
-              IconButton(
-                icon: Icon(Icons.clear, color: Colors.grey),
-                onPressed: () {
-                  _searchController.clear();
-                  setState(() {});
-                },
-              ):null),
+              child: _buildCustomTextField(
+                "Search for a location...",
+                _searchController,
+                searchFocusNode,
+                _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(Icons.clear, color: Colors.grey),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {});
+                        },
+                      )
+                    : null,
+              ),
             ),
 
             // Map
@@ -5751,7 +6168,7 @@ class _LocationPickerMobileDialogState extends State<LocationPickerMobileDialog>
                         backgroundColor: Constants.ctaColorLight,
                         foregroundColor: Colors.white,
 
-                        padding: EdgeInsets.symmetric(vertical: 18,),
+                        padding: EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(360),
                         ),
@@ -5770,12 +6187,13 @@ class _LocationPickerMobileDialogState extends State<LocationPickerMobileDialog>
       ),
     );
   }
+
   Widget _buildCustomTextField(
-      String hintText,
-      TextEditingController controller,
-      FocusNode focusNode,
-      Widget? suffixIcon,
-      ) {
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    Widget? suffixIcon,
+  ) {
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
       labelText: hintText,
@@ -5794,6 +6212,7 @@ class _LocationPickerMobileDialogState extends State<LocationPickerMobileDialog>
       },
     );
   }
+
   @override
   void dispose() {
     _searchController.dispose();

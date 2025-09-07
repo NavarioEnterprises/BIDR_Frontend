@@ -1079,8 +1079,8 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
         textInputAction: widget.textInputAction,
         inputFormatters: widget.integersOnly == true
             ? <TextInputFormatter>[
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                LengthLimitingTextInputFormatter(widget.maxLength ?? 10),
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9+]')),
+                LengthLimitingTextInputFormatter(widget.maxLength ?? 15),
               ]
             : widget.maxLength != null
             ? <TextInputFormatter>[

@@ -81,6 +81,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
   String _deliveryMethod = 'sms'; // Default to SMS
   String message = "";
   AuthApiService apiService = AuthApiService();
+  
 
   @override
   void dispose() {
@@ -98,9 +99,6 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     super.dispose();
   }
 
-  bool _isValidEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
-  }
 
   void _handleSignUp() async {
     if (!_validateForm()) return;
@@ -135,6 +133,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
 
           // Navigate to OTP verification
           if (result['success'] == true) {
+            if (!mounted) return;
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -161,6 +160,15 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                 final emailErrors = errors['email'] as List;
                 if (emailErrors.isNotEmpty) {
                   errorMessage = emailErrors.first.toString();
+                  // Check if the error is about email already existing
+                  if (errorMessage.toLowerCase().contains('already exists') ||
+                      errorMessage.toLowerCase().contains('already registered') ||
+                      errorMessage.toLowerCase().contains('user with this email')) {
+                    // Show option to navigate to OTP screen directly
+                    if (!mounted) return;
+                    _showEmailExistsDialog();
+                    return;
+                  }
                 }
               }
               // Check for other field errors
@@ -183,6 +191,15 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
               final emailErrors = errorResponse['email'] as List;
               if (emailErrors.isNotEmpty) {
                 errorMessage = emailErrors.first.toString();
+                // Check if the error is about email already existing
+                if (errorMessage.toLowerCase().contains('already exists') ||
+                    errorMessage.toLowerCase().contains('already registered') ||
+                    errorMessage.toLowerCase().contains('user with this email')) {
+                  // Show option to navigate to OTP screen directly
+                  if (!mounted) return;
+                  _showEmailExistsDialog();
+                  return;
+                }
               }
             }
           } else if (result['message'] != null) {
@@ -282,17 +299,28 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
           : TextInputAction.done,
       isPasswordField: isPasswordField ?? false,
       integersOnly: integersOnly,
-      maxLength: integersOnly == true ? 10 : null,
+      maxLength: integersOnly == true ? 15 : null,
       suffix: suffixIcon,
       onChanged: (value) {
         // Real-time validation and formatting
         if (integersOnly == true) {
-          // For mobile numbers, ensure only digits and limit to 10
-          final digitsOnly = value.replaceAll(RegExp(r'[^0-9]'), '');
-          if (digitsOnly != value) {
+          // For mobile numbers, allow + prefix and digits
+          final cleanedValue = value.replaceAll(RegExp(r'[^0-9+]'), '');
+          // Ensure + only appears at the beginning
+          String formattedValue = cleanedValue;
+          if (cleanedValue.contains('+')) {
+            final plusCount = '+'.allMatches(cleanedValue).length;
+            if (plusCount > 1 || (plusCount == 1 && !cleanedValue.startsWith('+'))) {
+              formattedValue = cleanedValue.replaceAll('+', '');
+              if (value.startsWith('+')) {
+                formattedValue = '+' + formattedValue;
+              }
+            }
+          }
+          if (formattedValue != value) {
             controller.value = TextEditingValue(
-              text: digitsOnly,
-              selection: TextSelection.collapsed(offset: digitsOnly.length),
+              text: formattedValue,
+              selection: TextSelection.collapsed(offset: formattedValue.length),
             );
           }
         } else if (isName == true) {
@@ -339,11 +367,14 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
       if (value.trim().isEmpty) {
         return 'Mobile number is required';
       }
-      if (value.length != 10) {
-        return 'Mobile number must be exactly 10 digits';
+      // Remove + prefix for length checking
+      final digitsOnly = value.replaceAll('+', '');
+      if (digitsOnly.length < 10 || digitsOnly.length > 15) {
+        return 'Mobile number must be between 10-15 digits';
       }
-      if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
-        return 'Mobile number can only contain digits';
+      // Allow optional + at the beginning followed by digits
+      if (!RegExp(r'^\+?[0-9]+$').hasMatch(value)) {
+        return 'Mobile number can only contain digits and optional + prefix';
       }
     } else if (fieldName.contains('Email')) {
       if (value.trim().isEmpty) {
@@ -392,8 +423,109 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     );
   }
 
-  void _handleSignIn() {
-    print('Navigate to sign in');
+  void _showEmailExistsDialog() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Account Already Exists',
+            style: GoogleFonts.manrope(
+              fontWeight: FontWeight.bold,
+              color: Constants.ftaColorLight,
+            ),
+          ),
+          content: Text(
+            'An account with this email already exists. Would you like to:\n\n'
+            '1. Go to OTP verification screen\n'
+            '2. Resend OTP to the new phone number: ${_mobileController.text}',
+            style: GoogleFonts.manrope(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.manrope(color: Colors.grey),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                // Resend OTP with new phone number
+                setState(() {
+                  _isLoading = true;
+                });
+                
+                final result = await apiService.resendOtp(
+                  _emailController.text,
+                  _mobileController.text,
+                  deliveryMethod: _deliveryMethod,
+                );
+                
+                setState(() {
+                  _isLoading = false;
+                });
+                
+                if (result != null && result['success'] == true) {
+                  if (!mounted) return;
+                  CustomDialogs.showSuccessDialog(
+                    context,
+                    'OTP sent to ${_mobileController.text}',
+                    onDismiss: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BidrOTPVerificationScreen(
+                            email: _emailController.text,
+                            phone: _mobileController.text,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  if (!mounted) return;
+                  CustomDialogs.showErrorDialog(
+                    context,
+                    result?['error'] ?? 'Failed to send OTP',
+                  );
+                }
+              },
+              child: Text(
+                'Resend OTP',
+                style: GoogleFonts.manrope(
+                  color: Constants.ctaColorLight,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Go directly to OTP screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BidrOTPVerificationScreen(
+                      email: _emailController.text,
+                      phone: _mobileController.text,
+                    ),
+                  ),
+                );
+              },
+              child: Text(
+                'Go to OTP',
+                style: GoogleFonts.manrope(
+                  color: Constants.ctaColorLight,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

@@ -26,7 +26,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Set the environment configuration
-  AppConfig.setEnvironment(EnvironmentType.uat);
+  AppConfig.setEnvironment(EnvironmentType.prod);
 
   // Check if user is logged in
   final bool isLoggedIn =

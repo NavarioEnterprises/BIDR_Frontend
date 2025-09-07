@@ -1,15 +1,19 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:async';
 import 'package:bidr/pages/seller/seller_home_dashboard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
+import 'package:google_places_flutter/model/prediction.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 import '../authentication/forgot_password.dart';
 import '../authentication/login.dart';
@@ -69,12 +73,8 @@ class _BuyerHomePageState extends State<BuyerHomePage>
     super.initState();
     myNotifier = MyNotifier(buyerHomeValueNotifier, context);
     mySellerNotifier = MyNotifier(sellerHomeValueNotifier, context);
-    buyerHomeValueNotifier.addListener(() {
-      setState(() {});
-    });
-    sellerHomeValueNotifier.addListener(() {
-      setState(() {});
-    });
+    buyerHomeValueNotifier.addListener(_onBuyerValueChanged);
+    sellerHomeValueNotifier.addListener(_onSellerValueChanged);
     // Initialize animation controllers
     _fadeController = AnimationController(
       duration: Duration(milliseconds: 800),
@@ -132,8 +132,22 @@ class _BuyerHomePageState extends State<BuyerHomePage>
     _categoryController.forward();
   }
 
+  void _onBuyerValueChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _onSellerValueChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   void dispose() {
+    buyerHomeValueNotifier.removeListener(_onBuyerValueChanged);
+    sellerHomeValueNotifier.removeListener(_onSellerValueChanged);
     _fadeController.dispose();
     _slideController.dispose();
     _scaleController.dispose();
@@ -152,267 +166,331 @@ class _BuyerHomePageState extends State<BuyerHomePage>
   }
 
   final List<Map<String, String>> categories = [
-    {"icon": "lib/assets/images/spares1.png", "icon2": "lib/assets/images/vehicle_light.png","name": "Vehicle\nSpares"},
-    {"icon": "lib/assets/images/rim_and_type.png","icon2": "lib/assets/images/rims.png", "name": "Vehicle Tyres\nand Rims"},
     {
-      "icon": "lib/assets/images/consumer.png","icon2": "lib/assets/images/ele_light.png",
+      "icon": "lib/assets/images/spares1.png",
+      "icon2": "lib/assets/images/vehicle_light.png",
+      "name": "Vehicle\nSpares",
+    },
+    {
+      "icon": "lib/assets/images/rim_and_type.png",
+      "icon2": "lib/assets/images/rims.png",
+      "name": "Vehicle Tyres\nand Rims",
+    },
+    {
+      "icon": "lib/assets/images/consumer.png",
+      "icon2": "lib/assets/images/ele_light.png",
       "name": "Consumer \nElectronics",
     },
   ];
 
   @override
   Widget build(BuildContext context) {
-    return  Breakpoints.isMobile(context)?BuyerHomeMobilePage():
-    Scaffold(
-      backgroundColor: Colors.white, //
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Animated Header Section
-            SizedBox(height: 24),
-            FadeTransition(
-              opacity: _fadeAnimation,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 32,
-                    right: 32,
-                  ), //BlogCardsScreen
-                  child: HeaderSection(),
-                ),
-              ),
-            ),
+    return Breakpoints.isMobile(context)
+        ? BuyerHomeMobilePage()
+        : Scaffold(
+            backgroundColor: Colors.white, //
+            body: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Animated Header Section
+                  SizedBox(height: 24),
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 32,
+                          right: 32,
+                        ), //BlogCardsScreen
+                        child: HeaderSection(),
+                      ),
+                    ),
+                  ),
 
-            Constants.buyerAppBarValue == 0
-                ?
-            Expanded(
-                    child: Container(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Container(
-                              constraints: BoxConstraints(maxWidth: 1600),
+                  Constants.buyerAppBarValue == 0
+                      ? Expanded(
+                          child: Container(
+                            child: SingleChildScrollView(
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SizedBox(height: 24),
+                                  Container(
+                                    constraints: BoxConstraints(maxWidth: 1600),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        SizedBox(height: 24),
 
-                                  // Animated Banner Section
-                                  ScaleTransition(
-                                    scale: _scaleAnimation,
-                                    child: Padding(
-                                      padding:  EdgeInsets.only(
-                                        left: Breakpoints.isTablet(context)?24:64,
-                                        right: Breakpoints.isTablet(context)?24:64,
-                                      ),
-                                      child: Center(
-                                        child: _buildAnimatedBannerSection(
-                                          "lib/assets/images/competitive.png",
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  SizedBox(height: 24),
-
-                                  // Animated Category Section
-                                  Center(
-                                    child: SlideTransition(
-                                      position: _slideAnimation,
-                                      child: FadeTransition(
-                                        opacity: _categoryAnimation,
-                                        child: Padding(
-                                          padding:  EdgeInsets.only(
-                                            left: Breakpoints.isTablet(context)?24:64,
-                                            right: Breakpoints.isTablet(context)?24:64,
-                                          ),
-                                          child: Center(
-                                            child: _buildCategoryItems(),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  // Animated Form Section
-                                  AnimatedSwitcher(
-                                    duration: Duration(milliseconds: 500),
-                                    transitionBuilder:
-                                        (
-                                          Widget child,
-                                          Animation<double> animation,
-                                        ) {
-                                          return SlideTransition(
-                                            position: Tween<Offset>(
-                                              begin: Offset(0.0, 0.3),
-                                              end: Offset.zero,
-                                            ).animate(animation),
-                                            child: FadeTransition(
-                                              opacity: animation,
-                                              child: child,
+                                        // Animated Banner Section
+                                        ScaleTransition(
+                                          scale: _scaleAnimation,
+                                          child: Padding(
+                                            padding: EdgeInsets.only(
+                                              left:
+                                                  Breakpoints.isTablet(context)
+                                                  ? 24
+                                                  : 64,
+                                              right:
+                                                  Breakpoints.isTablet(context)
+                                                  ? 24
+                                                  : 64,
                                             ),
-                                          );
-                                        },
+                                            child: Center(
+                                              child: _buildAnimatedBannerSection(
+                                                "lib/assets/images/competitive.png",
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+
+                                        SizedBox(height: 24),
+
+                                        // Animated Category Section
+                                        Center(
+                                          child: SlideTransition(
+                                            position: _slideAnimation,
+                                            child: FadeTransition(
+                                              opacity: _categoryAnimation,
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  left:
+                                                      Breakpoints.isTablet(
+                                                        context,
+                                                      )
+                                                      ? 24
+                                                      : 64,
+                                                  right:
+                                                      Breakpoints.isTablet(
+                                                        context,
+                                                      )
+                                                      ? 24
+                                                      : 64,
+                                                ),
+                                                child: Center(
+                                                  child: _buildCategoryItems(),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+
+                                        // Animated Form Section
+                                        AnimatedSwitcher(
+                                          duration: Duration(milliseconds: 500),
+                                          transitionBuilder:
+                                              (
+                                                Widget child,
+                                                Animation<double> animation,
+                                              ) {
+                                                return SlideTransition(
+                                                  position: Tween<Offset>(
+                                                    begin: Offset(0.0, 0.3),
+                                                    end: Offset.zero,
+                                                  ).animate(animation),
+                                                  child: FadeTransition(
+                                                    opacity: animation,
+                                                    child: child,
+                                                  ),
+                                                );
+                                              },
+                                          child: Center(
+                                            key: ValueKey(selectedIndex),
+                                            child: selectedIndex == 0
+                                                ? Padding(
+                                                    padding: EdgeInsets.only(
+                                                      left:
+                                                          Breakpoints.isTablet(
+                                                            context,
+                                                          )
+                                                          ? 24
+                                                          : 64,
+                                                      right: 64,
+                                                    ),
+                                                    child:
+                                                        VehicleDetailsQuoteForm(),
+                                                  )
+                                                : selectedIndex == 1
+                                                ? Padding(
+                                                    padding: EdgeInsets.only(
+                                                      left:
+                                                          Breakpoints.isTablet(
+                                                            context,
+                                                          )
+                                                          ? 24
+                                                          : 64,
+                                                      right:
+                                                          Breakpoints.isTablet(
+                                                            context,
+                                                          )
+                                                          ? 24
+                                                          : 64,
+                                                    ),
+                                                    child:
+                                                        TireProductQuoteForm(),
+                                                  )
+                                                : selectedIndex == 2
+                                                ? Padding(
+                                                    padding: EdgeInsets.only(
+                                                      left:
+                                                          Breakpoints.isTablet(
+                                                            context,
+                                                          )
+                                                          ? 24
+                                                          : 64,
+                                                      right:
+                                                          Breakpoints.isTablet(
+                                                            context,
+                                                          )
+                                                          ? 24
+                                                          : 64,
+                                                    ),
+                                                    child: ProductQuoteForm(),
+                                                  )
+                                                : SizedBox.shrink(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  // Animated About Us Section
+                                  selectedIndex < 0
+                                      ? SizedBox.shrink()
+                                      : SizedBox(height: 60),
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(begin: 0.0, end: 1.0),
+                                    duration: Duration(milliseconds: 1000),
+                                    builder: (context, value, child) {
+                                      return Transform.translate(
+                                        offset: Offset(0, 50 * (1 - value)),
+                                        child: Opacity(
+                                          opacity: value,
+                                          child: Center(
+                                            child: _buildAboutUsSection(),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+
+                                  SizedBox(height: 24),
+
+                                  // Animated Bottom Banner
+                                  FadeTransition(
+                                    opacity: _fadeAnimation,
+                                    child: Container(
+                                      constraints: BoxConstraints(
+                                        maxWidth: 1600,
+                                      ),
+                                      child: Padding(
+                                        padding: EdgeInsets.only(
+                                          left: Breakpoints.isTablet(context)
+                                              ? 24
+                                              : 64,
+                                          right: Breakpoints.isTablet(context)
+                                              ? 24
+                                              : 64,
+                                        ),
+                                        child: Center(
+                                          child: _buildAnimatedBannerSection(
+                                            "lib/assets/images/mask_group.png",
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 24),
+
+                                  // Animated Footer
+                                  SlideTransition(
+                                    position: Tween<Offset>(
+                                      begin: Offset(0, 1),
+                                      end: Offset.zero,
+                                    ).animate(_slideController),
                                     child: Center(
-                                      key: ValueKey(selectedIndex),
-                                      child: selectedIndex == 0
-                                          ? Padding(
-                                              padding:  EdgeInsets.only(
-                                                left: Breakpoints.isTablet(context)?24:64,
-                                                right:64,
-                                              ),
-                                              child: VehicleDetailsQuoteForm(),
-                                            )
-                                          : selectedIndex == 1
-                                          ? Padding(
-                                              padding:  EdgeInsets.only(
-                                                left:Breakpoints.isTablet(context)?24:64,
-                                                right: Breakpoints.isTablet(context)?24:64,
-                                              ),
-                                              child:TireProductQuoteForm() ,
-                                            )
-                                          : selectedIndex == 2
-                                          ? Padding(
-                                              padding:  EdgeInsets.only(
-                                                left: Breakpoints.isTablet(context)?24:64,
-                                                right: Breakpoints.isTablet(context)?24:64,
-                                              ),
-                                              child: ProductQuoteForm(),
-                                            )
-                                          : SizedBox.shrink(),
+                                      child: FooterSection(
+                                        logo:
+                                            "lib/assets/images/bidr_logo2.png",
+                                        onFooterLinkTap: (String text) {
+                                          switch (text) {
+                                            case 'Home':
+                                              setState(() {
+                                                Constants.buyerAppBarValue = 0;
+                                                buyerHomeValueNotifier.value++;
+                                              });
+                                              break;
+                                            case 'Support':
+                                              setState(() {
+                                                Constants.buyerAppBarValue = 1;
+                                                buyerHomeValueNotifier.value++;
+                                              });
+                                              break;
+                                            case 'FAQs':
+                                              setState(() {
+                                                Constants.buyerAppBarValue = 2;
+                                                buyerHomeValueNotifier.value++;
+                                              });
+                                              break;
+                                            case 'Policies':
+                                              setState(() {
+                                                Constants.buyerAppBarValue = 3;
+                                                buyerHomeValueNotifier.value++;
+                                              });
+                                              break;
+                                            case 'Blogs':
+                                              setState(() {
+                                                Constants.buyerAppBarValue = 4;
+                                                buyerHomeValueNotifier.value++;
+                                              });
+                                              break;
+                                            case 'Contact Us':
+                                              setState(() {
+                                                Constants.buyerAppBarValue = 5;
+                                                buyerHomeValueNotifier.value++;
+                                              });
+                                              break;
+                                          }
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-
-                            // Animated About Us Section
-                            selectedIndex < 0
-                                ? SizedBox.shrink()
-                                : SizedBox(height: 60),
-                            TweenAnimationBuilder<double>(
-                              tween: Tween<double>(begin: 0.0, end: 1.0),
-                              duration: Duration(milliseconds: 1000),
-                              builder: (context, value, child) {
-                                return Transform.translate(
-                                  offset: Offset(0, 50 * (1 - value)),
-                                  child: Opacity(
-                                    opacity: value,
-                                    child: Center(
-                                      child: _buildAboutUsSection(),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-
-                            SizedBox(height: 24),
-
-                            // Animated Bottom Banner
-                            FadeTransition(
-                              opacity: _fadeAnimation,
-                              child: Container(
-                                constraints: BoxConstraints(maxWidth: 1600),
-                                child: Padding(
-                                  padding:  EdgeInsets.only(
-                                    left: Breakpoints.isTablet(context)?24:64,
-                                    right: Breakpoints.isTablet(context)?24:64,
-                                  ),
-                                  child: Center(
-                                    child: _buildAnimatedBannerSection(
-                                      "lib/assets/images/mask_group.png",
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(height: 24),
-
-                            // Animated Footer
-                            SlideTransition(
-                              position: Tween<Offset>(
-                                begin: Offset(0, 1),
-                                end: Offset.zero,
-                              ).animate(_slideController),
-                              child: Center(
-                                child: FooterSection(
-                                  logo: "lib/assets/images/bidr_logo2.png",
-                                  onFooterLinkTap: (String text) {
-                                    switch (text) {
-                                      case 'Home':
-                                        setState(() {
-                                          Constants.buyerAppBarValue = 0;
-                                          buyerHomeValueNotifier.value++;
-                                        });
-                                        break;
-                                      case 'Support':
-                                        setState(() {
-                                          Constants.buyerAppBarValue = 1;
-                                          buyerHomeValueNotifier.value++;
-                                        });
-                                        break;
-                                      case 'FAQs':
-                                        setState(() {
-                                          Constants.buyerAppBarValue = 2;
-                                          buyerHomeValueNotifier.value++;
-                                        });
-                                        break;
-                                      case 'Policies':
-                                        setState(() {
-                                          Constants.buyerAppBarValue = 3;
-                                          buyerHomeValueNotifier.value++;
-                                        });
-                                        break;
-                                      case 'Blogs':
-                                        setState(() {
-                                          Constants.buyerAppBarValue = 4;
-                                          buyerHomeValueNotifier.value++;
-                                        });
-                                        break;
-                                      case 'Contact Us':
-                                        setState(() {
-                                          Constants.buyerAppBarValue = 5;
-                                          buyerHomeValueNotifier.value++;
-                                        });
-                                        break;
-                                    }
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                : Constants.buyerAppBarValue == 1
-                ? Expanded(child: Support())
-                : Constants.buyerAppBarValue == 2
-                ? Expanded(child: FAQScreen())
-                : Constants.buyerAppBarValue == 3
-                ? Expanded(child: PoliciesScreen())
-                : Constants.buyerAppBarValue == 4
-                ? Expanded(child: BlogCardsScreen())
-                : Constants.buyerAppBarValue == 5
-                ? Expanded(child: ContactFormScreen())
-                : Constants.buyerAppBarValue == 6
-                ? Expanded(child:Breakpoints.isMobile(context)?BuyerMobileDashboard():BuyerDashboardScreen())
-                : Constants.buyerAppBarValue == 7
-                ? Expanded(child: SellerDashboard())
-                : Constants.buyerAppBarValue == 8
-                ? Expanded(
-                    child: NotificationPage(notifications: notifications),
-                  )
-                : Container(),
-          ],
-        ),
-      ),
-    );
+                          ),
+                        )
+                      : Constants.buyerAppBarValue == 1
+                      ? Expanded(child: Support())
+                      : Constants.buyerAppBarValue == 2
+                      ? Expanded(child: FAQScreen())
+                      : Constants.buyerAppBarValue == 3
+                      ? Expanded(child: PoliciesScreen())
+                      : Constants.buyerAppBarValue == 4
+                      ? Expanded(child: BlogCardsScreen())
+                      : Constants.buyerAppBarValue == 5
+                      ? Expanded(child: ContactFormScreen())
+                      : Constants.buyerAppBarValue == 6
+                      ? Expanded(
+                          child: Breakpoints.isMobile(context)
+                              ? BuyerMobileDashboard()
+                              : BuyerDashboardScreen(),
+                        )
+                      : Constants.buyerAppBarValue == 7
+                      ? Expanded(child: SellerDashboard())
+                      : Constants.buyerAppBarValue == 8
+                      ? Expanded(
+                          child: NotificationPage(notifications: notifications),
+                        )
+                      : Container(),
+                ],
+              ),
+            ),
+          );
   }
 
   Widget _buildAboutUsSection() {
@@ -847,7 +925,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
 
   Widget _categoryCard(
     String iconImage,
-      String iconImage2,
+    String iconImage2,
     String name,
     int index,
     int selectedIndex,
@@ -888,7 +966,10 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                 child: AnimatedScale(
                   scale: isSelected ? 0.82 : 0.8,
                   duration: Duration(milliseconds: 200),
-                  child: Image.asset(isSelected?iconImage:iconImage2, fit: BoxFit.contain),
+                  child: Image.asset(
+                    isSelected ? iconImage : iconImage2,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
               SizedBox(height: 16),
@@ -1316,47 +1397,93 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     return Stack(
       children: [
         Container(
-          width: double.infinity,
-          height: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.grey[300]!),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: FutureBuilder<Uint8List>(
-              future: image.readAsBytes(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Image.memory(
-                    snapshot.data!,
-                    width: double.infinity,
-                    height: double.infinity,
+            child: kIsWeb
+                ? Image.network(
+                    image.path,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
+                      print('Error loading web image: $error');
                       return Container(
                         color: Colors.grey[200],
-                        child: Icon(
-                          Icons.broken_image,
-                          color: Colors.grey[400],
+                        child: Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.grey[400],
+                          ),
                         ),
                       );
                     },
-                  );
-                } else if (snapshot.hasError) {
-                  return Container(
-                    color: Colors.grey[200],
-                    child: Icon(Icons.broken_image, color: Colors.grey[400]),
-                  );
-                }
-                return Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
-                  ),
-                );
-              },
-            ),
+                  )
+                : _imageBytes.containsKey(image.path)
+                    ? Image.memory(
+                        _imageBytes[image.path]!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          print('Error loading memory image: $error');
+                          return Container(
+                            color: Colors.grey[200],
+                            child: Center(
+                              child: Icon(
+                                Icons.broken_image,
+                                color: Colors.grey[400],
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : FutureBuilder<Uint8List>(
+                        future: image.readAsBytes(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            // Cache the bytes for future use
+                            _imageBytes[image.path] = snapshot.data!;
+                            return Image.memory(
+                              snapshot.data!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                print('Error displaying image: $error');
+                                return Container(
+                                  color: Colors.grey[200],
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      color: Colors.grey[400],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          } else if (snapshot.hasError) {
+                            print('Error reading image bytes: ${snapshot.error}');
+                            return Container(
+                              color: Colors.grey[200],
+                              child: Center(
+                                child: Icon(
+                                  Icons.broken_image,
+                                  color: Colors.grey[400],
+                                ),
+                              ),
+                            );
+                          }
+                          return Container(
+                            color: Colors.grey[100],
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.grey,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
           ),
         ),
         Positioned(
@@ -1365,13 +1492,20 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
           child: GestureDetector(
             onTap: () => _removeImage(image),
             child: Container(
-              width: 18,
-              height: 18,
+              width: 20,
+              height: 20,
               decoration: BoxDecoration(
                 color: Colors.red,
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 2,
+                    offset: Offset(0, 1),
+                  ),
+                ],
               ),
-              child: Icon(Icons.close, size: 12, color: Colors.white),
+              child: Icon(Icons.close, size: 14, color: Colors.white),
             ),
           ),
         ),
@@ -1383,14 +1517,48 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     try {
       final List<XFile>? images = await _imagePicker.pickMultiImage();
       if (images != null && images.isNotEmpty) {
-        setState(() {
-          _selectedImages.addAll(images);
-        });
+        if (kIsWeb) {
+          // For web: keep XFile references directly (preserve blob URLs)
+          setState(() {
+            _selectedImages.addAll(images);
+          });
+        } else {
+          // For mobile: use byte-based approach
+          List<XFile> validImages = [];
+
+          for (final image in images) {
+            try {
+              final bytes = await image.readAsBytes();
+              _imageBytes[image.path] = bytes;
+              validImages.add(image);
+            } catch (e) {
+              print('Failed to read image bytes: $e');
+            }
+          }
+
+          if (validImages.isNotEmpty) {
+            setState(() {
+              _selectedImages.addAll(validImages);
+            });
+          } else if (images.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Unable to load selected images. Please try again.',
+                ),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error picking images: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error picking images: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -2136,9 +2304,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                             Constants.buyerAppBarValue = 6;
                             appBarValueNotifier.value++;
                             buyerHomeValueNotifier.value++;
-                            setState(() {
-
-                            });
+                            setState(() {});
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -2246,14 +2412,48 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     try {
       final List<XFile>? images = await _imagePicker.pickMultiImage();
       if (images != null && images.isNotEmpty) {
-        setState(() {
-          _vinImages.addAll(images);
-        });
+        if (kIsWeb) {
+          // For web: keep XFile references directly (preserve blob URLs)
+          setState(() {
+            _vinImages.addAll(images);
+          });
+        } else {
+          // For mobile: use byte-based approach
+          List<XFile> validImages = [];
+
+          for (final image in images) {
+            try {
+              final bytes = await image.readAsBytes();
+              _vinImageBytes[image.path] = bytes;
+              validImages.add(image);
+            } catch (e) {
+              print('Failed to read image bytes: $e');
+            }
+          }
+
+          if (validImages.isNotEmpty) {
+            setState(() {
+              _vinImages.addAll(validImages);
+            });
+          } else if (images.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Unable to load selected images. Please try again.',
+                ),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error picking VIN images: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error picking images: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -2262,6 +2462,91 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       _vinImages.remove(image);
       _vinImageBytes.remove(image.path);
     });
+  }
+
+  void _showFullScreenImage(XFile image) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Stack(
+            children: [
+              Center(
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.9,
+                    maxHeight: MediaQuery.of(context).size.height * 0.8,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: kIsWeb
+                        ? Image.network(
+                            image.path,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.grey[800],
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.broken_image,
+                                        color: Colors.white,
+                                        size: 64,
+                                      ),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        'Failed to load image',
+                                        style: GoogleFonts.manrope(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : _vinImageBytes.containsKey(image.path)
+                        ? Image.memory(
+                            _vinImageBytes[image.path]!,
+                            fit: BoxFit.contain,
+                          )
+                        : Container(
+                            color: Colors.grey[800],
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: Constants.ctaColorLight,
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 40,
+                right: 20,
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.close, color: Colors.white, size: 24),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _showLocationPicker() {
@@ -2284,65 +2569,294 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   }
 
   Widget _buildLocationField() {
-    return GestureDetector(
-      onTap: _showLocationPicker,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(36),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
       child: Container(
         height: 55,
-        child: TextField(
+        child: TypeAheadField<Prediction>(
           controller: _locationController,
           focusNode: _locationFocus,
-          enabled: false,
-          decoration: InputDecoration(
-            labelText: 'Your Location*',
-            labelStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 13.5,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'YuGothic',
-            ),
-            floatingLabelBehavior: FloatingLabelBehavior.always,
-            hintText: 'Tap to select location',
-            hintStyle: GoogleFonts.manrope(
-              color: Colors.grey.shade500,
-              fontSize: 14,
-            ),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-              borderRadius: BorderRadius.circular(36),
-            ),
-            disabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-              borderRadius: BorderRadius.circular(36),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-              borderRadius: BorderRadius.circular(36),
-            ),
-            suffixIcon: Container(
-              margin: EdgeInsets.all(8),
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          builder: (context, controller, focusNode) {
+            return TextField(
+              controller: controller,
+              focusNode: focusNode,
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+              decoration: InputDecoration(
+                labelText: 'Your Location*',
+                labelStyle: GoogleFonts.manrope(
+                  color: Constants.ftaColorLight,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                ),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                hintText: 'Start typing your address...',
+                hintStyle: GoogleFonts.manrope(
+                  color: Colors.grey.shade400,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade300,
+                    width: 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(36),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Constants.ctaColorLight,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(36),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.red.shade400,
+                    width: 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(36),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.red.shade600,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(36),
+                ),
+                prefixIcon: Container(
+                  margin: EdgeInsets.only(left: 16, right: 8),
+                  child: Icon(
+                    Icons.location_on,
+                    color: Constants.ftaColorLight,
+                    size: 22,
+                  ),
+                ),
+                suffixIcon: _locationController.text.isNotEmpty
+                    ? IconButton(
+                        onPressed: () {
+                          _locationController.clear();
+                          setState(() {
+                            _selectedLocation = null;
+                            _selectedAddress = '';
+                          });
+                        },
+                        icon: Icon(
+                          Icons.clear,
+                          color: Colors.grey.shade400,
+                          size: 20,
+                        ),
+                        splashRadius: 20,
+                      )
+                    : GestureDetector(
+                        onTap: _showLocationPicker,
+                        child: Container(
+                          margin: EdgeInsets.all(8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Constants.ctaColorLight,
+                            borderRadius: BorderRadius.circular(360),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Constants.ctaColorLight.withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.map, color: Colors.white, size: 16),
+                              SizedBox(width: 6),
+                              Text(
+                                'Select',
+                                style: GoogleFonts.manrope(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+              ),
+            );
+          },
+          suggestionsCallback: (pattern) async {
+            if (pattern.length < 3) return [];
+            return await _searchPlacesAutocomplete(pattern);
+          },
+          itemBuilder: (context, suggestion) {
+            return Container(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: Color(0xFF2C3E50),
-                borderRadius: BorderRadius.circular(360),
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey.shade200,
+                    width: 0.5,
+                  ),
+                ),
               ),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.location_on, color: Colors.white, size: 16),
-                  SizedBox(width: 6),
-                  Text(
-                    'Select Location',
-                    style: GoogleFonts.manrope(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Constants.ctaColorLight.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    child: Icon(
+                      Icons.location_on,
+                      color: Constants.ctaColorLight,
+                      size: 18,
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          suggestion.structuredFormatting?.mainText ?? suggestion.description ?? '',
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (suggestion.structuredFormatting?.secondaryText != null) ...[
+                          SizedBox(height: 2),
+                          Text(
+                            suggestion.structuredFormatting!.secondaryText!,
+                            style: GoogleFonts.manrope(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.grey.shade600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.grey.shade400,
+                    size: 16,
                   ),
                 ],
               ),
+            );
+          },
+          onSelected: (suggestion) async {
+            await _onLocationSelected(suggestion);
+          },
+          decorationBuilder: (context, child) {
+            return Material(
+              elevation: 8,
+              borderRadius: BorderRadius.circular(12),
+              shadowColor: Colors.black.withOpacity(0.15),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white,
+                  border: Border.all(
+                    color: Colors.grey.shade200,
+                    width: 1,
+                  ),
+                ),
+                child: child,
+              ),
+            );
+          },
+          offset: Offset(0, 8),
+          constraints: BoxConstraints(
+            maxHeight: 300,
+          ),
+          hideOnEmpty: true,
+          hideOnError: true,
+          hideOnLoading: false,
+          loadingBuilder: (context) => Container(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Constants.ctaColorLight),
+                  ),
+                ),
+                SizedBox(width: 12),
+                Text(
+                  'Searching locations...',
+                  style: GoogleFonts.manrope(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          errorBuilder: (context, error) => Container(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  color: Colors.red.shade400,
+                  size: 20,
+                ),
+                SizedBox(width: 12),
+                Text(
+                  'Unable to search locations',
+                  style: GoogleFonts.manrope(
+                    fontSize: 14,
+                    color: Colors.red.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          emptyBuilder: (context) => Container(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.search_off,
+                  color: Colors.grey.shade400,
+                  size: 20,
+                ),
+                SizedBox(width: 12),
+                Text(
+                  'No locations found',
+                  style: GoogleFonts.manrope(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -2520,24 +3034,69 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
-                                    child: Image.network(
-                                      image.path,
-                                      width: 80,
-                                      height: 80,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                            return Container(
-                                              width: 80,
-                                              height: 80,
-                                              color: Colors.grey[200],
-                                              child: Icon(
-                                                Icons.image,
-                                                color: Colors.grey[400],
-                                              ),
-                                            );
-                                          },
-                                    ),
+                                    child: kIsWeb
+                                        ? Image.network(
+                                            image.path,
+                                            width: 80,
+                                            height: 80,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                                  return Container(
+                                                    width: 80,
+                                                    height: 80,
+                                                    color: Colors.grey[200],
+                                                    child: Icon(
+                                                      Icons.image,
+                                                      color: Colors.grey[400],
+                                                    ),
+                                                  );
+                                                },
+                                          )
+                                        : _vinImageBytes.containsKey(image.path)
+                                        ? Image.memory(
+                                            _vinImageBytes[image.path]!,
+                                            width: 80,
+                                            height: 80,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                                  return Container(
+                                                    width: 80,
+                                                    height: 80,
+                                                    color: Colors.grey[200],
+                                                    child: Icon(
+                                                      Icons.image,
+                                                      color: Colors.grey[400],
+                                                    ),
+                                                  );
+                                                },
+                                          )
+                                        : FutureBuilder<Uint8List>(
+                                            future: image.readAsBytes(),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasData) {
+                                                // Cache the bytes for future use
+                                                _vinImageBytes[image.path] =
+                                                    snapshot.data!;
+                                                return Image.memory(
+                                                  snapshot.data!,
+                                                  width: 80,
+                                                  height: 80,
+                                                  fit: BoxFit.cover,
+                                                );
+                                              }
+                                              return Container(
+                                                width: 80,
+                                                height: 80,
+                                                color: Colors.grey[200],
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                    ),
+                                              );
+                                            },
+                                          ),
                                   ),
                                 ),
                                 Positioned(
@@ -2576,122 +3135,319 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          child: Container(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                constraints: BoxConstraints(
+                  maxWidth: 500,
+                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                ),
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'VIN Images (${_vinImages.length})',
-                      style: GoogleFonts.manrope(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'VIN Images (${_vinImages.length})',
+                          style: GoogleFonts.manrope(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1B3B5C),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: Icon(Icons.close, color: Colors.grey),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.grey.shade100,
+                            shape: CircleBorder(),
+                          ),
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: Icon(Icons.close),
+                    SizedBox(height: 16),
+
+                    if (_vinImages.isEmpty)
+                      Container(
+                        height: 200,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.image_outlined,
+                              size: 64,
+                              color: Colors.grey.shade400,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              'No VIN images uploaded',
+                              style: GoogleFonts.manrope(
+                                fontSize: 16,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Flexible(
+                        child: Container(
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: _vinImages.length == 1
+                                      ? 1
+                                      : 2,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                ),
+                            itemCount: _vinImages.length,
+                            itemBuilder: (context, index) {
+                              final image = _vinImages[index];
+                              return Stack(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => _showFullScreenImage(image),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.1,
+                                            ),
+                                            blurRadius: 4,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: kIsWeb
+                                            ? Image.network(
+                                                image.path,
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                                fit: BoxFit.cover,
+                                                errorBuilder:
+                                                    (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) {
+                                                      return Container(
+                                                        color: Colors.grey[200],
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Icon(
+                                                              Icons
+                                                                  .broken_image,
+                                                              color: Colors
+                                                                  .grey[400],
+                                                              size: 40,
+                                                            ),
+                                                            SizedBox(height: 8),
+                                                            Text(
+                                                              'Failed to load',
+                                                              style: GoogleFonts.manrope(
+                                                                color: Colors
+                                                                    .grey[600],
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    },
+                                              )
+                                            : _vinImageBytes.containsKey(
+                                                image.path,
+                                              )
+                                            ? Image.memory(
+                                                _vinImageBytes[image.path]!,
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : Container(
+                                                color: Colors.grey[100],
+                                                child: Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                        color: Constants
+                                                            .ctaColorLight,
+                                                      ),
+                                                ),
+                                              ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _removeVinImage(image);
+                                        setDialogState(
+                                          () {},
+                                        ); // Update dialog state
+                                        setState(
+                                          () {},
+                                        ); // Update main widget state
+                                        if (_vinImages.isEmpty) {
+                                          Navigator.of(context).pop();
+                                        }
+                                      },
+                                      child: Container(
+                                        width: 28,
+                                        height: 28,
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.2,
+                                              ),
+                                              blurRadius: 2,
+                                              offset: Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Icon(
+                                          Icons.delete_outline,
+                                          size: 16,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+
+                    SizedBox(height: 20),
+
+                    // Action buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              _pickVinImages();
+                            },
+                            icon: Icon(Icons.add_photo_alternate),
+                            label: Text('Add More Images'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Constants.ctaColorLight,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _pickVinImages,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Constants.ctaColorLight,
+                          padding: EdgeInsets.symmetric(vertical: 36),
+                        ),
+                        child: Text(
+                          'Add More Images',
+                          style: GoogleFonts.manrope(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
-                Container(
-                  height: 300,
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemCount: _vinImages.length,
-                    itemBuilder: (context, index) {
-                      final image = _vinImages[index];
-                      return Stack(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey[300]!),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                image.path,
-                                width: double.infinity,
-                                height: double.infinity,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: Colors.grey[200],
-                                    child: Icon(
-                                      Icons.image,
-                                      color: Colors.grey[400],
-                                      size: 40,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 4,
-                            right: 4,
-                            child: GestureDetector(
-                              onTap: () {
-                                _removeVinImage(image);
-                                if (_vinImages.isEmpty) {
-                                  Navigator.of(context).pop();
-                                }
-                                setState(() {});
-                              },
-                              child: Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.delete,
-                                  size: 16,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _pickVinImages,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Constants.ctaColorLight,
-                      padding: EdgeInsets.symmetric(vertical: 36),
-                    ),
-                    child: Text(
-                      'Add More Images',
-                      style: GoogleFonts.manrope(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
+  }
+
+  // Autocomplete method for TypeAhead field
+  Future<List<Prediction>> _searchPlacesAutocomplete(String pattern) async {
+    if (pattern.length < 3) return [];
+    
+    // Reuse existing search logic
+    try {
+      List<Prediction> predictions = [];
+      
+      // Use geocoding to search for places
+      try {
+        List<Location> locations = await locationFromAddress(pattern);
+        for (var location in locations.take(5)) {
+          // Create a prediction from the location
+          String placeId = 'geocoding_${location.latitude}_${location.longitude}';
+          predictions.add(Prediction(
+            description: pattern,
+            placeId: placeId,
+          ));
+        }
+      } catch (e) {
+        print('Error with locationFromAddress: $e');
+      }
+      
+      return predictions;
+    } catch (e) {
+      print('Error in _searchPlacesAutocomplete: $e');
+      return [];
+    }
+  }
+
+  // Handle location selection from TypeAhead
+  Future<void> _onLocationSelected(Prediction suggestion) async {
+    if (suggestion.placeId?.startsWith('geocoding_') == true) {
+      final coords = suggestion.placeId!
+          .substring('geocoding_'.length)
+          .split('_');
+      if (coords.length == 2) {
+        final lat = double.tryParse(coords[0]);
+        final lng = double.tryParse(coords[1]);
+
+        if (lat != null && lng != null) {
+          final newLatLng = LatLng(lat, lng);
+
+          setState(() {
+            _selectedLocation = newLatLng;
+            _selectedAddress = suggestion.description ?? '';
+            _locationController.text = suggestion.description ?? '';
+          });
+
+          // Optionally show location picker dialog for confirmation
+          // _showLocationPicker();
+        }
+      }
+    }
   }
 }
 
@@ -2879,20 +3635,19 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
     return Stack(
       children: [
         Container(
-          width: 60,
-          height: 60,
+          width: 80,
+          height: 80,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.grey[300]!),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: FutureBuilder<Uint8List>(
-              future: image.readAsBytes(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Image.memory(
-                    snapshot.data!,
+            child: kIsWeb
+                ? Image.network(
+                    image.path,
+                    width: 80,
+                    height: 80,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
@@ -2903,26 +3658,37 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                         ),
                       );
                     },
-                  );
-                } else if (snapshot.hasError) {
-                  return Container(
+                  )
+                : _imageBytes.containsKey(image.path)
+                ? Image.memory(
+                    _imageBytes[image.path]!,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[200],
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.grey[400],
+                        ),
+                      );
+                    },
+                  )
+                : Container(
                     color: Colors.grey[200],
-                    child: Icon(Icons.broken_image, color: Colors.grey[400]),
-                  );
-                }
-                return Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                      ),
+                    ),
                   ),
-                );
-              },
-            ),
           ),
         ),
         Positioned(
-          top: -5,
-          right: -5,
+          top: 4,
+          right: 4,
           child: GestureDetector(
             onTap: () => _removeImage(image),
             child: Container(
@@ -2944,14 +3710,48 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
     try {
       final List<XFile>? images = await _imagePicker.pickMultiImage();
       if (images != null && images.isNotEmpty) {
-        setState(() {
-          _selectedImages.addAll(images);
-        });
+        if (kIsWeb) {
+          // For web: keep XFile references directly (preserve blob URLs)
+          setState(() {
+            _selectedImages.addAll(images);
+          });
+        } else {
+          // For mobile: use byte-based approach
+          List<XFile> validImages = [];
+
+          for (final image in images) {
+            try {
+              final bytes = await image.readAsBytes();
+              _imageBytes[image.path] = bytes;
+              validImages.add(image);
+            } catch (e) {
+              print('Failed to read image bytes: $e');
+            }
+          }
+
+          if (validImages.isNotEmpty) {
+            setState(() {
+              _selectedImages.addAll(validImages);
+            });
+          } else if (images.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Unable to load selected images. Please try again.',
+                ),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error picking images: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error picking images: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -3575,9 +4375,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
                             Constants.buyerAppBarValue = 6;
                             appBarValueNotifier.value++;
                             buyerHomeValueNotifier.value++;
-                            setState(() {
-
-                            });
+                            setState(() {});
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -3791,10 +4589,10 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
   String? _selectedWheelRimDiameter;
   String? _selectedTyresRims;
   String? _selectedQuantity;
-  String? _selectedTimeframe ;
+  String? _selectedTimeframe;
   String? _selectedVehicleType;
   String? _selectedTyreConstruction;
-  String? _selectedFitmentRequired ;
+  String? _selectedFitmentRequired;
   String? _selectedBalancingRequired;
   String? _selectedTyreRotation;
 
@@ -3861,11 +4659,11 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
   }
 
   Widget _buildCustomDropdown(
-      String label,
-      String? value,
-      List<String> items,
-      Function(String?) onChanged,
-      ) {
+    String label,
+    String? value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
     return Container(
       width: double.infinity,
       height: 48,
@@ -4096,14 +4894,48 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     try {
       final List<XFile>? images = await _imagePicker.pickMultiImage();
       if (images != null && images.isNotEmpty) {
-        setState(() {
-          _selectedImages.addAll(images);
-        });
+        if (kIsWeb) {
+          // For web: keep XFile references directly (preserve blob URLs)
+          setState(() {
+            _selectedImages.addAll(images);
+          });
+        } else {
+          // For mobile: use byte-based approach
+          List<XFile> validImages = [];
+
+          for (final image in images) {
+            try {
+              final bytes = await image.readAsBytes();
+              _imageBytes[image.path] = bytes;
+              validImages.add(image);
+            } catch (e) {
+              print('Failed to read image bytes: $e');
+            }
+          }
+
+          if (validImages.isNotEmpty) {
+            setState(() {
+              _selectedImages.addAll(validImages);
+            });
+          } else if (images.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Unable to load selected images. Please try again.',
+                ),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error picking images: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error picking images: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -4602,9 +5434,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                             Constants.buyerAppBarValue = 6;
                             appBarValueNotifier.value++;
                             buyerHomeValueNotifier.value++;
-                            setState(() {
-
-                            });
+                            setState(() {});
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -4804,13 +5634,12 @@ class FooterSection extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            padding: EdgeInsets.all(Breakpoints.isMobile(context)?16:50),
+            padding: EdgeInsets.all(Breakpoints.isMobile(context) ? 16 : 50),
             child: Column(
               children: [
                 Image.asset(logo, fit: BoxFit.contain),
                 SizedBox(height: 24),
                 Wrap(
-
                   children: [
                     _footerLink('Home'),
                     _footerLink('Support'),
@@ -4825,7 +5654,7 @@ class FooterSection extends StatelessWidget {
                   '© 2024 BIDR. All rights reserved.',
                   style: GoogleFonts.manrope(
                     color: Colors.white.withOpacity(0.7),
-                    fontSize: Breakpoints.isMobile(context)?12:14,
+                    fontSize: Breakpoints.isMobile(context) ? 12 : 14,
                   ),
                 ),
                 SizedBox(height: 20),
@@ -4948,6 +5777,9 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
   String _selectedAddress = '';
   final TextEditingController _searchController = TextEditingController();
   final FocusNode searchFocusNode = FocusNode();
+  List<Prediction> _searchResults = [];
+  bool _isSearching = false;
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -4987,49 +5819,294 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
     }
   }
 
-  // Search for a location by name
-  void _searchLocation(String query) async {
-    if (query.trim().isEmpty) return;
+  // Search for places using Google Places API
+  void _searchPlaces(String query) async {
+    if (query.trim().isEmpty) {
+      setState(() {
+        _searchResults = [];
+        _isSearching = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isSearching = true;
+    });
 
     try {
-      List<Location> locations = await locationFromAddress(query);
+      final results = await _getPlacePredictions(query);
 
-      if (locations.isNotEmpty) {
-        final location = locations.first;
-        final newLatLng = LatLng(location.latitude, location.longitude);
-
-        // Update the map and get the address
-        setState(() {
-          _selectedLocation = newLatLng;
-        });
-
-        // Move the camera to the new location
-        if (_mapController != null) {
-          await _mapController!.animateCamera(
-            CameraUpdate.newCameraPosition(
-              CameraPosition(target: newLatLng, zoom: 16.0),
-            ),
-          );
-        }
-
-        // Get the formatted address
-        _getAddressFromLocation(newLatLng);
-      } else {
-        // Show error if location not found
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Location not found: $query'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      setState(() {
+        _searchResults = results;
+        _isSearching = false;
+      });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error searching location: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      print('Error searching places: $e');
+      setState(() {
+        _searchResults = [];
+        _isSearching = false;
+      });
+    }
+  }
+
+  // Get place predictions from Google Places API
+  Future<List<Prediction>> _getPlacePredictions(String query) async {
+    try {
+      List<Prediction> predictions = [];
+
+      // Try multiple search variations to get more results
+      List<String> searchQueries = [
+        query,
+        '$query, South Africa',
+        '$query, SA',
+      ];
+
+      // Try different variations if query is short
+      if (query.length < 10) {
+        searchQueries.addAll([
+          '$query street',
+          '$query road',
+          '$query city',
+          '$query town',
+        ]);
+      }
+
+      Set<String> uniqueResults = {}; // To avoid duplicates
+
+      for (String searchQuery in searchQueries.take(3)) {
+        try {
+          List<Location> locations = await locationFromAddress(searchQuery);
+
+          for (final location in locations.take(3)) {
+            try {
+              List<Placemark> placemarks = await placemarkFromCoordinates(
+                location.latitude,
+                location.longitude,
+              );
+
+              String description;
+              if (placemarks.isNotEmpty) {
+                final placemark = placemarks.first;
+                description = [
+                  placemark.street,
+                  placemark.subLocality,
+                  placemark.locality,
+                  placemark.administrativeArea,
+                  placemark.country,
+                ].where((s) => s != null && s.isNotEmpty).join(', ');
+              } else {
+                description =
+                    '$searchQuery (${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)})';
+              }
+
+              // Check for duplicates
+              if (uniqueResults.add(description)) {
+                predictions.add(
+                  Prediction(
+                    description: description.isNotEmpty
+                        ? description
+                        : searchQuery,
+                    placeId:
+                        'geocoding_${location.latitude}_${location.longitude}',
+                    reference: '',
+                    matchedSubstrings: [],
+                    terms: [],
+                    types: [],
+                    structuredFormatting: null,
+                  ),
+                );
+              }
+
+              // Stop if we have enough predictions
+              if (predictions.length >= 5) break;
+            } catch (e) {
+              // Add basic result even if reverse geocoding fails
+              final description =
+                  '$searchQuery (${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)})';
+              if (uniqueResults.add(description)) {
+                predictions.add(
+                  Prediction(
+                    description: description,
+                    placeId:
+                        'geocoding_${location.latitude}_${location.longitude}',
+                    reference: '',
+                    matchedSubstrings: [],
+                    terms: [],
+                    types: [],
+                    structuredFormatting: null,
+                  ),
+                );
+              }
+            }
+          }
+
+          if (predictions.length >= 5) break;
+        } catch (e) {
+          continue; // Try next search query
+        }
+      }
+
+      return predictions;
+    } catch (e) {
+      print('Error getting place predictions: $e');
+      return [];
+    }
+  }
+
+  // Handle selection of a place from the search results
+  void _onPlaceSelected(Prediction prediction) async {
+    if (prediction.placeId?.startsWith('geocoding_') == true) {
+      final coords = prediction.placeId!
+          .substring('geocoding_'.length)
+          .split('_');
+      if (coords.length == 2) {
+        final lat = double.tryParse(coords[0]);
+        final lng = double.tryParse(coords[1]);
+
+        if (lat != null && lng != null) {
+          final newLatLng = LatLng(lat, lng);
+
+          setState(() {
+            _selectedLocation = newLatLng;
+            _selectedAddress = prediction.description ?? '';
+            _searchResults = [];
+            _searchController.text = prediction.description ?? '';
+          });
+
+          // Move the camera to the new location
+          if (_mapController != null) {
+            await _mapController!.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(target: newLatLng, zoom: 16.0),
+              ),
+            );
+          }
+        }
+      }
+    }
+  }
+
+  // Autocomplete method for TypeAhead field
+  Future<List<Prediction>> _searchPlacesAutocomplete(String pattern) async {
+    if (pattern.length < 3) return [];
+    
+    try {
+      final results = await _getPlacePredictions(pattern);
+      return results;
+    } catch (e) {
+      print('Error in _searchPlacesAutocomplete: $e');
+      return [];
+    }
+  }
+
+  // Handle location selection from TypeAhead
+  Future<void> _onLocationSelected(Prediction suggestion) async {
+    if (suggestion.placeId?.startsWith('geocoding_') == true) {
+      final coords = suggestion.placeId!
+          .substring('geocoding_'.length)
+          .split('_');
+      if (coords.length == 2) {
+        final lat = double.tryParse(coords[0]);
+        final lng = double.tryParse(coords[1]);
+
+        if (lat != null && lng != null) {
+          final newLatLng = LatLng(lat, lng);
+
+          setState(() {
+            _selectedLocation = newLatLng;
+            _selectedAddress = suggestion.description ?? '';
+            _searchController.text = suggestion.description ?? '';
+          });
+        }
+      }
+    }
+  }
+
+  // TypeAhead-specific methods for LocationPickerDialog
+  Future<List<Prediction>> _getPlacePredictionsTypeAhead(String query) async {
+    if (query.trim().isEmpty) {
+      return [];
+    }
+
+    try {
+      List<Prediction> predictions = [];
+      
+      // Use existing _getPlacePredictions method if available, otherwise use geocoding
+      try {
+        List<Location> locations = await locationFromAddress(query);
+        for (var location in locations.take(5)) {
+          // Create a prediction from the location
+          String placeId = 'geocoding_${location.latitude}_${location.longitude}';
+          
+          // Try to get a formatted address
+          try {
+            List<Placemark> placemarks = await placemarkFromCoordinates(
+              location.latitude,
+              location.longitude,
+            );
+            
+            if (placemarks.isNotEmpty) {
+              final placemark = placemarks.first;
+              final formattedAddress = [
+                placemark.street,
+                placemark.locality,
+                placemark.administrativeArea,
+                placemark.country,
+              ].where((s) => s != null && s.isNotEmpty).join(', ');
+              
+              predictions.add(Prediction(
+                description: formattedAddress.isNotEmpty ? formattedAddress : query,
+                placeId: placeId,
+              ));
+            }
+          } catch (e) {
+            // Fallback to original query if reverse geocoding fails
+            predictions.add(Prediction(
+              description: query,
+              placeId: placeId,
+            ));
+          }
+        }
+      } catch (e) {
+        print('Error with locationFromAddress: $e');
+      }
+      
+      return predictions;
+    } catch (e) {
+      print('Error in _getPlacePredictionsTypeAhead: $e');
+      return [];
+    }
+  }
+
+  // Handle location selection from TypeAhead
+  void _onPlaceSelectedTypeAhead(Prediction prediction) async {
+    if (prediction.placeId?.startsWith('geocoding_') == true) {
+      final coords = prediction.placeId!
+          .substring('geocoding_'.length)
+          .split('_');
+      if (coords.length == 2) {
+        final lat = double.tryParse(coords[0]);
+        final lng = double.tryParse(coords[1]);
+
+        if (lat != null && lng != null) {
+          final newLatLng = LatLng(lat, lng);
+
+          setState(() {
+            _selectedLocation = newLatLng;
+            _selectedAddress = prediction.description ?? '';
+            _searchController.text = prediction.description ?? '';
+          });
+
+          // Move the camera to the new location
+          if (_mapController != null) {
+            await _mapController!.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(target: newLatLng, zoom: 16.0),
+              ),
+            );
+          }
+        }
+      }
     }
   }
 
@@ -5127,17 +6204,251 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
               ),
             ),
 
-            // Search bar
+            // Search bar with autocomplete
             Padding(
-                padding: const EdgeInsets.all(16),
-              child: _buildCustomTextField("Search for a location...",_searchController,searchFocusNode,_searchController.text.isNotEmpty?
-                IconButton(
-                icon: Icon(Icons.clear, color: Colors.grey),
-                onPressed: () {
-                  _searchController.clear();
-                  setState(() {});
-                },
-              ):null),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  TypeAheadField<Prediction>(
+                    controller: _searchController,
+                    focusNode: searchFocusNode,
+                    builder: (context, controller, focusNode) {
+                      return TextField(
+                        controller: controller,
+                        focusNode: focusNode,
+                        style: GoogleFonts.manrope(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Search Location',
+                          labelStyle: GoogleFonts.manrope(
+                            color: Constants.ftaColorLight,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          hintText: 'Start typing to search...',
+                          hintStyle: GoogleFonts.manrope(
+                            color: Colors.grey.shade500,
+                            fontSize: 14,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Constants.ctaColorLight, width: 2),
+                          ),
+                          prefixIcon: Container(
+                            padding: EdgeInsets.all(12),
+                            child: Icon(
+                              Icons.search,
+                              color: Constants.ftaColorLight,
+                              size: 24,
+                            ),
+                          ),
+                          suffixIcon: controller.text.isNotEmpty
+                              ? IconButton(
+                                  onPressed: () {
+                                    controller.clear();
+                                    setState(() {});
+                                  },
+                                  icon: Icon(
+                                    Icons.clear,
+                                    color: Colors.grey.shade400,
+                                    size: 20,
+                                  ),
+                                )
+                              : null,
+                        ),
+                      );
+                    },
+                    suggestionsCallback: (pattern) async {
+                      if (pattern.length < 3) return [];
+                      return await _getPlacePredictionsTypeAhead(pattern);
+                    },
+                    itemBuilder: (context, suggestion) {
+                      return Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.grey.shade200,
+                              width: 0.5,
+                            ),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Constants.ctaColorLight.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.location_on,
+                                color: Constants.ctaColorLight,
+                                size: 20,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    suggestion.structuredFormatting?.mainText ?? 
+                                    suggestion.description?.split(',').first ?? '',
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  if (suggestion.structuredFormatting?.secondaryText != null) ...[
+                                    SizedBox(height: 2),
+                                    Text(
+                                      suggestion.structuredFormatting!.secondaryText!,
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ] else ...[
+                                    SizedBox(height: 2),
+                                    Text(
+                                      suggestion.description?.split(',').skip(1).join(', ') ?? '',
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.grey.shade400,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    onSelected: (suggestion) {
+                      _onPlaceSelectedTypeAhead(suggestion);
+                    },
+                    decorationBuilder: (context, child) {
+                      return Material(
+                        elevation: 8,
+                        borderRadius: BorderRadius.circular(12),
+                        shadowColor: Colors.black.withOpacity(0.15),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.white,
+                            border: Border.all(
+                              color: Colors.grey.shade200,
+                              width: 1,
+                            ),
+                          ),
+                          child: child,
+                        ),
+                      );
+                    },
+                    offset: Offset(0, 4),
+                    constraints: BoxConstraints(
+                      maxHeight: 280,
+                    ),
+                    hideOnEmpty: true,
+                    hideOnError: true,
+                    hideOnLoading: false,
+                    loadingBuilder: (context) => Container(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Constants.ctaColorLight),
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Text(
+                            'Searching locations...',
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    errorBuilder: (context, error) => Container(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            color: Colors.red.shade400,
+                            size: 20,
+                          ),
+                          SizedBox(width: 12),
+                          Text(
+                            'Unable to search locations',
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              color: Colors.red.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    emptyBuilder: (context) => Container(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            color: Colors.grey.shade400,
+                            size: 20,
+                          ),
+                          SizedBox(width: 12),
+                          Text(
+                            'No locations found',
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                ],
+              ),
             ),
 
             // Map
@@ -5296,7 +6607,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                         backgroundColor: Constants.ctaColorLight,
                         foregroundColor: Colors.white,
 
-                        padding: EdgeInsets.symmetric(vertical: 18,),
+                        padding: EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(360),
                         ),
@@ -5315,12 +6626,13 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
       ),
     );
   }
+
   Widget _buildCustomTextField(
-      String hintText,
-      TextEditingController controller,
-      FocusNode focusNode,
-        Widget? suffixIcon,
-      ) {
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    Widget? suffixIcon,
+  ) {
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
       labelText: hintText,
@@ -5331,17 +6643,31 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
       suffix: suffixIcon,
       onSubmitted: (value) {
         if (value.isNotEmpty) {
-          _searchLocation(value);
+          _searchPlaces(value);
         }
       },
       onChanged: (value) {
         setState(() {}); // To show/hide clear button
+
+        // Trigger search after user stops typing
+        if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+        _debounceTimer = Timer(Duration(milliseconds: 500), () {
+          if (value.isNotEmpty) {
+            _searchPlaces(value);
+          } else {
+            setState(() {
+              _searchResults = [];
+            });
+          }
+        });
       },
     );
   }
+
   @override
   void dispose() {
     _searchController.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
   }
 }

@@ -44,8 +44,7 @@ class AuthApiService {
     required String password,
     required String confirmPassword,
     String deliveryMethod = 'sms',
-  }) async
-  {
+  }) async {
     final url = Uri.parse('${GlobalVariables.authServiceUrl}register/');
 
     final headers = {'Content-Type': 'application/json'};
@@ -66,7 +65,9 @@ class AuthApiService {
     try {
       final response = await http.post(url, headers: headers, body: body);
 
-      print('Response Status: ${response.statusCode}');
+      if (kDebugMode) {
+        print('Response Status: ${response.statusCode}');
+      }
       print('Response Headers: ${response.headers}');
       print('Response Body: ${response.body}');
 
@@ -144,8 +145,7 @@ class AuthApiService {
     String email,
     String cellphone, {
     String deliveryMethod = 'sms',
-  }) async
-  {
+  }) async {
     var url = Uri.parse('${GlobalVariables.authServiceUrl}resend-otp/');
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
