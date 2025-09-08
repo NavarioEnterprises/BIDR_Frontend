@@ -1,3 +1,4 @@
+import 'package:bidr/pages/mobileView/landingPage/landingMobileViewPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -62,7 +63,7 @@ class _HeaderSectionState extends State<HeaderSection> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          if (isMobile) ...[_buildMobileMenuIcon(), SizedBox(width: 16)],
+         // if (isMobile) ...[_buildMobileMenuIcon(), SizedBox(width: 16)],
 
           // Logo - responsive sizing
           _buildResponsiveLogo(context),
@@ -455,6 +456,7 @@ class _HeaderSectionState extends State<HeaderSection> {
               Constants.buyerAppBarValue = 7;
               appBarValueNotifier.value++;
               buyerHomeValueNotifier.value++;
+              sellerHomeMobileValueNotifier.value++;
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Constants.ctaColorLight,
@@ -478,13 +480,15 @@ class _HeaderSectionState extends State<HeaderSection> {
           );
         case 'buyer':
           return Container(
-            constraints: BoxConstraints(maxWidth: 250, maxHeight: 55),
+            constraints: BoxConstraints(maxWidth: 250, maxHeight: 55),//
             child: ElevatedButton(
               onPressed: () {
                 if (mounted) {
                   Constants.buyerAppBarValue = 6;
                   appBarValueNotifier.value++;
                   buyerHomeValueNotifier.value++;
+                  buyerHomeMobileValueNotifier.value++;
+
                 }
               },
               style: ElevatedButton.styleFrom(

@@ -7,12 +7,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../authentication/login.dart';
 import '../../../constants/Constants.dart';
 
-class MobileBuyerLandingPage extends StatefulWidget {
+class MobileBusinessLandingPage extends StatefulWidget {
   @override
-  _MobileBuyerLandingPageState createState() => _MobileBuyerLandingPageState();
+  _MobileBusinessLandingPageState createState() => _MobileBusinessLandingPageState();
 }
 
-class _MobileBuyerLandingPageState extends State<MobileBuyerLandingPage>
+class _MobileBusinessLandingPageState extends State<MobileBusinessLandingPage>
     with TickerProviderStateMixin {
   late ScrollController _scrollController;
   late AnimationController _heroAnimationController;
@@ -179,7 +179,7 @@ class _MobileBuyerLandingPageState extends State<MobileBuyerLandingPage>
         title: Opacity(
           opacity: _titleOpacity,
           child: Text(
-            'Why Join As A Buyer',
+            'Why Join As A Business',
             style: GoogleFonts.manrope(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -264,6 +264,7 @@ class _MobileBuyerLandingPageState extends State<MobileBuyerLandingPage>
                     SizedBox(height: 20),
                     _buildMobileContentSection(),
                     SizedBox(height: 20),
+
                     Padding(
                       padding: const EdgeInsets.only(left: 16.0, right: 16),
                       child: SizedBox(
@@ -303,7 +304,7 @@ class _MobileBuyerLandingPageState extends State<MobileBuyerLandingPage>
                             elevation: 0,
                           ),
                           child: Text(
-                            'Join as a buyer',
+                            'Join as a Business',
                             style: GoogleFonts.manrope(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
@@ -344,7 +345,7 @@ class _MobileBuyerLandingPageState extends State<MobileBuyerLandingPage>
                     height: 260,
                     width: double.infinity,
                     child: Image.asset(
-                      "lib/assets/images/buyer.png",
+                      "lib/assets/images/business.png",
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -364,28 +365,27 @@ class _MobileBuyerLandingPageState extends State<MobileBuyerLandingPage>
         children: [
           SizedBox(height: 16),
           _buildMobileBenefitCard(
-            title: 'Save Time & Effort',
+            title: 'Competitive Edge',
             description:
-                'No Need To Search Manually—Simply Submit A Request And Let Sellers Come To You.',
-            icon: Icons.access_time,
+                'Stand Out By Providing The Best Quotes And Winning More Deals.',
+            icon: Icons.emoji_events,
             delay: Duration(milliseconds: 0),
           ),
           SizedBox(height: 16),
           _buildMobileBenefitCard(
-            title: 'Chat Before You Buy',
+            title: 'Seamless Communication',
             description:
-                'Discuss Details, Negotiate, And Make Informed Decisions Before Accepting A Quote.',
+                'Chat Directly With Buyers To Clarify Requirements And Finalize Deals.',
             icon: Icons.chat_bubble_outline,
             delay: Duration(milliseconds: 200),
           ),
-
           SizedBox(height: 16),
           _buildMobileBenefitCard(
-            title: 'Fast & Efficient',
+            title: 'Trust & Credibility',
             description:
-                'Receive Quick Responses From Sellers Who Meet Your Requirements.',
-            icon: Icons.flash_on,
-            delay: Duration(milliseconds: 600),
+                'Build Your Reputation Through Ratings, Reviews, And Successful Transactions.',
+            icon: Icons.verified_user,
+            delay: Duration(milliseconds: 400),
           ),
         ],
       ),
@@ -459,81 +459,6 @@ class _MobileBuyerLandingPageState extends State<MobileBuyerLandingPage>
     );
   }
 
-  Widget _buildHighlightedBenefitCard({
-    required String title,
-    required String description,
-    required IconData icon,
-    required Duration delay,
-  }) {
-    return TweenAnimationBuilder<double>(
-      duration: Duration(milliseconds: 800),
-      tween: Tween(begin: 0.0, end: 1.0),
-      builder: (context, value, child) {
-        return Transform.translate(
-          offset: Offset(0, 30 * (1 - value)),
-          child: Opacity(
-            opacity: value,
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Color(0xFFFFF5E6),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Color(0xFFE8B366), width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Constants.ctaColorLight.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(icon, color: Constants.ctaColorLight, size: 20),
-                  ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: GoogleFonts.manrope(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1B3B5C),
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          description,
-                          style: GoogleFonts.manrope(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Widget _buildMobileContentSection() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20),
@@ -560,25 +485,25 @@ class _MobileBuyerLandingPageState extends State<MobileBuyerLandingPage>
             SizedBox(height: 20),
             _buildMobileContentParagraph(
               text:
-                  "The Majority Of South African's Are Finding It Harder And Harder To Make Ends Meet. These Days, It's A Necessity To Search The \"Specials\" Pamphlets From Various Shops To Pick The Best Deals To Save A Buck.",
+                  "Lead Generation Is Becoming A Tougher Task These Days. Several Companies Offer Similar Goods And Buyers Are Pressed To Go Out And Source The Best Deals For Themselves. Online Sales Are Now A Necessity. B2OR Provides You A New Channel To Corner New Leads As Well As Offer A Simple And Safe Online Sales Platform.",
               delay: Duration(milliseconds: 0),
             ),
             SizedBox(height: 12),
             _buildMobileContentParagraph(
               text:
-                  "We Understand The Frustration In The Amount Of Time It Takes To Call Multiple Stores To Negotiate The Best Price, Or Browse The Internet Looking For Deals. Our Solution Provides An Automated Platform To Facilitate The Negotiation Process Without Any Of The Hassles.",
+                  "Businesses Are Charged An Annual Registration Fee To Use The Platform And A Small Percentage For The Processing Of The Transaction. We Do Not Bill The Client Anything About The Price That You Quote. All Transactions Are Transparent, And Our Financial System Utilises Industry Standard E-Commerce Best Practices Safety.",
               delay: Duration(milliseconds: 200),
             ),
             SizedBox(height: 12),
             _buildMobileContentParagraph(
               text:
-                  "Buyers Simply Provide Information About The Product That They Require And Select The Area For Our System To Search. We Then Notify All Sellers In The Search Area Of The Request.",
+                  "Our Platform Allows You To Easily Interact With Clients That Do Not Have To Take Up Your Time On The Phone Or Walking-In To Your Counter. Registered Sellers Will Be Automatically Notified When Applicable Request Are Made. You Can Then Tender A Bid For Their Consideration.",
               delay: Duration(milliseconds: 400),
             ),
             SizedBox(height: 12),
             _buildMobileContentParagraph(
               text:
-                  "Our Platform Is Free To Use For Buyers. A Small Transaction Percentage Is Levied To The Seller For Use Of The System So There Is No Hidden Costs To The Buyer.",
+                  "Our Solution Has The Potential Of Bringing You New Customers That May Not Have Known Of Your Company, Allows You To Be More Competitively Priced And To Corner Market Trends In The Geographic And Product Sectors That You Service.",
               delay: Duration(milliseconds: 600),
             ),
           ],

@@ -1,11 +1,13 @@
 import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/pages/mobileView/SellerDashboard/profileManagementMobile.dart';
 import 'package:bidr/pages/mobileView/SellerDashboard/ratingReviewsMobile.dart';
+import 'package:bidr/pages/mobileView/SellerDashboard/sellerDashboardGrid.dart';
 import 'package:bidr/pages/mobileView/buyerDashboard/groupChatMobile.dart';
 import 'package:bidr/pages/mobileView/landingPage/supportMobileView.dart';
 import 'package:bidr/pages/notification.dart';
 import 'package:bidr/pages/seller/profile_management.dart';
 import 'package:bidr/pages/seller/rating_and_review.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,14 +31,14 @@ import 'enterPinMobile.dart';
 
 enum LeadStatus { open, closed, unsuccessful, pending, inProgress }
 
-class SellerDashboard extends StatefulWidget {
+class SellerMobileDashboard extends StatefulWidget {
   @override
-  _SellerDashboardState createState() => _SellerDashboardState();
+  _SellerMobileDashboardState createState() => _SellerMobileDashboardState();
 }
 
 List<WebNotification> notifications = [];
 
-class _SellerDashboardState extends State<SellerDashboard>
+class _SellerMobileDashboardState extends State<SellerMobileDashboard>
     with TickerProviderStateMixin {
   int selectedIndex = 0;
   int tabActiveIndex = 0;
@@ -615,172 +617,127 @@ class _SellerDashboardState extends State<SellerDashboard>
     final unreadCount = notifications.where((n) => !n.read).length;
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Image.asset(
+            "lib/assets/images/bidr_logo1.png",
+            height: 40,
+            width: 55,
+          ),
+        ),
+       actions: [
+         Stack(
+           children: [
+             IconButton(
+               icon: Icon(
+                 HugeIcons.strokeRoundedNotification01,
+                 color: Constants.ftaColorLight,
+               ),
+               onPressed: _showNotificationDialog,
+             ),
+             if (unreadCount > 0)
+               Positioned(
+                 right: 2,
+                 top: 2,
+                 child: Container(
+                   padding: const EdgeInsets.all(4),
+                   decoration: BoxDecoration(
+                     color: Constants.ctaColorLight,
+                     shape: BoxShape.circle,
+                   ),
+                   constraints: const BoxConstraints(
+                     minWidth: 16,
+                     minHeight: 16,
+                   ),
+                   child: Text(
+                     unreadCount.toString(),
+                     style: const TextStyle(
+                       color: Colors.white,
+                       fontSize: 9,
+                       fontWeight: FontWeight.bold,
+                     ),
+                     textAlign: TextAlign.center,
+                   ),
+                 ),
+               ),
+           ],
+         ),
+         SizedBox(width: 15),
+         SellerSortDropdownMenu(
+           initialValue: _currentSort,
+           onSortChanged: (option) {
+             setState(() {
+               _currentSort = option;
+             });
+             print('Sort changed to: $option');
+           },
+         ),
+       ],
+      ),
       body: Column(
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 66, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 66, vertical: 12),
             decoration: BoxDecoration(color: Constants.ftaColorLight),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
-                  'Seller Dashboard',
+                  'Complete Registration',
+
                   style: GoogleFonts.manrope(
                     color: Colors.white,
                     fontSize: 18,
+                    decoration: TextDecoration.underline,
+                    decorationColor: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Spacer(),
-                Stack(
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        HugeIcons.strokeRoundedNotification01,
-                        color: Colors.white,
-                      ),
-                      onPressed: _showNotificationDialog,
-                    ),
-                    if (unreadCount > 0)
-                      Positioned(
-                        right: 2,
-                        top: 2,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Constants.ctaColorLight,
-                            shape: BoxShape.circle,
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 16,
-                            minHeight: 16,
-                          ),
-                          child: Text(
-                            unreadCount.toString(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                SizedBox(width: 15),
-                SellerSortDropdownMenu(
-                  initialValue: _currentSort,
-                  onSortChanged: (option) {
-                    setState(() {
-                      _currentSort = option;
-                    });
-                    print('Sort changed to: $option');
-                  },
-                ),
+
               ],
             ),
           ),
           // Orange Navigation Bar
           SizedBox(height: 24),
           // Main Content Area
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"BookKeeper" ,onTap: (){},backgroundColor: Constants.ctaColorLight,)),
+                SizedBox(width: 16,),
+                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"BookKeeper" ,onTap: (){},backgroundColor: Constants.ctaColorLight,))
+              ],
+            ),
+          ),
+          SizedBox(height: 16,),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"BookKeeper" ,onTap: (){},backgroundColor: Constants.ctaColorLight,)),
+                SizedBox(width: 16,),
+                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"BookKeeper" ,onTap: (){},backgroundColor: Constants.ctaColorLight,))
+              ],
+            ),
+          ),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 children: [
+
                   Padding(
-                    padding: const EdgeInsets.only(left: 64, right: 64),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      constraints: BoxConstraints(maxWidth: 1600),
-                      decoration: BoxDecoration(
-                        color: Constants.ctaColorLight,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildNavItem(
-                            () {
-                              print('Dashboard tab clicked');
-                              setState(() {
-                                tabActiveIndex = 0;
-                              });
-                            },
-                            HugeIcons.strokeRoundedDashboardSquare01,
-                            'My Dashboard',
-                            tabActiveIndex == 0 ? true : false,
-                          ),
-                          _buildNavItem(
-                            () {
-                              setState(() {
-                                tabActiveIndex = 1;
-                              });
-                            },
-                            HugeIcons.strokeRoundedBook01,
-                            'My Bookkeeper',
-                            tabActiveIndex == 1 ? true : false,
-                          ),
-                          _buildNavItem(
-                            () {
-                              setState(() {
-                                tabActiveIndex = 2;
-                              });
-                            },
-                            HugeIcons.strokeRoundedCustomerSupport,
-                            'Support (BIDR)',
-                            tabActiveIndex == 2 ? true : false,
-                          ),
-                          _buildNavItem(
-                            () {
-                              setState(() {
-                                tabActiveIndex = 3;
-                              });
-                            },
-                            HugeIcons.strokeRoundedUserAdd01,
-                            'Refer a Friend/Business',
-                            tabActiveIndex == 3 ? true : false,
-                          ),
-                          _buildNavItem(
-                            () {
-                              setState(() {
-                                tabActiveIndex = 4;
-                              });
-                            },
-                            HugeIcons.strokeRoundedStar,
-                            'Review & Rating Manager',
-                            tabActiveIndex == 4 ? true : false,
-                          ),
-                          _buildNavItem(
-                            () {
-                              setState(() {
-                                tabActiveIndex = 5;
-                              });
-                            },
-                            HugeIcons.strokeRoundedProfile,
-                            'Profile Management',
-                            tabActiveIndex == 5 ? true : false,
-                          ),
-                        ],
-                      ),
-                    ),
+                    padding: const EdgeInsets.only(left: 16, right: 16),
+                    child: buildLeadsRequestsWidget(),
                   ),
                   if (tabActiveIndex == 0) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(left: 64, right: 64),
-                      child: Container(
-                        height: 900,
-                        width: MediaQuery.of(context).size.width,
-                        constraints: BoxConstraints(maxWidth: 1600),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 0,
-                          vertical: 12,
-                        ),
-                        child: buildLeadsRequestsWidget(),
-                      ),
-                    ),
+
                   ] else if (tabActiveIndex == 1) ...[
                     Padding(
                       padding: const EdgeInsets.only(left: 64, right: 64),
@@ -872,8 +829,6 @@ class _SellerDashboardState extends State<SellerDashboard>
                   ] else ...[
                     Container(),
                   ],
-                  SizedBox(height: 24),
-                  FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
                 ],
               ),
             ),

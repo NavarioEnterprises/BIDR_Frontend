@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Breakpoints {
   // Screen Breakpoints
@@ -242,7 +243,7 @@ class ResponsiveText extends StatelessWidget {
     return Text(
       text,
       textAlign: textAlign,
-      style: TextStyle(
+      style: GoogleFonts.manrope(
         fontSize: fontSize,
         color: color,
         fontWeight: fontWeight,

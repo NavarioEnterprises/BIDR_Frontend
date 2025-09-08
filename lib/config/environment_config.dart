@@ -116,7 +116,7 @@ class AppConfig {
     ),
     EnvironmentType.prod: EnvironmentConfig(
       // Service URLs (Production URLs)
-      authServiceUrl: "https://bidr-auth.ngrok.io/",
+      authServiceUrl: "https://api.bidr.co.za/",
       chatServiceUrl: "https://bidr-chat.ngrok.io/",
       paymentServiceUrl: "https://bidr-payment.ngrok.io/",
       resolutionServiceUrl: "https://bidr-resolution.ngrok.io/",

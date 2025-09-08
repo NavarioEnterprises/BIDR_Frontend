@@ -1160,146 +1160,191 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveBuilder(
-      builder: (context, typography, spacing) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top Tab Bar (Request/Order)
-            ResponsiveContainer(
-              paddingType: SpacingType.small,
-              color: Colors.white,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedTopTab = 0;
-                          _animationController.reset();
-                          _animationController.forward();
-                        });
-                        // Reload orders to ensure fresh data when switching back to Order tab later
-                        _loadOrdersFromAPI();
-                      },
-                      child: AnimatedContainer(
-                        duration: Duration(milliseconds: 300),
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: _selectedTopTab == 0
-                              ? Constants.ctaColorLight.withOpacity(0.05)
-                              : Colors.transparent,
-                          border: Border(
-                            bottom: BorderSide(
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading:IconButton(
+            onPressed:(){
+              Navigator.pop(context);
+              setState(() {
+
+              });
+            },
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Constants.ftaColorLight,
+              elevation: 5,
+              shadowColor: Colors.black54,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            icon: Icon(
+              CupertinoIcons.back,
+              color: Constants.ftaColorLight,
+            ),
+          ),
+          title: Text(
+            "Transaction",
+            style: GoogleFonts.manrope(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          centerTitle: true,
+          actions: [
+            IconButton(
+                onPressed: (){}, icon: Icon(HugeIcons.strokeRoundedFilter)
+            )
+          ],
+        ),
+        body: ResponsiveBuilder(
+          builder: (context, typography, spacing) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top Tab Bar (Request/Order)
+                ResponsiveContainer(
+                  paddingType: SpacingType.small,
+                  color: Colors.white,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedTopTab = 0;
+                              _animationController.reset();
+                              _animationController.forward();
+                            });
+                            // Reload orders to ensure fresh data when switching back to Order tab later
+                            _loadOrdersFromAPI();
+                          },
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            decoration: BoxDecoration(
                               color: _selectedTopTab == 0
-                                  ? Constants.ctaColorLight
-                                  : Colors.grey[300]!,
-                              width: _selectedTopTab == 0 ? 2 : 1,
+                                  ? Constants.ctaColorLight.withOpacity(0.05)
+                                  : Colors.transparent,
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: _selectedTopTab == 0
+                                      ? Constants.ctaColorLight
+                                      : Colors.transparent,
+                                  width: _selectedTopTab == 0 ? 2 : 1,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        child: Center(
-                          child: ResponsiveText(
-                            text: "Request",
-                            type: TextType.medium,
-                            fontWeight: _selectedTopTab == 0
-                                ? FontWeight.w600
-                                : FontWeight.w500,
-                            color: _selectedTopTab == 0
-                                ? Constants.ctaColorLight
-                                : Colors.grey[500],
+                            child: Center(
+                              child: ResponsiveText(
+                                text: "Request",
+                                type: TextType.medium,
+                                fontWeight: _selectedTopTab == 0
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                                color: _selectedTopTab == 0
+                                    ? Constants.ctaColorLight
+                                    : Colors.grey[500],
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedTopTab = 1;
-                          _animationController.reset();
-                          _animationController.forward();
-                        });
-                        // Load orders when Order tab is selected
-                        _loadOrdersFromAPI();
-                      },
-                      child: AnimatedContainer(
-                        duration: Duration(milliseconds: 300),
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: _selectedTopTab == 1
-                              ? Constants.ctaColorLight.withOpacity(0.05)
-                              : Colors.transparent,
-                          border: Border(
-                            bottom: BorderSide(
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedTopTab = 1;
+                              _animationController.reset();
+                              _animationController.forward();
+                            });
+                            // Load orders when Order tab is selected
+                            _loadOrdersFromAPI();
+                          },
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            decoration: BoxDecoration(
                               color: _selectedTopTab == 1
-                                  ? Constants.ctaColorLight
-                                  : Colors.grey[300]!,
-                              width: _selectedTopTab == 1 ? 2 : 1,
+                                  ? Constants.ctaColorLight.withOpacity(0.05)
+                                  : Colors.transparent,
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: _selectedTopTab == 1
+                                      ? Constants.ctaColorLight
+                                      : Colors.grey[300]!,
+                                  width: _selectedTopTab == 1 ? 2 : 1,
+                                ),
+                              ),
+                            ),
+                            child: Center(
+                              child: ResponsiveText(
+                                text: "Order",
+                                type: TextType.medium,
+                                fontWeight: _selectedTopTab == 1
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                                color: _selectedTopTab == 1
+                                    ? Constants.ctaColorLight
+                                    : Colors.grey[500],
+                              ),
                             ),
                           ),
                         ),
-                        child: Center(
-                          child: ResponsiveText(
-                            text: "Order",
-                            type: TextType.medium,
-                            fontWeight: _selectedTopTab == 1
-                                ? FontWeight.w600
-                                : FontWeight.w500,
-                            color: _selectedTopTab == 1
-                                ? Constants.ctaColorLight
-                                : Colors.grey[500],
-                          ),
-                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Show Order Status Tabs only when Order tab is selected
+                if (_selectedTopTab == 1) ...[
+                  Container(
+                    color: Constants.ftaColorLight,
+                    width: MediaQuery.of(context).size.width,
+                    height: 50,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          _buildStatusTab("On Going", 0),
+                          _buildStatusTab("Purchased", 1),
+                          _buildStatusTab("Returns/Refunds", 2),
+                          _buildStatusTab("Cancelled", 3),
+                        ],
                       ),
                     ),
                   ),
                 ],
-              ),
-            ),
 
-            // Show Order Status Tabs only when Order tab is selected
-            if (_selectedTopTab == 1) ...[
-              Container(
-                color: Colors.white,
-                width: MediaQuery.of(context).size.width,
-                height: 50,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildStatusTab("On Going", 0),
-                      _buildStatusTab("Purchased", 1),
-                      _buildStatusTab("Returns/Refunds", 2),
-                      _buildStatusTab("Cancelled", 3),
-                    ],
+                SizedBox(height: 16),
+                Expanded(
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: ResponsiveContainer(
+                        paddingType: SpacingType.medium,
+                        child: _selectedTopTab == 0
+                            ? _buildRequestContent(typography, spacing)
+                            : SingleChildScrollView(
+                          child: Center(child: _buildContent(typography, spacing)),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
-
-            SizedBox(height: 16),
-            Expanded(
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: ResponsiveContainer(
-                    paddingType: SpacingType.medium,
-                    child: _selectedTopTab == 0
-                        ? _buildRequestContent(typography, spacing)
-                        : SingleChildScrollView(
-                            child: _buildContent(typography, spacing),
-                          ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -1316,23 +1361,27 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: EdgeInsets.symmetric(
+            padding: isSelected?
+            EdgeInsets.only(
+              left: 4,top: 4,right: 4
+            ):EdgeInsets.symmetric(
               vertical: 4,
               horizontal: spacing.paddingSmall,
             ),
-            margin: EdgeInsets.all(8),
+            margin: EdgeInsets.only(
+                left: 8,top: 8,right: 8
+            ),
             decoration: BoxDecoration(
-              color: isSelected
-                  ? Constants.ftaColorLight
-                  : Colors.grey.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(360),
-              border: Border.all(
-                color: isSelected
+              color:Constants.ftaColorLight,
+
+              //borderRadius: BorderRadius.circular(360),
+              border: Border(
+                bottom: BorderSide(color: isSelected
                     ? Constants.ctaColorLight
-                    : Colors.grey.withOpacity(0.3),
-                width: 1,
+                    : Colors.transparent,
+                  width: 4,)
               ),
-              boxShadow: isSelected
+            /*  boxShadow: isSelected
                   ? [
                       BoxShadow(
                         color: Constants.ctaColorLight.withOpacity(0.3),
@@ -1340,7 +1389,7 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
                         offset: const Offset(0, 2),
                       ),
                     ]
-                  : null,
+                  : null,*/
             ),
             child: Center(
               child: Text(
@@ -1348,8 +1397,8 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
                 textAlign: TextAlign.center,
                 style: GoogleFonts.manrope(
                   fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w300,
-                  color: isSelected ? Colors.white : Colors.black54,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? Colors.white : Constants.ctaColorLight,
                 ),
               ),
             ),
@@ -1358,40 +1407,6 @@ class _TransactionMobileDashboardState extends State<TransactionMobileDashboard>
       },
     );
   }
-
-  /*Widget _buildStatusTab(String title, int index) {
-    bool isSelected = _selectedTab == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _selectedTab = index;
-          });
-          // Reload orders when switching between status tabs
-          _loadOrdersFromAPI();
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-          margin: EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.orange : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Center(
-            child: Text(
-              title,
-              style: GoogleFonts.manrope(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
-    );
-  }*/
 
   Widget _buildRequestContent(
     TypographyConfig typography,

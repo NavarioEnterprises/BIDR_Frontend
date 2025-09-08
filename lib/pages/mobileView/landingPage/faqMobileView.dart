@@ -1,3 +1,5 @@
+import 'package:bidr/pages/mobileView/landingPage/profileMobile.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -6,11 +8,14 @@ import '../../../constants/Constants.dart';
 import '../../../customWdget/appbar.dart';
 import '../../../customWdget/customCard.dart';
 import '../../../customWdget/custom_input2.dart';
+import '../../../customWdget/mobileBottomNavBar.dart';
 import '../../../models/faq.dart';
 import '../../../services/faq_api_service.dart';
 import '../../buyer/support.dart';
 import '../../buyer_home.dart';
 import '../breakpoints.dart';
+import 'landingMobileController.dart';
+import 'landingMobileViewPage.dart';
 
 class FAQMobileScreen extends StatefulWidget {
   const FAQMobileScreen({super.key});
@@ -245,142 +250,115 @@ class _FAQMobileScreenState extends State<FAQMobileScreen> with TickerProviderSt
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
     
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: Column(
-        children: [
-          // Header
-          SizedBox(height: spacing.spacingLarge),
-          TweenAnimationBuilder<double>(
-            duration: Duration(milliseconds: 600),
-            tween: Tween(begin: 0.0, end: 1.0),
-            builder: (context, value, child) {
-              return Opacity(
-                opacity: value,
-                child: Transform.translate(
-                  offset: Offset(0, 20 * (1 - value)),
-                  child: BuyerDashboardHeader(
-                    headerName: 'Frequently Answered\nQuestioned',
-                    totalAlert: 0,
-                  ),
-                ),
-              );
-            },
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:isBackButtonDisplayed?
+        IconButton(
+          onPressed:(){
+            Navigator.pop(context);
+            setState(() {
+
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
-          SizedBox(height: spacing.spacingLarge),
-          
-          // Main Content
-          Expanded(
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // Hero Section with Title
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      padding: EdgeInsets.symmetric(
-                        vertical: spacing.paddingLarge,
-                        horizontal: spacing.paddingLarge,
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ):
+        IconButton(
+          onPressed:(){
+            currentIndex =0;
+            selectedTitle = "";
+            currentControllerValueNotifier.value++;
+            buyerBackMobileButtonValueNotifier.value++;
+            setState(() {
+
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        title: Text(
+          "Frequently Answered\nQuestioned",
+          style: GoogleFonts.manrope(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: Column(
+          children: [
+            // Header
+            SizedBox(height: spacing.spacingLarge),
+
+            // Main Content
+            Expanded(
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // Search Section
+                      Container(
+                        margin: EdgeInsets.all(spacing.spacingLarge),
+                        child: _buildSearchSection(typography, spacing),
                       ),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Constants.ctaColorLight.withOpacity(0.1),
-                            Constants.ctaColorLight.withOpacity(0.05),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+
+                      // Category Filter
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: spacing.spacingLarge),
+                        child: _buildCategoryFilter(typography, spacing),
                       ),
-                      child: Column(
-                        children: [
-                          TweenAnimationBuilder<double>(
-                            duration: Duration(milliseconds: 800),
-                            tween: Tween(begin: 0.0, end: 1.0),
-                            builder: (context, value, child) {
-                              return Transform.scale(
-                                scale: 0.8 + (0.2 * value),
-                                child: Icon(
-                                  HugeIcons.strokeRoundedHelpSquare,
-                                  size: 48,
-                                  color: Constants.ctaColorLight,
-                                ),
-                              );
-                            },
-                          ),
-                          SizedBox(height: spacing.spacingMedium),
-                          Text(
-                            'Frequently Asked Questions',
-                            style: GoogleFonts.manrope(
-                              fontSize: typography.heading,
-                              fontWeight: FontWeight.bold,
-                              color: Constants.ftaColorLight,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: spacing.spacingSmall),
-                          Text(
-                            'Find quick answers to common questions',
-                            style: GoogleFonts.manrope(
-                              fontSize: typography.normal,
-                              color: Colors.grey[600],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+
+                      SizedBox(height: spacing.spacingLarge),
+                      SizedBox(height: spacing.spacingLarge),
+
+                      // FAQ Content
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: spacing.spacingLarge),
+                        child: _buildFAQContent(typography, spacing),
                       ),
-                    ),
-                    
-                    // Search Section
-                    Container(
-                      margin: EdgeInsets.all(spacing.spacingLarge),
-                      child: _buildSearchSection(typography, spacing),
-                    ),
-                    
-                    // Category Filter
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: spacing.spacingLarge),
-                      child: _buildCategoryFilter(typography, spacing),
-                    ),
-                    
-                    SizedBox(height: spacing.spacingLarge),
-                    SizedBox(height: spacing.spacingLarge),
-                    
-                    // FAQ Content
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: spacing.spacingLarge),
-                      child: _buildFAQContent(typography, spacing),
-                    ),
-                    
-                    // Contact Support Section
-                    Container(
-                      margin: EdgeInsets.all(spacing.spacingLarge),
-                      child: _buildContactSupportSection(typography, spacing),
-                    ),
-                    
-                    SizedBox(height: spacing.spacingLarge * 2),
-                    
-                    // Footer
-                    TweenAnimationBuilder<double>(
-                      duration: Duration(milliseconds: 1200),
-                      tween: Tween(begin: 0.0, end: 1.0),
-                      builder: (context, value, child) {
-                        return Opacity(
-                          opacity: value,
-                          child: Transform.translate(
-                            offset: Offset(0, 20 * (1 - value)),
-                            child: FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+
+                      // Contact Support Section
+                      Container(
+                        margin: EdgeInsets.all(spacing.spacingLarge),
+                        child: _buildContactSupportSection(typography, spacing),
+                      ),
+
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

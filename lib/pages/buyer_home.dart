@@ -16,6 +16,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 import '../authentication/login.dart';
 import '../constants/Constants.dart';
+import '../customWdget/mobileBottomNavBar.dart';
 import '../models/alert.dart';
 import '../customWdget/appbar.dart';
 import '../customWdget/custom_input2.dart';
@@ -31,6 +32,7 @@ import 'buyer/video.dart';
 import 'faq_screen.dart';
 import 'mobileView/breakpoints.dart';
 import 'mobileView/buyerDashboard/buyerMobileDashboard.dart';
+import 'mobileView/landingPage/landingMobileController.dart';
 import 'mobileView/landingPage/landingMobileViewPage.dart';
 import 'notification.dart';
 import 'policies_screen.dart';
@@ -183,7 +185,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
   @override
   Widget build(BuildContext context) {
     return Breakpoints.isMobile(context)
-        ? BuyerHomeMobilePage()
+        ? LandingMobileController()
         : Scaffold(
             backgroundColor: Colors.white, //
             body: Container(
@@ -411,8 +413,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                     ).animate(_slideController),
                                     child: Center(
                                       child: FooterSection(
-                                        logo:
-                                            "lib/assets/images/bidr_logo2.png",
+                                        logo: "lib/assets/images/bidr_logo2.png",
                                         onFooterLinkTap: (String text) {
                                           switch (text) {
                                             case 'Home':

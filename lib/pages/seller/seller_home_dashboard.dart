@@ -27,6 +27,7 @@ import '../buyer/share_with_friends.dart';
 import '../buyer/support.dart';
 import '../buyer_home.dart';
 import '../group_chat.dart';
+import '../mobileView/SellerDashboard/sellerMobileDashboard.dart';
 import 'enter_pin.dart';
 import 'seller_dashboard_mobile.dart';
 
@@ -569,7 +570,7 @@ class _SellerDashboardState extends State<SellerDashboard>
   Widget build(BuildContext context) {
     // Show mobile version for screens smaller than 800px
     if (MediaQuery.of(context).size.width < 800) {
-      return SellerDashboardMobile();
+      return SellerMobileDashboard();
     }
 
     final unreadCount = notifications.where((n) => !n.read).length;

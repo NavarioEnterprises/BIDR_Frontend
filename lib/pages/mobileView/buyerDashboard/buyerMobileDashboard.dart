@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 import '../../../customWdget/dropdownMenu.dart';
+import '../../../customWdget/mobileBottomNavBar.dart';
 import '../../../models/product_request_api.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -16,6 +17,8 @@ import '../../../models/request_models.dart';
 import '../../../services/chat_service.dart';
 import '../../../services/products_management_api_service.dart';
 import '../breakpoints.dart';
+import '../landingPage/landingMobileController.dart';
+import '../landingPage/landingMobileViewPage.dart';
 import 'accountManagementMobile.dart';
 import 'shareMobile.dart';
 import 'transactionMobileDashboard.dart';
@@ -130,20 +133,21 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveBuilder(
-      builder: (context, typography, spacing) {
-        return SingleChildScrollView(
-          child: Column(
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: ResponsiveBuilder(
+        builder: (context, typography, spacing) {
+          return Column(
             children: [
-              Container(height: 580, child: MobileBuyerDashboardGrid()),
-              Container(
-                height: 800,
-                child: _buildContent(dashboardIndex, typography, spacing),
+              Container(height: 365, child: MobileBuyerDashboardGrid(_transactionKey)),
+              Expanded(
+                child:  _buildContent(dashboardIndex, typography, spacing),
               ),
             ],
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -534,191 +538,193 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
     final requestId = _getRequestId(request);
     final isCancelled = _cancelledRequests.contains(requestId);
 
-    return Container(
-      margin: EdgeInsets.all(spacing.paddingSmall),
-      padding: EdgeInsets.all(spacing.paddingMedium),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header row with date, request ID, cancel button, and sort
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ResponsiveText(
-                    text: _formatDate(request.createdAt?.toString()),
-                    type: TextType.normal,
-                    color: Colors.grey.shade600,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  ResponsiveText(
-                    text: "REQUEST #$index",
-                    type: TextType.subHeading,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  if (!isCancelled)
-                    InkWell(
-                      onTap: () => _showCancelRequestDialog(request),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.red.shade300),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: ResponsiveText(
-                          text: "Cancel",
-                          type: TextType.normal,
-                          color: Colors.red.shade500,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  SizedBox(width: 12),
-                  // Sort dropdown placeholder for mobile
-                  Icon(Icons.sort, color: Colors.grey.shade600, size: 20),
-                ],
-              ),
-            ],
-          ),
-          ResponsiveGap(type: SpacingType.small),
-
-          // Description section with orange border
-          IntrinsicHeight(
-            child: Row(
+    return Padding(
+      padding: const EdgeInsets.only(left: 24,right: 24, bottom: 16, top: 12),
+      child: Container(
+        padding: EdgeInsets.all(spacing.paddingMedium),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header row with date, request ID, cancel button, and sort
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Padding(
-                  padding: EdgeInsets.only(
-                    right: spacing.spacingSmall,
-                    top: 4,
-                    bottom: 4,
-                  ),
-                  child: Container(
-                    width: 4,
-                    decoration: BoxDecoration(
-                      color: Constants.ctaColorLight,
-                      borderRadius: BorderRadius.circular(36),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ResponsiveText(
+                      text: "REQUEST #$index",
+                      type: TextType.subHeading,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ),
+                    ResponsiveText(
+                      text: _formatDate(request.createdAt?.toString()),
+                      type: TextType.normal,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ResponsiveText(
-                            text: "Description -",
+                Row(
+                  children: [
+                    if (!isCancelled)
+                      InkWell(
+                        onTap: () => _showCancelRequestDialog(request),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.red.shade300),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: ResponsiveText(
+                            text: "Cancel",
                             type: TextType.normal,
-                            color: Colors.grey.shade600,
+                            color: Colors.red.shade500,
+                            fontWeight: FontWeight.w500,
                           ),
-                          Spacer(),
-                          GestureDetector(
-                            onTap: () =>
-                                _navigateToDetailScreen(request, index),
-                            child: ResponsiveText(
-                              text: "View Details",
-                              type: TextType.normal,
-                              color: Constants.ftaColorLight,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                      ResponsiveGap(type: SpacingType.small),
-                      ResponsiveText(
-                        text: _getRequestDescription(request),
-                        type: TextType.normal,
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      ResponsiveGap(type: SpacingType.small),
-                      // Category
-                      ResponsiveText(
-                        text: _getCategoryDisplayName(request.category),
-                        type: TextType.normal,
-                        color: Colors.orange.shade600,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ],
-                  ),
+                    SizedBox(width: 12),
+                    // Sort dropdown placeholder for mobile
+                    Icon(Icons.sort, color: Colors.grey.shade600, size: 20),
+                  ],
                 ),
               ],
             ),
-          ),
+            ResponsiveGap(type: SpacingType.small),
 
-          ResponsiveGap(type: SpacingType.large),
-
-          // Countdown Timer
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildTimerCircle("0", "D"),
-              SizedBox(width: 12),
-              _buildTimerCircle(
-                _getElapsedTime(request.createdAt, 'hours'),
-                "H",
+            // Description section with orange border
+            IntrinsicHeight(
+              child: Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                      right: spacing.spacingSmall,
+                      top: 4,
+                      bottom: 4,
+                    ),
+                    child: Container(
+                      width: 4,
+                      decoration: BoxDecoration(
+                        color: Constants.ctaColorLight,
+                        borderRadius: BorderRadius.circular(36),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ResponsiveText(
+                              text: "Description -",
+                              type: TextType.normal,
+                              color: Colors.grey.shade600,
+                            ),
+                            Spacer(),
+                            GestureDetector(
+                              onTap: () =>
+                                  _navigateToDetailScreen(request, index),
+                              child: ResponsiveText(
+                                text: "View Details",
+                                type: TextType.normal,
+                                color: Constants.ftaColorLight,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                        ResponsiveGap(type: SpacingType.small),
+                        ResponsiveText(
+                          text: _getRequestDescription(request),
+                          type: TextType.normal,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        ResponsiveGap(type: SpacingType.small),
+                        // Category
+                        ResponsiveText(
+                          text: _getCategoryDisplayName(request.category),
+                          type: TextType.normal,
+                          color: Colors.orange.shade600,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(width: 12),
-              _buildTimerCircle(
-                _getElapsedTime(request.createdAt, 'minutes'),
-                "M",
-              ),
-              SizedBox(width: 12),
-              _buildTimerCircle(
-                _getElapsedTime(request.createdAt, 'seconds'),
-                "S",
-              ),
-            ],
-          ),
-
-          ResponsiveGap(type: SpacingType.large),
-
-          // Seller Bids Section
-          if (bidsToShow.isNotEmpty) ...[
-            ...bidsToShow.asMap().entries.map(
-              (entry) =>
-                  _buildModernSellerBid(entry.value, request, entry.key + 1),
             ),
-            if (hasMoreThanTwoBids) ...[
-              ResponsiveGap(type: SpacingType.medium),
-              _buildViewAllBidsButton(bids.length),
-            ],
-          ] else ...[
-            Container(
-              height: 100,
-              child: Center(
-                child: ResponsiveText(
-                  text: "No bids yet",
-                  type: TextType.medium,
-                  color: Colors.grey.shade500,
+
+            ResponsiveGap(type: SpacingType.large),
+
+            // Countdown Timer
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildTimerCircle("0", "D"),
+                SizedBox(width: 12),
+                _buildTimerCircle(
+                  _getElapsedTime(request.createdAt, 'hours'),
+                  "H",
+                ),
+                SizedBox(width: 12),
+                _buildTimerCircle(
+                  _getElapsedTime(request.createdAt, 'minutes'),
+                  "M",
+                ),
+                SizedBox(width: 12),
+                _buildTimerCircle(
+                  _getElapsedTime(request.createdAt, 'seconds'),
+                  "S",
+                ),
+              ],
+            ),
+
+            ResponsiveGap(type: SpacingType.large),
+
+            // Seller Bids Section
+            if (bidsToShow.isNotEmpty) ...[
+              ...bidsToShow.asMap().entries.map(
+                (entry) =>
+                    _buildModernSellerBid(entry.value, request, entry.key + 1),
+              ),
+              if (hasMoreThanTwoBids) ...[
+                ResponsiveGap(type: SpacingType.medium),
+                _buildViewAllBidsButton(bids.length),
+              ],
+            ] else ...[
+              Container(
+                height: 100,
+                child: Center(
+                  child: ResponsiveText(
+                    text: "No bids yet",
+                    type: TextType.medium,
+                    color: Colors.grey.shade500,
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -9677,150 +9683,211 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
 }
 
 class MobileBuyerDashboardGrid extends StatelessWidget {
+  final GlobalKey transactionKey;
+  const MobileBuyerDashboardGrid(this.transactionKey, {super.key});
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          // Orange header section
-          Container(
-            height: 210,
-            child: Stack(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: Constants.ctaColorLight.withOpacity(0.75),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(45),
-                      bottomRight: Radius.circular(45),
-                    ),
+    return Column(
+      children: [
+        // Orange header section
+        Container(
+          height: 180,
+          child: Stack(
+            children: [
+              Container(
+                width: double.infinity,
+                height: 150,
+                decoration: BoxDecoration(
+                  color: Constants.ctaColorLight.withOpacity(0.75),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(45),
+                    bottomRight: Radius.circular(45),
                   ),
-                  child: SafeArea(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 16,
-                      ),
-                      child: Column(
-                        children: [
-                          // Top row with BIDR logo, title, and notification
-                        ],
-                      ),
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
+                    child: Column(
+                      children: [
+                        // Top row with BIDR logo, title, and notification
+                      ],
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 16.0,
-                    right: 16,
-                    top: 16,
-                  ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 16.0,
+                  right: 16,
+                  top: 16,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'BIDR',
+                      style: GoogleFonts.manrope(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1B3B5C),
+                      ),
+                    ),
+                    Text(
+                      'Buyer Dashboard',
+                      style: GoogleFonts.manrope(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1B3B5C),
+                      ),
+                    ),
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF1B3B5C),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.notifications,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 40),
+
+              // Top row cards
+              Padding(
+                padding: const EdgeInsets.only(top: 80.0),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 24, right: 24),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'BIDR',
-                        style: GoogleFonts.manrope(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1B3B5C),
+                      Expanded(
+                        child: _buildDashboardCard(
+                          title: 'Profile',
+                          icon: Icons.person,
+                          onTap: () {
+                            // Navigate to profile
+                            currentIndex = 4;
+                            Constants.buyerAppBarValue = 0;
+                            currentControllerValueNotifier.value++;
+                            buyerHomeMobileValueNotifier.value++;
+                          },
                         ),
                       ),
-                      Text(
-                        'Buyer Dashboard',
-                        style: GoogleFonts.manrope(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1B3B5C),
-                        ),
-                      ),
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: Color(0xFF1B3B5C),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.notifications,
-                          color: Colors.white,
-                          size: 20,
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: _buildDashboardCard(
+                          title: 'Categories',
+                          icon: Icons.grid_view,
+                          onTap: () {
+                            currentIndex = 1;
+                            Constants.buyerAppBarValue = 0;
+                            currentControllerValueNotifier.value++;
+                            buyerHomeMobileValueNotifier.value++;
+                          },
                         ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 40),
-
-                // Top row cards
-                Padding(
-                  padding: const EdgeInsets.only(top: 100.0),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 24, right: 24),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _buildDashboardCard(
-                            title: 'Profile',
-                            icon: Icons.person,
-                            onTap: () {
-                              // Navigate to profile
-                            },
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: _buildDashboardCard(
-                            title: 'Categories',
-                            icon: Icons.grid_view,
-                            onTap: () {
-                              // Navigate to categories
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
 
-          // White background section with remaining cards
-          Expanded(
-            child: Container(
-              color: Colors.white,
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    // Refer a Friend card
-                    _buildFullWidthCard(
-                      title: 'Refer A Friend / Business',
-                      icon: Icons.person_add,
-                      onTap: () {
-                        // Navigate to referral
-                      },
-                    ),
-                    SizedBox(height: 16),
+        // White background section with remaining cards
+        Expanded(
+          child: Container(
+            color: Colors.white,
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  // Refer a Friend card
+                  _buildFullWidthCard(
+                    title: 'Refer A Friend / Business',
+                    icon: Icons.person_add,
+                    onTap: () {
+                      // Navigate to referral
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (
+                              context,
+                              animation,
+                              secondaryAnimation,
+                              ) => ShareWidgetMobile(),
+                          transitionsBuilder:
+                              (
+                              context,
+                              animation,
+                              secondaryAnimation,
+                              child,
+                              ) {
+                            return SlideTransition(
+                              position: Tween<Offset>(
+                                begin: Offset(1.0, 0.0),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 16),
 
-                    // Transaction Management card
-                    _buildFullWidthCard(
-                      title: 'Transaction Management',
-                      icon: Icons.check_box,
-                      onTap: () {
-                        // Navigate to transactions
-                      },
-                    ),
-                  ],
-                ),
+                  // Transaction Management card
+                  _buildFullWidthCard(
+                    title: 'Transaction Management', //TransactionMobileDashboard(key: _transactionKey);
+                    icon: Icons.check_box,
+                    onTap: () {
+                      // Navigate to transactions
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (
+                              context,
+                              animation,
+                              secondaryAnimation,
+                              ) => TransactionMobileDashboard(key: transactionKey),
+                          transitionsBuilder:
+                              (
+                              context,
+                              animation,
+                              secondaryAnimation,
+                              child,
+                              ) {
+                            return SlideTransition(
+                              position: Tween<Offset>(
+                                begin: Offset(1.0, 0.0),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -9832,7 +9899,7 @@ class MobileBuyerDashboardGrid extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 120,
+        height: 100,
         decoration: BoxDecoration(
           color: Color(0xFF1B3B5C),
           borderRadius: BorderRadius.circular(16),
@@ -9905,7 +9972,7 @@ class MobileBuyerDashboardGrid extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        height: 80,
+        height: 60,
         decoration: BoxDecoration(
           color: Color(0xFF1B3B5C),
           borderRadius: BorderRadius.circular(16),
@@ -9918,13 +9985,13 @@ class MobileBuyerDashboardGrid extends StatelessWidget {
           ],
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           child: Row(
             children: [
               // Icon
               Container(
-                width: 40,
-                height: 40,
+                width: 35,
+                height: 35,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
@@ -9948,8 +10015,8 @@ class MobileBuyerDashboardGrid extends StatelessWidget {
 
               // Arrow
               Container(
-                width: 32,
-                height: 32,
+                width: 30,
+                height: 30,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -9966,4 +10033,6 @@ class MobileBuyerDashboardGrid extends StatelessWidget {
       ),
     );
   }
+
+
 }

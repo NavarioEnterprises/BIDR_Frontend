@@ -36,6 +36,7 @@ import '../buyerDashboard/buyerMobileDashboard.dart';
 import 'blogcardMobileView.dart';
 import 'contactUsMobileView.dart';
 import 'faqMobileView.dart';
+import 'mobileBusinessLandingPage.dart';
 import 'mobileBuyerLandingPage.dart';
 
 class BuyerHomeMobilePage extends StatefulWidget {
@@ -44,9 +45,11 @@ class BuyerHomeMobilePage extends StatefulWidget {
 }
 
 MyNotifier? myNotifier;
-MyNotifier? mySellerNotifier;
-final buyerHomeValueNotifier = ValueNotifier<int>(0);
-final sellerHomeValueNotifier = ValueNotifier<int>(0);
+MyNotifier? mySellerMobileNotifier;
+MyNotifier? myBuyerMobileNotifier;
+final buyerHomeMobileValueNotifier = ValueNotifier<int>(0);
+final buyerBackMobileButtonValueNotifier = ValueNotifier<int>(0);
+final sellerHomeMobileValueNotifier = ValueNotifier<int>(0);
 
 class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
     with TickerProviderStateMixin {
@@ -78,11 +81,16 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
   void initState() {
     super.initState();
     myNotifier = MyNotifier(buyerHomeValueNotifier, context);
-    mySellerNotifier = MyNotifier(sellerHomeValueNotifier, context);
-    buyerHomeValueNotifier.addListener(() {
+    myBuyerMobileNotifier = MyNotifier(buyerHomeMobileValueNotifier, context);
+    mySellerMobileNotifier = MyNotifier(sellerHomeMobileValueNotifier, context);
+    buyerBackMobileButtonValueNotifier.addListener(() {
+      Constants.buyerAppBarValue =0;
       setState(() {});
     });
-    sellerHomeValueNotifier.addListener(() {
+    sellerHomeMobileValueNotifier.addListener(() {
+      setState(() {});
+    });
+    buyerHomeMobileValueNotifier.addListener(() {
       setState(() {});
     });
     // Initialize animation controllers
@@ -355,24 +363,18 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                             // Animated Bottom Banner
                             FadeTransition(
                               opacity: _fadeAnimation,
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                //height: 800,
-                                constraints: BoxConstraints(maxWidth: 1600),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 0,
-                                    right: 0,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: _buildAnimatedBannerSection(
-                                          "lib/assets/images/mask_group.png",
-                                          false,
-                                        ),
-                                      ),
-                                    ],
+                              child:Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal:
+                                  ResponsiveSpacing.getSpacing(
+                                    context,
+                                  ).paddingLarge *
+                                      2,
+                                ),
+                                child:  Center(
+                                  child: _buildAnimatedBannerSection(
+                                    "lib/assets/images/mask_group.png",
+                                    false,
                                   ),
                                 ),
                               ),
@@ -383,78 +385,26 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                                 context,
                               ).spacingLarge,
                             ),
-
-                            // Animated Footer
-                            SlideTransition(
-                              position: Tween<Offset>(
-                                begin: Offset(0, 1),
-                                end: Offset.zero,
-                              ).animate(_slideController),
-                              child: Center(
-                                child: FooterSection(
-                                  logo: "lib/assets/images/bidr_logo2.png",
-                                  onFooterLinkTap: (String text) {
-                                    switch (text) {
-                                      case 'Home':
-                                        setState(() {
-                                          Constants.buyerAppBarValue = 0;
-                                          buyerHomeValueNotifier.value++;
-                                        });
-                                        break;
-                                      case 'Support':
-                                        setState(() {
-                                          Constants.buyerAppBarValue = 1;
-                                          buyerHomeValueNotifier.value++;
-                                        });
-                                        break;
-                                      case 'FAQs':
-                                        setState(() {
-                                          Constants.buyerAppBarValue = 2;
-                                          buyerHomeValueNotifier.value++;
-                                        });
-                                        break;
-                                      case 'Policies':
-                                        setState(() {
-                                          Constants.buyerAppBarValue = 3;
-                                          buyerHomeValueNotifier.value++;
-                                        });
-                                        break;
-                                      case 'Blogs':
-                                        setState(() {
-                                          Constants.buyerAppBarValue = 4;
-                                          buyerHomeValueNotifier.value++;
-                                        });
-                                        break;
-                                      case 'Contact Us':
-                                        setState(() {
-                                          Constants.buyerAppBarValue = 5;
-                                          buyerHomeValueNotifier.value++;
-                                        });
-                                        break;
-                                    }
-                                  },
-                                ),
-                              ),
+                            SizedBox(
+                              height: ResponsiveSpacing.getSpacing(
+                                context,
+                              ).spacingMedium,
                             ),
+                            // Animated Footer
+
                           ],
                         ),
                       ),
                     ),
                   )
                 : Constants.buyerAppBarValue == 1
-                ? Expanded(child: SupportMobile())
-                : Constants.buyerAppBarValue == 2
                 ? Expanded(child: FAQMobileScreen())
-                : Constants.buyerAppBarValue == 3
+                : Constants.buyerAppBarValue == 2
                 ? Expanded(child: PoliciesMobileScreen())
-                : Constants.buyerAppBarValue == 4
+                : Constants.buyerAppBarValue == 3
                 ? Expanded(child: BlogCardsMobileScreen())
-                : Constants.buyerAppBarValue == 5
+                : Constants.buyerAppBarValue == 4
                 ? Expanded(child: ContactFormMobileScreen())
-                : Constants.buyerAppBarValue == 6
-                ? Expanded(child: BuyerMobileDashboard())
-                : Constants.buyerAppBarValue == 7
-                ? Expanded(child: SellerDashboard())
                 : Constants.buyerAppBarValue == 8
                 ? Expanded(
                     child: NotificationPage(notifications: notifications),
@@ -525,7 +475,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                       context,
                       PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) =>
-                            BusinessLandingPage(),
+                            MobileBusinessLandingPage(),
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {
                               return SlideTransition(
@@ -737,7 +687,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
               height: 180,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
@@ -747,7 +697,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
                   image,
                   fit: BoxFit.contain,
@@ -5752,7 +5702,7 @@ class SocialMediaMobileButton extends StatelessWidget {
     Key? key,
     required this.imagePath,
     required this.url,
-    this.size = 50.0,
+    this.size = 30.0,
   }) : super(key: key);
 
   Future<void> _launchUrl() async {
@@ -5766,25 +5716,9 @@ class SocialMediaMobileButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: _launchUrl,
-      child: Container(
-        width: size,
-        height: size,
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(360.0),
-          child: Image.asset(imagePath, fit: BoxFit.cover),
-        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(360.0),
+        child: Image.asset(imagePath, fit: BoxFit.contain, width: 30, height:30,),
       ),
     );
   }

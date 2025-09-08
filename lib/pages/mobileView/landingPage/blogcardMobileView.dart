@@ -1,4 +1,5 @@
 import 'package:bidr/pages/buyer/support.dart';
+import 'package:bidr/pages/mobileView/landingPage/profileMobile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,11 +10,14 @@ import 'package:intl/intl.dart';
 import '../../../constants/Constants.dart';
 import '../../../customWdget/appbar.dart';
 import '../../../customWdget/customCard.dart';
+import '../../../customWdget/mobileBottomNavBar.dart';
 import '../../../global_values.dart';
 import '../../../models/blog.dart';
 import '../../../services/blog_api_service.dart';
 import '../../buyer_home.dart';
 import '../breakpoints.dart';
+import 'landingMobileController.dart';
+import 'landingMobileViewPage.dart';
 
 class BlogCardsMobileScreen extends StatefulWidget {
   const BlogCardsMobileScreen({super.key});
@@ -272,121 +276,79 @@ class _BlogCardsMobileScreenState extends State<BlogCardsMobileScreen> with Tick
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
     
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: Column(
-        children: [
-          // Header
-          SizedBox(height: spacing.spacingLarge),
-          TweenAnimationBuilder<double>(
-            duration: Duration(milliseconds: 600),
-            tween: Tween(begin: 0.0, end: 1.0),
-            builder: (context, value, child) {
-              return Opacity(
-                opacity: value,
-                child: Transform.translate(
-                  offset: Offset(0, 20 * (1 - value)),
-                  child: BuyerDashboardHeader(
-                    headerName: '',
-                    totalAlert: GlobalVariables.alertList.length,
-                  ),
-                ),
-              );
+    return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading:isBackButtonDisplayed?
+          IconButton(
+            onPressed:(){
+              Navigator.pop(context);
+              setState(() {
+
+              });
             },
-          ),
-          SizedBox(height: spacing.spacingLarge),
-          
-          // Main Content
-          Expanded(
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // Hero Section
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      padding: EdgeInsets.symmetric(
-                        vertical: spacing.paddingLarge,
-                        horizontal: spacing.paddingLarge,
-                      ),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Constants.ctaColorLight.withOpacity(0.1),
-                            Constants.ctaColorLight.withOpacity(0.05),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          TweenAnimationBuilder<double>(
-                            duration: Duration(milliseconds: 800),
-                            tween: Tween(begin: 0.0, end: 1.0),
-                            builder: (context, value, child) {
-                              return Transform.scale(
-                                scale: 0.8 + (0.2 * value),
-                                child: Icon(
-                                  HugeIcons.strokeRoundedNews,
-                                  size: 48,
-                                  color: Constants.ctaColorLight,
-                                ),
-                              );
-                            },
-                          ),
-                          SizedBox(height: spacing.spacingMedium),
-                          Text(
-                            'Latest Blog Posts',
-                            style: GoogleFonts.manrope(
-                              fontSize: typography.heading,
-                              fontWeight: FontWeight.bold,
-                              color: Constants.ftaColorLight,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: spacing.spacingSmall),
-                          Text(
-                            'Stay updated with industry insights and tips',
-                            style: GoogleFonts.manrope(
-                              fontSize: typography.normal,
-                              color: Colors.grey[600],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                    // Blog Content
-                    Container(
-                      padding: EdgeInsets.all(spacing.paddingLarge),
-                      child: _buildMobileBlogContent(),
-                    ),
-                    
-                    // Footer
-                    TweenAnimationBuilder<double>(
-                      duration: Duration(milliseconds: 1200),
-                      tween: Tween(begin: 0.0, end: 1.0),
-                      builder: (context, value, child) {
-                        return Opacity(
-                          opacity: value,
-                          child: Transform.translate(
-                            offset: Offset(0, 20 * (1 - value)),
-                            child: FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Constants.ftaColorLight,
+              elevation: 5,
+              shadowColor: Colors.black54,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
+            icon: Icon(
+              CupertinoIcons.back,
+              color: Constants.ftaColorLight,
+            ),
+          ):
+          IconButton(
+            onPressed:(){
+              currentIndex =0;
+              selectedTitle = "";
+              Constants.buyerAppBarValue =0;
+              currentControllerValueNotifier.value++;
+              buyerBackMobileButtonValueNotifier.value++;
+              setState(() {
+
+              });
+            },
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Constants.ftaColorLight,
+              elevation: 5,
+              shadowColor: Colors.black54,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            icon: Icon(
+              CupertinoIcons.back,
+              color: Constants.ftaColorLight,
+            ),
           ),
-        ],
+          title: Text(
+            "Blogs",
+            style: GoogleFonts.manrope(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          centerTitle: true,
+        ),
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: Container(
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height,
+          padding: EdgeInsets.all(spacing.paddingMedium),
+          child: SingleChildScrollView(child: _buildMobileBlogContent()),
+        ),
       ),
     );
+
   }
 }
 
@@ -456,165 +418,152 @@ class _MobileBlogCardState extends State<MobileBlogCard> with SingleTickerProvid
         builder: (context, child) {
           return Transform.scale(
             scale: _scaleAnimation.value,
-            child: CustomCard(
-              elevation: _elevationAnimation.value,
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Image section
-                  Container(
-                    width: double.infinity,
-                    height: 180,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                      child: CachedNetworkImage(
-                        imageUrl: widget.blogItem.imageUrl,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                        placeholder: (context, url) => Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                          ),
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: Constants.ctaColorLight,
-                              strokeWidth: 2,
+            child: GestureDetector(
+              onTap: widget.onTap,
+              child: Container(
+                width: double.infinity,
+                height: 180,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey.shade500)
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    // Image section
+
+                    Container(
+                      width: 140,
+                      height: 180,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: CachedNetworkImage(
+                          imageUrl: widget.blogItem.imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          placeholder: (context, url) => Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: Constants.ctaColorLight,
+                                strokeWidth: 2,
+                              ),
                             ),
                           ),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                HugeIcons.strokeRoundedImage01,
-                                color: Colors.grey[400],
-                                size: 48,
-                              ),
-                              SizedBox(height: widget.spacing.spacingSmall),
-                              Text(
-                                'Image not available',
-                                style: GoogleFonts.manrope(
-                                  color: Colors.grey[500],
-                                  fontSize: widget.typography.normal,
+                          errorWidget: (context, url, error) => Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  HugeIcons.strokeRoundedImage01,
+                                  color: Colors.grey[400],
+                                  size: 40,
                                 ),
-                              ),
-                            ],
+                                SizedBox(height: widget.spacing.spacingSmall),
+                                Text(
+                                  'Image not available',
+                                  style: GoogleFonts.manrope(
+                                    color: Colors.grey[500],
+                                    fontSize: widget.typography.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  
-                  // Content section
-                  Padding(
-                    padding: EdgeInsets.all(widget.spacing.paddingMedium),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Title
-                        Text(
-                          widget.blogItem.title,
-                          style: GoogleFonts.manrope(
-                            fontSize: widget.typography.subHeading,
-                            fontWeight: FontWeight.bold,
-                            color: Constants.ftaColorLight,
-                            height: 1.3,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: widget.spacing.spacingMedium),
-                        
-                        // Description
-                        Text(
-                          widget.blogItem.description,
-                          style: GoogleFonts.manrope(
-                            fontSize: widget.typography.normal,
-                            color: Colors.grey[700],
-                            height: 1.5,
-                          ),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: widget.spacing.spacingMedium),
-                        
-                        // Date and stats
-                        Row(
+
+                    // Content section
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(widget.spacing.paddingMedium),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              HugeIcons.strokeRoundedCalendar01,
-                              size: widget.typography.normal,
-                              color: Constants.ctaColorLight,
-                            ),
-                            SizedBox(width: widget.spacing.spacingSmall / 2),
+                            // Title
                             Text(
-                              DateFormat("dd MMM yyyy").format(DateTime.parse(widget.blogItem.date)),
+                              widget.blogItem.title,
+                              style: GoogleFonts.manrope(
+                                fontSize: widget.typography.subHeading,
+                                fontWeight: FontWeight.bold,
+                                color: Constants.ftaColorLight,
+                                height: 1.3,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: widget.spacing.spacingMedium),
+
+                            // Description
+                            Text(
+                              widget.blogItem.description,
+
                               style: GoogleFonts.manrope(
                                 fontSize: widget.typography.normal,
-                                color: Constants.ctaColorLight,
-                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[700],
+                                height: 1.5,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            Spacer(),
-                            _buildStatItem(
-                              CupertinoIcons.heart_fill,
-                              widget.blogItem.likes,
-                              Colors.red[400]!,
+                            SizedBox(height: widget.spacing.spacingMedium),
+
+                            // Date and stats
+                            Row(
+                              children: [
+                                Icon(
+                                  HugeIcons.strokeRoundedCalendar01,
+                                  size: widget.typography.normal,
+                                  color: Colors.black87,
+                                ),
+                                SizedBox(width: widget.spacing.spacingSmall / 2),
+                                Text(
+                                  DateFormat("dd MMM yyyy").format(DateTime.parse(widget.blogItem.date)),
+                                  style: GoogleFonts.manrope(
+                                    fontSize: widget.typography.normal,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(width: widget.spacing.spacingMedium),
-                            _buildStatItem(
-                              HugeIcons.strokeRoundedMessage01,
-                              widget.blogItem.commentsCount,
-                              Colors.blue[400]!,
+                            SizedBox(height: widget.spacing.spacingMedium),
+                            Row(
+                              children: [
+                                _buildStatItem(
+                                  CupertinoIcons.heart_fill,
+                                  widget.blogItem.likes,
+                                  Constants.ctaColorLight,
+                                ),
+                                SizedBox(width: widget.spacing.spacingMedium),
+                                _buildStatItem(
+                                  HugeIcons.strokeRoundedMessage01,
+                                  widget.blogItem.commentsCount,
+                                    Constants.ctaColorLight,
+                                ),
+                              ],
                             ),
+
+                            SizedBox(height: widget.spacing.spacingSmall),
                           ],
                         ),
-                        
-                        SizedBox(height: widget.spacing.spacingMedium),
-                        
-                        // Read more button
-                        Container(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: widget.onTap,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Constants.ctaColorLight,
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(
-                                vertical: widget.spacing.paddingSmall,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              elevation: 0,
-                            ),
-                            child: Text(
-                              'Read More',
-                              style: GoogleFonts.manrope(
-                                fontSize: widget.typography.normal,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
@@ -627,12 +576,12 @@ class _MobileBlogCardState extends State<MobileBlogCard> with SingleTickerProvid
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: widget.typography.normal, color: color),
+        Icon(icon, size: widget.typography.medium, color: color),
         SizedBox(width: widget.spacing.spacingSmall / 2),
         Text(
           '$count',
           style: GoogleFonts.manrope(
-            fontSize: widget.typography.normal,
+            fontSize: widget.typography.medium,
             color: color,
             fontWeight: FontWeight.w600,
           ),
@@ -695,44 +644,49 @@ class _MobileBlogDetailScreenState extends State<MobileBlogDetailScreen> with Ti
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading:IconButton(
+            onPressed:(){
+              Navigator.pop(context);
+              setState(() {
+
+              });
+            },
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Constants.ftaColorLight,
+              elevation: 5,
+              shadowColor: Colors.black54,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            icon: Icon(
+              CupertinoIcons.back,
+              color: Constants.ftaColorLight,
+            ),
+          ),
+          title: Text(
+            widget.blogItem.title,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: GoogleFonts.manrope(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+
+            ),
+          ),
+          centerTitle: true,
+        ),
         body: FadeTransition(
           opacity: _fadeAnimation,
           child: SingleChildScrollView(
             child: Column(
               children: [
                 SizedBox(height: spacing.spacingLarge),
-                
-                // Header with back button
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: spacing.paddingLarge),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: Icon(
-                          HugeIcons.strokeRoundedArrowLeft01,
-                          color: Constants.ftaColorLight,
-                          size: typography.large,
-                        ),
-                      ),
-                      SizedBox(width: spacing.spacingMedium),
-                      Expanded(
-                        child: Text(
-                          'Blog Details',
-                          style: GoogleFonts.manrope(
-                            fontSize: typography.heading,
-                            fontWeight: FontWeight.bold,
-                            color: Constants.ftaColorLight,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                SizedBox(height: spacing.spacingLarge),
-                
-                // Blog content
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: spacing.paddingLarge),
                   child: Column(

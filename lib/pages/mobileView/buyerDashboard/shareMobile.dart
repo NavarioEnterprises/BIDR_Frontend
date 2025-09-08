@@ -1,4 +1,5 @@
 import 'package:bidr/constants/Constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -149,26 +150,81 @@ Let's grow together and enjoy exclusive benefits! 💰
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.all(16),
-      color: Colors.white,
-      child: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:IconButton(
+          onPressed:(){
+            Navigator.pop(context);
+            setState(() {
+
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        title: Text(
+          "Refer A Friend",
+          style: GoogleFonts.manrope(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        padding: EdgeInsets.all(16),
+        color: Colors.white,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Header Image
             Container(
-              height: 200,
+              height: 250,
               width: double.infinity,
               child: Image.asset(
                 'lib/assets/images/share.png',
                 fit: BoxFit.contain,
               ),
             ),
-        
+
+           /* if (_selectedTopTab == 1) ...[
+              Container(
+                color: Constants.ftaColorLight,
+                width: MediaQuery.of(context).size.width,
+                height: 50,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildStatusTab("On Going", 0),
+                      _buildStatusTab("Purchased", 1),
+                      _buildStatusTab("Returns/Refunds", 2),
+                      _buildStatusTab("Cancelled", 3),
+                    ],
+                  ),
+                ),
+              ),
+            ],*/
+
             SizedBox(height: 16),
-        
+
             // Title and Description
             Text(
               'Earn ${_referralCode?.referrerRewardAmount ?? 50} points for each friend you refer!',
@@ -179,17 +235,17 @@ Let's grow together and enjoy exclusive benefits! 💰
               ),
               textAlign: TextAlign.center,
             ),
-        
+
             SizedBox(height: 8),
-        
+
             Text(
               'Your friends will earn ${_referralCode?.refereeRewardAmount ?? 25} points when they join!',
               style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
-        
+
             SizedBox(height: 16),
-        
+
             // Referral Code Container
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -228,7 +284,7 @@ Let's grow together and enjoy exclusive benefits! 💰
                   GestureDetector(
                     onTap: _copyToClipboard,
                     child: Container(
-                      padding: EdgeInsets.all(4),
+                      padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: isCodeCopied ? Colors.green : Colors.orange,
                         borderRadius: BorderRadius.circular(360),
@@ -243,9 +299,9 @@ Let's grow together and enjoy exclusive benefits! 💰
                 ],
               ),
             ),
-        
-            SizedBox(height: 24),
-        
+
+           Spacer(),
+
             // Share Link Button
             SizedBox(
               width: MediaQuery.of(context).size.width ,
@@ -253,7 +309,7 @@ Let's grow together and enjoy exclusive benefits! 💰
                 onPressed: _shareLink,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Constants.ctaColorLight,
-                  padding: EdgeInsets.symmetric(vertical: 12),
+                  padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(360),
                   ),
@@ -269,9 +325,9 @@ Let's grow together and enjoy exclusive benefits! 💰
                 ),
               ),
             ),
-        
+
             SizedBox(height: 16),
-        
+
             // Generate New Code Button (Optional)
             TextButton(
               onPressed: _generateNewReferralCode,
@@ -284,6 +340,7 @@ Let's grow together and enjoy exclusive benefits! 💰
                 ),
               ),
             ),
+            SizedBox(height: 24),
           ],
         ),
       ),
