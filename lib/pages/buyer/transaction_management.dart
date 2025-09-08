@@ -14,6 +14,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:motion_toast/motion_toast.dart';
 
 import '../../customWdget/custom_input2.dart';
 import '../../models/order.dart';
@@ -652,7 +653,9 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                 ),
                               ),
                             ] else if (order.status.toLowerCase() ==
-                                "Delivered".toLowerCase()) ...[
+                                    "Delivered".toLowerCase() ||
+                                order.status.toLowerCase() ==
+                                    "Purchased".toLowerCase()) ...[
                               Expanded(
                                 child: OutlinedButton.icon(
                                   onPressed: () {
@@ -3520,8 +3523,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.4,
-                padding: EdgeInsets.all(24),
+                constraints: BoxConstraints(maxWidth: 500, maxHeight: 650),
+                padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -3534,73 +3537,78 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                       Icon(
                         CupertinoIcons.return_icon,
                         color: Colors.red[600],
-                        size: 60,
+                        size: 48,
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 16),
 
                       // Title
                       Text(
                         'Request Return & Refund',
                         style: GoogleFonts.manrope(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF2B3A5C),
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 12),
 
                       // Description
                       Text(
-                        'Please provide details about why you want to return this product. This will help us process your request efficiently.',
+                        'Please provide details about why you want to return this product.',
                         style: GoogleFonts.manrope(
-                          fontSize: 14,
+                          fontSize: 13,
                           color: Colors.grey[600],
-                          height: 1.4,
+                          height: 1.3,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 24),
+                      SizedBox(height: 16),
 
                       // Order Info
                       Container(
                         width: double.infinity,
-                        padding: EdgeInsets.all(16),
+                        padding: EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.grey[200]!),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Order #${order.orderNumber.length > 8 ? order.orderNumber.substring(0, 8).toUpperCase() : order.orderNumber.toUpperCase()}',
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF2B3A5C),
+                                  ),
+                                ),
+                                Text(
+                                  order.product,
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 11,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
                             Text(
-                              'Order Details',
+                              'R${order.price.toStringAsFixed(2)}',
                               style: GoogleFonts.manrope(
                                 fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF2B3A5C),
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Order #${order.orderNumber.length > 8 ? order.orderNumber.substring(0, 8).toUpperCase() : order.orderNumber.toUpperCase()}',
-                              style: GoogleFonts.manrope(
-                                fontSize: 13,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            Text(
-                              'Amount: R${order.price.toStringAsFixed(2)}',
-                              style: GoogleFonts.manrope(
-                                fontSize: 13,
-                                color: Colors.grey[700],
+                                fontWeight: FontWeight.w700,
+                                color: Colors.red[600],
                               ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 16),
 
                       // Return Reason Dropdown
                       Column(
@@ -3656,7 +3664,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                           ),
                         ],
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 16),
 
                       // Description Text Field
                       Column(
@@ -3665,41 +3673,40 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                           Text(
                             'Additional Details *',
                             style: GoogleFonts.manrope(
-                              fontSize: 14,
+                              fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFF2B3A5C),
                             ),
                           ),
-                          SizedBox(height: 8),
+                          SizedBox(height: 6),
                           TextField(
                             controller: _returnDescriptionController,
-                            maxLines: 4,
+                            maxLines: 3,
                             decoration: InputDecoration(
-                              hintText:
-                                  'Please provide detailed information about the issue...',
+                              hintText: 'Describe the issue...',
                               hintStyle: GoogleFonts.manrope(
-                                fontSize: 14,
+                                fontSize: 13,
                                 color: Colors.grey[600],
                               ),
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide(
                                   color: Colors.grey[300]!,
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide(
                                   color: Colors.grey[300]!,
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide(
                                   color: Constants.ctaColorLight,
                                 ),
                               ),
-                              contentPadding: EdgeInsets.all(16),
+                              contentPadding: EdgeInsets.all(12),
                             ),
                             style: GoogleFonts.manrope(
                               fontSize: 14,
@@ -3709,132 +3716,6 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                         ],
                       ),
                       SizedBox(height: 20),
-
-                      // Photos/Evidence Section (Suggestion)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Photos/Evidence (Optional)',
-                            style: GoogleFonts.manrope(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF2B3A5C),
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.grey[300]!,
-                                style: BorderStyle.solid,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  CupertinoIcons.camera,
-                                  color: Colors.grey[600],
-                                  size: 32,
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Upload photos to support your return request',
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 24),
-
-                      // Preferred Resolution Section
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Preferred Resolution',
-                            style: GoogleFonts.manrope(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF2B3A5C),
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red[50],
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.red[200]!),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        CupertinoIcons.money_dollar_circle,
-                                        color: Colors.red[600],
-                                        size: 24,
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        'Full Refund',
-                                        style: GoogleFonts.manrope(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.red[600],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue[50],
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: Colors.blue[200]!,
-                                    ),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        CupertinoIcons.refresh,
-                                        color: Colors.blue[600],
-                                        size: 24,
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        'Exchange',
-                                        style: GoogleFonts.manrope(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.blue[600],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 24),
 
                       // Submit Return Request Button
                       SizedBox(
@@ -3859,9 +3740,9 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                         .isNotEmpty)
                                 ? Colors.red[600]
                                 : Colors.grey[400],
-                            padding: EdgeInsets.symmetric(vertical: 16),
+                            padding: EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(360),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                             elevation: 0,
                           ),
@@ -3903,25 +3784,370 @@ class _TransactionDashboardState extends State<TransactionDashboard>
   }
 
   // Method to handle return request submission
-  void _submitReturnRequest(dynamic order) {
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Return request submitted successfully. We will contact you within 24 hours.',
-          style: GoogleFonts.manrope(fontSize: 14),
-        ),
-        backgroundColor: Colors.green[600],
-        duration: Duration(seconds: 3),
-        behavior: SnackBarBehavior.floating,
-      ),
+  void _showAllReviewsDialog(Order order) {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            constraints: BoxConstraints(maxWidth: 500, maxHeight: 600),
+            padding: EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'All Reviews',
+                      style: GoogleFonts.manrope(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Constants.ftaColorLight,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(Icons.close, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                // Order info
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.shopping_bag,
+                        color: Constants.ctaColorLight,
+                        size: 20,
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${order.product} - Order #${order.orderNumber}',
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16),
+                // Rating summary
+                Row(
+                  children: [
+                    Icon(Icons.star, color: Constants.ctaColorLight, size: 24),
+                    SizedBox(width: 4),
+                    Text(
+                      _getAverageRating().toStringAsFixed(1),
+                      style: GoogleFonts.manrope(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Constants.ftaColorLight,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '($totalReviews reviews)',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                // Reviews list
+                Expanded(
+                  child: reviews.isEmpty
+                      ? Center(
+                          child: Text(
+                            'No reviews yet',
+                            style: GoogleFonts.manrope(
+                              fontSize: 16,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        )
+                      : ListView.separated(
+                          itemCount: reviews.length,
+                          separatorBuilder: (context, index) =>
+                              Divider(height: 24),
+                          itemBuilder: (context, index) {
+                            final review = reviews[index];
+                            return Container(
+                              padding: EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey[200]!),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundColor:
+                                            Constants.ctaColorLight,
+                                        radius: 16,
+                                        child: Text(
+                                          review.customerName.isNotEmpty
+                                              ? review.customerName[0]
+                                                    .toUpperCase()
+                                              : 'A',
+                                          style: GoogleFonts.manrope(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              review.customerName.isNotEmpty
+                                                  ? review.customerName
+                                                  : 'Anonymous',
+                                              style: GoogleFonts.manrope(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                ...List.generate(
+                                                  5,
+                                                  (starIndex) => Icon(
+                                                    Icons.star,
+                                                    size: 14,
+                                                    color:
+                                                        starIndex <
+                                                            review.rating
+                                                        ? Constants
+                                                              .ctaColorLight
+                                                        : Colors.grey[300],
+                                                  ),
+                                                ),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  '${review.rating}/5',
+                                                  style: GoogleFonts.manrope(
+                                                    fontSize: 12,
+                                                    color: Colors.grey[600],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        _formatDate(
+                                          DateTime.tryParse(review.createdAt) ??
+                                              DateTime.now(),
+                                        ),
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 12,
+                                          color: Colors.grey[500],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 12),
+                                  Text(
+                                    review.comment,
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 14,
+                                      color: Colors.black87,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                ),
+                SizedBox(height: 16),
+                // Add review button
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _showAddReviewDialog(order);
+                    },
+                    icon: Icon(Icons.add_comment, size: 18),
+                    label: Text('Add Your Review'),
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      side: BorderSide(color: Constants.ctaColorLight),
+                      foregroundColor: Constants.ctaColorLight,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
+  }
 
-    // Here you would typically send the request to your backend API
-    print('Return request submitted:');
-    print('Order Number: ${order.orderNumber}');
-    print('Reason: $_selectedReturnReason');
-    print('Description: ${_returnDescriptionController.text}');
+  void _submitReturnRequest(dynamic order) async {
+    try {
+      // First, find the order by order_number to get its ID
+      final findOrderResponse = await http.get(
+        Uri.parse(
+          '${AppConfig.productsServiceUrl}api/v1/product-requests/orders/?order_number=${order.orderNumber}',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      
+      if (findOrderResponse.statusCode != 200) {
+        throw Exception('Failed to find order');
+      }
+      
+      final findOrderData = json.decode(findOrderResponse.body);
+      if (findOrderData['results'] == null || findOrderData['results'].isEmpty) {
+        throw Exception('Order not found');
+      }
+      
+      final String orderId = findOrderData['results'][0]['id'].toString();
+      
+      // Now make API call to update order status using the correct endpoint
+      final response = await http.post(
+        Uri.parse(
+          '${AppConfig.productsServiceUrl}api/v1/product-requests/orders/$orderId/update_status/',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          // Add authentication headers if needed
+        },
+        body: json.encode({
+          'status': 'REFUNDED',
+          'user_id': Constants.myUid,
+          'return_reason': _selectedReturnReason,
+          'return_description': _returnDescriptionController.text,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Success - update local order list
+        setState(() {
+          // Find and update the order in the appropriate list
+          for (var list in [onGoingOrders, purchasedOrders]) {
+            final index = list.indexWhere(
+              (o) => o.orderNumber == order.orderNumber,
+            );
+            if (index != -1) {
+              list.removeAt(index);
+              // Create updated order with new status
+              final updatedOrder = Order(
+                vendorName: order.vendorName,
+                product: order.product,
+                productId: order.productId,
+                sellerId: order.sellerId,
+                requestId: order.requestId,
+                vehicle: order.vehicle,
+                orderNumber: order.orderNumber,
+                status: 'REFUNDED',
+                dateTime: order.dateTime,
+                price: order.price,
+                rating: order.rating,
+                distanceInKm: order.distanceInKm,
+                location: order.location,
+                comments: order.comments,
+              );
+              returnsRefundsOrders.add(updatedOrder);
+              break;
+            }
+          }
+        });
+
+        // Show success message with MotionToast
+        MotionToast.success(
+          title: Text(
+            'Success!',
+            style: GoogleFonts.manrope(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          description: Text(
+            'Return request submitted successfully. We will contact you within 24 hours.',
+            style: GoogleFonts.manrope(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          width: 350,
+          height: 80,
+          toastDuration: const Duration(seconds: 3),
+        ).show(context);
+      } else {
+        // Show error message
+        MotionToast.error(
+          title: Text(
+            'Error',
+            style: GoogleFonts.manrope(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          description: Text(
+            'Failed to submit return request. Please try again.',
+            style: GoogleFonts.manrope(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          width: 350,
+          height: 80,
+          toastDuration: const Duration(seconds: 3),
+        ).show(context);
+      }
+    } catch (e) {
+      print('Error submitting return request: $e');
+      // Show error message
+      MotionToast.error(
+        title: Text(
+          'Error',
+          style: GoogleFonts.manrope(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+        description: Text(
+          'An error occurred. Please try again.',
+          style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+        width: 350,
+        height: 80,
+        toastDuration: const Duration(seconds: 3),
+      ).show(context);
+    }
   }
 
   void _verifyCollectionPINDialog(BuildContext context) {
@@ -4378,13 +4604,35 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        order.comments.isNotEmpty ? "Comments:" : "Reviews:",
-                        style: GoogleFonts.manrope(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            order.comments.isNotEmpty
+                                ? "Comments:"
+                                : "Reviews:",
+                            style: GoogleFonts.manrope(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          if ((order.status.toLowerCase() == "delivered" ||
+                                  order.status.toLowerCase() == "purchased") &&
+                              reviews.isNotEmpty)
+                            InkWell(
+                              onTap: () => _showAllReviewsDialog(order),
+                              child: Text(
+                                "View Reviews",
+                                style: GoogleFonts.manrope(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Constants.ctaColorLight,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                       SizedBox(height: 4),
                       // Show order comments if available, otherwise show local reviews
@@ -4495,8 +4743,8 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                 SizedBox(height: 8),
 
                 // Conditional UI based on order status and review state
-                if (order.status.toLowerCase() ==
-                    "Delivered".toLowerCase()) ...[
+                if (order.status.toLowerCase() == "delivered" ||
+                    order.status.toLowerCase() == "purchased") ...[
                   // Show rating and reviews
                   Padding(
                     padding: const EdgeInsets.only(left: 16, right: 16),
@@ -4530,32 +4778,39 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                     ),
                   ),
                   SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {
-                            _showAddReviewDialog(order);
-                          },
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            side: BorderSide.none,
-                            padding: EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(360),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0, right: 16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              _showAddReviewDialog(order);
+                            },
+                            icon: Icon(
+                              Icons.star_outline,
+                              size: 18,
+                              color: Constants.ctaColorLight,
                             ),
-                          ),
-                          child: Text(
-                            "Give Order Review & Rating",
-                            style: GoogleFonts.manrope(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.orange.shade900,
+                            label: Text(
+                              "Write Review",
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Constants.ctaColorLight,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              side: BorderSide(color: Constants.ctaColorLight),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   SizedBox(height: 8),
                   // Return & Refund button

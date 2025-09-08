@@ -744,4 +744,49 @@ class AuthApiService {
       return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
+
+  Future<Map<String, dynamic>?> getSellerEarningHistory({
+    required String accessToken,
+    String? startDate,
+    String? endDate,
+    String? status,
+    int page = 1,
+  }) async {
+    // Build query parameters
+    Map<String, String> queryParams = {
+      'page': page.toString(),
+    };
+    if (startDate != null) queryParams['start_date'] = startDate;
+    if (endDate != null) queryParams['end_date'] = endDate;
+    if (status != null) queryParams['status'] = status;
+
+    var uri = Uri.parse('${GlobalVariables.transactionsServiceUrl}api/v1/payment-transactions/seller-earnings/')
+        .replace(queryParameters: queryParams);
+    
+    var request = http.Request('GET', uri);
+    request.headers['Content-Type'] = 'application/json';
+    request.headers['Authorization'] = 'Bearer $accessToken';
+
+    try {
+      http.StreamedResponse response = await request.send();
+      String responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(responseBody);
+        print('Seller earning history retrieved successfully');
+        return jsonResponse;
+      } else {
+        print('Get seller earning history failed: ${response.statusCode}');
+        print('Response: $responseBody');
+        return {
+          'success': false,
+          'statusCode': response.statusCode,
+          'error': responseBody,
+        };
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+      return {'success': false, 'error': 'Network or parsing error: $e'};
+    }
+  }
 }

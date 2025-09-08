@@ -6,19 +6,23 @@ import 'package:bidr/pages/notification.dart';
 import 'package:bidr/pages/seller/profile_management.dart';
 import 'package:bidr/pages/seller/rating_and_review.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import "package:universal_html/html.dart" as html;
+import 'package:motion_toast/motion_toast.dart';
 
 import '../../customWdget/appbar.dart';
 import '../../customWdget/dropdownMenu.dart';
 import '../../models/alert.dart';
 import '../../models/request_models.dart';
+import '../../services/auth_api_service.dart';
 import '../../services/chat_service.dart';
 import '../../services/notification_api_service.dart';
 import '../../services/products_management_api_service.dart';
+import '../../services/shared_preferences.dart';
 import '../buyer/share_with_friends.dart';
 import '../buyer/support.dart';
 import '../buyer_home.dart';
@@ -77,6 +81,17 @@ class _SellerDashboardState extends State<SellerDashboard>
   bool isLoadingOrdersSummary = true;
   String? ordersSummaryError;
   String selectedTimeframe = 'monthly'; // daily, weekly, monthly, yearly
+
+  // Earning history state variables
+  List<dynamic> earningHistory = [];
+  bool isLoadingEarnings = false;
+  String? earningsError;
+  int currentEarningsPage = 1;
+  int totalEarningsCount = 0;
+  bool hasNextEarningsPage = false;
+
+  // Auth service instance
+  final AuthApiService _authService = AuthApiService();
 
   // Tab labels
   List<String> requestTabLabels = ['New Requests', 'My Requests'];
@@ -153,6 +168,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     super.initState();
     _loadNotificationsFromApi();
     _loadSellerOrders();
+    _loadEarningHistory();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -861,6 +877,63 @@ class _SellerDashboardState extends State<SellerDashboard>
           notifications = [];
           _isLoadingNotifications = false;
         });
+      }
+    }
+  }
+
+  // Load earning history from backend API
+  Future<void> _loadEarningHistory({int page = 1}) async {
+    if (page == 1) {
+      setState(() {
+        isLoadingEarnings = true;
+        earningsError = null;
+      });
+    }
+
+    try {
+      final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+      if (accessToken == null || accessToken.isEmpty) {
+        setState(() {
+          earningsError = 'Authentication required. Please log in again.';
+          isLoadingEarnings = false;
+        });
+        return;
+      }
+
+      final response = await _authService.getSellerEarningHistory(
+        accessToken: accessToken,
+        page: page,
+      );
+
+      if (response != null && response.containsKey('results')) {
+        final List<dynamic> newEarnings = response['results'] ?? [];
+        
+        setState(() {
+          if (page == 1) {
+            earningHistory = newEarnings;
+          } else {
+            earningHistory.addAll(newEarnings);
+          }
+          
+          currentEarningsPage = page;
+          totalEarningsCount = response['count'] ?? 0;
+          hasNextEarningsPage = response['next'] != null;
+          isLoadingEarnings = false;
+          earningsError = null;
+        });
+      } else {
+        setState(() {
+          earningsError = response?['error'] ?? 'Failed to load earning history';
+          isLoadingEarnings = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        earningsError = 'Failed to load earning history. Please try again.';
+        isLoadingEarnings = false;
+      });
+      if (kDebugMode) {
+        print('Error loading earning history: $e');
       }
     }
   }
@@ -4380,34 +4453,186 @@ class _SellerDashboardState extends State<SellerDashboard>
           ],
         ),
         SizedBox(height: 20),
-        // Transaction List
-        Row(
-          children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.5,
-              child: Column(
-                children: List.generate(
-                  3,
-                  (index) => TweenAnimationBuilder<double>(
-                    tween: Tween<double>(begin: 0, end: 1),
-                    duration: Duration(milliseconds: 300 + (index * 100)),
-                    curve: Curves.easeOutBack,
-                    builder: (context, value, child) {
-                      return Transform.scale(
-                        scale: value,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 24),
-                          child: _buildTransactionItem(),
-                        ),
-                      );
-                    },
+        // Content based on selected tab
+        selectedSubIndex == 0 
+          ? _buildEarningHistoryContent()
+          : _buildWithdrawHistoryContent(),
+      ],
+    );
+  }
+
+  Widget _buildEarningHistoryContent() {
+    if (isLoadingEarnings) {
+      return Container(
+        width: MediaQuery.of(context).size.width * 0.5,
+        height: 300,
+        child: Center(
+          child: CircularProgressIndicator(
+            color: Constants.ctaColorLight,
+          ),
+        ),
+      );
+    }
+
+    if (earningsError != null) {
+      return Container(
+        width: MediaQuery.of(context).size.width * 0.5,
+        height: 300,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                color: Colors.red,
+                size: 48,
+              ),
+              SizedBox(height: 16),
+              Text(
+                earningsError!,
+                style: GoogleFonts.manrope(
+                  color: Colors.red,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => _loadEarningHistory(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                ),
+                child: Text(
+                  'Retry',
+                  style: GoogleFonts.manrope(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (earningHistory.isEmpty) {
+      return Container(
+        width: MediaQuery.of(context).size.width * 0.5,
+        height: 300,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.receipt_long_outlined,
+                color: Colors.grey[400],
+                size: 64,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'No Earning History',
+                style: GoogleFonts.manrope(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[600],
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'You haven\'t received any payments yet.\nStart accepting orders to see your earnings!',
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  color: Colors.grey[500],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.5,
+      child: Column(
+        children: [
+          // Earning transactions
+          ...earningHistory.asMap().entries.map((entry) {
+            final index = entry.key;
+            final earning = entry.value;
+            return TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0, end: 1),
+              duration: Duration(milliseconds: 300 + (index * 100)),
+              curve: Curves.easeOutBack,
+              builder: (context, value, child) {
+                return Transform.scale(
+                  scale: value,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _buildEarningTransactionItem(earning),
+                  ),
+                );
+              },
+            );
+          }).toList(),
+          
+          // Load more button if there are more pages
+          if (hasNextEarningsPage)
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: ElevatedButton(
+                onPressed: () => _loadEarningHistory(page: currentEarningsPage + 1),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+                child: Text(
+                  'Load More',
+                  style: GoogleFonts.manrope(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWithdrawHistoryContent() {
+    // Placeholder for withdraw history - as mentioned, it's always empty for now
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.5,
+      height: 300,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.account_balance_wallet_outlined,
+              color: Colors.grey[400],
+              size: 64,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'No Withdrawal History',
+              style: GoogleFonts.manrope(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Withdrawal functionality will be available soon.\nStay tuned for updates!',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: Colors.grey[500],
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
-      ],
+      ),
     );
   }
 
@@ -4418,6 +4643,11 @@ class _SellerDashboardState extends State<SellerDashboard>
         setState(() {
           selectedSubIndex = index;
         });
+        
+        // Load earning history when switching to earning history tab
+        if (index == 0 && earningHistory.isEmpty && !isLoadingEarnings) {
+          _loadEarningHistory();
+        }
       },
       child: Padding(
         padding: const EdgeInsets.only(right: 16),
@@ -4507,6 +4737,141 @@ class _SellerDashboardState extends State<SellerDashboard>
                   : Color(0xFFE74C3C),
               fontWeight: FontWeight.bold,
               fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEarningTransactionItem(Map<String, dynamic> earning) {
+    final amount = earning['amount']?.toString() ?? '0.00';
+    final currency = earning['currency'] ?? 'ZAR';
+    final paymentDate = earning['payment_date'] ?? earning['created_at'] ?? '';
+    final buyerName = earning['buyer']?['username'] ?? 'Unknown Buyer';
+    final buyerEmail = earning['buyer']?['email'] ?? '';
+    final orderId = earning['order_id']?.toString() ?? '';
+    final earningsStatus = earning['earnings_status'] ?? 'Completed';
+    final productInfo = earning['quote']?['product_service_info'] ?? 'Product/Service';
+
+    // Format the date
+    String formattedDate = '';
+    try {
+      final dateTime = DateTime.parse(paymentDate);
+      formattedDate = DateFormat('dd MMM yyyy, h:mm a').format(dateTime);
+    } catch (e) {
+      formattedDate = paymentDate;
+    }
+
+    // Status color
+    Color statusColor = Constants.ctaColorLight;
+    IconData statusIcon = Icons.check_circle;
+    
+    switch (earningsStatus.toLowerCase()) {
+      case 'completed':
+      case 'captured':
+      case 'released':
+        statusColor = Colors.green;
+        statusIcon = Icons.check_circle;
+        break;
+      case 'pending':
+        statusColor = Colors.orange;
+        statusIcon = Icons.access_time;
+        break;
+      default:
+        statusColor = Constants.ctaColorLight;
+        statusIcon = Icons.payments;
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.05),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: statusColor.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              statusIcon,
+              color: statusColor,
+              size: 20,
+            ),
+          ),
+          SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Payment from $buyerName',
+                        style: GoogleFonts.manrope(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      '$currency $amount',
+                      style: GoogleFonts.manrope(
+                        color: statusColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 4),
+                Text(
+                  productInfo.length > 30 
+                    ? '${productInfo.substring(0, 30)}...' 
+                    : productInfo,
+                  style: GoogleFonts.manrope(
+                    color: Colors.grey.shade600,
+                    fontSize: 12,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      formattedDate,
+                      style: GoogleFonts.manrope(
+                        color: Colors.grey.shade500,
+                        fontSize: 11,
+                      ),
+                    ),
+                    if (orderId.isNotEmpty) ...[
+                      SizedBox(width: 12),
+                      Text(
+                        'Order: ${orderId.substring(0, 8)}...',
+                        style: GoogleFonts.manrope(
+                          color: Colors.grey.shade500,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -4736,7 +5101,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                       context: context,
                       onPinCompleted: (string) {
                         Navigator.pop(context);
-                        _verifyPinDialog(context);
+                        //  _verifyPinDialog(context);
                         setState(() {});
                       },
                     ),
@@ -5633,37 +5998,49 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   // Build approved bids content - shows paid orders belonging to this seller
   Widget _buildApprovedBidsContent() {
+    print('Building approved bids content');
+
     // Show loading state
     if (isLoadingOrders) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(color: Constants.ctaColorLight),
-            SizedBox(height: 16),
-            Text(
-              'Loading approved bids...',
-              style: GoogleFonts.manrope(
-                fontSize: 14,
-                color: Constants.ftaColorLight,
-              ),
-            ),
-          ],
+      return Container(
+        padding: EdgeInsets.all(64),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Constants.ftaColorLight),
+          ),
         ),
       );
     }
 
-    // Show error state
+    // Show error if any
     if (ordersError != null) {
-      return Center(
+      return Container(
+        padding: EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.red.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.red.shade200),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, color: Colors.red, size: 48),
+            Icon(Icons.error, color: Colors.red, size: 48),
             SizedBox(height: 16),
             Text(
+              'Error loading approved bids',
+              style: GoogleFonts.manrope(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.red.shade700,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
               ordersError!,
-              style: GoogleFonts.manrope(fontSize: 14, color: Colors.red),
+              style: GoogleFonts.manrope(
+                color: Colors.red.shade600,
+                fontSize: 14,
+              ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 16),
@@ -5673,124 +6050,90 @@ class _SellerDashboardState extends State<SellerDashboard>
       );
     }
 
-    // Filter paid orders for this seller that need delivery confirmation
-    print('DEBUG: Current seller ID: ${Constants.myUid}');
-    print('DEBUG: Total seller orders: ${sellerOrders.length}');
-
+    // Filter paid orders for this seller and transform to match lead card format
     final List<Map<String, dynamic>> approvedBids = sellerOrders
         .where((order) {
-          print(
-            'DEBUG: Order status: ${order['status']}, seller_id: ${order['seller_id']}',
-          );
           return (order['status'] == 'PAID' ||
                   order['status'] == 'Payment Confirmed') &&
               order['seller_id'] == Constants.myUid;
         })
         .map(
           (order) => {
+            'request_id': order['order_id']?.toString() ?? 'N/A',
+            'title': order['product_name'] ?? order['productName'] ?? 'Order',
+            'description':
+                order['buyer_notes'] ?? 'No additional notes provided',
+            'created_at':
+                order['created_at'] ??
+                order['orderDate'] ??
+                DateTime.now().toIso8601String(),
+            'status': 'APPROVED', // Show as approved status
+            'urgency_timeline': 'Delivery Required',
+            'category': 'ORDER',
+            'vehicle_spares_summary': '',
+            'tyres_rims_summary': '',
+            'consumer_electronics_summary': '',
+            'total_amount':
+                order['total_amount']?.toString() ??
+                order['amount']?.toString() ??
+                '0',
+            'currency': order['currency'] ?? 'ZAR',
+            'delivery_address': order['delivery_address'] ?? 'Not provided',
             'orderNumber':
                 order['order_number'] ?? order['orderNumber'] ?? 'N/A',
             'buyerName':
                 order['buyer_name'] ?? order['buyerName'] ?? 'Unknown Buyer',
-            'productName':
-                order['product_name'] ?? order['productName'] ?? 'N/A',
-            'amount': _parseToDouble(
-              order['total_amount'] ?? order['amount'] ?? 0.0,
-            ),
-            'status': order['status'] ?? 'Paid',
-            'orderDate':
-                order['created_at'] ??
-                order['orderDate'] ??
-                DateTime.now().toIso8601String(),
-            'needsConfirmation': true,
             'order': order, // Keep full order data for API calls
           },
         )
         .toList();
 
-    print('DEBUG: Filtered approved bids: ${approvedBids.length}');
+    print('Filtered approved bids: ${approvedBids.length}');
 
-    return Container(
-      height: 500,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Constants.ctaColorLight.withOpacity(0.1),
-                  Constants.ftaColorLight.withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Constants.ctaColorLight.withOpacity(0.2),
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Constants.ctaColorLight.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.check_circle,
-                    color: Constants.ctaColorLight,
-                    size: 24,
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Approved Bids',
-                        style: GoogleFonts.manrope(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Constants.ftaColorLight,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Paid orders waiting for delivery confirmation',
-                        style: GoogleFonts.manrope(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+    // Show empty state if no approved bids
+    if (approvedBids.isEmpty) {
+      return _buildEmptyApprovedBids();
+    }
 
-          SizedBox(height: 20),
+    // Calculate pagination (same as My Bids)
+    final totalPages = (approvedBids.length / itemsPerPage).ceil();
+    final startIndex = (currentPage - 1) * itemsPerPage;
+    final endIndex = startIndex + itemsPerPage;
+    final paginatedBids = approvedBids.sublist(
+      startIndex,
+      endIndex > approvedBids.length ? approvedBids.length : endIndex,
+    );
 
-          // Orders list
-          Expanded(
-            child: approvedBids.isEmpty
-                ? Center(child: _buildEmptyApprovedBids())
-                : ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: approvedBids.length,
-                    itemBuilder: (context, index) {
-                      final order = approvedBids[index];
-                      return _buildApprovedBidCard(order);
-                    },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 3 items per row with intrinsic height (same layout as My Bids)
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final double itemWidth =
+                (constraints.maxWidth - 32) /
+                3; // 3 items per row with 16px spacing
+            return Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: paginatedBids.asMap().entries.map((entry) {
+                final index = entry.key;
+                final bid = entry.value;
+                final globalIndex = startIndex + index + 1;
+                return IntrinsicHeight(
+                  child: SizedBox(
+                    width: itemWidth,
+                    child: _buildApprovedBidCard(bid),
                   ),
-          ),
-        ],
-      ),
+                );
+              }).toList(),
+            );
+          },
+        ),
+        SizedBox(height: 16),
+        // Pagination
+        if (totalPages > 1) _buildPagination(totalPages, approvedBids.length),
+      ],
     );
   }
 
@@ -5823,202 +6166,300 @@ class _SellerDashboardState extends State<SellerDashboard>
     );
   }
 
-  // Build individual approved bid card
-  Widget _buildApprovedBidCard(Map<String, dynamic> order) {
-    return Container(
-      height: 240,
+  // Build individual approved bid card - same design as My Bids
+  Widget _buildApprovedBidCard(Map<String, dynamic> bid) {
+    final requestId = bid['request_id'] ?? '';
+    final title = bid['title'] ?? '';
+    final createdAt = bid['created_at'] ?? '';
+    final totalAmount = bid['total_amount'] ?? '0';
+    final currency = bid['currency'] ?? 'ZAR';
+    final buyerName = bid['buyerName'] ?? 'Unknown Buyer';
+    final orderStatus =
+        bid['order']?['status']?.toString().toUpperCase() ?? 'APPROVED';
 
-      margin: EdgeInsets.only(bottom: 16),
+    // Calculate time since order creation
+    final DateTime createdDate = DateTime.tryParse(createdAt) ?? DateTime.now();
+    final Duration timeSinceCreated = DateTime.now().difference(createdDate);
+
+    String timeElapsedText = '';
+    int progressValue = 0;
+
+    if (timeSinceCreated.inDays > 0) {
+      timeElapsedText = '${timeSinceCreated.inDays}d';
+      progressValue = (timeSinceCreated.inDays * 10).clamp(0, 100);
+    } else if (timeSinceCreated.inHours > 0) {
+      timeElapsedText = '${timeSinceCreated.inHours}h';
+      progressValue = (timeSinceCreated.inHours * 4).clamp(0, 100);
+    } else {
+      timeElapsedText = '${timeSinceCreated.inMinutes}m';
+      progressValue = (timeSinceCreated.inMinutes * 2).clamp(0, 100);
+    }
+
+    return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
-            blurRadius: 4,
-            offset: Offset(0, 2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header row with order number and status
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Order #${order['orderNumber']}',
-                  style: GoogleFonts.manrope(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Constants.ftaColorLight,
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade100,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    order['status'],
-                    style: GoogleFonts.manrope(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.green.shade800,
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // UUID and Timer Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // UUID Display
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5A623),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Text(
+                    requestId.length >= 6
+                        ? requestId.substring(0, 6).toUpperCase()
+                        : requestId.toUpperCase(),
+                    style: GoogleFonts.manrope(
+                      color: Colors.grey[700],
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              // Timer
+              Row(
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      value: progressValue / 100,
+                      strokeWidth: 2,
+                      backgroundColor: Colors.grey[300],
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Color(0xFFF5A623),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    timeElapsedText,
+                    style: GoogleFonts.manrope(
+                      color: const Color(0xFFF5A623),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Status Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E3A5F),
+              borderRadius: BorderRadius.circular(20),
             ),
-
-            SizedBox(height: 12),
-
-            // Product and buyer info
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Product',
-                        style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        order['productName'],
-                        style: GoogleFonts.manrope(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Buyer',
-                        style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        order['buyerName'],
-                        style: GoogleFonts.manrope(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            child: Text(
+              'Approved',
+              style: GoogleFonts.manrope(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-
-            SizedBox(height: 12),
-
-            // Amount and date
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Amount',
-                        style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'R ${order['amount'].toStringAsFixed(2)}',
-                        style: GoogleFonts.manrope(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Constants.ctaColorLight,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Order Date',
-                        style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        order['orderDate'],
-                        style: GoogleFonts.manrope(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+          ),
+          const SizedBox(height: 16),
+          // Description
+          Text(
+            'Order - $title',
+            style: GoogleFonts.manrope(
+              color: Colors.grey[700],
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
-
-            SizedBox(height: 16),
-
-            // Confirm delivery button
-            if (order['needsConfirmation'])
-              SizedBox(
-                width: double.infinity,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 8),
+          // Additional Notes
+          Text(
+            'Buyer: $buyerName • Amount: $currency $totalAmount',
+            style: GoogleFonts.manrope(
+              color: Colors.grey[600],
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 16),
+          // Action Buttons
+          Row(
+            children: [
+              Expanded(
                 child: ElevatedButton(
-                  onPressed: () => _showPinConfirmationDialog(order),
+                  onPressed: orderStatus == 'PURCHASED'
+                      ? null
+                      : () => _showPinConfirmationDialog({
+                          'orderNumber': bid['orderNumber'] ?? 'Unknown',
+                          'productName': bid['title'] ?? 'Unknown Product',
+                          'amount': (bid['total_amount'] ?? 0.0) is String
+                              ? double.tryParse(
+                                      bid['total_amount'].toString(),
+                                    ) ??
+                                    0.0
+                              : (bid['total_amount'] ?? 0.0).toDouble(),
+                        }),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Constants.ctaColorLight,
-                    padding: EdgeInsets.symmetric(vertical: 14),
+                    backgroundColor: orderStatus == 'PURCHASED'
+                        ? const Color(0xFF4CAF50)
+                        : const Color(0xFFE8F5E9),
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (orderStatus == 'PURCHASED')
+                        const Icon(
+                          Icons.check_circle,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      if (orderStatus == 'PURCHASED') const SizedBox(width: 6),
+                      Text(
+                        orderStatus == 'PURCHASED'
+                            ? 'Completed'
+                            : 'Confirm Delivery',
+                        style: GoogleFonts.manrope(
+                          color: orderStatus == 'PURCHASED'
+                              ? Colors.white
+                              : Colors.green[700],
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () => _showApprovedBidDetails(bid),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFEBEE),
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   child: Text(
-                    'Confirm Delivery',
+                    'View Details',
                     style: GoogleFonts.manrope(
-                      fontSize: 14,
+                      color: Colors.red[700],
+                      fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
                     ),
                   ),
                 ),
               ),
-          ],
-        ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Bottom Links
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              InkWell(
+                onTap: () => _showApprovedBidDetails(bid),
+                child: Text(
+                  'Full Details',
+                  style: GoogleFonts.manrope(
+                    color: const Color(0xFFF5A623),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
+    );
+  }
+
+  // Show approved bid details dialog
+  void _showApprovedBidDetails(Map<String, dynamic> bid) {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            width: 400,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Approved Bid Details',
+                  style: GoogleFonts.manrope(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1A1A1A),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Title: ${bid['title'] ?? 'N/A'}',
+                  style: GoogleFonts.manrope(fontSize: 14),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Amount: ${bid['currency'] ?? 'ZAR'} ${bid['total_amount'] ?? '0'}',
+                  style: GoogleFonts.manrope(fontSize: 14),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Buyer: ${bid['buyerName'] ?? 'Unknown'}',
+                  style: GoogleFonts.manrope(fontSize: 14),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Close'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -6026,11 +6467,12 @@ class _SellerDashboardState extends State<SellerDashboard>
   void _showPinConfirmationDialog(Map<String, dynamic> order) {
     final TextEditingController pinController = TextEditingController();
 
-    showDialog(
+    showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -6044,7 +6486,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                 Container(
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Constants.ctaColorLight.withOpacity(0.1),
+                    color: Constants.ctaColorLight.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: Icon(
@@ -6067,6 +6509,16 @@ class _SellerDashboardState extends State<SellerDashboard>
                 ),
 
                 SizedBox(height: 8),
+
+                Text(
+                  "By clicking the pay button you accept the offer made by this seller",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.manrope(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                SizedBox(height: 12),
 
                 // Subtitle
                 Text(
@@ -6102,7 +6554,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                             ),
                           ),
                           Text(
-                            order['orderNumber'],
+                            "${order['orderNumber']?.toString().isNotEmpty == true ? (order['orderNumber'].toString().length > 8 ? order['orderNumber'].toString().substring(0, 8) : order['orderNumber'].toString()) : 'N/A'}",
                             style: GoogleFonts.manrope(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -6160,11 +6612,11 @@ class _SellerDashboardState extends State<SellerDashboard>
                     ),
                     counterText: '',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey.shade300),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                         color: Constants.ctaColorLight,
                         width: 2,
@@ -6258,37 +6710,32 @@ class _SellerDashboardState extends State<SellerDashboard>
           // Note: Add proper authentication headers when available
         },
         body: json.encode({
-          'order_number':
-              order['order']['order_number'] ?? order['orderNumber'],
+          'order_number': order['orderNumber'],
           'pin_code': pin,
           'seller_id': Constants.myUid,
         }),
       );
+      if (kDebugMode) {
+        print(
+          '${AppConfig.productsServiceUrl}api/v1/product-requests/collection-codes/confirm/',
+        );
+        print(response.body);
+      }
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
         if (data['success'] == true) {
           // Success - delivery confirmed
-          Navigator.of(context).pop(); // Close dialog
+          if (mounted) {
+            Navigator.of(context).pop(); // Close dialog
 
-          // Show success message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Delivery confirmed! Order status updated to Purchased.',
-                style: GoogleFonts.manrope(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 3),
-            ),
-          );
+            // Show custom pin verification dialog
+            _verifyPinDialog(context);
 
-          // Refresh the approved bids list to reflect changes
-          _loadSellerOrders();
+            // Refresh the approved bids list to reflect changes
+            _loadSellerOrders();
+          }
         } else {
           // API returned success=false
           _showErrorMessage(data['error'] ?? 'Invalid PIN or PIN has expired');
@@ -6298,23 +6745,31 @@ class _SellerDashboardState extends State<SellerDashboard>
         _showErrorMessage('Failed to confirm delivery. Please try again.');
       }
     } catch (e) {
-      print('Error confirming delivery: $e');
+      if (kDebugMode) {
+        print('Error confirming delivery: $e');
+      }
       _showErrorMessage('Failed to confirm delivery. Please try again.');
     }
   }
 
   // Show error message
   void _showErrorMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
-        ),
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
+    MotionToast.error(
+      title: Text(
+        'Error',
+        style: GoogleFonts.manrope(fontSize: 16, fontWeight: FontWeight.w700),
       ),
-    );
+      description: Text(
+        message,
+        style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
+      ),
+
+      animationType: AnimationType.slideInFromBottom,
+      width: 300,
+      height: 80,
+      borderRadius: 12,
+      toastDuration: const Duration(seconds: 3),
+    ).show(context);
   }
 }
 

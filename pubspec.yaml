@@ -88,6 +88,15 @@ dependencies:
   random_string: ^2.3.1
   universal_html: ^2.2.4
 
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  web:
+    generate: true
+    image_path: "lib/assets/images/bidr_logo_with_text.png"
+  image_path: "lib/assets/images/bidr_logo_with_text.png"
+  min_sdk_android: 21
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

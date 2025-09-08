@@ -213,15 +213,18 @@ class _AccountManagementPageState extends State<AccountManagementPage>
   void _loadUserData() async {
     try {
       // Get access token to fetch fresh user data from backend
-      final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
-      
+      final accessToken =
+          await Sharedprefs.getUserAccessTokenSharedPreference();
+
       if (accessToken != null && accessToken.isNotEmpty) {
         // Try to get fresh data from backend
-        final response = await _authService.getUserProfile(accessToken: accessToken);
-        
+        final response = await _authService.getUserProfile(
+          accessToken: accessToken,
+        );
+
         if (response != null && response['success'] == true) {
           final userData = response['data'] ?? response;
-          
+
           setState(() {
             _firstNameController.text = userData['first_name'] ?? '';
             _lastNameController.text = userData['last_name'] ?? '';
@@ -231,7 +234,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           return;
         }
       }
-      
+
       // Fallback to SharedPreferences if backend call fails
       final firstName = await Sharedprefs.getUserNameSharedPreference() ?? '';
       final email = await Sharedprefs.getUserEmailSharedPreference() ?? '';
@@ -409,8 +412,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     String title,
     IconData icon, {
     bool isDestructive = false,
-  })
-  {
+  }) {
     final bool isSelected = selectedMenuItem == title;
     final bool isSignOutSelected = title == "Sign Out";
     final bool isDeleteSelected = title == "Delete Account";
@@ -522,11 +524,10 @@ class _AccountManagementPageState extends State<AccountManagementPage>
               ),
             ],
           ),
-         
 
           const SizedBox(height: 32),
           SizedBox(
-            width: MediaQuery.of(context).size.width*0.35,
+            width: MediaQuery.of(context).size.width * 0.35,
             child: ElevatedButton(
               onPressed: _isProfileLoading ? null : _saveProfileChanges,
               style: ElevatedButton.styleFrom(
@@ -600,7 +601,8 @@ class _AccountManagementPageState extends State<AccountManagementPage>
                 _newPasswordFocusNode,
                 TextInputAction.next,
                 isPassword: true,
-                onSubmitted: (value) => _confirmPasswordFocusNode.requestFocus(),
+                onSubmitted: (value) =>
+                    _confirmPasswordFocusNode.requestFocus(),
               ),
               const SizedBox(height: 24),
               _buildCustomInputField(
@@ -616,7 +618,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
           const SizedBox(height: 32),
           SizedBox(
-            width: MediaQuery.of(context).size.width*0.35,
+            width: MediaQuery.of(context).size.width * 0.35,
             child: ElevatedButton(
               onPressed: _isPasswordLoading ? null : _changePassword,
               style: ElevatedButton.styleFrom(
@@ -702,11 +704,11 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
           const SizedBox(height: 32),
           SizedBox(
-            width: MediaQuery.of(context).size.width*0.35,
+            width: MediaQuery.of(context).size.width * 0.35,
             child: ElevatedButton(
               onPressed: _requestQuote,
               style: ElevatedButton.styleFrom(
-                backgroundColor:Constants.ctaColorLight,
+                backgroundColor: Constants.ctaColorLight,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -770,7 +772,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
         const SizedBox(height: 24),
         SizedBox(
-          width: MediaQuery.of(context).size.width*0.35,
+          width: MediaQuery.of(context).size.width * 0.35,
           child: ElevatedButton(
             onPressed: _sendMessage,
             style: ElevatedButton.styleFrom(
@@ -857,7 +859,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
         const Spacer(),
 
         SizedBox(
-          width: MediaQuery.of(context).size.width*0.35,
+          width: MediaQuery.of(context).size.width * 0.35,
           child: ElevatedButton(
             onPressed: _deleteAccount,
             style: ElevatedButton.styleFrom(
@@ -1000,10 +1002,10 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     TextInputAction textInputAction, {
     bool isPassword = false,
     int maxLines = 1,
-        final Function(String)? onSubmitted,
+    final Function(String)? onSubmitted,
   }) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width*0.35,
+      width: MediaQuery.of(context).size.width * 0.35,
       child: CustomInputTransparent4(
         hintText: hintText.replaceAll('*', ''),
         labelText: hintText,
@@ -1012,9 +1014,9 @@ class _AccountManagementPageState extends State<AccountManagementPage>
         textInputAction: focusNode != null
             ? TextInputAction.next
             : TextInputAction.done,
-        isPasswordField: false,
+        isPasswordField: isPassword,
         onChanged: (value) {},
-        onSubmitted:onSubmitted??(value){},
+        onSubmitted: onSubmitted ?? (value) {},
       ),
     );
   }
@@ -1341,7 +1343,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           title: 'Profile Updated!',
           message: 'Your profile information has been successfully updated.',
           icon: Icons.person_outline,
-          color: const Color(0xFF38A169),
+          color: Constants.ctaColorLight,
           additionalInfo:
               'Changes will take effect immediately across the platform.',
         );
@@ -1367,40 +1369,70 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Change Password',
-            style: GoogleFonts.manrope(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 600),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Title
+                Text(
+                  'Change Password',
+                  style: GoogleFonts.manrope(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Content
+                Text(
+                  'For security reasons, we\'ll send a password reset link to your email address. Please check your email to confirm this action.',
+                  style: GoogleFonts.manrope(fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                // Actions
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.manrope(color: Colors.grey[600]),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _requestPasswordReset();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4299E1),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'Send Reset Link',
+                        style: GoogleFonts.manrope(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          content: Text(
-            'For security reasons, we\'ll send a password reset link to your email address. Please check your email and follow the instructions to set a new password.',
-            style: GoogleFonts.manrope(fontSize: 14),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.manrope(color: Colors.grey[600]),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _requestPasswordReset();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4299E1),
-              ),
-              child: Text(
-                'Send Reset Link',
-                style: GoogleFonts.manrope(color: Colors.white),
-              ),
-            ),
-          ],
         );
       },
     );
@@ -1464,7 +1496,8 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
     try {
       // Get access token
-      final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+      final accessToken =
+          await Sharedprefs.getUserAccessTokenSharedPreference();
       if (accessToken == null || accessToken.isEmpty) {
         _showErrorDialog(
           'Authentication Error',
@@ -1478,9 +1511,9 @@ class _AccountManagementPageState extends State<AccountManagementPage>
         accessToken: accessToken,
         email: _quoteEmailController.text.trim(),
         company: _companyController.text.trim(),
-        projectDetails: _projectDetailsController.text.trim().isEmpty 
-          ? null 
-          : _projectDetailsController.text.trim(),
+        projectDetails: _projectDetailsController.text.trim().isEmpty
+            ? null
+            : _projectDetailsController.text.trim(),
       );
 
       if (response != null && response['success'] == true) {
@@ -1499,7 +1532,8 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           },
         );
       } else {
-        final errorMessage = response?['error']?.toString() ?? 'Failed to submit quote request';
+        final errorMessage =
+            response?['error']?.toString() ?? 'Failed to submit quote request';
         _showErrorDialog('Request Failed', errorMessage);
       }
     } catch (e) {
@@ -1522,7 +1556,8 @@ class _AccountManagementPageState extends State<AccountManagementPage>
 
     try {
       // Get access token
-      final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+      final accessToken =
+          await Sharedprefs.getUserAccessTokenSharedPreference();
       if (accessToken == null || accessToken.isEmpty) {
         _showErrorDialog(
           'Authentication Error',
@@ -1544,7 +1579,8 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           message: 'Your message has been sent to our support team.',
           icon: Icons.message_outlined,
           color: const Color(0xFF9F7AEA),
-          additionalInfo: 'You should receive a response within 2-3 business days.',
+          additionalInfo:
+              'You should receive a response within 2-3 business days.',
           onContinue: () {
             // Clear form fields
             _subjectController.clear();
@@ -1552,7 +1588,8 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           },
         );
       } else {
-        final errorMessage = response?['error']?.toString() ?? 'Failed to send message';
+        final errorMessage =
+            response?['error']?.toString() ?? 'Failed to send message';
         _showErrorDialog('Send Failed', errorMessage);
       }
     } catch (e) {
@@ -1811,11 +1848,13 @@ class _AccountManagementPageState extends State<AccountManagementPage>
             },
           );
         } else {
-          final errorMessage = jsonResponse['error']?.toString() ?? 'Failed to delete account';
+          final errorMessage =
+              jsonResponse['error']?.toString() ?? 'Failed to delete account';
           _showErrorDialog('Deletion Failed', errorMessage);
         }
       } else {
-        final errorMessage = 'Failed to delete account. Server returned ${response.statusCode}';
+        final errorMessage =
+            'Failed to delete account. Server returned ${response.statusCode}';
         _showErrorDialog('Deletion Failed', errorMessage);
       }
     } catch (e) {
@@ -1856,11 +1895,11 @@ class _AccountManagementPageState extends State<AccountManagementPage>
       // Show success message and navigate to login
       _showSuccessDialog(
         title: 'Signed Out',
-        message: 'You have been successfully signed out.',
+        message: 'You will signed out.',
         icon: Icons.logout,
-        color: const Color(0xFF38A169),
+        color: Constants.ctaColorLight,
         additionalInfo:
-            'Thank you for using BIDR. You will be redirected to the login screen.',
+            'Thank you for using BIDR.Once signed out. You will be redirected to the login screen.',
         onContinue: () {
           // Navigate to login screen
           context.go('/getstarted');

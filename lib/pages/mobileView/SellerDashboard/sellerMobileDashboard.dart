@@ -12,8 +12,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import "package:universal_html/html.dart" as html;
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../../../customWdget/dropdownMenu.dart';
+import '../../../global_values.dart';
 import '../../../models/alert.dart';
 import '../../../models/request_models.dart';
 import '../../../services/chat_service.dart';
@@ -70,6 +73,11 @@ class _SellerDashboardState extends State<SellerDashboard>
   bool isLoadingOrdersSummary = true;
   String? ordersSummaryError;
   String selectedTimeframe = 'monthly'; // daily, weekly, monthly, yearly
+
+  // Dispute orders state variables
+  List<dynamic> disputeOrders = [];
+  bool isLoadingDisputes = true;
+  String? disputesError;
 
   // Tab labels
   List<String> requestTabLabels = ['New Requests', 'My Requests'];
@@ -200,6 +208,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     _fetchRequestsData();
     _fetchQuotesData();
     _fetchOrdersSummary();
+    _fetchDisputeOrders();
   }
 
   Future<void> _getCurrentLocation() async {
@@ -535,6 +544,66 @@ class _SellerDashboardState extends State<SellerDashboard>
       setState(() {
         ordersSummaryError = 'Network error: ${e.toString()}';
         isLoadingOrdersSummary = false;
+      });
+    }
+  }
+
+  // API service method to fetch dispute/refund orders for this seller
+  Future<void> _fetchDisputeOrders() async {
+    try {
+      setState(() {
+        isLoadingDisputes = true;
+        disputesError = null;
+      });
+
+      final response = await http.get(
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/',
+        ).replace(queryParameters: {'seller_id': Constants.myUid}),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+
+        // Handle different possible response structures
+        List<dynamic> ordersData;
+        if (jsonData is List) {
+          ordersData = jsonData;
+        } else if (jsonData is Map && jsonData.containsKey('results')) {
+          ordersData = jsonData['results'];
+        } else if (jsonData is Map && jsonData.containsKey('orders')) {
+          ordersData = jsonData['orders'];
+        } else {
+          ordersData = [];
+        }
+
+        // Filter for dispute/refund related orders
+        final List<dynamic> filteredDisputes = ordersData.where((order) {
+          final status = order['status']?.toString().toUpperCase() ?? '';
+          return status == 'RETURNED' ||
+              status == 'REFUNDED' ||
+              status == 'REFUND_REQUESTED' ||
+              status == 'REFUND REQUESTED';
+        }).toList();
+
+        setState(() {
+          disputeOrders = filteredDisputes;
+          isLoadingDisputes = false;
+        });
+      } else {
+        setState(() {
+          disputesError = 'Failed to load disputes: ${response.statusCode}';
+          isLoadingDisputes = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        disputesError = 'Network error: ${e.toString()}';
+        isLoadingDisputes = false;
       });
     }
   }
@@ -4433,6 +4502,81 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   Widget _buildManageDisputes() {
+    // Show loading state
+    if (isLoadingDisputes) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: Constants.ctaColorLight),
+            SizedBox(height: 16),
+            Text(
+              'Loading disputes...',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: Constants.ftaColorLight,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show error state
+    if (disputesError != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, color: Colors.red, size: 48),
+            SizedBox(height: 16),
+            Text(
+              disputesError!,
+              style: GoogleFonts.manrope(fontSize: 14, color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _fetchDisputeOrders,
+              child: Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show empty state if no disputes
+    if (disputeOrders.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.check_circle_outline,
+              size: 80,
+              color: Colors.green[400],
+            ),
+            SizedBox(height: 20),
+            Text(
+              'No Active Disputes',
+              style: GoogleFonts.manrope(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Constants.ftaColorLight,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Orders with refund requests will appear here',
+              style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[500]),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show dispute orders
     return Row(
       children: [
         Expanded(
@@ -4440,68 +4584,89 @@ class _SellerDashboardState extends State<SellerDashboard>
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              // Header
+              Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Constants.ctaColorLight.withOpacity(0.1),
+                      Constants.ftaColorLight.withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Constants.ctaColorLight.withOpacity(0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.report_problem,
+                        color: Colors.red,
+                        size: 24,
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Dispute Management',
+                            style: GoogleFonts.manrope(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Constants.ftaColorLight,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            '${disputeOrders.length} active dispute${disputeOrders.length != 1 ? 's' : ''} requiring attention',
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              color: Constants.ftaColorLight.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+              // Disputes list
               Wrap(
                 spacing: 16,
                 runSpacing: 16,
-                children: [
-                  TweenAnimationBuilder<double>(
+                children: disputeOrders.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final order = entry.value;
+                  return TweenAnimationBuilder<double>(
                     tween: Tween<double>(begin: 0, end: 1),
-                    duration: Duration(milliseconds: 400),
+                    duration: Duration(milliseconds: 400 + (index * 100)),
                     curve: Curves.easeOutBack,
                     builder: (context, value, child) {
                       return Transform.translate(
                         offset: Offset(0, 50 * (1 - value)),
                         child: Opacity(
-                          opacity: 0.8,
-                          child: _buildDisputeCard(
-                            'DP-202402-00123',
-                            'Mark Anthony',
-                            '12 March 2024',
-                            '12:36 PM',
-                          ),
+                          opacity: value * 0.9,
+                          child: _buildDisputeCardFromOrder(order),
                         ),
                       );
                     },
-                  ),
-                  TweenAnimationBuilder<double>(
-                    tween: Tween<double>(begin: 0, end: 1),
-                    duration: Duration(milliseconds: 500),
-                    curve: Curves.easeOutBack,
-                    builder: (context, value, child) {
-                      return Transform.translate(
-                        offset: Offset(0, 50 * (1 - value)),
-                        child: Opacity(
-                          opacity: 0.8,
-                          child: _buildDisputeCard(
-                            'DP-202402-00108',
-                            'Juke Bezos',
-                            '29 July 2024',
-                            '1:45 PM',
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  TweenAnimationBuilder<double>(
-                    tween: Tween<double>(begin: 0, end: 1),
-                    duration: Duration(milliseconds: 600),
-                    curve: Curves.easeOutBack,
-                    builder: (context, value, child) {
-                      return Transform.translate(
-                        offset: Offset(0, 50 * (1 - value)),
-                        child: Opacity(
-                          opacity: 0.8,
-                          child: _buildDisputeCard(
-                            'DP-202508-10123',
-                            'Sara Carla',
-                            '12 August 2024',
-                            '05:56 PM',
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                  );
+                }).toList(),
               ),
             ],
           ),
@@ -4682,6 +4847,244 @@ class _SellerDashboardState extends State<SellerDashboard>
           SizedBox(height: 16),
         ],
       ),
+    );
+  }
+
+  // Build dispute card from real order data
+  Widget _buildDisputeCardFromOrder(Map<String, dynamic> order) {
+    final orderNumber = order['order_number'] ?? order['orderNumber'] ?? 'N/A';
+    final buyerName =
+        order['buyer_name'] ?? order['buyerName'] ?? 'Unknown Buyer';
+    final productName = order['product_name'] ?? order['productName'] ?? 'N/A';
+    final status = order['status'] ?? 'N/A';
+    final createdAt =
+        order['created_at'] ??
+        order['createdAt'] ??
+        DateTime.now().toIso8601String();
+    final amount = order['total_amount'] ?? order['amount'] ?? 0.0;
+
+    // Format date
+    DateTime dateTime;
+    String formattedDate = 'N/A';
+    String formattedTime = 'N/A';
+
+    try {
+      if (createdAt is String) {
+        dateTime = DateTime.parse(createdAt);
+        formattedDate = DateFormat('dd MMMM yyyy').format(dateTime);
+        formattedTime = DateFormat('HH:mm').format(dateTime);
+      }
+    } catch (e) {
+      // Use default values if parsing fails
+    }
+
+    return Container(
+      width: 300,
+      margin: EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.red.shade300, width: 1.4),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.red.withOpacity(0.1),
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Order #$orderNumber',
+                      style: GoogleFonts.manrope(
+                        color: Constants.ftaColorLight,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(status).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: _getStatusColor(status)),
+                      ),
+                      child: Text(
+                        status.toUpperCase(),
+                        style: GoogleFonts.manrope(
+                          color: _getStatusColor(status),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Text(
+                  productName,
+                  style: GoogleFonts.manrope(
+                    color: Constants.ftaColorLight,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Amount: R${amount.toString()}',
+                  style: GoogleFonts.manrope(
+                    color: Constants.ctaColorLight,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.person, size: 16, color: Colors.grey[600]),
+                    SizedBox(width: 8),
+                    Text(
+                      buyerName,
+                      style: GoogleFonts.manrope(
+                        color: Colors.black87,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: 14,
+                      color: Colors.grey[600],
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '$formattedDate - $formattedTime',
+                      style: GoogleFonts.manrope(
+                        color: Colors.grey[600],
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Handle dispute resolution
+                      _showDisputeDetailsDialog(order);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      'View Details',
+                      style: GoogleFonts.manrope(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper method to get status color
+  Color _getStatusColor(String status) {
+    switch (status.toUpperCase()) {
+      case 'REFUNDED':
+        return Colors.green;
+      case 'RETURNED':
+        return Colors.orange;
+      case 'REFUND_REQUESTED':
+      case 'REFUND REQUESTED':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  // Show dispute details dialog
+  void _showDisputeDetailsDialog(Map<String, dynamic> order) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Dispute Details',
+            style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Order: ${order['order_number'] ?? 'N/A'}'),
+              Text('Product: ${order['product_name'] ?? 'N/A'}'),
+              Text('Buyer: ${order['buyer_name'] ?? 'N/A'}'),
+              Text('Status: ${order['status'] ?? 'N/A'}'),
+              Text(
+                'Amount: R${order['total_amount'] ?? order['amount'] ?? 0.0}',
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 
