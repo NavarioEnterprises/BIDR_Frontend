@@ -30,21 +30,32 @@ urlpatterns = [
     path('health/ready/', views.readiness_check, name='readiness'),
     path('health/live/', views.liveness_check, name='liveness'),
     
+    # Authentication endpoints with /auth/ prefix
+    path("auth/role-selection/", views.RoleSelectionView.as_view(), name="role-selection"),
+    path("auth/register/", views.UserRegistrationView.as_view(), name="user-register"),
+    path("auth/login/", views.UserLoginView.as_view(), name="user-login"),
+    path("auth/logout/", views.UserLogoutView.as_view(), name="user-logout"),
+
+    # Keep the original paths for backward compatibility and direct access
     # Role selection endpoint
-    path("role-selection/", views.RoleSelectionView.as_view(), name="role-selection"),
+    path("role-selection/", views.RoleSelectionView.as_view(), name="role-selection-direct"),
 
     # Registration endpoints
-    path("register/", views.UserRegistrationView.as_view(), name="user-register"),
+    path("register/", views.UserRegistrationView.as_view(), name="user-register-direct"),
     # path("register/buyer/", views.BuyerRegistrationView.as_view(), name="buyer-register"),
     # path("register/seller/", views.SellerRegistrationView.as_view(), name="seller-register"),
 
     # Authentication endpoints
-    path("login/", views.UserLoginView.as_view(), name="user-login"),
-    path("logout/", views.UserLogoutView.as_view(), name="user-logout"),
+    path("login/", views.UserLoginView.as_view(), name="user-login-direct"),
+    path("logout/", views.UserLogoutView.as_view(), name="user-logout-direct"),
 
-    # Password reset endpoints
-    path("password-reset-request/", views.PasswordResetRequestView.as_view(), name="password-reset-request"),
-    path("password-reset/", views.PasswordResetView.as_view(), name="password-reset"),
+    # Password reset endpoints with /auth/ prefix
+    path("auth/password-reset-request/", views.PasswordResetRequestView.as_view(), name="password-reset-request"),
+    path("auth/password-reset/", views.PasswordResetView.as_view(), name="password-reset"),
+    
+    # Password reset endpoints (backward compatibility)
+    path("password-reset-request/", views.PasswordResetRequestView.as_view(), name="password-reset-request-direct"),
+    path("password-reset/", views.PasswordResetView.as_view(), name="password-reset-direct"),
 
     # OTP endpoints
     path('api/otp/', include('otp.urls')),

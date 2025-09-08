@@ -84,7 +84,7 @@ class ResendOTPView(APIView):
             # Find user by email or phone
             user = None
             if email:
-                user = AppUser.objects.filter(email=email).first()
+                user = AppUser.objects.filter(email__iexact=email).first()
             elif phone:
                 # Assuming AppUser has a phone field - adjust as needed
                 user = AppUser.objects.filter(phone_number=phone).first()
@@ -109,7 +109,7 @@ class ResendOTPView(APIView):
             
             # Send OTP via requested channels
             delivery_results = delivery_service.send_otp_multi_channel(
-                user_id=str(user.id),
+                user_id=str(user.uid),
                 otp_code=otp_code,
                 email=user.email if 'email' in channels else None,
                 phone=user.get_decrypted_phone_number() if 'sms' in channels and hasattr(user, 'get_decrypted_phone_number') else None,

@@ -68,7 +68,8 @@ from .serializers import (
     PaymentTransactionCreateSerializer,
     PaymentTransactionUpdateSerializer,
     ProcessPaymentSerializer,
-    RefundPaymentSerializer
+    RefundPaymentSerializer,
+    SellerEarningHistorySerializer
 )
 
 
@@ -460,4 +461,65 @@ class PaymentTransactionViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
         
         serializer = PaymentTransactionListSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], url_path='seller-earnings')
+    def seller_earning_history(self, request):
+        """
+        Get earning history for sellers - shows all successful/paid payments.
+        Only accessible to sellers and admins.
+        Filters payments with status 'CAPTURED', 'RELEASED', 'PAID'.
+        """
+        user = request.user
+        
+        # Check if user is a seller or admin
+        if not (user.is_staff or user.role in ['seller', 'administrator']):
+            raise PermissionDenied("Only sellers and administrators can access earning history")
+        
+        # Get payment transactions with successful status
+        successful_statuses = ['CAPTURED', 'RELEASED', 'PAID']
+        queryset = PaymentTransaction.objects.filter(
+            status__in=successful_statuses
+        )
+        
+        # If not admin, filter by seller
+        if not (user.is_staff or user.role == 'administrator'):
+            queryset = queryset.filter(
+                transaction_id__seller_id__username=user.username
+            )
+        
+        # Optional filtering by seller_id for admins
+        seller_id = request.query_params.get('seller_id')
+        if seller_id and (user.is_staff or user.role == 'administrator'):
+            queryset = queryset.filter(transaction_id__seller_id__id=seller_id)
+        
+        # Optional date filtering
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        
+        if start_date:
+            queryset = queryset.filter(created_at__gte=start_date)
+        
+        if end_date:
+            queryset = queryset.filter(created_at__lte=end_date)
+        
+        # Optional status filtering
+        status_filter = request.query_params.get('status')
+        if status_filter and status_filter.upper() in successful_statuses:
+            queryset = queryset.filter(status=status_filter.upper())
+        
+        # Order by most recent first
+        queryset = queryset.order_by('-created_at')
+        
+        # Log the earning history access
+        seller_filter = f" for seller {seller_id}" if seller_id else ""
+        logger.info(f"Earning history accessed by user {user.id}{seller_filter}")
+        
+        # Paginate results
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = SellerEarningHistorySerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = SellerEarningHistorySerializer(queryset, many=True)
         return Response(serializer.data)

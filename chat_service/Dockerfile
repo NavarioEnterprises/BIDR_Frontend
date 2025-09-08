@@ -4,7 +4,7 @@ FROM python:3.11-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=chat_service.settings
+ENV DJANGO_SETTINGS_MODULE=chat_service.settings_production
 
 # Set work directory
 WORKDIR /app
@@ -27,11 +27,8 @@ COPY services-requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-# Copy project
+# Copy the chat service directory content
 COPY . /app/
-
-# Set working directory to chat service
-WORKDIR /app/chat_service
 
 # Create necessary directories and set permissions
 RUN mkdir -p /app/staticfiles /app/media /app/logs \

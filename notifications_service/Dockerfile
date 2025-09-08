@@ -31,8 +31,8 @@ RUN pip install --no-cache-dir --upgrade pip \
 # Copy project
 COPY . /app/
 
-# Set working directory to notifications service
-WORKDIR /app/notifications_service
+# Set working directory to the main app directory
+# The manage.py and project files are at /app/ level
 
 # Create necessary directories and set permissions
 RUN mkdir -p /app/staticfiles /app/media /app/logs \

@@ -17,6 +17,8 @@ class UserLoginSerializer(serializers.Serializer):
         password = attrs.get('password')
 
         if email and password:
+            # Normalize email for case-insensitive authentication
+            email = email.lower().strip()
             user = authenticate(email=email, password=password)
             if not user:
                 raise serializers.ValidationError('Invalid credentials')
@@ -50,10 +52,11 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         try:
-            user = AppUser.objects.get(email=value)
+            # Use case-insensitive email lookup
+            user = AppUser.objects.get(email__iexact=value.lower().strip())
         except AppUser.DoesNotExist:
             raise serializers.ValidationError("User with this email does not exist")
-        return value
+        return value.lower().strip()
 
 
 class PasswordResetSerializer(serializers.Serializer):
@@ -83,7 +86,19 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs['password'] != attrs['confirm_password']:
             raise serializers.ValidationError("Passwords don't match")
+        
+        # Normalize email for case-insensitive storage
+        if 'email' in attrs:
+            attrs['email'] = attrs['email'].lower().strip()
+        
         return attrs
+    
+    def validate_email(self, value):
+        """Validate email uniqueness (case-insensitive)"""
+        normalized_email = value.lower().strip()
+        if AppUser.objects.filter(email__iexact=normalized_email).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return normalized_email
         
     def validate_role(self, value):
         if value not in ['buyer', 'seller']:

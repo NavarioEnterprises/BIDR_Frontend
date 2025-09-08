@@ -82,6 +82,8 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
+    'core.middleware.CSPMiddleware',  # Add CSP middleware early
+    'core.middleware.CORSMiddleware',  # Add enhanced CORS middleware
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -301,6 +303,10 @@ CORS_ALLOWED_HEADERS = [
     'access-control-allow-origin',
     'access-control-allow-headers',
     'access-control-allow-methods',
+    'access-control-allow-credentials',
+    'access-control-max-age',
+
+
 ]
 
 # Expose headers that Flutter web might need
@@ -489,3 +495,22 @@ PRODUCT_LOGGING_SETTINGS = {
 
 # Allow all hosts for Kubernetes deployment
 ALLOWED_HOSTS.append('*')
+
+# Content Security Policy Settings
+# Allow localhost connections for development tools and debugging
+SECURE_CONTENT_TYPE_NOSNIFF = False  # Disable for development
+SECURE_BROWSER_XSS_FILTER = False   # Disable for development
+
+# Add custom CSP headers to allow localhost connections
+CSP_DEFAULT_SRC = "'self' data: https: 'unsafe-inline' 'unsafe-eval'"
+CSP_CONNECT_SRC = "'self' https: wss: ws: http://localhost:* https://localhost:* ws://localhost:* wss://localhost:*"
+CSP_SCRIPT_SRC = "'self' 'unsafe-inline' 'unsafe-eval' https: http://localhost:* https://localhost:*"
+CSP_STYLE_SRC = "'self' 'unsafe-inline' https: http://localhost:* https://localhost:*"
+CSP_IMG_SRC = "'self' data: https: http: http://localhost:* https://localhost:*"
+CSP_FONT_SRC = "'self' data: https: http://localhost:* https://localhost:*"
+CSP_FRAME_SRC = "'self' https: http://localhost:* https://localhost:*"
+CSP_WORKER_SRC = "'self' blob: https: http://localhost:* https://localhost:*"
+
+# Specifically allow the port from the error message
+if DEBUG:
+    CSP_CONNECT_SRC += " http://localhost:61978 ws://localhost:61978 wss://localhost:61978"

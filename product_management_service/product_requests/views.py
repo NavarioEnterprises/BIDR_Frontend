@@ -17,7 +17,7 @@ from core.cors_decorators import CORSMixin
 from .models import (
     ConsumerElectronics, VehicleSpares, VehicleTyresRims, 
     ProductRequest, RequestImage, RequestSpecification, 
-    RequestMessage, RequestWatchlist, Order
+    RequestMessage, RequestWatchlist, Order, CollectionCode
 )
 from .serializers import (
     ConsumerElectronicsSerializer, VehicleSparesSerializer, VehicleTyresRimsSerializer,
@@ -1162,3 +1162,221 @@ class OrderViewSet(CORSMixin, viewsets.ModelViewSet):
             
         except Exception as e:
             print(f"Error updating order analytics: {e}")
+
+
+# Collection Code API Views
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.utils.decorators import method_decorator
+import json
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def get_or_create_collection_code(request):
+    """
+    API endpoint to get or create a collection code for an order.
+    Generates a 4-digit PIN that expires in 5 minutes.
+    
+    POST /collection-codes/get-or-create/
+    
+    Request Body:
+    {
+        "order_id": "BF1234567"  // Order number/identifier
+    }
+    
+    Response:
+    {
+        "pin_code": "1234",
+        "expires_at": "2025-09-07T15:25:00Z",
+        "created": true,  // true if new code was created, false if existing returned
+        "order_id": "BF1234567"
+    }
+    """
+    try:
+        # Parse request data
+        data = json.loads(request.body)
+        order_id = data.get('order_id')
+        
+        if not order_id:
+            return JsonResponse({
+                'error': 'order_id is required'
+            }, status=400)
+        
+        # Find the order
+        try:
+            order = Order.objects.get(order_number=order_id)
+        except Order.DoesNotExist:
+            return JsonResponse({
+                'error': f'Order {order_id} not found'
+            }, status=404)
+        
+        # Get or create collection code
+        collection_code, created = CollectionCode.get_or_create_valid_code(order)
+        
+        return JsonResponse({
+            'pin_code': collection_code.pin_code,
+            'expires_at': collection_code.expires_at.isoformat(),
+            'created': created,
+            'order_id': order_id,
+            'message': 'New collection code generated' if created else 'Existing valid code returned'
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON in request body'
+        }, status=400)
+    except Exception as e:
+        print(f"Error in get_or_create_collection_code: {e}")
+        return JsonResponse({
+            'error': 'Internal server error',
+            'details': str(e)
+        }, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def confirm_collection_code(request):
+    """
+    API endpoint for sellers to confirm delivery using the PIN code.
+    
+    POST /collection-codes/confirm/
+    
+    Request Body:
+    {
+        "order_number": "BF1234567",
+        "pin_code": "1234",
+        "seller_id": "seller-uuid-here"  // UUID of the confirming seller
+    }
+    
+    Response:
+    {
+        "success": true,
+        "message": "Delivery confirmed successfully",
+        "order_status": "PURCHASED",
+        "confirmed_at": "2025-09-07T15:30:00Z"
+    }
+    """
+    try:
+        # Parse request data
+        data = json.loads(request.body)
+        order_number = data.get('order_number')
+        pin_code = data.get('pin_code')
+        seller_id = data.get('seller_id')
+        
+        if not all([order_number, pin_code, seller_id]):
+            return JsonResponse({
+                'error': 'order_number, pin_code, and seller_id are required'
+            }, status=400)
+        
+        # Find the order
+        try:
+            order = Order.objects.get(order_number=order_number)
+        except Order.DoesNotExist:
+            return JsonResponse({
+                'error': f'Order {order_number} not found'
+            }, status=404)
+        
+        # Find the collection code
+        try:
+            collection_code = CollectionCode.objects.get(
+                order_id=order,
+                pin_code=pin_code,
+                is_used=False
+            )
+        except CollectionCode.DoesNotExist:
+            return JsonResponse({
+                'error': 'Invalid or expired PIN code'
+            }, status=400)
+        
+        # Verify the seller ID matches
+        if str(collection_code.seller_id) != str(seller_id):
+            return JsonResponse({
+                'error': 'Unauthorized: Seller ID does not match'
+            }, status=403)
+        
+        # Use the collection code (this will update order status to PURCHASED)
+        try:
+            collection_code.use_code(seller_id)
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Delivery confirmed successfully',
+                'order_status': 'PURCHASED',
+                'confirmed_at': collection_code.used_at.isoformat(),
+                'order_number': order_number
+            })
+            
+        except ValueError as e:
+            return JsonResponse({
+                'error': str(e)
+            }, status=400)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON in request body'
+        }, status=400)
+    except Exception as e:
+        print(f"Error in confirm_collection_code: {e}")
+        return JsonResponse({
+            'error': 'Internal server error',
+            'details': str(e)
+        }, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def collection_code_status(request, order_number):
+    """
+    API endpoint to check the status of collection codes for an order.
+    
+    GET /collection-codes/status/{order_number}/
+    
+    Response:
+    {
+        "order_number": "BF1234567",
+        "has_active_code": true,
+        "pin_code": "1234",  // Only if has_active_code is true
+        "expires_at": "2025-09-07T15:25:00Z",  // Only if has_active_code is true
+        "minutes_until_expiry": 3  // Only if has_active_code is true
+    }
+    """
+    try:
+        # Find the order
+        try:
+            order = Order.objects.get(order_number=order_number)
+        except Order.DoesNotExist:
+            return JsonResponse({
+                'error': f'Order {order_number} not found'
+            }, status=404)
+        
+        # Check for active collection codes
+        active_code = CollectionCode.objects.filter(
+            order_id=order,
+            is_used=False,
+            expires_at__gt=timezone.now()
+        ).first()
+        
+        if active_code:
+            # Calculate minutes until expiry
+            time_diff = active_code.expires_at - timezone.now()
+            minutes_until_expiry = int(time_diff.total_seconds() / 60)
+            
+            return JsonResponse({
+                'order_number': order_number,
+                'has_active_code': True,
+                'pin_code': active_code.pin_code,
+                'expires_at': active_code.expires_at.isoformat(),
+                'minutes_until_expiry': max(0, minutes_until_expiry)
+            })
+        else:
+            return JsonResponse({
+                'order_number': order_number,
+                'has_active_code': False
+            })
+            
+    except Exception as e:
+        print(f"Error in collection_code_status: {e}")
+        return JsonResponse({
+            'error': 'Internal server error',
+            'details': str(e)
+        }, status=500)

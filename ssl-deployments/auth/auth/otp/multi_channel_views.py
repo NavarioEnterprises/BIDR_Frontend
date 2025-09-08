@@ -63,7 +63,7 @@ class SendMultiChannelOTPView(APIView):
             else:
                 # Try to find user by email or phone
                 if email:
-                    user = AppUser.objects.filter(email=email).first()
+                    user = AppUser.objects.filter(email__iexact=email).first()
                 if not user and phone:
                     user = AppUser.objects.filter(phone_number=phone).first()
                 
@@ -212,7 +212,7 @@ class OTPDeliveryStatusView(APIView):
                     }, status=status.HTTP_404_NOT_FOUND)
             else:
                 if email:
-                    user = AppUser.objects.filter(email=email).first()
+                    user = AppUser.objects.filter(email__iexact=email).first()
                 if not user and phone:
                     user = AppUser.objects.filter(phone_number=phone).first()
             

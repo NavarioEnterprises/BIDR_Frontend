@@ -149,6 +149,12 @@ else:
 # Custom User Model
 AUTH_USER_MODEL = 'user.AppUser'
 
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'user.backends.CaseInsensitiveEmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -309,8 +315,15 @@ SMS_PORTAL_API_KEY = config('SMS_PORTAL_API_KEY', default='')
 SMS_PORTAL_API_SECRET = config('SMS_PORTAL_API_SECRET', default='')
 SMS_PORTAL_SENDER_ID = config('SMS_PORTAL_SENDER_ID', default='BIDR')
 
+# Development/Production Environment Flag
+IS_DEVELOPMENT = config('IS_DEVELOPMENT', default=DEBUG, cast=bool)
+
 # Notification Service Configuration
-NOTIFICATION_SERVICE_URL = config('NOTIFICATION_SERVICE_URL', default='http://localhost:8006')
+# Use localhost for development, production URL for production
+if IS_DEVELOPMENT:
+    NOTIFICATION_SERVICE_URL = config('NOTIFICATION_SERVICE_URL', default='http://localhost:8006')
+else:
+    NOTIFICATION_SERVICE_URL = config('NOTIFICATION_SERVICE_URL', default='https://notifications.bidr.co.za')
 
 # Logging configuration
 LOGGING = {

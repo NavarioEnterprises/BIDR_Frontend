@@ -23,7 +23,8 @@ class OTPDeliveryService:
         self.notification_service_url = getattr(
             settings, 
             'NOTIFICATION_SERVICE_URL', 
-            'https://notifications.bidr.co.za'
+            #'https://notifications.bidr.co.za'
+            'http://localhost:8006'
         )
     
     def send_otp_email(self, email: str, otp_code: str, user_name: str = '') -> bool:

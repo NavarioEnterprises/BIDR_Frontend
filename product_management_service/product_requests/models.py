@@ -12,6 +12,8 @@ from decimal import Decimal
 from core.models import BaseModel, StatusChoices, PriorityChoices
 from core.utils import calculate_expiry_date, generate_reference_number
 from categories.models import Category, CategorySpecification
+import random
+import string
 
 
 class ConsumerElectronics(models.Model):
@@ -1565,6 +1567,171 @@ class RequestWatchlist(models.Model):
         return f"User {self.user_id} watching {self.request.request_id}"
 
 
+class CollectionCode(models.Model):
+    """
+    Collection codes generated for order pickup confirmation.
+    4-digit PIN codes that expire every 5 minutes.
+    """
+    
+    # Primary key
+    code_id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text="Collection code identifier"
+    )
+    
+    # Reference to order
+    order_id = models.ForeignKey(
+        'Order',
+        on_delete=models.CASCADE,
+        related_name='collection_codes',
+        help_text="Reference to the order"
+    )
+    
+    # The 4-digit PIN code
+    pin_code = models.CharField(
+        max_length=4,
+        help_text="4-digit PIN code for collection"
+    )
+    
+    # Buyer and seller IDs for verification
+    buyer_id = models.UUIDField(
+        help_text="UUID of the buyer from authentication service"
+    )
+    seller_id = models.UUIDField(
+        help_text="UUID of the seller from authentication service"
+    )
+    
+    # Status and timing
+    is_used = models.BooleanField(
+        default=False,
+        help_text="Whether the code has been used"
+    )
+    expires_at = models.DateTimeField(
+        help_text="When the code expires (5 minutes from generation)"
+    )
+    used_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When the code was used"
+    )
+    confirmed_by_seller_id = models.UUIDField(
+        null=True,
+        blank=True,
+        help_text="UUID of seller who confirmed the code"
+    )
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'collection_codes'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['order_id', 'is_used']),
+            models.Index(fields=['buyer_id']),
+            models.Index(fields=['seller_id']),
+            models.Index(fields=['expires_at']),
+            models.Index(fields=['pin_code']),
+        ]
+    
+    def __str__(self):
+        return f"Code {self.pin_code} for Order {self.order_id.order_number}"
+    
+    def save(self, *args, **kwargs):
+        # Auto-generate PIN code if not provided
+        if not self.pin_code:
+            self.pin_code = self.generate_pin_code()
+        
+        # Set expiry time to 5 minutes from now if not provided
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timezone.timedelta(minutes=5)
+            
+        super().save(*args, **kwargs)
+    
+    def generate_pin_code(self):
+        """Generate a unique 4-digit PIN code."""
+        while True:
+            # Generate 4-digit code
+            pin = ''.join(random.choices(string.digits, k=4))
+            
+            # Ensure it's unique for active codes
+            if not CollectionCode.objects.filter(
+                pin_code=pin,
+                is_used=False,
+                expires_at__gt=timezone.now()
+            ).exists():
+                return pin
+    
+    @property
+    def is_expired(self):
+        """Check if the code has expired."""
+        return timezone.now() > self.expires_at
+    
+    @property
+    def is_valid(self):
+        """Check if the code is valid (not used and not expired)."""
+        return not self.is_used and not self.is_expired
+    
+    def use_code(self, seller_id):
+        """Mark the code as used by a seller."""
+        if not self.is_valid:
+            if self.is_expired:
+                raise ValueError("Collection code has expired")
+            else:
+                raise ValueError("Collection code has already been used")
+        
+        # Verify the seller ID matches
+        if str(self.seller_id) != str(seller_id):
+            raise ValueError("Seller ID does not match")
+        
+        self.is_used = True
+        self.used_at = timezone.now()
+        self.confirmed_by_seller_id = seller_id
+        self.save(update_fields=['is_used', 'used_at', 'confirmed_by_seller_id'])
+        
+        # Update order status to purchased
+        self.order_id.status = 'PURCHASED'
+        self.order_id.save(update_fields=['status'])
+        
+        return True
+    
+    @classmethod
+    def get_or_create_valid_code(cls, order):
+        """Get existing valid code or create a new one for an order."""
+        # Check if there's a valid existing code
+        valid_code = cls.objects.filter(
+            order_id=order,
+            is_used=False,
+            expires_at__gt=timezone.now()
+        ).first()
+        
+        if valid_code:
+            return valid_code, False  # (code, created)
+        
+        # Create new code
+        new_code = cls.objects.create(
+            order_id=order,
+            buyer_id=order.buyer_id,
+            seller_id=order.seller_id
+        )
+        
+        return new_code, True  # (code, created)
+    
+    @classmethod
+    def cleanup_expired_codes(cls):
+        """Clean up expired unused codes (can be run as a scheduled task)."""
+        expired_codes = cls.objects.filter(
+            is_used=False,
+            expires_at__lt=timezone.now()
+        )
+        count = expired_codes.count()
+        expired_codes.delete()
+        return count
+
+
 class Order(models.Model):
     """
     Orders created when a buyer accepts a quote.
@@ -1576,6 +1743,7 @@ class Order(models.Model):
         ('PROCESSING', 'Processing'),
         ('SHIPPED', 'Shipped'),
         ('DELIVERED', 'Delivered'),
+        ('PURCHASED', 'Purchased'),  # Added for collection confirmation
         ('COMPLETED', 'Completed'),
         ('CANCELLED', 'Cancelled'),
         ('REFUNDED', 'Refunded'),

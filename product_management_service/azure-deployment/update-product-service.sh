@@ -10,7 +10,7 @@ CONTAINER_REGISTRY="bidrsimpleregistry"
 CONTAINER_NAME="bidr-product-service"
 IMAGE_NAME="bidr-product-service"
 SERVICE_NAME="Product Management Service"
-SERVICE_PORT=8002
+SERVICE_PORT=8000
 SERVICE_DIR="/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/product_management_service"
 
 # Colors for output
@@ -152,32 +152,49 @@ NEW_FQDN=$(echo $NEW_CONTAINER_INFO | jq -r '.fqdn // "N/A"')
 CONTAINER_STATE=$(echo $NEW_CONTAINER_INFO | jq -r '.state // "Unknown"')
 PROVISIONING_STATE=$(echo $NEW_CONTAINER_INFO | jq -r '.provisioningState // "Unknown"')
 
-# Step 7: Display results
+# Step 9: Display deployment summary with color-coded sections
 echo ""
-echo "========================================"
-echo "🎉 Product Management Service Updated!"
-echo "========================================"
-echo "Service Name: BIDR Product Management Service"
-echo "Image Tag: ${NEW_TAG}"
-echo "Container State: $CONTAINER_STATE"
-echo "Provisioning State: $PROVISIONING_STATE"
-echo "Public IP: $NEW_IP"
-echo "FQDN: $NEW_FQDN"
-echo "Service URL: http://${NEW_FQDN}:${SERVICE_PORT}"
-echo "Admin URL: http://${NEW_FQDN}:${SERVICE_PORT}/admin/"
-echo "API URL: http://${NEW_FQDN}:${SERVICE_PORT}/api/"
-echo "Health Check: http://${NEW_FQDN}:${SERVICE_PORT}/health/"
-echo "========================================"
+echo -e "${CYAN}========================================${NC}"
+echo -e "${CYAN}🎉 BIDR ${SERVICE_NAME} Updated!${NC}"
+echo -e "${CYAN}========================================${NC}"
+echo -e "${GREEN}✅ Service: BIDR ${SERVICE_NAME}${NC}"
+echo -e "${GREEN}✅ Version: ${NEW_TAG}${NC}"
+echo -e "${GREEN}✅ Container: $CONTAINER_NAME${NC}"
+echo -e "${GREEN}✅ State: $CONTAINER_STATE / $PROVISIONING_STATE${NC}"
+echo -e "${GREEN}✅ IP Address: $NEW_IP:$SERVICE_PORT${NC}"
+echo -e "${GREEN}✅ Public URL: http://$NEW_FQDN:$SERVICE_PORT${NC}"
+echo ""
+echo -e "${BLUE}🔗 Service Endpoints:${NC}"
+echo -e "${BLUE}• Product API: http://$NEW_FQDN:$SERVICE_PORT/api/products/${NC}"
+echo -e "${BLUE}• Categories API: http://$NEW_FQDN:$SERVICE_PORT/api/categories/${NC}"
+echo -e "${BLUE}• Admin Panel: http://$NEW_FQDN:$SERVICE_PORT/admin/${NC}"
+echo -e "${BLUE}• Health Check: http://$NEW_FQDN:$SERVICE_PORT/health/${NC}"
+echo ""
 
-# Step 8: Test the service
-echo -e "${YELLOW}Step 7: Testing ${SERVICE_NAME}...${NC}"
-echo -e "${BLUE}⌜ Service is starting up, testing API endpoint...${NC}"
-sleep 15
+if [ "$API_AVAILABLE" = true ]; then
+    echo -e "${GREEN}🎊 API Test Status: SUCCESS${NC}"
+else
+    echo -e "${YELLOW}⚠️  API Test Status: PENDING${NC}"
+    echo -e "${YELLOW}   Service may still be starting up. Try manual tests in a few moments.${NC}"
+fi
 
-MAX_RETRIES=5
-RETRY_COUNT=0
-API_AVAILABLE=false
+echo ""
+echo -e "${YELLOW}🔧 Enhanced Management Commands:${NC}"
+echo -e "${YELLOW}• View Logs: az container logs --resource-group $RESOURCE_GROUP --name $CONTAINER_NAME${NC}"
+echo -e "${YELLOW}• Real-time Logs: az container logs --resource-group $RESOURCE_GROUP --name $CONTAINER_NAME --follow${NC}"
+echo -e "${YELLOW}• Container Status: az container show --resource-group $RESOURCE_GROUP --name $CONTAINER_NAME${NC}"
+echo -e "${YELLOW}• Restart Container: az container restart --resource-group $RESOURCE_GROUP --name $CONTAINER_NAME${NC}"
+echo -e "${YELLOW}• Delete Container: az container delete --resource-group $RESOURCE_GROUP --name $CONTAINER_NAME --yes${NC}"
+echo -e "${YELLOW}• Interactive Logs & Management: python bidr-deploy-manager.py (Option 5)${NC}"
+echo ""
 
+echo -e "${CYAN}📈 Quick Test Commands:${NC}"
+echo -e "${CYAN}curl http://${NEW_FQDN}:${SERVICE_PORT}/health/${NC}"
+echo -e "${CYAN}curl http://${NEW_FQDN}:${SERVICE_PORT}/api/products/${NC}"
+
+echo ""
+echo -e "${GREEN}🎊 ${SERVICE_NAME} has been updated successfully!${NC}"
+echo -e "${CYAN}========================================${NC}"
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     # Try health check endpoint first
     HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://${NEW_FQDN}:${SERVICE_PORT}/health/" --connect-timeout 10 --max-time 30 || echo "000")

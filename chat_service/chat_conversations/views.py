@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from .models import Conversation, ConversationParticipant
 from .serializers import ConversationSerializer, ConversationCreateSerializer
-from chat_messaging.models import Message
+from chat_messaging.models import Message, MessageAttachment
 from chat_messaging.serializers import MessageSerializer, MessageCreateSerializer
 
 
@@ -59,7 +59,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
             is_active=True
         ).order_by('created_at')
         
-        serializer = MessageSerializer(messages, many=True)
+        serializer = MessageSerializer(messages, many=True, context={'request': request})
         return Response(serializer.data)
     
     @action(detail=True, methods=['post'])
@@ -99,6 +99,8 @@ class ConversationViewSet(viewsets.ModelViewSet):
             'conversation': conversation.id,
             'content': request.data.get('content', ''),
             'message_type': request.data.get('message_type', 'text'),
+            'sender_name': request.data.get('sender_name', ''),
+            'sender_role': request.data.get('sender_role', 'user'),
         }
         
         message_serializer = MessageCreateSerializer(data=message_data, context={'request': request})
@@ -111,6 +113,107 @@ class ConversationViewSet(viewsets.ModelViewSet):
             conversation.save(update_fields=['total_messages', 'last_message_at'])
             
             return Response(message_serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(message_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['post'])
+    def send_attachment(self, request, pk=None):
+        """Send a file attachment to a conversation."""
+        conversation = self.get_object()
+        
+        # For authenticated users, check access and permissions
+        if request.user.is_authenticated:
+            # Check if user has access to this conversation
+            if not conversation.can_user_access(request.user):
+                return Response(
+                    {'error': 'You do not have access to this conversation'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # Check if user can send messages
+            try:
+                participant = ConversationParticipant.objects.get(
+                    conversation=conversation,
+                    user=request.user
+                )
+                if not participant.can_perform_action('send_message'):
+                    return Response(
+                        {'error': 'You do not have permission to send attachments'},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+            except ConversationParticipant.DoesNotExist:
+                return Response(
+                    {'error': 'You are not a participant in this conversation'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        
+        # Get uploaded file
+        if 'attachment' not in request.FILES:
+            return Response(
+                {'error': 'No file uploaded'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        uploaded_file = request.FILES['attachment']
+        
+        # Validate file size (10MB limit)
+        max_size = 10 * 1024 * 1024  # 10MB
+        if uploaded_file.size > max_size:
+            return Response(
+                {'error': 'File size exceeds 10MB limit'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Create message with attachment
+        message_data = {
+            'conversation': conversation.id,
+            'content': f'Attachment: {uploaded_file.name}',
+            'message_type': request.data.get('message_type', 'file'),
+            'sender_name': request.data.get('sender_name', ''),
+            'sender_role': request.data.get('sender_role', 'user'),
+        }
+        
+        message_serializer = MessageCreateSerializer(data=message_data, context={'request': request})
+        if message_serializer.is_valid():
+            message = message_serializer.save()
+            
+            # Create attachment
+            import mimetypes
+            mime_type, _ = mimetypes.guess_type(uploaded_file.name)
+            
+            # Determine file type based on mime type
+            file_type = 'other'
+            if mime_type:
+                if mime_type.startswith('image/'):
+                    file_type = 'image'
+                elif mime_type.startswith('video/'):
+                    file_type = 'video'
+                elif mime_type.startswith('audio/'):
+                    file_type = 'audio'
+                elif mime_type in ['application/pdf', 'application/msword', 
+                                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                 'text/plain']:
+                    file_type = 'document'
+                elif mime_type in ['application/zip', 'application/x-rar-compressed']:
+                    file_type = 'archive'
+            
+            attachment = MessageAttachment.objects.create(
+                message=message,
+                file=uploaded_file,
+                filename=uploaded_file.name,
+                file_size=uploaded_file.size,
+                file_type=file_type,
+                mime_type=mime_type or 'application/octet-stream',
+            )
+            
+            # Update conversation metadata
+            conversation.total_messages += 1
+            conversation.last_message_at = message.created_at
+            conversation.save(update_fields=['total_messages', 'last_message_at'])
+            
+            # Return message with attachment data
+            message_data = MessageSerializer(message, context={'request': request}).data
+            return Response(message_data, status=status.HTTP_201_CREATED)
         
         return Response(message_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

@@ -73,7 +73,7 @@ class PasswordResetRequestView(APIView):
         serializer = PasswordResetRequestSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data['email']
-            user = AppUser.objects.get(email=email)
+            user = AppUser.objects.get(email__iexact=email)
 
             # Generate reset token
             token = default_token_generator.make_token(user)
@@ -219,8 +219,9 @@ class UserRegistrationView(APIView):
             if delivery_method in ['sms', 'both'] and decrypted_phone:
                 try:
                     # Call notifications service to send SMS
-                    notification_service_url = getattr(settings, 'NOTIFICATION_SERVICE_URL', 'https://notifications.bidr.co.za/')
-                    sms_endpoint = f"{notification_service_url}/api/v1/sms/send/otp/"
+                    #notification_service_url = getattr(settings, 'NOTIFICATION_SERVICE_URL', 'https://notifications.bidr.co.za/')
+                    notification_service_url = "http://localhost:8006/"
+                    sms_endpoint = f"{notification_service_url.rstrip('/')}/api/v1/sms/send/otp/"
                     
                     sms_payload = {
                         'phone_number': decrypted_phone,
@@ -572,3 +573,172 @@ class ProfileCompletionView(APIView):
             'suggestions': suggestions,
             'is_complete': completion_percentage >= 90
         }, status=status.HTTP_200_OK)
+
+
+class UserDeleteAccountView(APIView):
+    """
+    Delete user account endpoint
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+        
+        try:
+            # Perform account deletion - you can implement soft delete or hard delete
+            # For security, you might want to add additional verification here
+            
+            # Soft delete approach - mark user as deleted but keep data for audit
+            user.is_active = False
+            user.is_deleted = True
+            user.deleted_at = timezone.now()
+            user.save()
+            
+            return Response({
+                'success': True,
+                'message': 'Account deleted successfully'
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            logger.error(f"Account deletion failed for user {user.id}: {str(e)}")
+            return Response({
+                'success': False,
+                'error': 'Failed to delete account'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ContactSupportView(APIView):
+    """
+    Contact support endpoint
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        subject = request.data.get('subject')
+        message = request.data.get('message')
+        user = request.user
+        
+        if not subject or not message:
+            return Response({
+                'success': False,
+                'error': 'Subject and message are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Send email to support team
+            support_email = getattr(settings, 'SUPPORT_EMAIL', 'support@bidr.co.za')
+            user_email = user.email
+            user_name = f"{user.get_decrypted_first_name()} {user.get_decrypted_last_name()}"
+            
+            email_subject = f"Support Request from {user_name}: {subject}"
+            email_message = f"""
+            Support request from user:
+            Name: {user_name}
+            Email: {user_email}
+            User ID: {user.id}
+            
+            Subject: {subject}
+            
+            Message:
+            {message}
+            """
+            
+            send_mail(
+                email_subject,
+                email_message,
+                settings.DEFAULT_FROM_EMAIL,
+                [support_email],
+                fail_silently=False,
+            )
+            
+            return Response({
+                'success': True,
+                'message': 'Support request sent successfully'
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            logger.error(f"Failed to send support request: {str(e)}")
+            return Response({
+                'success': False,
+                'error': 'Failed to send support request'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class RequestQuoteView(APIView):
+    """
+    Request quote endpoint
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        email = request.data.get('email')
+        company = request.data.get('company')
+        project_details = request.data.get('project_details')
+        user = request.user
+        
+        if not email or not company:
+            return Response({
+                'success': False,
+                'error': 'Email and company are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Send quote request to sales team
+            sales_email = getattr(settings, 'SALES_EMAIL', 'sales@bidr.co.za')
+            user_name = f"{user.get_decrypted_first_name()} {user.get_decrypted_last_name()}"
+            
+            email_subject = f"Quote Request from {user_name} - {company}"
+            email_message = f"""
+            Quote request from:
+            Name: {user_name}
+            Email: {email}
+            Company: {company}
+            User ID: {user.id}
+            
+            Project Details:
+            {project_details or 'No additional details provided'}
+            """
+            
+            send_mail(
+                email_subject,
+                email_message,
+                settings.DEFAULT_FROM_EMAIL,
+                [sales_email],
+                fail_silently=False,
+            )
+            
+            # Also send confirmation to user
+            confirmation_subject = "Quote Request Received - BIDR"
+            confirmation_message = f"""
+            Dear {user_name},
+            
+            Thank you for your quote request. We have received the following information:
+            
+            Company: {company}
+            Project Details: {project_details or 'No additional details provided'}
+            
+            Our sales team will review your request and get back to you within 24 hours.
+            
+            Best regards,
+            BIDR Team
+            """
+            
+            send_mail(
+                confirmation_subject,
+                confirmation_message,
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=True,  # Don't fail if confirmation email fails
+            )
+            
+            return Response({
+                'success': True,
+                'message': 'Quote request submitted successfully'
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            logger.error(f"Failed to send quote request: {str(e)}")
+            return Response({
+                'success': False,
+                'error': 'Failed to submit quote request'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

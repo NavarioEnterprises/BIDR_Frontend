@@ -16,7 +16,7 @@ class OTPVerificationSerializer(serializers.Serializer):
         otp_code = attrs.get('otp')
 
         try:
-            user = AppUser.objects.get(email=email)
+            user = AppUser.objects.get_by_email(email)
             otp = OTP.objects.get(user=user, otp=otp_code, verified_at__isnull=True)
 
             if otp.is_expired():

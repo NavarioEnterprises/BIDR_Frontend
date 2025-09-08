@@ -16,7 +16,7 @@ class OTPVerificationSerializer(serializers.Serializer):
         otp_code = attrs.get('otp')
 
         try:
-            user = AppUser.objects.get(email=email)
+            user = AppUser.objects.get_by_email(email)
             
             # Try to find valid OTP
             try:

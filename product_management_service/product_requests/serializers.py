@@ -200,6 +200,20 @@ class ProductRequestCreateSerializer(serializers.ModelSerializer):
     buyer_location = JSONStringField()
     product_images = JSONStringField(required=False, allow_null=True)
     
+    # Image upload fields - these handle actual file uploads
+    images = serializers.ListField(
+        child=serializers.ImageField(max_length=None, use_url=True),
+        required=False,
+        write_only=True,
+        help_text="Upload images for the product request"
+    )
+    vin_images = serializers.ListField(
+        child=serializers.ImageField(max_length=None, use_url=True),
+        required=False,
+        write_only=True,
+        help_text="Upload VIN images for vehicle requests"
+    )
+    
     # User ID field for setting the buyer - allow UUID strings
     buyer_id = serializers.UUIDField(required=False)
     auth_user_uid = serializers.UUIDField(required=True)
@@ -211,7 +225,8 @@ class ProductRequestCreateSerializer(serializers.ModelSerializer):
             'quantity', 'condition_preference', 'max_budget', 'currency',
             'buyer_location', 'max_travel_distance', 'urgency_timeline',
             'product_images', 'vin_photo_url', 'terms_accepted', 'contact_consent',
-            'consumer_electronics_data', 'vehicle_spares_data', 'vehicle_tyres_rims_data'
+            'consumer_electronics_data', 'vehicle_spares_data', 'vehicle_tyres_rims_data',
+            'images', 'vin_images'
         ]
         
     def to_internal_value(self, data):
@@ -223,6 +238,14 @@ class ProductRequestCreateSerializer(serializers.ModelSerializer):
             'vehicle_spares_data', 'consumer_electronics_data', 'vehicle_tyres_rims_data',
             'buyer_location', 'product_specifications'
         ]
+        
+        # Create a mutable copy of data to avoid QueryDict immutability issues
+        if hasattr(data, '_mutable'):
+            # This is a QueryDict, make it mutable
+            data._mutable = True
+        else:
+            # Create a mutable copy for other dict-like objects
+            data = data.copy()
         
         for field in json_fields:
             if field in data:
@@ -286,16 +309,68 @@ class ProductRequestCreateSerializer(serializers.ModelSerializer):
         vehicle_spares_data = validated_data.pop('vehicle_spares_data', None)
         vehicle_tyres_rims_data = validated_data.pop('vehicle_tyres_rims_data', None)
         
+        # Extract image files
+        uploaded_images = validated_data.pop('images', [])
+        vin_images = validated_data.pop('vin_images', [])
+        
         # Handle buyer_id: use auth_user_uid as buyer_id since it's the actual UUID
         auth_user_uid = validated_data.get('auth_user_uid')
         if auth_user_uid:
             validated_data['buyer_id'] = auth_user_uid
+        
+        # Process uploaded images and save them
+        from core.image_utils import save_uploaded_images, validate_image_file
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        saved_image_urls = []
+        vin_image_url = None
+        
+        # Process regular product images
+        if uploaded_images:
+            # Validate images first
+            valid_images = []
+            for image in uploaded_images:
+                if validate_image_file(image):
+                    valid_images.append(image)
+                else:
+                    logger.warning(f"Invalid image file skipped: {getattr(image, 'name', 'unknown')}")
+            
+            if valid_images:
+                saved_image_urls = save_uploaded_images(valid_images, 'product_requests')
+                logger.info(f"Saved {len(saved_image_urls)} product images")
+        
+        # Process VIN images (usually just one)
+        if vin_images:
+            # Validate VIN images
+            valid_vin_images = []
+            for image in vin_images:
+                if validate_image_file(image):
+                    valid_vin_images.append(image)
+                else:
+                    logger.warning(f"Invalid VIN image file skipped: {getattr(image, 'name', 'unknown')}")
+            
+            if valid_vin_images:
+                vin_urls = save_uploaded_images(valid_vin_images, 'vin_images')
+                if vin_urls:
+                    vin_image_url = vin_urls[0]  # Use first VIN image
+                    logger.info(f"Saved VIN image: {vin_image_url}")
+        
+        # Set image data in validated_data
+        if saved_image_urls:
+            validated_data['product_images'] = saved_image_urls
+        
+        if vin_image_url:
+            validated_data['vin_photo_url'] = vin_image_url
         
         # Create the main ProductRequest
         product_request = ProductRequest.objects.create(**validated_data)
         
         # Create and link the category-specific model
         if consumer_electronics_data:
+            # Add saved images to electronics data
+            if saved_image_urls:
+                consumer_electronics_data['product_images'] = saved_image_urls
             consumer_electronics = ConsumerElectronics.objects.create(**consumer_electronics_data)
             product_request.consumer_electronics = consumer_electronics
             
@@ -313,7 +388,14 @@ class ProductRequestCreateSerializer(serializers.ModelSerializer):
                 k: v for k, v in vehicle_spares_data.items() 
                 if k in vehicle_spares_fields
             }
-            print(f"Filtered vehicle spares data: {filtered_vehicle_data}")
+            
+            # Add saved images to vehicle spares data
+            if saved_image_urls:
+                filtered_vehicle_data['product_images'] = saved_image_urls
+            if vin_image_url:
+                filtered_vehicle_data['vin_photo'] = vin_image_url
+            
+            logger.info(f"Filtered vehicle spares data: {filtered_vehicle_data}")
             vehicle_spares = VehicleSpares.objects.create(**filtered_vehicle_data)
             product_request.vehicle_spares = vehicle_spares
             
@@ -329,7 +411,12 @@ class ProductRequestCreateSerializer(serializers.ModelSerializer):
                 k: v for k, v in vehicle_tyres_rims_data.items() 
                 if k in vehicle_tyres_rims_fields
             }
-            print(f"Filtered vehicle tyres/rims data: {filtered_tyres_rims_data}")
+            
+            # Add saved images to tyres/rims data
+            if saved_image_urls:
+                filtered_tyres_rims_data['product_images'] = saved_image_urls
+            
+            logger.info(f"Filtered vehicle tyres/rims data: {filtered_tyres_rims_data}")
             vehicle_tyres_rims = VehicleTyresRims.objects.create(**filtered_tyres_rims_data)
             product_request.vehicle_tyres_rims = vehicle_tyres_rims
         

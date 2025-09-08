@@ -29,7 +29,14 @@ from django.http import JsonResponse
 from django.views.generic import TemplateView
 from django.utils import timezone
 # from rest_framework.authtoken.views import obtain_auth_token  # Authentication disabled
-from django_prometheus.exports import ExportToDjangoView
+
+# Conditional import for django_prometheus (might not be available in production)
+try:
+    from django_prometheus.exports import ExportToDjangoView
+    PROMETHEUS_AVAILABLE = True
+except ImportError:
+    ExportToDjangoView = None
+    PROMETHEUS_AVAILABLE = False
 
 # Health check endpoint
 def health_check(request):
@@ -67,8 +74,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     # Health check
-    # Metrics endpoint for Prometheus
-    path('metrics', ExportToDjangoView, name='prometheus-django-metrics'),
     path('health/', health_check, name='health-check'),
     
     # API root
@@ -82,6 +87,10 @@ urlpatterns = [
     path('', include('chat_core.urls')),
     path('', include('chat_conversations.urls')),
 ]
+
+# Add metrics endpoint if prometheus is available
+if PROMETHEUS_AVAILABLE and ExportToDjangoView:
+    urlpatterns.insert(2, path('metrics/', ExportToDjangoView, name='prometheus-django-metrics'))
 
 # Add media files serving in development
 if settings.DEBUG:

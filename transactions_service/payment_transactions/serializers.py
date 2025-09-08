@@ -329,3 +329,79 @@ class RefundPaymentSerializer(serializers.Serializer):
             }
         except Exception as e:
             return False, {'error': str(e)}
+
+
+class SellerEarningHistorySerializer(serializers.ModelSerializer):
+    """
+    Serializer for seller earning history showing successful/paid payments.
+    """
+    transaction_id = serializers.SerializerMethodField()
+    order_date = serializers.SerializerMethodField()
+    buyer_info = serializers.SerializerMethodField()
+    product_info = serializers.SerializerMethodField()
+    earnings_status = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = PaymentTransaction
+        fields = [
+            'payment_id', 'transaction_id', 'amount', 'currency',
+            'order_date', 'status', 'earnings_status', 'buyer_info', 
+            'product_info', 'actual_release_date', 'created_at'
+        ]
+    
+    def get_transaction_id(self, obj):
+        """Get the transaction ID."""
+        try:
+            return str(obj.transaction_id.transaction_id)
+        except (AttributeError, Exception):
+            return None
+    
+    def get_order_date(self, obj):
+        """Get the order/transaction creation date."""
+        try:
+            return obj.transaction_id.created_at
+        except (AttributeError, Exception):
+            return obj.created_at
+    
+    def get_buyer_info(self, obj):
+        """Get buyer information."""
+        try:
+            transaction = obj.transaction_id
+            buyer = transaction.buyer_id
+            return {
+                'buyer_id': str(buyer.id),
+                'username': buyer.username,
+                'email': buyer.email
+            }
+        except (AttributeError, Exception):
+            return {
+                'buyer_id': None,
+                'username': 'Unknown',
+                'email': 'Unknown'
+            }
+    
+    def get_product_info(self, obj):
+        """Get product/service information from the quote."""
+        try:
+            transaction = obj.transaction_id
+            quote = transaction.quote_id
+            return {
+                'quote_id': str(quote.id),
+                'amount': str(quote.amount),
+                'currency': quote.currency
+            }
+        except (AttributeError, Exception):
+            return {
+                'quote_id': None,
+                'amount': '0.00',
+                'currency': 'USD'
+            }
+    
+    def get_earnings_status(self, obj):
+        """Get a user-friendly status for earnings."""
+        status_mapping = {
+            'CAPTURED': 'Funds Secured',
+            'RELEASED': 'Earnings Released',
+            'PAID': 'Payment Completed'
+        }
+        return status_mapping.get(obj.status, obj.status)

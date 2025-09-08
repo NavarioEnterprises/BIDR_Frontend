@@ -516,14 +516,12 @@ def reviews_endpoint(request):
     - POST: Create or update a review
     """
     if request.method == 'GET':
-        return list_reviews(request)
+        return list_reviews_logic(request)
     elif request.method == 'POST':
-        return create_review(request)
+        return create_review_logic(request)
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def create_review(request):
+def create_review_logic(request):
     """
     Custom view to handle POST requests directly at /api/reviews/
     Removes authentication requirements and provides a simple endpoint
@@ -641,9 +639,7 @@ def create_review(request):
         )
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def list_reviews(request):
+def list_reviews_logic(request):
     """
     Custom view to handle GET requests at /api/reviews/
     Returns a list of approved reviews with optional filtering
@@ -690,3 +686,18 @@ def list_reviews(request):
             {'success': False, 'error': f'Failed to retrieve reviews: {str(e)}'}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+# Standalone decorated versions for backward compatibility
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def list_reviews(request):
+    """Standalone GET endpoint for listing reviews"""
+    return list_reviews_logic(request)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_review(request):
+    """Standalone POST endpoint for creating reviews"""
+    return create_review_logic(request)

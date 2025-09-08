@@ -18,7 +18,7 @@ class AppUserManager(BaseUserManager):
         if not email:
             raise ValueError('The Email field must be set')
         
-        email = self.normalize_email(email)
+        email = self.normalize_email(email).lower()
         user = self.model(email=email, **extra_fields)
         
         # Use test-friendly password setting during tests
@@ -44,3 +44,15 @@ class AppUserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
         
         return self.create_user(email, password, **extra_fields)
+    
+    def get_by_email(self, email):
+        """
+        Get user by email (case-insensitive)
+        """
+        return self.get(email__iexact=email.lower().strip())
+    
+    def email_exists(self, email):
+        """
+        Check if email exists (case-insensitive)
+        """
+        return self.filter(email__iexact=email.lower().strip()).exists()

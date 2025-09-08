@@ -15,6 +15,7 @@ from .models import (
 class MessageAttachmentSerializer(serializers.ModelSerializer):
     """Message attachment serializer."""
     file_size_display = serializers.SerializerMethodField()
+    file_url = serializers.SerializerMethodField()
     
     class Meta:
         model = MessageAttachment
@@ -22,7 +23,7 @@ class MessageAttachmentSerializer(serializers.ModelSerializer):
             'id', 'filename', 'file_size', 'file_size_display', 'file_type',
             'mime_type', 'width', 'height', 'duration', 'is_scanned',
             'scan_result', 'is_public', 'download_count', 'file_hash',
-            'thumbnail', 'created_at'
+            'thumbnail', 'file_url', 'created_at'
         ]
         read_only_fields = [
             'id', 'file_size_display', 'is_scanned', 'scan_result', 
@@ -31,6 +32,14 @@ class MessageAttachmentSerializer(serializers.ModelSerializer):
     
     def get_file_size_display(self, obj):
         return obj.get_file_size_display()
+    
+    def get_file_url(self, obj):
+        if obj.file:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.file.url)
+            return obj.file.url
+        return None
 
 
 class MessageReactionSerializer(serializers.ModelSerializer):
@@ -93,7 +102,7 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = [
-            'id', 'sender', 'conversation', 'message_type', 'content',
+            'id', 'sender', 'sender_name', 'sender_role', 'conversation', 'message_type', 'content',
             'original_content', 'reply_to', 'reply_to_message', 'thread_id',
             'delivery_status', 'is_edited', 'edited_at', 'is_flagged',
             'flagged_reason', 'is_auto_moderated', 'moderation_action',
@@ -139,7 +148,7 @@ class MessageCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = [
-            'conversation', 'message_type', 'content', 'reply_to',
+            'conversation', 'message_type', 'content', 'sender_name', 'sender_role', 'reply_to',
             'client_message_id', 'external_reference', 'metadata'
         ]
     
@@ -147,7 +156,11 @@ class MessageCreateSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             validated_data['sender'] = request.user
+            # If sender_name not provided, use authenticated user's username
+            if not validated_data.get('sender_name'):
+                validated_data['sender_name'] = request.user.username
         # For unauthenticated users, sender will be None (which should be allowed)
+        # sender_name and sender_role should be provided in the request data
         return super().create(validated_data)
 
 

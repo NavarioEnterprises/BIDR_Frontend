@@ -111,8 +111,13 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
         if not self.uid:
             self.uid = uuid.uuid4()
         
-        # Encrypt PII fields before saving
-        self._encrypt_pii_fields()
+        # Normalize email to lowercase for case-insensitive operations
+        if self.email:
+            self.email = self.email.lower().strip()
+        
+        # Encrypt PII fields before saving (unless skipped for migration)
+        if not getattr(self, '_skip_encryption', False):
+            self._encrypt_pii_fields()
         
         super().save(*args, **kwargs)
     
@@ -140,16 +145,22 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
             return ""
         try:
             decrypted = security_utils.encryption.decrypt_pii(self.first_name)
+            # Don't return migration placeholders - return empty string instead
+            if decrypted and decrypted.startswith("[Migrated"):
+                return ""
             return decrypted
         except (ValueError, Exception) as e:
             import logging
             logger = logging.getLogger(__name__)
             logger.warning(f"Failed to decrypt first_name for user {self.id}: {str(e)}")
-            # If it looks like base64 encrypted data but can't be decrypted, return placeholder
+            # Check if it's already a migration placeholder
+            if self.first_name.startswith("[Migrated"):
+                return ""
+            # If it looks like base64 encrypted data but can't be decrypted, return empty string
             import base64
             try:
                 base64.urlsafe_b64decode(self.first_name)
-                return "[ENCRYPTED_DATA_ERROR]"  # It's encrypted but corrupted
+                return ""  # It's encrypted but corrupted
             except:
                 return self.first_name  # It's probably plain text, return as-is
     
@@ -159,16 +170,22 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
             return ""
         try:
             decrypted = security_utils.encryption.decrypt_pii(self.last_name)
+            # Don't return migration placeholders - return empty string instead
+            if decrypted and decrypted.startswith("[Migrated"):
+                return ""
             return decrypted
         except (ValueError, Exception) as e:
             import logging
             logger = logging.getLogger(__name__)
             logger.warning(f"Failed to decrypt last_name for user {self.id}: {str(e)}")
-            # If it looks like base64 encrypted data but can't be decrypted, return placeholder
+            # Check if it's already a migration placeholder
+            if self.last_name.startswith("[Migrated"):
+                return ""
+            # If it looks like base64 encrypted data but can't be decrypted, return empty string
             import base64
             try:
                 base64.urlsafe_b64decode(self.last_name)
-                return "[ENCRYPTED_DATA_ERROR]"  # It's encrypted but corrupted
+                return ""  # It's encrypted but corrupted
             except:
                 return self.last_name  # It's probably plain text, return as-is
     
@@ -179,18 +196,23 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
         
         try:
             decrypted = security_utils.encryption.decrypt_pii(self.phone_number)
+            # Don't return migration placeholders - return empty string instead
+            if decrypted and decrypted.startswith("[Migrated"):
+                return ""
             return decrypted
         except Exception as e:
-            # Check if it's a corrupted encrypted value (base64 encoded but not decryptable)
             import base64
             import logging
             logger = logging.getLogger(__name__)
+            # Check if it's already a migration placeholder
+            if self.phone_number.startswith("[Migrated"):
+                return ""
+            # Check if it's a corrupted encrypted value (base64 encoded but not decryptable)
             try:
                 base64.urlsafe_b64decode(self.phone_number.encode())
-                # It's base64 encoded but corrupted - log warning and return masked value
+                # It's base64 encoded but corrupted - log warning and return empty string
                 logger.warning(f"Corrupted encrypted phone number detected for user {self.id}: {str(e)}")
-                # Return a masked placeholder for corrupted encrypted data
-                return "[ENCRYPTED_DATA_ERROR]"
+                return ""  # Return empty string instead of error message
             except:
                 # It's likely plain text, return as-is
                 logger.warning(f"Phone number appears to be plain text for user {self.id}: {str(e)}")
@@ -341,10 +363,6 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
         """Return the full name of the user."""
         first_name = self.get_decrypted_first_name()
         last_name = self.get_decrypted_last_name()
-        
-        # Handle encryption errors
-        if first_name == "[ENCRYPTED_DATA_ERROR]" or last_name == "[ENCRYPTED_DATA_ERROR]":
-            return "[ENCRYPTED_DATA_ERROR]"
         
         return f"{first_name} {last_name}".strip() or self.email
 

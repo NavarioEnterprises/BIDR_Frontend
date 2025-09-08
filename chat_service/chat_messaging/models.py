@@ -34,6 +34,8 @@ class Message(BaseModel):
     # Core message data
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages', null=True, blank=True)
+    sender_name = models.CharField(max_length=255, blank=True, help_text='Display name of the message sender')
+    sender_role = models.CharField(max_length=50, blank=True, default='user', help_text='Role of the message sender (user, admin, moderator, etc.)')
     message_type = models.CharField(max_length=20, choices=MESSAGE_TYPES, default='text')
     
     # Message content

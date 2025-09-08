@@ -18,4 +18,9 @@ router.register(r'orders', views.OrderViewSet, basename='order')
 
 urlpatterns = [
     path('', include(router.urls)),
+    
+    # Collection Code endpoints
+    path('collection-codes/get-or-create/', views.get_or_create_collection_code, name='get_or_create_collection_code'),
+    path('collection-codes/confirm/', views.confirm_collection_code, name='confirm_collection_code'),
+    path('collection-codes/status/<str:order_number>/', views.collection_code_status, name='collection_code_status'),
 ]

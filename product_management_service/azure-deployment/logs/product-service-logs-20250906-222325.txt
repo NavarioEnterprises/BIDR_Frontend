@@ -1,0 +1,1972 @@
+[2025-09-06 18:39:54 +0000] [18] [INFO] Starting gunicorn 23.0.0
+[2025-09-06 18:39:54 +0000] [18] [INFO] Listening at: http://0.0.0.0:8000 (18)
+[2025-09-06 18:39:54 +0000] [18] [INFO] Using worker: sync
+[2025-09-06 18:39:54 +0000] [23] [INFO] Booting worker with pid: 23
+[2025-09-06 18:39:54 +0000] [24] [INFO] Booting worker with pid: 24
+[2025-09-06 18:39:54 +0000] [25] [INFO] Booting worker with pid: 25
+ℹ️  Using local SQLite databaseℹ️  Using local SQLite database
+
+ℹ️  Using local SQLite database
+Transactions admin placeholder - implement when models are created
+Transactions admin placeholder - implement when models are created
+Transactions admin placeholder - implement when models are created
+Ratings admin placeholder - implement when models are createdRatings admin placeholder - implement when models are createdRatings admin placeholder - implement when models are created
+
+
+Product Logs admin placeholder - implement when models are createdProduct Logs admin placeholder - implement when models are created
+
+Product Logs admin placeholder - implement when models are created
+INFO 2025-09-06 18:39:55,811 apps 23 139648616172416 Encryption is enabled for core application
+INFO 2025-09-06 18:39:55,812 apps 24 139648616172416 Encryption is enabled for core application
+INFO 2025-09-06 18:39:55,812 apps 24 139648616172416 Core Application is ready
+INFO 2025-09-06 18:39:55,813 apps 23 139648616172416 Core Application is ready
+INFO 2025-09-06 18:39:55,813 apps 24 139648616172416 Product Categories app is ready
+INFO 2025-09-06 18:39:55,813 apps 24 139648616172416 Product Requests app is ready
+INFO 2025-09-06 18:39:55,814 apps 23 139648616172416 Product Categories app is ready
+INFO 2025-09-06 18:39:55,814 apps 23 139648616172416 Product Requests app is ready
+INFO 2025-09-06 18:39:55,814 apps 24 139648616172416 Analytics & Reporting app is ready
+INFO 2025-09-06 18:39:55,815 apps 24 139648616172416 Application Logs app is ready
+INFO 2025-09-06 18:39:55,815 apps 25 139648616172416 Encryption is enabled for core application
+INFO 2025-09-06 18:39:55,815 apps 25 139648616172416 Core Application is ready
+INFO 2025-09-06 18:39:55,816 apps 25 139648616172416 Product Categories app is ready
+INFO 2025-09-06 18:39:55,816 apps 23 139648616172416 Analytics & Reporting app is ready
+INFO 2025-09-06 18:39:55,816 apps 23 139648616172416 Application Logs app is ready
+INFO 2025-09-06 18:39:55,817 apps 25 139648616172416 Product Requests app is ready
+INFO 2025-09-06 18:39:55,817 apps 25 139648616172416 Analytics & Reporting app is ready
+INFO 2025-09-06 18:39:55,818 apps 25 139648616172416 Application Logs app is ready
+10.92.0.26 - - [06/Sep/2025:18:40:39 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:40:39 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:41:06 +0000] "HEAD /health/ HTTP/1.1" 200 131 "-" "curl/8.7.1"
+10.92.0.26 - - [06/Sep/2025:18:41:09 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:41:09 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:41:39 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:41:39 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:42:09 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:42:09 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:42:39 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:42:39 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:43:09 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:43:09 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:43:39 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:43:39 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:44:16 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:44:16 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:44:53 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:44:54 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:45:23 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:45:24 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:45:53 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:45:54 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:46:23 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:46:24 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:47:09 +0000] "GET / HTTP/1.1" 200 1682 "-" "curl/7.64.1"
+10.92.0.26 - - [06/Sep/2025:18:47:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:47:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:47:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:47:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:48:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:48:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:48:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:48:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:49:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:49:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:49:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:49:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:50:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:50:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:50:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:50:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:51:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:51:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:51:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:51:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:52:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:52:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:52:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:52:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:53:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:53:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:53:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:53:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:54:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:54:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:54:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:54:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:55:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:55:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:55:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:55:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:56:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:56:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:56:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:56:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:57:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:57:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:57:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:57:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:58:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:58:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:58:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:58:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:58:56 +0000] "GET / HTTP/1.1" 200 1682 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
+10.92.0.26 - - [06/Sep/2025:18:58:58 +0000] "GET / HTTP/1.1" 200 1682 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+10.92.0.25 - - [06/Sep/2025:18:59:00 +0000] "GET /static/drf-yasg/swagger-ui-init.js HTTP/1.1" 200 0 "https://chat-service.bidr.co.za/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+10.92.0.26 - - [06/Sep/2025:18:59:00 +0000] "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-bundle.js HTTP/1.1" 200 0 "https://chat-service.bidr.co.za/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+10.92.0.25 - - [06/Sep/2025:18:59:00 +0000] "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-standalone-preset.js HTTP/1.1" 200 0 "https://chat-service.bidr.co.za/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+10.92.0.26 - - [06/Sep/2025:18:59:00 +0000] "GET /static/drf-yasg/insQ.min.js HTTP/1.1" 200 0 "https://chat-service.bidr.co.za/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+10.92.0.25 - - [06/Sep/2025:18:59:00 +0000] "GET /static/drf-yasg/immutable.min.js HTTP/1.1" 200 0 "https://chat-service.bidr.co.za/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+WARNING 2025-09-06 18:59:03,890 base 24 139648616172416 view's QuoteItemViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 402, in get_queryset
+    seller_items = queryset.filter(quote__seller_id=user)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,899 base 24 139648616172416 view's QuoteAttachmentViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 440, in get_queryset
+    seller_attachments = queryset.filter(quote__seller_id=user)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,900 base 24 139648616172416 view's QuoteMessageViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 493, in get_queryset
+    seller_messages = queryset.filter(
+                      ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,902 base 24 139648616172416 view's QuoteComparisonViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 543, in get_queryset
+    return queryset.filter(request__requester=user)  # This assumes the ProductRequest model has a requester field
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1409, in build_lookup
+    lhs = self.try_transform(lhs, lookup_name)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1458, in try_transform
+    raise FieldError(
+django.core.exceptions.FieldError: Unsupported lookup 'requester' for OneToOneField or join on the field not permitted.
+WARNING 2025-09-06 18:59:03,904 base 24 139648616172416 view's QuoteItemViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 402, in get_queryset
+    seller_items = queryset.filter(quote__seller_id=user)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,905 base 24 139648616172416 view's QuoteAttachmentViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 440, in get_queryset
+    seller_attachments = queryset.filter(quote__seller_id=user)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,906 base 24 139648616172416 view's QuoteMessageViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 493, in get_queryset
+    seller_messages = queryset.filter(
+                      ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,908 base 24 139648616172416 view's QuoteComparisonViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 543, in get_queryset
+    return queryset.filter(request__requester=user)  # This assumes the ProductRequest model has a requester field
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1409, in build_lookup
+    lhs = self.try_transform(lhs, lookup_name)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1458, in try_transform
+    raise FieldError(
+django.core.exceptions.FieldError: Unsupported lookup 'requester' for OneToOneField or join on the field not permitted.
+WARNING 2025-09-06 18:59:03,910 base 24 139648616172416 view's QuoteMessageViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 493, in get_queryset
+    seller_messages = queryset.filter(
+                      ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,911 base 24 139648616172416 view's QuoteComparisonViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 543, in get_queryset
+    return queryset.filter(request__requester=user)  # This assumes the ProductRequest model has a requester field
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1409, in build_lookup
+    lhs = self.try_transform(lhs, lookup_name)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1458, in try_transform
+    raise FieldError(
+django.core.exceptions.FieldError: Unsupported lookup 'requester' for OneToOneField or join on the field not permitted.
+WARNING 2025-09-06 18:59:03,913 base 24 139648616172416 view's QuoteMessageViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 493, in get_queryset
+    seller_messages = queryset.filter(
+                      ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,914 base 24 139648616172416 view's QuoteComparisonViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 543, in get_queryset
+    return queryset.filter(request__requester=user)  # This assumes the ProductRequest model has a requester field
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1409, in build_lookup
+    lhs = self.try_transform(lhs, lookup_name)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1458, in try_transform
+    raise FieldError(
+django.core.exceptions.FieldError: Unsupported lookup 'requester' for OneToOneField or join on the field not permitted.
+WARNING 2025-09-06 18:59:03,915 base 24 139648616172416 view's QuoteItemViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 402, in get_queryset
+    seller_items = queryset.filter(quote__seller_id=user)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,916 base 24 139648616172416 view's QuoteAttachmentViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 440, in get_queryset
+    seller_attachments = queryset.filter(quote__seller_id=user)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,917 base 24 139648616172416 view's QuoteMessageViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 493, in get_queryset
+    seller_messages = queryset.filter(
+                      ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,918 base 24 139648616172416 view's QuoteItemViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 402, in get_queryset
+    seller_items = queryset.filter(quote__seller_id=user)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,919 base 24 139648616172416 view's QuoteAttachmentViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 440, in get_queryset
+    seller_attachments = queryset.filter(quote__seller_id=user)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,920 base 24 139648616172416 view's QuoteMessageViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 493, in get_queryset
+    seller_messages = queryset.filter(
+                      ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,922 base 24 139648616172416 view's QuoteItemViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 402, in get_queryset
+    seller_items = queryset.filter(quote__seller_id=user)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,922 base 24 139648616172416 view's QuoteAttachmentViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 440, in get_queryset
+    seller_attachments = queryset.filter(quote__seller_id=user)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,924 base 24 139648616172416 view's QuoteMessageViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 493, in get_queryset
+    seller_messages = queryset.filter(
+                      ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,925 base 24 139648616172416 view's QuoteItemViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 402, in get_queryset
+    seller_items = queryset.filter(quote__seller_id=user)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,926 base 24 139648616172416 view's QuoteAttachmentViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 440, in get_queryset
+    seller_attachments = queryset.filter(quote__seller_id=user)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,928 base 24 139648616172416 view's QuoteMessageViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 493, in get_queryset
+    seller_messages = queryset.filter(
+                      ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,930 base 24 139648616172416 view's QuoteItemViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 402, in get_queryset
+    seller_items = queryset.filter(quote__seller_id=user)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,931 base 24 139648616172416 view's QuoteAttachmentViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 440, in get_queryset
+    seller_attachments = queryset.filter(quote__seller_id=user)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,932 base 24 139648616172416 view's QuoteMessageViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 493, in get_queryset
+    seller_messages = queryset.filter(
+                      ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,934 base 24 139648616172416 view's QuoteItemViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 402, in get_queryset
+    seller_items = queryset.filter(quote__seller_id=user)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,935 base 24 139648616172416 view's QuoteAttachmentViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 440, in get_queryset
+    seller_attachments = queryset.filter(quote__seller_id=user)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+WARNING 2025-09-06 18:59:03,936 base 24 139648616172416 view's QuoteMessageViewSet raised exception during schema generation; use `getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/models.py", line 549, in __int__
+    raise TypeError(
+TypeError: Cannot cast AnonymousUser to int. Are you trying to use it in place of User?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 42, in call_view_method
+    return view_method()
+           ^^^^^^^^^^^^^
+  File "/app/quotes/views.py", line 493, in get_queryset
+    seller_messages = queryset.filter(
+                      ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1493, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1511, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1518, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1646, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1503, in build_filter
+    return self._add_q(
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1415, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 112, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <django.contrib.auth.models.AnonymousUser object at 0x7f02747aa4d0>.
+ERROR 2025-09-06 18:59:04,038 exceptions 24 139648616172416 Unhandled exception: ImproperlyConfigured - Field name `product` is not valid for model `QuoteItem` in `quotes.serializers.QuoteItemSerializer`.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/views.py", line 112, in get
+    schema = generator.get_schema(request, self.public)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/generators.py", line 276, in get_schema
+    paths, prefix = self.get_paths(endpoints, components, request, public)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/generators.py", line 482, in get_paths
+    operation = self.get_operation(view, path, prefix, method, components, request)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/generators.py", line 524, in get_operation
+    operation = view_inspector.get_operation(operation_keys)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/view.py", line 45, in get_operation
+    responses = self.get_responses()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/view.py", line 180, in get_responses
+    response_serializers = self.get_response_serializers()
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/view.py", line 235, in get_response_serializers
+    responses = self.get_default_responses()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/view.py", line 211, in get_default_responses
+    default_schema = self.serializer_to_schema(default_schema) or ''
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 438, in serializer_to_schema
+    return self.probe_inspectors(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/field.py", line 49, in get_schema
+    return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 228, in probe_field_inspectors
+    return self.probe_inspectors(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/field.py", line 140, in field_to_swagger_object
+    actual_schema = definitions.setdefault(ref_name, make_schema_definition)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/openapi.py", line 685, in setdefault
+    ret = maker()
+          ^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/drf_yasg/inspectors/field.py", line 109, in make_schema_definition
+    for property_name, child in serializer.fields.items():
+                                ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/serializers.py", line 374, in fields
+    for key, value in self.get_fields().items():
+                      ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/serializers.py", line 1105, in get_fields
+    field_class, field_kwargs = self.build_field(
+                                ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/serializers.py", line 1251, in build_field
+    return self.build_unknown_field(field_name, model_class)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/serializers.py", line 1369, in build_unknown_field
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: Field name `product` is not valid for model `QuoteItem` in `quotes.serializers.QuoteItemSerializer`.
+ERROR 2025-09-06 18:59:04,049 log 24 139648616172416 Internal Server Error: /
+10.92.0.25 - - [06/Sep/2025:18:59:04 +0000] "GET /?format=openapi HTTP/1.1" 500 96 "https://chat-service.bidr.co.za/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+10.92.0.26 - - [06/Sep/2025:18:59:12 +0000] "GET /static/drf-yasg/swagger-ui-dist/favicon-32x32.png HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
+10.92.0.25 - - [06/Sep/2025:18:59:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:59:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:18:59:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:18:59:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:00:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:00:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:00:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:00:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:01:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:01:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:01:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:01:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:02:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:02:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:02:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:02:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:03:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:03:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:03:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:03:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:04:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:04:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:04:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:04:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:05:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:05:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:05:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:05:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:06:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:06:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:06:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:06:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:07:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:07:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:07:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:07:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:08:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:08:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:08:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:08:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:09:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:09:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:09:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:09:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:10:21 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:10:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:10:51 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:10:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:11:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:11:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:11:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:11:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:12:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:12:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:12:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:12:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:13:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:13:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:13:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:13:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:14:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:14:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:14:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:14:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:15:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:15:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:15:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:15:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:16:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:16:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:16:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:16:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:17:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:17:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:17:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:17:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:18:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:18:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:18:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:18:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:19:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:19:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:19:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:19:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:20:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:20:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:20:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:20:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:21:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:21:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:21:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:21:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:22:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:22:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:22:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:22:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:23:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:23:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:23:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:23:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:24:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:24:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:24:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:24:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:25:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:25:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:25:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:25:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:26:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:26:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:26:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:26:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:27:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:27:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:27:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:27:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:28:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:28:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:28:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:28:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:29:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:29:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:29:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:29:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:30:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:30:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:30:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:30:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:31:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:31:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:31:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:31:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:32:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:32:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:32:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:32:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:33:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:33:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:33:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:33:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:34:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:34:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:34:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:34:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:35:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:35:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:35:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:35:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:36:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:36:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:36:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:36:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:37:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:37:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:37:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:37:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:38:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:38:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:38:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:38:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:39:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:39:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:39:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:39:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:40:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:40:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:40:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:40:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:41:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:41:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:41:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:41:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:42:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:42:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:42:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:42:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:43:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:43:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:43:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:43:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:44:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:44:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:44:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:44:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:45:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:45:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:45:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:45:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:46:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:46:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:46:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:46:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:47:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:47:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:47:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:47:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:48:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:48:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:48:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:48:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:49:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:49:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:49:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:49:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:50:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:50:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:50:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:50:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:51:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:51:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:51:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:51:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:52:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:52:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:52:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:52:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:53:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:53:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:53:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:53:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:54:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:54:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:54:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:54:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:55:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:55:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:55:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:55:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:56:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:56:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:56:35 +0000] "GET / HTTP/1.1" 200 1682 "-" "Mozilla/5.0 (compatible; CensysInspect/1.1; +https://about.censys.io/)"
+10.92.0.26 - - [06/Sep/2025:19:56:43 +0000] "GET /static/drf-yasg/swagger-ui-dist/favicon-32x32.png HTTP/1.1" 200 0 "-" "Mozilla/5.0 (compatible; CensysInspect/1.1; +https://about.censys.io/)"
+WARNING 2025-09-06 19:56:46,219 log 23 139648616172416 Not Found: /favicon.ico
+10.92.0.25 - - [06/Sep/2025:19:56:46 +0000] "GET /favicon.ico HTTP/1.1" 404 4883 "-" "Mozilla/5.0 (compatible; CensysInspect/1.1; +https://about.censys.io/)"
+10.92.0.25 - - [06/Sep/2025:19:56:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:56:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:57:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:57:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+WARNING 2025-09-06 19:57:30,380 log 23 139648616172416 Not Found: /favicon.ico
+10.92.0.25 - - [06/Sep/2025:19:57:30 +0000] "GET /favicon.ico HTTP/1.1" 404 4883 "-" "Mozilla/5.0 (compatible; CensysInspect/1.1; +https://about.censys.io/)"
+WARNING 2025-09-06 19:57:32,926 log 23 139648616172416 Not Found: /login
+10.92.0.26 - - [06/Sep/2025:19:57:32 +0000] "GET /login HTTP/1.1" 404 4865 "-" "Mozilla/5.0 (compatible; CensysInspect/1.1; +https://about.censys.io/)"
+10.92.0.25 - - [06/Sep/2025:19:57:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:57:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:58:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:58:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:58:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:58:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:59:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:19:59:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:59:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:19:59:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:00:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:00:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:00:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:00:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:01:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:01:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:01:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:01:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:02:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:02:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:02:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:02:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:03:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:03:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:03:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:03:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:04:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:04:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:04:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:04:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:05:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:05:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:05:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:05:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:06:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:06:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:06:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:06:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:07:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:07:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:07:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:07:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:08:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:08:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:08:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:08:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:09:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:09:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:09:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:09:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:10:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:10:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:10:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:10:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:11:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:11:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:11:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:11:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:12:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:12:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:12:34 +0000] "GET / HTTP/1.1" 200 1682 "-" "Hello from Palo Alto Networks, find out more about our scans in https://docs-cortex.paloaltonetworks.com/r/1/Cortex-Xpanse/Scanning-activity"
+10.92.0.26 - - [06/Sep/2025:20:12:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:12:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:13:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:13:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:13:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:13:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:14:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:14:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:14:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:14:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:15:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:15:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:15:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:15:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:16:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:16:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:16:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:16:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:17:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:17:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:17:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:17:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:18:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:18:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:18:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:18:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:19:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:19:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:19:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:19:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:20:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:20:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:20:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:20:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:21:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:21:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:21:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:21:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:22:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:22:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:22:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:22:52 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.26 - - [06/Sep/2025:20:23:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+10.92.0.25 - - [06/Sep/2025:20:23:22 +0000] "GET / HTTP/1.1" 200 1682 "-" "-"
+
