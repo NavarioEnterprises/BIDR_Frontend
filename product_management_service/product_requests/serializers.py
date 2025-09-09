@@ -136,7 +136,7 @@ class ProductRequestListSerializer(serializers.ModelSerializer):
     tyres_rims_summary = serializers.ReadOnlyField()
     vehicle_spares_summary = serializers.ReadOnlyField()
     consumer_electronics_summary = serializers.ReadOnlyField()
-    images = RequestImageSerializer(many=True, read_only=True)
+    images = serializers.SerializerMethodField()
     
     def get_quotes(self, obj):
         """Return only valid (non-expired) quotes."""
@@ -145,6 +145,15 @@ class ProductRequestListSerializer(serializers.ModelSerializer):
             if quote.is_valid and not quote.is_expired
         ]
         return QuoteListSerializer(valid_quotes, many=True).data
+    
+    def get_images(self, obj):
+        """Return serialized request images."""
+        return [{
+            'id': img.id,
+            'image': img.image.url if img.image else None,
+            'caption': img.caption,
+            'sort_order': img.sort_order
+        } for img in obj.images.all()]
 
     class Meta:
         model = ProductRequest
@@ -166,7 +175,7 @@ class ProductRequestDetailSerializer(serializers.ModelSerializer):
     vehicle_spares = VehicleSparesSerializer(read_only=True)
     vehicle_tyres_rims = VehicleTyresRimsSerializer(read_only=True)
     quotes = serializers.SerializerMethodField()
-    images = RequestImageSerializer(many=True, read_only=True)
+    images = serializers.SerializerMethodField()
     
     # Read-only computed properties
     is_expired = serializers.ReadOnlyField()
@@ -182,6 +191,15 @@ class ProductRequestDetailSerializer(serializers.ModelSerializer):
             if quote.is_valid and not quote.is_expired
         ]
         return QuoteListSerializer(valid_quotes, many=True).data
+    
+    def get_images(self, obj):
+        """Return serialized request images."""
+        return [{
+            'id': img.id,
+            'image': img.image.url if img.image else None,
+            'caption': img.caption,
+            'sort_order': img.sort_order
+        } for img in obj.images.all()]
     
     class Meta:
         model = ProductRequest

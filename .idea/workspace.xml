@@ -4,23 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="chore: remove unused migrations and add image upload handling&#10;&#10;- Delete obsolete migrations from quotes, analytics, and product_requests apps&#10;- Implement serializers for product and VIN image uploads in product_requests&#10;- Add server-side validation and saving logic for uploaded files&#10;- Improve serializers' `to_internal_value` for handling mutable data structures&#10;- Adjust logic to support image processing in category-specific data&#10;- Add new test cases for payment transactions and update payment model tests&#10;- Conditional inclusion of Prometheus metrics endpoint in chat service&#10;- Introduce seller earnings endpoint tests in payment_transactions">
+    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="chore: add log file for product management service Azure deployment debugging">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/authentication_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication_service/user/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/user/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/chat_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/chat_service/logs/chat_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/logs/chat_service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notifications_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/notifications_service/logs/notification_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/logs/notification_service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notifications_service/system_notifications/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/system_notifications/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/azure-deployment/bidr-deploy-manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/bidr-deploy-manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/azure-deployment/update-chat-service.sh" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/update-chat-service.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/azure-deployment/update-notifications-service.sh" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/update-notifications-service.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/azure-deployment/update-reviews-service.sh" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/update-reviews-service.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/logs/product_management_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/logs/product_management_service.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resolution_service/logs/resolution_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/resolution_service/logs/resolution_service.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,7 +156,7 @@
       <workItem from="1757172756368" duration="90000" />
       <workItem from="1757173430466" duration="44289000" />
       <workItem from="1757263817521" duration="27441000" />
-      <workItem from="1757374629830" duration="3792000" />
+      <workItem from="1757374629830" duration="11489000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <option name="closed" value="true" />
@@ -262,7 +254,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757315766849</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="chore: add log file for product management service Azure deployment debugging">
+      <option name="closed" value="true" />
+      <created>1757394794709</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1757394794709</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -285,7 +285,9 @@
     <MESSAGE value="`Remove obsolete migration files across services for cleanup and consistency`" />
     <MESSAGE value="refactor: remove redundant migrations from product and analytics services&#10;&#10;- Eliminate unused migrations files, simplifying database migration history&#10;- Cleanup includes all migration files from product_requests, quotes, and analytics apps" />
     <MESSAGE value="chore: remove unused migrations and add image upload handling&#10;&#10;- Delete obsolete migrations from quotes, analytics, and product_requests apps&#10;- Implement serializers for product and VIN image uploads in product_requests&#10;- Add server-side validation and saving logic for uploaded files&#10;- Improve serializers' `to_internal_value` for handling mutable data structures&#10;- Adjust logic to support image processing in category-specific data&#10;- Add new test cases for payment transactions and update payment model tests&#10;- Conditional inclusion of Prometheus metrics endpoint in chat service&#10;- Introduce seller earnings endpoint tests in payment_transactions" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: remove unused migrations and add image upload handling&#10;&#10;- Delete obsolete migrations from quotes, analytics, and product_requests apps&#10;- Implement serializers for product and VIN image uploads in product_requests&#10;- Add server-side validation and saving logic for uploaded files&#10;- Improve serializers' `to_internal_value` for handling mutable data structures&#10;- Adjust logic to support image processing in category-specific data&#10;- Add new test cases for payment transactions and update payment model tests&#10;- Conditional inclusion of Prometheus metrics endpoint in chat service&#10;- Introduce seller earnings endpoint tests in payment_transactions" />
+    <MESSAGE value="chore: add private keys and deployment logs for debugging&#10;&#10;- Add `chat-service-privkey.pem` and `notifications-privkey.pem` for service configuration&#10;- Include product management service deployment logs for investigation" />
+    <MESSAGE value="chore: add log file for product management service Azure deployment debugging" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: add log file for product management service Azure deployment debugging" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

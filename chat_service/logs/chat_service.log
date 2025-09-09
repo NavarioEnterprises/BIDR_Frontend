@@ -580,3 +580,14 @@ WARNING 2025-09-08 17:13:22,451 basehttp 29106 6157185024 "GET /api/v1/moderatio
 INFO 2025-09-09 04:28:14,040 autoreload 55680 8517256640 Watching for file changes with StatReloader
 INFO 2025-09-09 04:29:18,093 autoreload 56212 8517256640 Watching for file changes with StatReloader
 INFO 2025-09-09 04:29:40,331 basehttp 56212 6164590592 "GET / HTTP/1.1" 200 450
+INFO 2025-09-09 14:22:34,949 basehttp 56212 6164590592 "OPTIONS /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 0
+INFO 2025-09-09 14:22:35,091 basehttp 56212 6164590592 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 201 598
+INFO 2025-09-09 14:22:35,331 basehttp 56212 6164590592 "OPTIONS /api/v1/moderation/users/thulani.tmen@gmail.com/status/ HTTP/1.1" 200 0
+WARNING 2025-09-09 14:22:35,350 log 56212 6164590592 Not Found: /api/v1/moderation/users/thulani.tmen@gmail.com/status/
+WARNING 2025-09-09 14:22:35,350 basehttp 56212 6164590592 "GET /api/v1/moderation/users/thulani.tmen@gmail.com/status/ HTTP/1.1" 404 3200
+INFO 2025-09-09 14:22:35,399 basehttp 56212 6164590592 "POST /api/v1/chat/conversations/create_for_request/ HTTP/1.1" 200 598
+INFO 2025-09-09 14:22:35,431 basehttp 56212 6164590592 "OPTIONS /api/v1/chat/conversations/d4a23895-b8c4-4a74-8088-b777c825908b/messages/ HTTP/1.1" 200 0
+INFO 2025-09-09 14:22:35,440 basehttp 56212 6164590592 "GET /api/v1/chat/conversations/d4a23895-b8c4-4a74-8088-b777c825908b/messages/ HTTP/1.1" 200 2
+INFO 2025-09-09 14:22:35,457 basehttp 56212 6164590592 "OPTIONS /api/v1/moderation/users/thulani.tmen@gmail.com/warnings/?limit=50&offset=0 HTTP/1.1" 200 0
+WARNING 2025-09-09 14:22:35,460 log 56212 6164590592 Not Found: /api/v1/moderation/users/thulani.tmen@gmail.com/warnings/
+WARNING 2025-09-09 14:22:35,461 basehttp 56212 6164590592 "GET /api/v1/moderation/users/thulani.tmen@gmail.com/warnings/?limit=50&offset=0 HTTP/1.1" 404 3228
