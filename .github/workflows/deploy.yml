@@ -1,0 +1,227 @@
+name: Deploy BIDR to AKS
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: bidrnparusdevregistry2024.azurecr.io
+  AKS_CLUSTER_NAME: BIDR-dev-aks-cluster
+  AKS_RESOURCE_GROUP: bidr-dev-k8s
+  NAMESPACE: bidr
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      auth-service: ${{ steps.changes.outputs.auth-service }}
+      chat-service: ${{ steps.changes.outputs.chat-service }}
+      payment-service: ${{ steps.changes.outputs.payment-service }}
+      product-service: ${{ steps.changes.outputs.product-service }}
+      notifications-service: ${{ steps.changes.outputs.notifications-service }}
+      transactions-service: ${{ steps.changes.outputs.transactions-service }}
+      reviews-service: ${{ steps.changes.outputs.reviews-service }}
+      resolution-service: ${{ steps.changes.outputs.resolution-service }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          auth-service:
+            - 'authentication_service/**'
+          chat-service:
+            - 'chat_service/**'
+          payment-service:
+            - 'payment_service/**'
+          product-service:
+            - 'product_management_service/**'
+          notifications-service:
+            - 'notifications_service/**'
+          transactions-service:
+            - 'transactions_service/**'
+          reviews-service:
+            - 'reviews_service/**'
+          resolution-service:
+            - 'resolution_service/**'
+
+  build-and-deploy:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: |
+      needs.detect-changes.outputs.auth-service == 'true' ||
+      needs.detect-changes.outputs.chat-service == 'true' ||
+      needs.detect-changes.outputs.payment-service == 'true' ||
+      needs.detect-changes.outputs.product-service == 'true' ||
+      needs.detect-changes.outputs.notifications-service == 'true' ||
+      needs.detect-changes.outputs.transactions-service == 'true' ||
+      needs.detect-changes.outputs.reviews-service == 'true' ||
+      needs.detect-changes.outputs.resolution-service == 'true'
+
+    strategy:
+      matrix:
+        service: [
+          { name: "auth-service", folder: "authentication_service", changed: "${{ needs.detect-changes.outputs.auth-service }}" },
+          { name: "chat-service", folder: "chat_service", changed: "${{ needs.detect-changes.outputs.chat-service }}" },
+          { name: "payment-service", folder: "payment_service", changed: "${{ needs.detect-changes.outputs.payment-service }}" },
+          { name: "product-service", folder: "product_management_service", changed: "${{ needs.detect-changes.outputs.product-service }}" },
+          { name: "notifications-service", folder: "notifications_service", changed: "${{ needs.detect-changes.outputs.notifications-service }}" },
+          { name: "transactions-service", folder: "transactions_service", changed: "${{ needs.detect-changes.outputs.transactions-service }}" },
+          { name: "reviews-service", folder: "reviews_service", changed: "${{ needs.detect-changes.outputs.reviews-service }}" },
+          { name: "resolution-service", folder: "resolution_service", changed: "${{ needs.detect-changes.outputs.resolution-service }}" }
+        ]
+    
+    steps:
+    - name: Skip if no changes
+      if: matrix.service.changed != 'true'
+      run: echo "No changes detected for ${{ matrix.service.name }}, skipping..."
+
+    - uses: actions/checkout@v4
+      if: matrix.service.changed == 'true'
+      
+    - name: Set up Docker Buildx
+      if: matrix.service.changed == 'true'
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Azure Container Registry
+      if: matrix.service.changed == 'true'
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    - name: Build and push Docker image
+      if: matrix.service.changed == 'true'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./${{ matrix.service.folder }}
+        file: ./${{ matrix.service.folder }}/Dockerfile
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ matrix.service.name }}:latest
+          ${{ env.REGISTRY }}/${{ matrix.service.name }}:${{ github.sha }}
+        platforms: linux/amd64
+
+    - name: Azure Login
+      if: matrix.service.changed == 'true'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Get AKS credentials
+      if: matrix.service.changed == 'true'
+      run: |
+        az aks get-credentials --resource-group ${{ env.AKS_RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER_NAME }} --overwrite-existing
+
+    - name: Deploy to AKS
+      if: matrix.service.changed == 'true'
+      run: |
+        # Map service names to Kubernetes deployment names
+        case "${{ matrix.service.name }}" in
+          "auth-service")
+            DEPLOYMENT_NAME="auth-service"
+            ;;
+          "chat-service")
+            DEPLOYMENT_NAME="chat-service"
+            ;;
+          "payment-service")
+            DEPLOYMENT_NAME="payment-service"
+            ;;
+          "product-service")
+            DEPLOYMENT_NAME="product-management-service"
+            ;;
+          "notifications-service")
+            DEPLOYMENT_NAME="notifications-service"
+            ;;
+          "transactions-service")
+            DEPLOYMENT_NAME="transactions-service"
+            ;;
+          "reviews-service")
+            DEPLOYMENT_NAME="reviews-service"
+            ;;
+          "resolution-service")
+            DEPLOYMENT_NAME="resolution-service"
+            ;;
+        esac
+        
+        # Update the deployment with the new image
+        kubectl set image deployment/${DEPLOYMENT_NAME} ${DEPLOYMENT_NAME}=${{ env.REGISTRY }}/${{ matrix.service.name }}:${{ github.sha }} -n ${{ env.NAMESPACE }}
+        
+        # Wait for rollout to complete
+        kubectl rollout status deployment/${DEPLOYMENT_NAME} -n ${{ env.NAMESPACE }} --timeout=300s
+        
+        # Verify deployment
+        kubectl get pods -n ${{ env.NAMESPACE }} -l app=${DEPLOYMENT_NAME}
+
+    - name: Post-deployment health check
+      if: matrix.service.changed == 'true'
+      run: |
+        echo "Waiting for service to be ready..."
+        sleep 30
+        
+        # Test the service endpoint through the proxy
+        SERVICE_PATH=""
+        case "${{ matrix.service.name }}" in
+          "auth-service")
+            SERVICE_PATH="admin"
+            ;;
+          "chat-service")
+            SERVICE_PATH="chat"
+            ;;
+          "payment-service")
+            SERVICE_PATH="payments"
+            ;;
+          "product-service")
+            SERVICE_PATH="products"
+            ;;
+          "notifications-service")
+            SERVICE_PATH="notifications"
+            ;;
+          "transactions-service")
+            SERVICE_PATH="transactions"
+            ;;
+          "reviews-service")
+            SERVICE_PATH="reviews"
+            ;;
+          "resolution-service")
+            SERVICE_PATH="resolution"
+            ;;
+        esac
+        
+        # Get the load balancer IP
+        LB_IP=$(kubectl get svc nginx-proxy -n ${{ env.NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        
+        if [ -n "$LB_IP" ]; then
+          echo "Testing http://${LB_IP}/${SERVICE_PATH}/"
+          curl -f -m 30 "http://${LB_IP}/${SERVICE_PATH}/" || echo "Health check failed, but deployment completed"
+        else
+          echo "Load balancer IP not found, skipping health check"
+        fi
+
+  notify-success:
+    needs: [detect-changes, build-and-deploy]
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+    - name: Deployment Success Notification
+      run: |
+        echo "✅ BIDR deployment completed successfully!"
+        echo "🔄 Services updated based on changed files"
+        echo "🌐 Access your application at: http://4.221.172.198/"
+
+  notify-failure:
+    needs: [detect-changes, build-and-deploy]
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+    - name: Deployment Failure Notification
+      run: |
+        echo "❌ BIDR deployment failed!"
+        echo "Please check the logs above for details"
+        exit 1

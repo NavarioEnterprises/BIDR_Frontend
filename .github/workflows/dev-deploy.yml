@@ -1,0 +1,174 @@
+name: Deploy to DEV Environment
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+env:
+  AZURE_RESOURCE_GROUP: bidr-dev-k8s
+  AZURE_CLUSTER_NAME: BIDR-dev-aks-cluster
+  AZURE_CONTAINER_REGISTRY: bidrnparusdevregistry2024
+  AZURE_LOCATION: southafricanorth
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - authentication_service
+          - chat_service
+          - payment_service
+          - resolution_service
+          - product_management_service
+          - notifications_service
+          - transactions_service
+          - reviews_and_ratings
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r services-requirements.txt
+
+    - name: Run Django tests
+      run: |
+        cd ${{ matrix.service }}
+        python manage.py test --verbosity=2
+      continue-on-error: true
+
+    - name: Run lint checks
+      run: |
+        cd ${{ matrix.service }}
+        python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      continue-on-error: true
+
+  build-and-push-images:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - authentication_service
+          - chat_service
+          - payment_service
+          - resolution_service
+          - product_management_service
+          - notifications_service
+          - transactions_service
+          - reviews_and_ratings
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Login to Azure Container Registry
+      run: |
+        az acr login --name ${{ env.AZURE_CONTAINER_REGISTRY }}
+
+    - name: Build and push Docker image
+      run: |
+        # Build image for the specific service
+        docker build -f ${{ matrix.service }}/Dockerfile \
+          -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/bidr-${{ matrix.service }}:${{ github.sha }} \
+          -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/bidr-${{ matrix.service }}:dev-latest \
+          .
+        
+        # Push images
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/bidr-${{ matrix.service }}:${{ github.sha }}
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/bidr-${{ matrix.service }}:dev-latest
+
+  deploy-to-k8s:
+    needs: build-and-push-images
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Get AKS credentials
+      run: |
+        az aks get-credentials --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_CLUSTER_NAME }}
+
+    - name: Deploy to Kubernetes (DEV)
+      run: |
+        # Update image tags in Kubernetes manifests
+        for service in authentication_service chat_service payment_service resolution_service product_management_service notifications_service transactions_service reviews_and_ratings; do
+          # Update the image tag in the deployment
+          sed -i "s|image: .*bidr-${service}:.*|image: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/bidr-${service}:${{ github.sha }}|g" k8s/overlays/development/*.yaml
+        done
+
+        # Apply Kubernetes manifests for development environment
+        kubectl apply -k k8s/overlays/development/
+        
+        # Wait for deployments to be ready
+        kubectl rollout status deployment/bidr-auth-deployment -n bidr-dev --timeout=600s
+        kubectl rollout status deployment/bidr-chat-deployment -n bidr-dev --timeout=600s
+        kubectl rollout status deployment/bidr-payment-deployment -n bidr-dev --timeout=600s
+        kubectl rollout status deployment/bidr-resolution-deployment -n bidr-dev --timeout=600s
+        kubectl rollout status deployment/bidr-product-deployment -n bidr-dev --timeout=600s
+        kubectl rollout status deployment/bidr-notifications-deployment -n bidr-dev --timeout=600s
+        kubectl rollout status deployment/bidr-transactions-deployment -n bidr-dev --timeout=600s
+        kubectl rollout status deployment/bidr-reviews-deployment -n bidr-dev --timeout=600s
+
+    - name: Run deployment validation
+      run: |
+        # Check pod status
+        kubectl get pods -n bidr-dev
+        
+        # Check services
+        kubectl get services -n bidr-dev
+        
+        # Check ingress
+        kubectl get ingress -n bidr-dev
+
+    - name: Run smoke tests
+      run: |
+        # Get external IP
+        EXTERNAL_IP=$(kubectl get service bidr-nginx-service -n bidr-dev -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        echo "External IP: $EXTERNAL_IP"
+        
+        # Basic health checks
+        curl -f http://$EXTERNAL_IP/health/ || echo "Health check failed"
+        curl -f http://$EXTERNAL_IP/admin/auth/ || echo "Auth service not accessible"
+      continue-on-error: true
+
+  notification:
+    needs: [build-and-test, build-and-push-images, deploy-to-k8s]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Send deployment notification
+      run: |
+        if [ "${{ needs.deploy-to-k8s.result }}" == "success" ]; then
+          echo "✅ DEV Deployment successful!"
+          echo "🔗 Application URL: Check AKS external IP"
+          echo "📊 Environment: DEV"
+          echo "🏷️  Version: ${{ github.sha }}"
+        else
+          echo "❌ DEV Deployment failed!"
+          echo "📋 Check the workflow logs for details"
+        fi

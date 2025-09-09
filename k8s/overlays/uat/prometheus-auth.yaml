@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-web-config
+  namespace: bidr-uat
+data:
+  web.yml: |
+    basic_auth_users:
+      # Username: admin, Password: PrometheusMonitor123! (bcrypt hashed)
+      admin: $2a$10$9vqmW1q2tFvqjYMVhQqEUeL5JfYfV7K0dGZ8YN1rV5ZfUgLWzRrXe
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prometheus-auth-secret
+  namespace: bidr-uat
+type: Opaque
+data:
+  # Username: admin (base64)
+  username: YWRtaW4=
+  # Password: PrometheusMonitor123! (base64)  
+  password: UHJvbWV0aGV1c01vbml0b3IxMjMh

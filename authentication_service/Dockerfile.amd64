@@ -1,0 +1,58 @@
+# Multi-stage build for smaller final image
+FROM python:3.11-slim as builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy and install requirements
+COPY services-requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r services-requirements.txt
+
+# Final stage
+FROM python:3.11-slim
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y \
+    libpq5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && adduser --disabled-password --gecos '' --uid 1000 appuser
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Set environment
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=authentication_service.settings
+
+WORKDIR /app
+
+# Copy only necessary files
+COPY authentication_service/ authentication_service/
+COPY services-requirements.txt .
+
+# Create directories and set permissions
+RUN mkdir -p staticfiles media logs && \
+    chown -R appuser:appuser /app
+
+USER appuser
+WORKDIR /app/authentication_service
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/health/ || exit 1
+
+EXPOSE 8000
+
+# Use gunicorn for production
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "30", "authentication_service.wsgi:application"]

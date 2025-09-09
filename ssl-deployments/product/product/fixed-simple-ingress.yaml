@@ -1,0 +1,161 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bidr-ingress
+  namespace: bidr
+  annotations:
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: bidr.local
+    http:
+      paths:
+      # Product Management Service - MUST come before other rules
+      - backend:
+          service:
+            name: product-management-service
+            port:
+              number: 8000
+        path: /products
+        pathType: Prefix
+      
+      # API endpoints
+      - backend:
+          service:
+            name: auth-service
+            port:
+              number: 8000
+        path: /api/v1/auth
+        pathType: Prefix
+      - backend:
+          service:
+            name: product-management-service
+            port:
+              number: 8000
+        path: /api/v1/products
+        pathType: Prefix
+      - backend:
+          service:
+            name: chat-service
+            port:
+              number: 8000
+        path: /api/v1/chat
+        pathType: Prefix
+      - backend:
+          service:
+            name: payment-service
+            port:
+              number: 8000
+        path: /api/v1/payment
+        pathType: Prefix
+      - backend:
+          service:
+            name: resolution-service
+            port:
+              number: 8000
+        path: /api/v1/resolution
+        pathType: Prefix
+      - backend:
+          service:
+            name: notifications-service
+            port:
+              number: 8000
+        path: /api/v1/notifications
+        pathType: Prefix
+      - backend:
+          service:
+            name: transactions-service
+            port:
+              number: 8000
+        path: /api/v1/transactions
+        pathType: Prefix
+      - backend:
+          service:
+            name: reviews-service
+            port:
+              number: 8000
+        path: /api/v1/reviews
+        pathType: Prefix
+      
+      # Admin endpoints for specific services
+      - backend:
+          service:
+            name: auth-service
+            port:
+              number: 8000
+        path: /admin/auth
+        pathType: Prefix
+      - backend:
+          service:
+            name: chat-service
+            port:
+              number: 8000
+        path: /admin/chat
+        pathType: Prefix
+      - backend:
+          service:
+            name: payment-service
+            port:
+              number: 8000
+        path: /admin/payment
+        pathType: Prefix
+      - backend:
+          service:
+            name: resolution-service
+            port:
+              number: 8000
+        path: /admin/resolution
+        pathType: Prefix
+      - backend:
+          service:
+            name: product-management-service
+            port:
+              number: 8000
+        path: /admin/products
+        pathType: Prefix
+      - backend:
+          service:
+            name: notifications-service
+            port:
+              number: 8000
+        path: /admin/notifications
+        pathType: Prefix
+      - backend:
+          service:
+            name: transactions-service
+            port:
+              number: 8000
+        path: /admin/transactions
+        pathType: Prefix
+      - backend:
+          service:
+            name: reviews-service
+            port:
+              number: 8000
+        path: /admin/reviews
+        pathType: Prefix
+      
+      # Health checks
+      - backend:
+          service:
+            name: auth-service
+            port:
+              number: 8000
+        path: /health
+        pathType: Prefix
+      
+      # Catch-all for auth service (MUST be last)
+      - backend:
+          service:
+            name: auth-service
+            port:
+              number: 8000
+        path: /
+        pathType: Prefix

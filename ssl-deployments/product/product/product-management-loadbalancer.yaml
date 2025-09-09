@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-management-loadbalancer
+  namespace: bidr
+  labels:
+    app: product-management-service
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /products/health/
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  selector:
+    app: product-management-service
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0  # Allow access from anywhere

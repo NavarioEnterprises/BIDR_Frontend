@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "8"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"chat-service","service":"chat","version":"dev"},"name":"chat-service","namespace":"bidr"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"chat-service"}},"template":{"metadata":{"labels":{"app":"chat-service","service":"chat","version":"dev"}},"spec":{"containers":[{"env":[{"name":"DEBUG","value":"False"},{"name":"DJANGO_SETTINGS_MODULE","value":"chat_service.settings"},{"name":"SERVICE_NAME","value":"chat"},{"name":"SECRET_KEY","valueFrom":{"secretKeyRef":{"key":"DJANGO_SECRET_KEY","name":"bidr-secrets"}}},{"name":"DATABASE_URL","valueFrom":{"secretKeyRef":{"key":"CHAT_DATABASE_URL","name":"bidr-secrets"}}},{"name":"REDIS_URL","valueFrom":{"secretKeyRef":{"key":"REDIS_URL","name":"bidr-secrets"}}},{"name":"AUTH_SERVICE_URL","value":"http://auth-service:8001"}],"image":"bidrnparusdevregistry2024.azurecr.io/chat-service:latest","livenessProbe":{"failureThreshold":5,"httpGet":{"path":"/health/","port":8000},"initialDelaySeconds":90,"periodSeconds":30},"name":"chat-service","ports":[{"containerPort":8000}],"readinessProbe":{"failureThreshold":6,"httpGet":{"path":"/health/","port":8000},"initialDelaySeconds":60,"periodSeconds":15},"resources":{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}}],"imagePullSecrets":[{"name":"acr-secret"}],"serviceAccountName":"bidr-service-account"}}}}
+  creationTimestamp: "2025-09-01T02:43:18Z"
+  generation: 10
+  labels:
+    app: chat-service
+    service: chat
+    version: dev
+  name: chat-service
+  namespace: bidr
+  resourceVersion: "180716"
+  uid: c25cb465-0dcb-4b5f-9014-bf9c514d5045
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: chat-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2025-09-01T07:44:22+02:00"
+      creationTimestamp: null
+      labels:
+        app: chat-service
+        service: chat
+        version: dev
+    spec:
+      containers:
+      - command:
+        - sh
+        - -c
+        - 'pip install django gunicorn && echo "from django.conf import settings;
+          settings.configure(DEBUG=True, ROOT_URLCONF=__name__, ALLOWED_HOSTS=[\"*\"]);
+          from django.http import HttpResponse; from django.urls import path; urlpatterns=[path(\"\",
+          lambda r: HttpResponse(\"Chat Service Running\"))]; from django.core.wsgi
+          import get_wsgi_application; application=get_wsgi_application()" > app.py
+          && gunicorn -b 0.0.0.0:8000 app:application'
+        env:
+        - name: DEBUG
+          value: "False"
+        - name: DJANGO_SETTINGS_MODULE
+          value: chat_service.settings
+        - name: SERVICE_NAME
+          value: chat
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: DJANGO_SECRET_KEY
+              name: bidr-secrets
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: CHAT_DATABASE_URL
+              name: bidr-secrets
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              key: REDIS_URL
+              name: bidr-secrets
+        - name: AUTH_SERVICE_URL
+          value: http://auth-service:8001
+        image: bidrnparusuatregistry2024.azurecr.io/bidr-chat_service:latest
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /health/
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 90
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: chat-service
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /health/
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: acr-secret
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: bidr-service-account
+      serviceAccountName: bidr-service-account
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2025-09-01T05:44:47Z"
+    lastUpdateTime: "2025-09-01T05:44:47Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2025-09-01T10:18:36Z"
+    lastUpdateTime: "2025-09-01T10:18:36Z"
+    message: ReplicaSet "chat-service-558d747d6f" has timed out progressing.
+    reason: ProgressDeadlineExceeded
+    status: "False"
+    type: Progressing
+  observedGeneration: 10
+  readyReplicas: 1
+  replicas: 2
+  unavailableReplicas: 1
+  updatedReplicas: 1

@@ -1,0 +1,95 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+- secret.yaml
+- configmap.yaml
+- postgres.yaml
+- namespace-and-serviceaccount.yaml
+- namespace-rbac.yaml
+- auth-migration-job.yaml
+- auth-service.yaml
+- chat-service.yaml
+- payment-service.yaml
+- resolution-service.yaml
+- product-management-service.yaml
+- notifications-service.yaml
+- transactions-service.yaml
+- reviews-service.yaml
+- nginx-proxy.yaml
+- prometheus.yaml
+- grafana.yaml
+
+patches:
+- path: configmap-patch.yaml
+  target:
+    kind: ConfigMap
+    name: bidr-config
+- path: nginx-proxy-patch.yaml
+  target:
+    kind: ConfigMap
+    name: nginx-proxy-config
+- path: load-balancer-patch.yaml
+  target:
+    kind: ConfigMap
+    name: nginx-load-balancer-config
+- path: load-balancer-patch.yaml
+  target:
+    kind: Service
+    name: bidr-load-balancer
+- path: load-balancer-patch.yaml
+  target:
+    kind: Deployment
+    name: nginx-load-balancer
+
+replicas:
+- name: auth-service
+  count: 1
+- name: chat-service
+  count: 1
+- name: payment-service
+  count: 1
+- name: resolution-service
+  count: 1
+- name: product-management-service
+  count: 1
+- name: notifications-service
+  count: 1
+- name: transactions-service
+  count: 1
+- name: reviews-service
+  count: 1
+
+images:
+- name: bidrnparusdevregistry2024.azurecr.io/auth-service
+  newName: bidruatregwe2024.azurecr.io/bidr-authentication_service
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
+- name: bidrnparusdevregistry2024.azurecr.io/chat-service
+  newName: bidruatregwe2024.azurecr.io/bidr-chat_service
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
+- name: bidrnparusdevregistry2024.azurecr.io/payment-service
+  newName: bidruatregwe2024.azurecr.io/bidr-payment_service
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
+- name: bidrnparusdevregistry2024.azurecr.io/resolution-service
+  newName: bidruatregwe2024.azurecr.io/bidr-resolution_service
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
+- name: bidrnparusdevregistry2024.azurecr.io/product-management-service
+  newName: bidruatregwe2024.azurecr.io/bidr-product_management_service
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
+- name: bidrnparusdevregistry2024.azurecr.io/notifications-service
+  newName: bidruatregwe2024.azurecr.io/bidr-notifications_service
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
+- name: bidrnparusdevregistry2024.azurecr.io/transactions-service
+  newName: bidruatregwe2024.azurecr.io/bidr-transactions_service
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
+- name: bidrnparusdevregistry2024.azurecr.io/reviews-service
+  newName: bidruatregwe2024.azurecr.io/bidr-reviews_and_ratings
+  newTag: 73628618c39af2a0383dd658a621789cfb1e8fb6
+
+labels:
+- includeSelectors: true
+  pairs:
+    environment: uat
+
+namespace: bidr-uat

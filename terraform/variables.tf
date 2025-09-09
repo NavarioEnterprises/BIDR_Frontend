@@ -1,0 +1,165 @@
+variable "resource_group_name" {
+  description = "Name of the Azure Resource Group"
+  type        = string
+  default     = "bidr-k8s"
+}
+
+variable "location" {
+  description = "Azure region for resources"
+  type        = string
+  default     = "West US"
+}
+
+variable "environment" {
+  description = "Environment name (dev, staging, prod)"
+  type        = string
+  default     = "prod"
+}
+
+variable "acr_name" {
+  description = "Name of the Azure Container Registry"
+  type        = string
+  default     = "BIDRcontainerregistry"
+}
+
+variable "acr_sku" {
+  description = "SKU for Azure Container Registry"
+  type        = string
+  default     = "Basic"
+  validation {
+    condition     = contains(["Basic", "Standard", "Premium"], var.acr_sku)
+    error_message = "ACR SKU must be Basic, Standard, or Premium."
+  }
+}
+
+variable "key_vault_name" {
+  description = "Name of the Azure Key Vault"
+  type        = string
+  default     = "bidr-keyvault"
+}
+
+variable "aks_cluster_name" {
+  description = "Name of the AKS cluster"
+  type        = string
+  default     = "BIDR-aks-cluster"
+}
+
+variable "kubernetes_version" {
+  description = "Version of Kubernetes to use"
+  type        = string
+  default     = "1.28"
+}
+
+variable "node_count" {
+  description = "Number of nodes in the default node pool"
+  type        = number
+  default     = 3
+}
+
+variable "node_vm_size" {
+  description = "Size of the VM for nodes"
+  type        = string
+  default     = "Standard_D4s_v3"
+}
+
+variable "enable_auto_scaling" {
+  description = "Enable auto scaling for the node pool"
+  type        = bool
+  default     = true
+}
+
+variable "min_node_count" {
+  description = "Minimum number of nodes when auto scaling is enabled"
+  type        = number
+  default     = 2
+}
+
+variable "max_node_count" {
+  description = "Maximum number of nodes when auto scaling is enabled"
+  type        = number
+  default     = 10
+}
+
+variable "database_user" {
+  description = "Database username for BIDR application"
+  type        = string
+  default     = "bidruser"
+  sensitive   = true
+}
+
+variable "email_host_user" {
+  description = "Email host user for SMTP configuration"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "email_host_password" {
+  description = "Email host password for SMTP configuration"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+# PostgreSQL Configuration
+variable "postgresql_version" {
+  description = "Version of PostgreSQL to use"
+  type        = string
+  default     = "15"
+}
+
+variable "postgresql_sku" {
+  description = "SKU for PostgreSQL Flexible Server"
+  type        = string
+  default     = "B_Standard_B1ms"
+}
+
+variable "postgresql_storage_mb" {
+  description = "Storage size in MB for PostgreSQL"
+  type        = number
+  default     = 32768
+}
+
+variable "database_names" {
+  description = "List of database names to create"
+  type        = list(string)
+  default     = [
+    "auth_db",
+    "chat_db",
+    "payment_db",
+    "resolution_db",
+    "product_db",
+    "notifications_db",
+    "transactions_db",
+    "reviews_db"
+  ]
+}
+
+# Redis Configuration
+variable "redis_capacity" {
+  description = "Capacity of Redis Cache"
+  type        = number
+  default     = 2
+}
+
+variable "redis_family" {
+  description = "Family of Redis Cache"
+  type        = string
+  default     = "C"
+}
+
+variable "redis_sku" {
+  description = "SKU for Redis Cache"
+  type        = string
+  default     = "Standard"
+  validation {
+    condition     = contains(["Basic", "Standard", "Premium"], var.redis_sku)
+    error_message = "Redis SKU must be Basic, Standard, or Premium."
+  }
+}
+
+variable "ssh_public_key" {
+  description = "SSH public key for accessing the NGINX proxy VM"
+  type        = string
+  default     = ""
+}

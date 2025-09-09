@@ -1,0 +1,28 @@
+# Development and Testing Dependencies
+# These are used in CI/CD for code quality checks and testing
+
+# Code Quality and Linting
+flake8>=7.0.0
+black>=24.0.0
+isort>=5.13.0
+
+# Security Scanning
+safety>=3.0.0
+bandit>=1.7.0
+
+# Testing Framework
+pytest>=8.0.0
+pytest-django>=4.0.0
+pytest-cov>=4.0.0
+coverage>=7.0.0
+
+# Test Data Generation
+factory-boy>=3.3.0
+faker>=24.0.0
+
+# Performance Testing
+locust>=2.20.0
+
+# Documentation
+sphinx>=7.0.0
+sphinx-rtd-theme>=2.0.0

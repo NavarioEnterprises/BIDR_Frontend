@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-service
+  namespace: bidr
+  labels:
+    app: chat-service
+    service: chat
+    version: dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chat-service
+  template:
+    metadata:
+      labels:
+        app: chat-service
+        service: chat
+        version: dev
+    spec:
+      serviceAccountName: bidr-service-account
+      containers:
+      - name: chat-service
+        image: bidrnparusdevregistry2024.azurecr.io/chat-service:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DEBUG
+          value: "False"
+        - name: DJANGO_SETTINGS_MODULE
+          value: "chat_service.settings"
+        - name: SERVICE_NAME
+          value: "chat"
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: DJANGO_SECRET_KEY
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: CHAT_DATABASE_URL
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: REDIS_URL
+        - name: AUTH_SERVICE_URL
+          value: "http://auth-service:8001"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health/
+            port: 8000
+          initialDelaySeconds: 90
+          periodSeconds: 30
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /health/
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 15
+          failureThreshold: 6
+      imagePullSecrets:
+      - name: acr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-service
+  namespace: bidr
+  labels:
+    app: chat-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: chat-service
+  ports:
+  - port: 8002
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0

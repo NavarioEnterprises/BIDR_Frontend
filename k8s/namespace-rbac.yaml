@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bidr
+  labels:
+    name: bidr
+    project: bidr-backend
+    environment: production
+
+---
+# Service Account for BIDR services
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bidr-service-account
+  namespace: bidr
+  annotations:
+    azure.workload.identity/client-id: "AZURE_CLIENT_ID_PLACEHOLDER"
+
+---
+# ClusterRole for BIDR services
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: bidr-cluster-role
+rules:
+- apiGroups: [""]
+  resources: ["secrets", "configmaps", "services", "endpoints"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch"]
+
+---
+# ClusterRoleBinding for BIDR services
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: bidr-cluster-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: bidr-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: bidr-service-account
+  namespace: bidr
+
+---
+# NetworkPolicy for BIDR services
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bidr-network-policy
+  namespace: bidr
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    - podSelector: {}
+    ports:
+    - protocol: TCP
+      port: 8000
+  egress:
+  - {} # Allow all egress traffic

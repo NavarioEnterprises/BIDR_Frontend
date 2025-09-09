@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="chore: add log file for product management service Azure deployment debugging">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/logs/chat_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/logs/chat_service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifications_service/logs/notification_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/logs/notification_service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/logs/product_management_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/logs/product_management_service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="AISelfReview" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="30xQDYETW2HKkLwnbYF3COeRNZF" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Django Server.Unnamed.executor": "Run",
+    "Python.settings.executor": "Run",
+    "Python.urls.executor": "Run",
+    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SHELLCHECK.PATH": "/Users/thulanimoyo/Library/Application Support/JetBrains/PyCharm2025.2/plugins/Shell Script/shellcheck",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/product_management_service" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/product_management_service/categories/management/commands" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Unnamed" type="Python.DjangoServer" factoryName="Django server" nameIsGenerated="true">
+      <module name="BIDR_Backend" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="DJANGO_SETTINGS_MODULE" value="chat_service.settings" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.10 virtualenv at ~/MEGA downloads/new downloads/BIDR_Backend/chat_service/venv" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </EXTENSION>
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8001" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="false" />
+      <option name="customRunCommand" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-PY-252.23892.515" />
+        <option value="bundled-python-sdk-7e47963ff851-f0eec537fc84-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.23892.515" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="" />
+      <created>1754566624929</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1754566624929</updated>
+      <workItem from="1754566626700" duration="18488000" />
+      <workItem from="1754723568007" duration="27548000" />
+      <workItem from="1754812158140" duration="1938000" />
+      <workItem from="1754877140004" duration="408000" />
+      <workItem from="1755002236325" duration="492000" />
+      <workItem from="1755263469507" duration="21931000" />
+      <workItem from="1755533413059" duration="2653000" />
+      <workItem from="1755669035492" duration="2601000" />
+      <workItem from="1755781772169" duration="181000" />
+      <workItem from="1755806689089" duration="6829000" />
+      <workItem from="1755877151218" duration="679000" />
+      <workItem from="1756050915101" duration="1234000" />
+      <workItem from="1756057185810" duration="3347000" />
+      <workItem from="1756080025435" duration="17096000" />
+      <workItem from="1756205347621" duration="46718000" />
+      <workItem from="1756367739702" duration="26674000" />
+      <workItem from="1756447019001" duration="37204000" />
+      <workItem from="1756564553201" duration="27462000" />
+      <workItem from="1756784496515" duration="53064000" />
+      <workItem from="1756891461292" duration="20640000" />
+      <workItem from="1757036848742" duration="1377000" />
+      <workItem from="1757062198099" duration="20619000" />
+      <workItem from="1757172756368" duration="90000" />
+      <workItem from="1757173430466" duration="44289000" />
+      <workItem from="1757263817521" duration="27441000" />
+      <workItem from="1757374629830" duration="11489000" />
+    </task>
+    <task id="LOCAL-00001" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1754794997968</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1754794997968</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1755672396355</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1755672396355</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1755806765257</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1755806765257</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1755806781429</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1755806781429</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1755807828772</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1755807828772</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1755814234844</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1755814234844</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1755819918543</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1755819918543</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1756298660519</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1756298660520</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1756694765737</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1756694765737</updated>
+    </task>
+    <task id="LOCAL-00010" summary="feat: configure chat service with HTTPS using Azure Application Gateway&#10;&#10;- Add Let's Encrypt SSL certificate for `chat-service.bidr.co.za`&#10;- Configure routing with Application Gateway HTTPS listener and backend pool&#10;- Include deployment summary and diagnostic commands&#10;- Introduce `.dockerignore` for reviews_and_ratings service&#10;- Add container and infrastructure configs for authentication service backend&#10;- Prepare DNS and monitoring steps for production readiness&#10;- Note temporary backend usage and plan for chat container stabilization">
+      <option name="closed" value="true" />
+      <created>1757083672110</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1757083672110</updated>
+    </task>
+    <task id="LOCAL-00011" summary="feat: configure chat service with HTTPS using Azure Application Gateway&#10;&#10;- Add Let's Encrypt SSL certificate for `chat-service.bidr.co.za`&#10;- Configure routing with Application Gateway HTTPS listener and backend pool&#10;- Include deployment summary and diagnostic commands&#10;- Introduce `.dockerignore` for reviews_and_ratings service&#10;- Add container and infrastructure configs for authentication service backend&#10;- Prepare DNS and monitoring steps for production readiness&#10;- Note temporary backend usage and plan for chat container stabilization">
+      <option name="closed" value="true" />
+      <created>1757182457985</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1757182457985</updated>
+    </task>
+    <task id="LOCAL-00012" summary="chore: remove unused migrations and add image upload handling&#10;&#10;- Delete obsolete migrations from quotes, analytics, and product_requests apps&#10;- Implement serializers for product and VIN image uploads in product_requests&#10;- Add server-side validation and saving logic for uploaded files&#10;- Improve serializers' `to_internal_value` for handling mutable data structures&#10;- Adjust logic to support image processing in category-specific data&#10;- Add new test cases for payment transactions and update payment model tests&#10;- Conditional inclusion of Prometheus metrics endpoint in chat service&#10;- Introduce seller earnings endpoint tests in payment_transactions">
+      <option name="closed" value="true" />
+      <created>1757315766849</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1757315766849</updated>
+    </task>
+    <task id="LOCAL-00013" summary="chore: add log file for product management service Azure deployment debugging">
+      <option name="closed" value="true" />
+      <created>1757394794709</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1757394794709</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial Commit" />
+    <MESSAGE value="feat: configure chat service with HTTPS using Azure Application Gateway&#10;&#10;- Add Let's Encrypt SSL certificate for `chat-service.bidr.co.za`&#10;- Configure routing with Application Gateway HTTPS listener and backend pool&#10;- Include deployment summary and diagnostic commands&#10;- Introduce `.dockerignore` for reviews_and_ratings service&#10;- Add container and infrastructure configs for authentication service backend&#10;- Prepare DNS and monitoring steps for production readiness&#10;- Note temporary backend usage and plan for chat container stabilization" />
+    <MESSAGE value="`Remove obsolete migration files across services for cleanup and consistency`" />
+    <MESSAGE value="refactor: remove redundant migrations from product and analytics services&#10;&#10;- Eliminate unused migrations files, simplifying database migration history&#10;- Cleanup includes all migration files from product_requests, quotes, and analytics apps" />
+    <MESSAGE value="chore: remove unused migrations and add image upload handling&#10;&#10;- Delete obsolete migrations from quotes, analytics, and product_requests apps&#10;- Implement serializers for product and VIN image uploads in product_requests&#10;- Add server-side validation and saving logic for uploaded files&#10;- Improve serializers' `to_internal_value` for handling mutable data structures&#10;- Adjust logic to support image processing in category-specific data&#10;- Add new test cases for payment transactions and update payment model tests&#10;- Conditional inclusion of Prometheus metrics endpoint in chat service&#10;- Introduce seller earnings endpoint tests in payment_transactions" />
+    <MESSAGE value="chore: add private keys and deployment logs for debugging&#10;&#10;- Add `chat-service-privkey.pem` and `notifications-privkey.pem` for service configuration&#10;- Include product management service deployment logs for investigation" />
+    <MESSAGE value="chore: add log file for product management service Azure deployment debugging" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: add log file for product management service Azure deployment debugging" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/deploy_to_k8s.py</url>
+          <line>41</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/BIDR_Backend$urls.coverage" NAME="urls Coverage Results" MODIFIED="1756578822990" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/reviews_and_ratings/rewards" />
+  </component>
+</project>

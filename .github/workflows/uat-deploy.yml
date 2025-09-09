@@ -1,0 +1,281 @@
+name: Deploy to UAT Environment
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+  workflow_dispatch:
+
+env:
+  AZURE_RESOURCE_GROUP: bidr-uat-k8s-we
+  AZURE_CLUSTER_NAME: BIDR-uat-aks-cluster-we
+  AZURE_CONTAINER_REGISTRY: bidruatregwe2024
+  AZURE_LOCATION: westeurope
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - authentication_service
+          - chat_service
+          - payment_service
+          - resolution_service
+          - product_management_service
+          - notifications_service
+          - transactions_service
+          - reviews_and_ratings
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r services-requirements.txt
+        pip install -r dev-requirements.txt
+
+    - name: Run Django system checks
+      run: |
+        cd ${{ matrix.service }}
+        echo "Running Django system check for ${{ matrix.service }}"
+        export PYTHONPATH=.
+        python manage.py check --deploy
+        echo "✅ Django system check completed successfully for ${{ matrix.service }}"
+      continue-on-error: false
+
+    - name: Run security and quality checks
+      run: |
+        cd ${{ matrix.service }}
+        python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        # Run safety check for known security vulnerabilities
+        pip install safety
+        safety check --json || true
+      continue-on-error: false
+
+  security-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      continue-on-error: true
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  build-and-push-images:
+    needs: [build-and-test, security-scan]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    strategy:
+      matrix:
+        service:
+          - authentication_service
+          - chat_service
+          - payment_service
+          - resolution_service
+          - product_management_service
+          - notifications_service
+          - transactions_service
+          - reviews_and_ratings
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Login to Azure Container Registry
+      run: |
+        az acr login --name ${{ env.AZURE_CONTAINER_REGISTRY }}
+
+    - name: Build and push Docker image
+      run: |
+        # Build image for the specific service
+        docker build -f ${{ matrix.service }}/Dockerfile \
+          -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/bidr-${{ matrix.service }}:${{ github.sha }} \
+          -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/bidr-${{ matrix.service }}:uat-latest \
+          .
+        
+        # Push images
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/bidr-${{ matrix.service }}:${{ github.sha }}
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/bidr-${{ matrix.service }}:uat-latest
+
+    - name: Scan Docker image for vulnerabilities
+      run: |
+        # Install Trivy
+        sudo apt-get update
+        sudo apt-get install wget apt-transport-https gnupg lsb-release
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy
+        
+        # Scan the image
+        trivy image --exit-code 0 --severity HIGH,CRITICAL ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/bidr-${{ matrix.service }}:${{ github.sha }}
+
+  deploy-to-k8s:
+    needs: build-and-push-images
+    runs-on: ubuntu-latest
+    environment: uat
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Get AKS credentials
+      run: |
+        az aks get-credentials --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_CLUSTER_NAME }}
+
+    - name: Deploy to Kubernetes (UAT)
+      run: |
+        # Delete existing migration job if it exists (Jobs are immutable)
+        kubectl delete job auth-migration-job -n bidr-uat --ignore-not-found=true
+        
+        # Delete specific deployments known to have selector conflicts
+        # This prevents the "field is immutable" error when selectors change
+        kubectl delete deployment product-management-service -n bidr-uat --ignore-not-found=true
+        kubectl delete deployment reviews-service -n bidr-uat --ignore-not-found=true
+        
+        # Update image tags in Kubernetes manifests
+        for service in authentication_service chat_service payment_service resolution_service product_management_service notifications_service transactions_service reviews_and_ratings; do
+          # Update the image tag in the deployment
+          sed -i "s|image: .*bidr-${service}:.*|image: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/bidr-${service}:${{ github.sha }}|g" k8s/overlays/uat/*.yaml
+        done
+
+        # Apply Kubernetes manifests for UAT environment
+        kubectl apply -k k8s/overlays/uat/
+        
+        # Wait for deployments to be ready
+        kubectl rollout status deployment/auth-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/chat-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/payment-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/resolution-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/product-management-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/notifications-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/transactions-service -n bidr-uat --timeout=900s
+        kubectl rollout status deployment/reviews-service -n bidr-uat --timeout=900s
+
+    - name: Run deployment validation
+      run: |
+        # Check pod status
+        kubectl get pods -n bidr-uat
+        
+        # Check services
+        kubectl get services -n bidr-uat
+        
+        # Check ingress
+        kubectl get ingress -n bidr-uat
+        
+        # Check persistent volumes
+        kubectl get pv
+        kubectl get pvc -n bidr-uat
+
+    - name: Run comprehensive smoke tests
+      run: |
+        # Get external IP
+        EXTERNAL_IP=$(kubectl get service bidr-nginx-service -n bidr-uat -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        echo "External IP: $EXTERNAL_IP"
+        
+        # Wait for external IP to be ready
+        sleep 60
+        
+        # Basic health checks
+        echo "Running health checks..."
+        curl -f http://$EXTERNAL_IP/health/ || echo "Health check failed"
+        
+        # Service-specific checks
+        echo "Checking authentication service..."
+        curl -f http://$EXTERNAL_IP/admin/auth/ || echo "Auth service not accessible"
+        
+        echo "Checking chat service..."
+        curl -f http://$EXTERNAL_IP/admin/chat/ || echo "Chat service not accessible"
+        
+        echo "Checking payment service..."
+        curl -f http://$EXTERNAL_IP/admin/payment/ || echo "Payment service not accessible"
+        
+        # Database connectivity checks
+        echo "Running database connectivity tests..."
+        kubectl exec deployment/auth-service -n bidr-uat -- python manage.py check --database default || echo "Database check failed"
+      continue-on-error: true
+
+  performance-tests:
+    needs: deploy-to-k8s
+    runs-on: ubuntu-latest
+    if: success()
+    
+    steps:
+    - name: Install Apache Bench
+      run: sudo apt-get update && sudo apt-get install -y apache2-utils
+
+    - name: Get service IP
+      run: |
+        EXTERNAL_IP=$(kubectl get service bidr-nginx-service -n bidr-uat -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        echo "EXTERNAL_IP=$EXTERNAL_IP" >> $GITHUB_ENV
+
+    - name: Run performance tests
+      run: |
+        # Basic load test
+        ab -n 100 -c 10 http://$EXTERNAL_IP/health/ || echo "Performance test failed"
+      continue-on-error: true
+
+  notification:
+    needs: [build-and-test, security-scan, build-and-push-images, deploy-to-k8s, performance-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Send deployment notification
+      run: |
+        if [ "${{ needs.deploy-to-k8s.result }}" == "success" ]; then
+          echo "✅ UAT Deployment successful!"
+          echo "🔗 Application URL: Check AKS external IP"
+          echo "📊 Environment: UAT"
+          echo "🏷️  Version: ${{ github.sha }}"
+          echo "🧪 Performance Tests: ${{ needs.performance-tests.result }}"
+          echo "🛡️ Security Scan: ${{ needs.security-scan.result }}"
+        else
+          echo "❌ UAT Deployment failed!"
+          echo "📋 Check the workflow logs for details"
+        fi

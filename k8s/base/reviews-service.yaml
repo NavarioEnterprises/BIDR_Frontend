@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-service
+  namespace: bidr
+  labels:
+    app: reviews-service
+    service: reviews
+    version: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reviews-service
+  template:
+    metadata:
+      labels:
+        app: reviews-service
+        service: reviews
+        version: dev
+    spec:
+      serviceAccountName: bidr-service-account
+      containers:
+      - name: reviews-service
+        image: python:3.11-slim
+        ports:
+        - containerPort: 8000
+        command: ['sh', '-c']
+        args: ['pip install gunicorn django && cd /app && python -m gunicorn --bind 0.0.0.0:8000 app:application']
+        env:
+        - name: DEBUG
+          value: "False"
+        - name: DJANGO_SETTINGS_MODULE
+          value: "reviews_service.settings"
+        - name: SERVICE_NAME
+          value: "reviews"
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: DJANGO_SECRET_KEY
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: REVIEWS_DATABASE_URL
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: bidr-secrets
+              key: REDIS_URL
+        - name: AUTH_SERVICE_URL
+          value: "http://auth-service:8001"
+        - name: PRODUCT_SERVICE_URL
+          value: "http://product-management-service:8004"
+        - name: TRANSACTION_SERVICE_URL
+          value: "http://transactions-service:8006"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health/
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 3
+        volumeMounts:
+        - name: app-code
+          mountPath: /app
+      volumes:
+      - name: app-code
+        configMap:
+          name: reviews-app-code
+      imagePullSecrets:
+      - name: acr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews-service
+  namespace: bidr
+  labels:
+    app: reviews-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: reviews-service
+  ports:
+  - port: 8007
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0

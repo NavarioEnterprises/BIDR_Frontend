@@ -1,0 +1,36 @@
+# Django and Core Dependencies
+Django>=5.0.0,<5.3.0
+djangorestframework>=3.14.0
+django-cors-headers>=4.0.0
+django-filter>=23.0.0
+python-decouple>=3.8
+
+# API Documentation
+drf-yasg>=1.21.0
+Pillow>=10.0.0
+
+# Database and Caching
+psycopg2-binary>=2.9.0
+redis>=5.0.0
+
+# Authentication and Security
+djangorestframework-simplejwt>=5.0.0
+cryptography>=42.0.0
+
+# External Service Integrations
+requests>=2.31.0
+
+# Notification Service Dependencies
+celery>=5.4.0
+twilio>=9.4.0
+sendgrid>=6.12.1
+pusher>=3.3.2
+python-dateutil>=2.9.0
+pytz>=2024.2
+django-prometheus>=2.3.1
+pyjwt>=2.10.1
+
+# Production Dependencies
+gunicorn>=21.2.0
+whitenoise>=6.6.0
+django-extensions>=3.2.0

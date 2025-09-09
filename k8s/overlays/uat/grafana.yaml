@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+data:
+  prometheus.yaml: |-
+    {
+        "apiVersion": 1,
+        "datasources": [
+            {
+               "access": "proxy",
+                "editable": true,
+                "name": "Prometheus-BIDR",
+                "orgId": 1,
+                "type": "prometheus",
+                "url": "http://prometheus-service.bidr-uat.svc.cluster.local:9090",
+                "version": 1,
+                "isDefault": true,
+                "jsonData": {
+                    "timeInterval": "5s"
+                }
+            }
+        ]
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          value: admin
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: BidrMonitor123!
+        - name: GF_SECURITY_SECRET_KEY
+          value: bidr-secret-key-2024
+        - name: GF_USERS_ALLOW_SIGN_UP
+          value: "false"
+        - name: GF_USERS_ALLOW_ORG_CREATE
+          value: "false"
+        - name: GF_USERS_AUTO_ASSIGN_ORG
+          value: "true"
+        - name: GF_USERS_AUTO_ASSIGN_ORG_ROLE
+          value: "Viewer"
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: "false"
+        - name: GF_SERVER_ROOT_URL
+          value: "http://48.222.241.55:3000/"
+        - name: GF_ANALYTICS_REPORTING_ENABLED
+          value: "false"
+        volumeMounts:
+        - name: grafana-datasources
+          mountPath: /etc/grafana/provisioning/datasources
+          readOnly: false
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "100m"
+          limits:
+            memory: "400Mi"
+            cpu: "300m"
+      volumes:
+      - name: grafana-datasources
+        configMap:
+          defaultMode: 420
+          name: grafana-datasources
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-service
+spec:
+  selector:
+    app: grafana
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP

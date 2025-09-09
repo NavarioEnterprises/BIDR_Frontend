@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-management-service
+  namespace: bidr
+  labels:
+    app: product-management-service
+    service: product-management
+    version: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-management-service
+  template:
+    metadata:
+      labels:
+        app: product-management-service
+        service: product-management
+        version: dev
+    spec:
+      serviceAccountName: bidr-service-account
+      containers:
+      - name: product-management-service
+        image: bidrnparusuatregistry2024.azurecr.io/product-service:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DEBUG
+          value: "True"
+        - name: DJANGO_SETTINGS_MODULE
+          value: "product_management_service.settings"
+        - name: SERVICE_NAME
+          value: "product-management"
+        - name: SECRET_KEY
+          value: "django-secret-key-for-product-management-service-uat-environment-2024"
+        - name: ALLOWED_HOSTS
+          value: "*"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health/
+            port: 8000
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /health/
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 15
+          failureThreshold: 5
+      imagePullSecrets:
+      - name: acr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-management-service
+  namespace: bidr
+  labels:
+    app: product-management-service
+spec:
+  type: ClusterIP
+  selector:
+    app: product-management-service
+  ports:
+  - port: 8004
+    targetPort: 8000
+    protocol: TCP
+    name: http

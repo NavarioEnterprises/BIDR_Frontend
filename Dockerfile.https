@@ -1,0 +1,81 @@
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=authentication_service.settings
+
+# Set work directory
+WORKDIR /app
+
+# Install system dependencies including nginx and supervisor
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    build-essential \
+    libpq-dev \
+    curl \
+    nginx \
+    supervisor \
+    && apt-get upgrade -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user early
+RUN adduser --disabled-password --gecos '' --uid 1000 appuser
+
+# Install Python dependencies
+COPY authentication_service/services-requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
+# Copy project files
+COPY authentication_service/ .
+
+# Copy SSL certificates
+COPY fullchain.pem /etc/ssl/certs/fullchain.pem
+COPY privkey.pem /etc/ssl/private/privkey.pem
+
+# Copy nginx configuration
+COPY nginx-ssl.conf /etc/nginx/sites-available/default
+RUN rm /etc/nginx/sites-enabled/default && \
+    ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+# Create supervisor configuration
+RUN echo '[supervisord]' > /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'nodaemon=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo '' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo '[program:nginx]' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'command=nginx -g "daemon off;"' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'autostart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'autorestart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'priority=10' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo '' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo '[program:django]' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'command=gunicorn --bind 127.0.0.1:8000 --workers 3 --worker-class sync authentication_service.wsgi:application' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'directory=/app' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'user=appuser' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'autostart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'autorestart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'priority=20' >> /etc/supervisor/conf.d/supervisord.conf
+
+# Create necessary directories and set permissions
+RUN mkdir -p /app/staticfiles /app/media /app/logs \
+    && chown -R appuser:appuser /app \
+    && chmod -R 755 /etc/ssl/certs \
+    && chmod -R 700 /etc/ssl/private
+
+# Switch to non-root user for static files collection
+USER appuser
+RUN python manage.py collectstatic --noinput || echo "Static files collection skipped"
+
+# Switch back to root for nginx
+USER root
+
+# Health check for HTTPS
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f -k https://localhost/health/ || curl -f http://localhost/health/ || exit 1
+
+# Expose ports 80 and 443
+EXPOSE 80 443
+
+# Run supervisor to manage both nginx and Django
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
