@@ -136,6 +136,7 @@ class ProductRequestListSerializer(serializers.ModelSerializer):
     tyres_rims_summary = serializers.ReadOnlyField()
     vehicle_spares_summary = serializers.ReadOnlyField()
     consumer_electronics_summary = serializers.ReadOnlyField()
+    images = RequestImageSerializer(many=True, read_only=True)
     
     def get_quotes(self, obj):
         """Return only valid (non-expired) quotes."""
@@ -152,7 +153,7 @@ class ProductRequestListSerializer(serializers.ModelSerializer):
             'quantity', 'condition_preference', 'max_budget', 'currency',
             'urgency_timeline', 'status', 'view_count', 'is_expired', 'is_urgent',
             'tyres_rims_summary', 'vehicle_spares_summary', 'consumer_electronics_summary',
-            'quotes', 'is_flagged', 'flags', 'created_at', 'updated_at'
+            'quotes', 'is_flagged', 'flags', 'product_images', 'images', 'created_at', 'updated_at'
         ]
 
 
@@ -165,6 +166,7 @@ class ProductRequestDetailSerializer(serializers.ModelSerializer):
     vehicle_spares = VehicleSparesSerializer(read_only=True)
     vehicle_tyres_rims = VehicleTyresRimsSerializer(read_only=True)
     quotes = serializers.SerializerMethodField()
+    images = RequestImageSerializer(many=True, read_only=True)
     
     # Read-only computed properties
     is_expired = serializers.ReadOnlyField()

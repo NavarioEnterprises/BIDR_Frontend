@@ -516,3 +516,106 @@ INFO 2025-09-08 05:04:43,180 basehttp 70746 6158348288 "POST /api/v1/sms/send/ot
 INFO 2025-09-08 05:15:33,231 basehttp 70746 6158348288 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
 INFO 2025-09-08 05:19:34,421 basehttp 70746 6158348288 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
 INFO 2025-09-08 05:52:26,727 basehttp 70746 6158348288 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-09-08 08:43:33,144 basehttp 70746 6158921728 "OPTIONS /api/v1/notifications/user/0dc0d1e8-b315-44a8-85a0-ac86bed986e8/ HTTP/1.1" 200 0
+INFO 2025-09-08 08:43:33,570 basehttp 70746 6158921728 "GET /api/v1/notifications/user/0dc0d1e8-b315-44a8-85a0-ac86bed986e8/ HTTP/1.1" 200 1049
+INFO 2025-09-08 09:25:27,380 autoreload 93703 8517256640 Watching for file changes with StatReloader
+WARNING 2025-09-08 09:25:39,915 log 93703 6194212864 Not Found: /
+WARNING 2025-09-08 09:25:39,915 basehttp 93703 6194212864 "GET / HTTP/1.1" 404 179
+INFO 2025-09-08 10:38:55,039 autoreload 29220 8517256640 Watching for file changes with StatReloader
+WARNING 2025-09-08 10:39:09,181 log 29220 6164410368 Not Found: /
+WARNING 2025-09-08 10:39:09,181 basehttp 29220 6164410368 "GET / HTTP/1.1" 404 179
+INFO 2025-09-08 12:15:17,502 basehttp 29220 6164410368 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-09-08 14:04:30,903 basehttp 29220 6164410368 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-09-08 14:14:02,087 basehttp 29220 6164410368 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-09-08 15:30:51,062 basehttp 29220 6164410368 "OPTIONS /api/v1/notifications/user/7b186537-5f40-43fc-8545-09f04dcc7c84/ HTTP/1.1" 200 0
+INFO 2025-09-08 15:30:51,551 basehttp 29220 6164410368 "GET /api/v1/notifications/user/7b186537-5f40-43fc-8545-09f04dcc7c84/ HTTP/1.1" 200 1049
+INFO 2025-09-08 15:31:00,537 basehttp 29220 6164410368 "GET /api/v1/notifications/user/7b186537-5f40-43fc-8545-09f04dcc7c84/ HTTP/1.1" 200 1049
+INFO 2025-09-08 15:31:03,370 basehttp 29220 6164410368 "GET /api/v1/notifications/user/7b186537-5f40-43fc-8545-09f04dcc7c84/ HTTP/1.1" 200 1049
+INFO 2025-09-08 16:09:19,203 basehttp 29220 6164410368 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-09-08 16:24:55,402 basehttp 29220 6164410368 "OPTIONS /api/v1/notifications/user/03701a7d-8d57-4924-a1cd-b6906e884e01/ HTTP/1.1" 200 0
+INFO 2025-09-08 16:24:55,831 basehttp 29220 6164410368 "GET /api/v1/notifications/user/03701a7d-8d57-4924-a1cd-b6906e884e01/ HTTP/1.1" 200 1049
+INFO 2025-09-08 16:29:56,628 basehttp 29220 6164410368 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-09-08 16:37:36,224 basehttp 29220 6164410368 "OPTIONS /api/v1/notifications/user/796a920f-207a-4f31-adf6-ed2299a1d832/ HTTP/1.1" 200 0
+INFO 2025-09-08 16:37:36,726 basehttp 29220 6164410368 "GET /api/v1/notifications/user/796a920f-207a-4f31-adf6-ed2299a1d832/ HTTP/1.1" 200 1049
+INFO 2025-09-08 16:39:37,278 basehttp 29220 6164410368 "OPTIONS /api/v1/notifications/user/0dc0d1e8-b315-44a8-85a0-ac86bed986e8/ HTTP/1.1" 200 0
+INFO 2025-09-08 16:39:37,700 basehttp 29220 6164410368 "GET /api/v1/notifications/user/0dc0d1e8-b315-44a8-85a0-ac86bed986e8/ HTTP/1.1" 200 1049
+INFO 2025-09-08 16:43:40,137 basehttp 29220 6164410368 "POST /api/v1/sms/send/otp/ HTTP/1.1" 200 260
+INFO 2025-09-08 16:55:13,259 basehttp 29220 6164410368 "GET /api/v1/notifications/user/796a920f-207a-4f31-adf6-ed2299a1d832/ HTTP/1.1" 200 1049
+INFO 2025-09-08 17:17:47,654 basehttp 29220 6164410368 "GET /api/v1/notifications/user/796a920f-207a-4f31-adf6-ed2299a1d832/ HTTP/1.1" 200 1049
+INFO 2025-09-08 17:19:59,410 basehttp 29220 6164410368 "GET /api/v1/notifications/user/796a920f-207a-4f31-adf6-ed2299a1d832/ HTTP/1.1" 200 1049
+INFO 2025-09-08 17:23:25,781 basehttp 29220 6164410368 "GET /api/v1/notifications/user/796a920f-207a-4f31-adf6-ed2299a1d832/ HTTP/1.1" 200 1049
+INFO 2025-09-08 17:28:13,404 basehttp 29220 6164410368 "GET /api/v1/notifications/user/796a920f-207a-4f31-adf6-ed2299a1d832/ HTTP/1.1" 200 1049
+INFO 2025-09-08 17:28:36,091 basehttp 29220 6164410368 "GET /api/v1/notifications/user/796a920f-207a-4f31-adf6-ed2299a1d832/ HTTP/1.1" 200 1049
+INFO 2025-09-08 17:40:52,169 basehttp 29220 6164410368 "GET /api/v1/notifications/user/0dc0d1e8-b315-44a8-85a0-ac86bed986e8/ HTTP/1.1" 200 1049
+WARNING 2025-09-08 23:48:22,900 log 29220 6164410368 Unauthorized: /api/v1/notifications/send/
+WARNING 2025-09-08 23:48:22,903 basehttp 29220 6164410368 "GET /api/v1/notifications/send/ HTTP/1.1" 401 3918
+WARNING 2025-09-08 23:48:25,212 log 29220 6164410368 Unauthorized: /api/v1/notifications/send/
+WARNING 2025-09-08 23:48:25,212 basehttp 29220 6164410368 "GET /api/v1/notifications/send/ HTTP/1.1" 401 3918
+WARNING 2025-09-08 23:48:25,238 log 29220 6164410368 Not Found: /static/rest_framework/css/bootstrap.min.css
+WARNING 2025-09-08 23:48:25,240 log 29220 6181810176 Not Found: /static/rest_framework/css/bootstrap-tweaks.css
+WARNING 2025-09-08 23:48:25,245 log 29220 6198636544 Not Found: /static/rest_framework/css/prettify.css
+WARNING 2025-09-08 23:48:25,247 basehttp 29220 6164410368 "GET /static/rest_framework/css/bootstrap.min.css HTTP/1.1" 404 179
+WARNING 2025-09-08 23:48:25,247 basehttp 29220 6181810176 "GET /static/rest_framework/css/bootstrap-tweaks.css HTTP/1.1" 404 179
+WARNING 2025-09-08 23:48:25,248 log 29220 6215462912 Not Found: /static/rest_framework/css/default.css
+WARNING 2025-09-08 23:48:25,251 log 29220 6164410368 Not Found: /static/rest_framework/js/csrf.js
+WARNING 2025-09-08 23:48:25,253 log 29220 6232289280 Not Found: /static/rest_framework/js/jquery-3.7.1.min.js
+WARNING 2025-09-08 23:48:25,254 log 29220 6181810176 Not Found: /static/rest_framework/js/bootstrap.min.js
+WARNING 2025-09-08 23:48:25,254 basehttp 29220 6198636544 "GET /static/rest_framework/css/prettify.css HTTP/1.1" 404 179
+WARNING 2025-09-08 23:48:25,255 log 29220 6249115648 Not Found: /static/rest_framework/js/ajax-form.js
+WARNING 2025-09-08 23:48:25,256 basehttp 29220 6215462912 "GET /static/rest_framework/css/default.css HTTP/1.1" 404 179
+WARNING 2025-09-08 23:48:25,256 basehttp 29220 6164410368 "GET /static/rest_framework/js/csrf.js HTTP/1.1" 404 179
+WARNING 2025-09-08 23:48:25,257 log 29220 6265942016 Not Found: /static/rest_framework/js/default.js
+WARNING 2025-09-08 23:48:25,258 log 29220 6198636544 Not Found: /static/rest_framework/js/prettify-min.js
+WARNING 2025-09-08 23:48:25,258 basehttp 29220 6232289280 "GET /static/rest_framework/js/jquery-3.7.1.min.js HTTP/1.1" 404 179
+WARNING 2025-09-08 23:48:25,258 basehttp 29220 6181810176 "GET /static/rest_framework/js/bootstrap.min.js HTTP/1.1" 404 179
+INFO 2025-09-08 23:48:25,259 basehttp 29220 6215462912 - Broken pipe from ('127.0.0.1', 50322)
+WARNING 2025-09-08 23:48:25,260 log 29220 6164410368 Not Found: /static/rest_framework/js/load-ajax-form.js
+WARNING 2025-09-08 23:48:25,260 basehttp 29220 6249115648 "GET /static/rest_framework/js/ajax-form.js HTTP/1.1" 404 179
+WARNING 2025-09-08 23:48:25,260 basehttp 29220 6265942016 "GET /static/rest_framework/js/default.js HTTP/1.1" 404 179
+WARNING 2025-09-08 23:48:25,261 basehttp 29220 6198636544 "GET /static/rest_framework/js/prettify-min.js HTTP/1.1" 404 179
+WARNING 2025-09-08 23:48:25,261 basehttp 29220 6164410368 "GET /static/rest_framework/js/load-ajax-form.js HTTP/1.1" 404 179
+INFO 2025-09-08 23:49:48,662 autoreload 29220 8517256640 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/system_notifications/views.py changed, reloading.
+INFO 2025-09-08 23:49:49,269 autoreload 51697 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-08 23:50:03,098 autoreload 51697 8517256640 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/system_notifications/views.py changed, reloading.
+INFO 2025-09-08 23:50:03,438 autoreload 51766 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-08 23:50:17,130 autoreload 51766 8517256640 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/system_notifications/views.py changed, reloading.
+INFO 2025-09-08 23:50:17,593 autoreload 51848 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-08 23:50:32,379 autoreload 51848 8517256640 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/system_notifications/views.py changed, reloading.
+INFO 2025-09-08 23:50:33,061 autoreload 51921 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-08 23:50:42,709 autoreload 51921 8517256640 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/system_notifications/views.py changed, reloading.
+INFO 2025-09-08 23:50:43,122 autoreload 51979 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-08 23:50:56,823 autoreload 51979 8517256640 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/system_notifications/views.py changed, reloading.
+INFO 2025-09-08 23:50:57,546 autoreload 52064 8517256640 Watching for file changes with StatReloader
+INFO 2025-09-08 23:51:11,234 autoreload 52064 8517256640 /Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service/system_notifications/views.py changed, reloading.
+INFO 2025-09-08 23:51:11,609 autoreload 52136 8517256640 Watching for file changes with StatReloader
+WARNING 2025-09-08 23:51:21,213 log 52136 6155284480 Method Not Allowed: /api/v1/notifications/send/
+WARNING 2025-09-08 23:51:21,213 basehttp 52136 6155284480 "GET /api/v1/notifications/send/ HTTP/1.1" 405 5831
+WARNING 2025-09-08 23:51:21,250 log 52136 6172110848 Not Found: /static/rest_framework/css/bootstrap-tweaks.css
+WARNING 2025-09-08 23:51:21,251 log 52136 6155284480 Not Found: /static/rest_framework/css/bootstrap.min.css
+WARNING 2025-09-08 23:51:21,251 log 52136 6222589952 Not Found: /static/rest_framework/js/jquery-3.7.1.min.js
+WARNING 2025-09-08 23:51:21,251 log 52136 6239416320 Not Found: /static/rest_framework/js/ajax-form.js
+WARNING 2025-09-08 23:51:21,251 log 52136 6188937216 Not Found: /static/rest_framework/css/prettify.css
+WARNING 2025-09-08 23:51:21,251 log 52136 6205763584 Not Found: /static/rest_framework/css/default.css
+WARNING 2025-09-08 23:51:21,252 basehttp 52136 6172110848 "GET /static/rest_framework/css/bootstrap-tweaks.css HTTP/1.1" 404 179
+WARNING 2025-09-08 23:51:21,252 basehttp 52136 6222589952 "GET /static/rest_framework/js/jquery-3.7.1.min.js HTTP/1.1" 404 179
+WARNING 2025-09-08 23:51:21,252 basehttp 52136 6239416320 "GET /static/rest_framework/js/ajax-form.js HTTP/1.1" 404 179
+WARNING 2025-09-08 23:51:21,252 basehttp 52136 6155284480 "GET /static/rest_framework/css/bootstrap.min.css HTTP/1.1" 404 179
+WARNING 2025-09-08 23:51:21,252 basehttp 52136 6188937216 "GET /static/rest_framework/css/prettify.css HTTP/1.1" 404 179
+WARNING 2025-09-08 23:51:21,252 basehttp 52136 6205763584 "GET /static/rest_framework/css/default.css HTTP/1.1" 404 179
+WARNING 2025-09-08 23:51:21,279 log 52136 6205763584 Not Found: /static/rest_framework/js/csrf.js
+WARNING 2025-09-08 23:51:21,279 basehttp 52136 6205763584 "GET /static/rest_framework/js/csrf.js HTTP/1.1" 404 179
+WARNING 2025-09-08 23:51:21,285 log 52136 6239416320 Not Found: /static/rest_framework/js/bootstrap.min.js
+WARNING 2025-09-08 23:51:21,285 log 52136 6155284480 Not Found: /static/rest_framework/js/prettify-min.js
+WARNING 2025-09-08 23:51:21,285 log 52136 6222589952 Not Found: /static/rest_framework/js/default.js
+WARNING 2025-09-08 23:51:21,286 log 52136 6172110848 Not Found: /static/rest_framework/js/load-ajax-form.js
+WARNING 2025-09-08 23:51:21,286 basehttp 52136 6239416320 "GET /static/rest_framework/js/bootstrap.min.js HTTP/1.1" 404 179
+WARNING 2025-09-08 23:51:21,286 basehttp 52136 6155284480 "GET /static/rest_framework/js/prettify-min.js HTTP/1.1" 404 179
+WARNING 2025-09-08 23:51:21,286 basehttp 52136 6172110848 "GET /static/rest_framework/js/load-ajax-form.js HTTP/1.1" 404 179
+WARNING 2025-09-08 23:51:21,286 basehttp 52136 6222589952 "GET /static/rest_framework/js/default.js HTTP/1.1" 404 179
+INFO 2025-09-09 04:29:27,457 autoreload 56271 8517256640 Watching for file changes with StatReloader
+WARNING 2025-09-09 04:29:40,546 log 56271 6167654400 Not Found: /
+WARNING 2025-09-09 04:29:40,547 basehttp 56271 6167654400 "GET / HTTP/1.1" 404 179
+INFO 2025-09-09 04:36:42,652 basehttp 56271 6167654400 "OPTIONS /api/v1/notifications/user/7b186537-5f40-43fc-8545-09f04dcc7c84/ HTTP/1.1" 200 0
+INFO 2025-09-09 04:36:42,663 basehttp 56271 6167654400 "GET /api/v1/notifications/user/7b186537-5f40-43fc-8545-09f04dcc7c84/ HTTP/1.1" 200 1049
+INFO 2025-09-09 04:36:48,037 basehttp 56271 6167654400 "GET /api/v1/notifications/user/7b186537-5f40-43fc-8545-09f04dcc7c84/ HTTP/1.1" 200 1049
+INFO 2025-09-09 04:36:50,748 basehttp 56271 6167654400 "GET /api/v1/notifications/user/7b186537-5f40-43fc-8545-09f04dcc7c84/ HTTP/1.1" 200 1049

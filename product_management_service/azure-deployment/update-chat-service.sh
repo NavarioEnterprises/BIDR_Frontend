@@ -13,7 +13,7 @@ REGISTRY_NAME="bidrsimpleregistry"
 CONTAINER_NAME="bidr-chat-service"
 SERVICE_NAME="bidr-chat-service"
 IMAGE_NAME="bidr-chat-service"
-SERVICE_PORT=8002
+SERVICE_PORT=8000
 
 # Colors for output
 RED='\033[0;31m'
@@ -41,7 +41,8 @@ print_error() {
 
 # Get the chat service directory path
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CHAT_SERVICE_DIR="$(dirname "$SCRIPT_DIR")/chat_service"
+BASE_DIR="$(dirname "$(dirname "$SCRIPT_DIR)")"
+CHAT_SERVICE_DIR="$BASE_DIR/chat_service"
 
 # Check if chat service directory exists
 if [ ! -d "$CHAT_SERVICE_DIR" ]; then

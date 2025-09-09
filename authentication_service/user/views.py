@@ -278,6 +278,33 @@ class UserRegistrationView(APIView):
             else:
                 message = 'User registered successfully. Please verify your account.'
             
+            # Send system notification for account creation
+            try:
+                notification_service_url = getattr(settings, 'NOTIFICATION_SERVICE_URL', 'http://localhost:8006/')
+                notification_endpoint = f"{notification_service_url.rstrip('/')}/api/v1/notifications/send/"
+                
+                notification_payload = {
+                    'recipient_id': str(user.id),
+                    'type': 'account_created',
+                    'subject': 'Welcome to BIDR!',
+                    'message': 'Your account has been successfully created. Welcome to the BIDR platform!',
+                    'priority': 'normal',
+                    'channels': ['in_app'],
+                    'recipient_email': user.email,
+                    'context': {
+                        'username': user.get_decrypted_first_name() or user.email,
+                        'user_role': user.role
+                    }
+                }
+                
+                response = requests.post(notification_endpoint, json=notification_payload, timeout=5)
+                if response.status_code == 200:
+                    logger.info(f"System notification sent for user {user.id}")
+                else:
+                    logger.error(f"Failed to send system notification: {response.text}")
+            except Exception as e:
+                logger.error(f"Failed to send system notification: {str(e)}")
+            
             return Response({
                 'success': True,
                 'message': message,

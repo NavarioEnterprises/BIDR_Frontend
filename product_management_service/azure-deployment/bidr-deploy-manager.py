@@ -40,8 +40,9 @@ class BIDRDeploymentManager:
                 "container_name": "bidr-product-service",
                 "icon": "📦",
                 "script": "deploy-product-service.sh",
-                "update_script": "update-product-service.sh",
-                "https_enabled": False
+                "update_script": "update-product-service-with-gateway.sh",
+                "https_enabled": True,
+                "public_url": "https://products-management.bidr.co.za"
             },
             "2": {
                 "name": "Authentication Service",
@@ -59,11 +60,13 @@ class BIDRDeploymentManager:
                 "name": "Chat Service",
                 "service_key": "chat",
                 "directory": "chat_service",
-                "port": 8002,
+                "port": 8000,
                 "container_name": "bidr-chat-service",
                 "icon": "💬",
                 "script": "deploy-chat-service.sh",
-                "update_script": "update-chat-service.sh"
+                "update_script": "update-chat-service-with-gateway.sh",
+                "https_enabled": True,
+                "public_url": "https://chat-service.bidr.co.za"
             },
             "4": {
                 "name": "Payment Service",
@@ -89,11 +92,13 @@ class BIDRDeploymentManager:
                 "name": "Notifications Service",
                 "service_key": "notifications",
                 "directory": "notifications_service",
-                "port": 8005,
+                "port": 8000,
                 "container_name": "bidr-notifications-service",
                 "icon": "🔔",
                 "script": "deploy-notifications-service.sh",
-                "update_script": "update-notifications-service.sh"
+                "update_script": "update-notifications-service-with-gateway.sh",
+                "https_enabled": True,
+                "public_url": "https://notifications.bidr.co.za"
             },
             "7": {
                 "name": "Transactions Service",
@@ -109,11 +114,13 @@ class BIDRDeploymentManager:
                 "name": "Reviews Service",
                 "service_key": "reviews",
                 "directory": "reviews_and_ratings",
-                "port": 8007,
+                "port": 8000,
                 "container_name": "bidr-reviews-service",
                 "icon": "⭐",
                 "script": "deploy-reviews-service.sh",
-                "update_script": "update-reviews-service.sh"
+                "update_script": "update-reviews-service.sh",
+                "https_enabled": True,
+                "public_url": "https://reviews.bidr.co.za"
             }
         }
 

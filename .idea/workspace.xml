@@ -4,112 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="refactor: remove redundant migrations from product and analytics services&#10;&#10;- Eliminate unused migrations files, simplifying database migration history&#10;- Cleanup includes all migration files from product_requests, quotes, and analytics apps">
-      <change afterPath="$PROJECT_DIR$/CSRF_FIX_DOCUMENTATION.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/azure-deployment-backup/DEPLOYMENT_SUMMARY.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/azure-deployment-backup/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/azure-deployment-backup/auth-service-config.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/azure-deployment-backup/deploy-auth-service.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/azure-deployment-backup/deploy-with-config.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/azure-deployment-backup/manage-auth-service.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/azure-deployment/DEPLOYMENT_SUMMARY.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/azure-deployment/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/azure-deployment/auth-service-config.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/azure-deployment/deploy-auth-service.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/azure-deployment/deploy-with-config.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/azure-deployment/manage-auth-service.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/migrate_user_encryption.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/authentication_service/user/backends.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chat_service/azure-deployment/chat-service-config.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chat_service/azure-deployment/deploy-chat-service.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chat_service/chat_messaging/migrations/0004_message_sender_name_message_sender_role.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chat_service/chat_service/settings_production.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/notifications_service/Dockerfile.standalone" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/notifications_service/azure-deployment/deploy-notifications-service.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/notifications_service/azure-deployment/notifications-service-config.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/notifications_service/notifications-aci.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/analytics/migrations/0002_initial.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/README-Enhanced-Template.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/deploy-example-product-service.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/deploy-product-service.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/deploy-service-template-enhanced.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/logs/product-service-logs-20250906-202238.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/logs/product-service-logs-20250906-222325.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/logs/product-service-logs-20250906-235338.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/product-service-config.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/core/docker.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/core/image_utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/core/middleware.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/csp_settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/product_requests/migrations/0002_initial.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/product_management_service/product_requests/migrations/0003_alter_order_status_collectioncode.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resolution_service/azure-deployment/deploy-resolution-service.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resolution_service/azure-deployment/resolution-service-config.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/reviews_and_ratings/azure-deployment/deploy-reviews-service.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/reviews_and_ratings/azure-deployment/reviews-service-config.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/reviews_and_ratings/entrypoint.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/reviews_and_ratings/reviews-aci.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/start-ngrok-tunnels.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/start-product-service.sh" afterDir="false" />
+    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="chore: remove unused migrations and add image upload handling&#10;&#10;- Delete obsolete migrations from quotes, analytics, and product_requests apps&#10;- Implement serializers for product and VIN image uploads in product_requests&#10;- Add server-side validation and saving logic for uploaded files&#10;- Improve serializers' `to_internal_value` for handling mutable data structures&#10;- Adjust logic to support image processing in category-specific data&#10;- Add new test cases for payment transactions and update payment model tests&#10;- Conditional inclusion of Prometheus metrics endpoint in chat service&#10;- Introduce seller earnings endpoint tests in payment_transactions">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication_service/authentication_service/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/authentication_service/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication_service/authentication_service/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/authentication_service/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/authentication_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication_service/otp/multi_channel_views.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/otp/multi_channel_views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication_service/otp/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/otp/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication_service/otp/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/otp/services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication_service/otp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/otp/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication_service/user/managers.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/user/managers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication_service/user/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/user/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication_service/user/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/user/serializers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/authentication_service/user/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/user/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat_service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/chat_conversations/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/chat_messaging/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/chat_messaging/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/chat_service/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/chat_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/chat_service/logs/chat_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/logs/chat_service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notifications_service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/notifications_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/notifications_service/logs/notification_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/logs/notification_service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notifications_service/notifications/wsgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/notifications/wsgi.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/analytics/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/analytics/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/analytics/migrations/0002_remove_categoryanalytics_active_products_and_more.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/app_logs/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/app_logs/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notifications_service/system_notifications/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/system_notifications/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/azure-deployment/bidr-deploy-manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/bidr-deploy-manager.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/azure-deployment/update-chat-service.sh" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/update-chat-service.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/azure-deployment/update-product-service.sh" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/update-product-service.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/categories/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/categories/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/azure-deployment/update-notifications-service.sh" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/update-notifications-service.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/azure-deployment/update-reviews-service.sh" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/azure-deployment/update-reviews-service.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/logs/product_management_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/logs/product_management_service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/product_logs/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_logs/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/product_management_service/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_management_service/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/migrations/0002_order.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/migrations/0003_productrequest_auth_user_uid_and_more.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/migrations/0004_convert_to_uuid_fields.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/migrations/0005_add_flag_fields.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/quotes/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/quotes/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/quotes/migrations/0002_alter_quote_valid_until.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/ratings/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/ratings/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/transactions/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/transactions/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resolution_service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/resolution_service/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resolution_service/logs/resolution_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/resolution_service/logs/resolution_service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resolution_service/services-requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/resolution_service/services-requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reviews_and_ratings/reviews/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/reviews_and_ratings/reviews/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ssl-deployments/auth/auth/otp/multi_channel_views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ssl-deployments/auth/auth/otp/multi_channel_views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ssl-deployments/auth/auth/otp/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/ssl-deployments/auth/auth/otp/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ssl-deployments/auth/auth/otp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ssl-deployments/auth/auth/otp/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transactions_service/payment_transactions/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/transactions_service/payment_transactions/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transactions_service/payment_transactions/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/transactions_service/payment_transactions/tests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transactions_service/payment_transactions/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/transactions_service/payment_transactions/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -144,29 +55,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Django Server.Unnamed.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.settings.executor&quot;: &quot;Run&quot;,
-    &quot;Python.urls.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/thulanimoyo/Library/Application Support/JetBrains/PyCharm2025.2/plugins/Shell Script/shellcheck&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Django Server.Unnamed.executor": "Run",
+    "Python.settings.executor": "Run",
+    "Python.urls.executor": "Run",
+    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SHELLCHECK.PATH": "/Users/thulanimoyo/Library/Application Support/JetBrains/PyCharm2025.2/plugins/Shell Script/shellcheck",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/product_management_service" />
@@ -252,7 +163,8 @@
       <workItem from="1757062198099" duration="20619000" />
       <workItem from="1757172756368" duration="90000" />
       <workItem from="1757173430466" duration="44289000" />
-      <workItem from="1757263817521" duration="8788000" />
+      <workItem from="1757263817521" duration="27441000" />
+      <workItem from="1757374629830" duration="3792000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <option name="closed" value="true" />
@@ -342,7 +254,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757182457985</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="chore: remove unused migrations and add image upload handling&#10;&#10;- Delete obsolete migrations from quotes, analytics, and product_requests apps&#10;- Implement serializers for product and VIN image uploads in product_requests&#10;- Add server-side validation and saving logic for uploaded files&#10;- Improve serializers' `to_internal_value` for handling mutable data structures&#10;- Adjust logic to support image processing in category-specific data&#10;- Add new test cases for payment transactions and update payment model tests&#10;- Conditional inclusion of Prometheus metrics endpoint in chat service&#10;- Introduce seller earnings endpoint tests in payment_transactions">
+      <option name="closed" value="true" />
+      <created>1757315766849</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1757315766849</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -364,7 +284,8 @@
     <MESSAGE value="feat: configure chat service with HTTPS using Azure Application Gateway&#10;&#10;- Add Let's Encrypt SSL certificate for `chat-service.bidr.co.za`&#10;- Configure routing with Application Gateway HTTPS listener and backend pool&#10;- Include deployment summary and diagnostic commands&#10;- Introduce `.dockerignore` for reviews_and_ratings service&#10;- Add container and infrastructure configs for authentication service backend&#10;- Prepare DNS and monitoring steps for production readiness&#10;- Note temporary backend usage and plan for chat container stabilization" />
     <MESSAGE value="`Remove obsolete migration files across services for cleanup and consistency`" />
     <MESSAGE value="refactor: remove redundant migrations from product and analytics services&#10;&#10;- Eliminate unused migrations files, simplifying database migration history&#10;- Cleanup includes all migration files from product_requests, quotes, and analytics apps" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: remove redundant migrations from product and analytics services&#10;&#10;- Eliminate unused migrations files, simplifying database migration history&#10;- Cleanup includes all migration files from product_requests, quotes, and analytics apps" />
+    <MESSAGE value="chore: remove unused migrations and add image upload handling&#10;&#10;- Delete obsolete migrations from quotes, analytics, and product_requests apps&#10;- Implement serializers for product and VIN image uploads in product_requests&#10;- Add server-side validation and saving logic for uploaded files&#10;- Improve serializers' `to_internal_value` for handling mutable data structures&#10;- Adjust logic to support image processing in category-specific data&#10;- Add new test cases for payment transactions and update payment model tests&#10;- Conditional inclusion of Prometheus metrics endpoint in chat service&#10;- Introduce seller earnings endpoint tests in payment_transactions" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: remove unused migrations and add image upload handling&#10;&#10;- Delete obsolete migrations from quotes, analytics, and product_requests apps&#10;- Implement serializers for product and VIN image uploads in product_requests&#10;- Add server-side validation and saving logic for uploaded files&#10;- Improve serializers' `to_internal_value` for handling mutable data structures&#10;- Adjust logic to support image processing in category-specific data&#10;- Add new test cases for payment transactions and update payment model tests&#10;- Conditional inclusion of Prometheus metrics endpoint in chat service&#10;- Introduce seller earnings endpoint tests in payment_transactions" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

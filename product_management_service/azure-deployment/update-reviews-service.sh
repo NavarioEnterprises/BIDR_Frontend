@@ -8,17 +8,18 @@ RESOURCE_GROUP="bidr-simple-rg"
 REGISTRY_NAME="bidrsimpleregistry"
 CONTAINER_NAME="bidr-reviews-service"
 IMAGE_NAME="bidr-reviews-service"
-reviews_8007=8007
+SERVICE_PORT=8000
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-reviews_DIR="$(dirname "$SCRIPT_DIR")/reviews_and_ratings"
+BASE_DIR="$(dirname "$(dirname "$SCRIPT_DIR)")"
+REVIEWS_DIR="$BASE_DIR/reviews_and_ratings"
 
-if [ ! -d "$reviews_DIR" ]; then
-    echo "❌ reviews service directory not found at: $reviews_DIR"
+if [ ! -d "$REVIEWS_DIR" ]; then
+    echo "❌ Reviews service directory not found at: $REVIEWS_DIR"
     exit 1
 fi
 
-cd "$reviews_DIR"
+cd "$REVIEWS_DIR"
 echo "Changed to reviews service directory"
 
 TIMESTAMP=$(date +%s)
@@ -49,7 +50,7 @@ az container create \
     --registry-username $REGISTRY_USERNAME \
     --registry-password $REGISTRY_PASSWORD \
     --dns-name-label $DNS_LABEL \
-    --ports $reviews_8007 \
+    --ports $SERVICE_PORT \
     --cpu 1 \
     --memory 1.5 \
     --restart-policy OnFailure \
@@ -80,5 +81,5 @@ CONTAINER_STATE=$(echo $NEW_CONTAINER_INFO | jq -r '.state // "Unknown"')
 echo "🎉 reviews Service Updated!"
 echo "Image Tag: $NEW_TAG"
 echo "Container State: $CONTAINER_STATE"
-echo "Service URL: http://${NEW_FQDN}:${reviews_8007}"
-echo "🎯 Health Check: curl http://${NEW_FQDN}:${reviews_8007}/health/"
+echo "Service URL: http://${NEW_FQDN}:${SERVICE_PORT}"
+echo "🎯 Health Check: curl http://${NEW_FQDN}:${SERVICE_PORT}/health/"

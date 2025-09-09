@@ -11,7 +11,7 @@ IMAGE_NAME="bidr-notifications-service"
 notifications_8005=8005
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-notifications_DIR="$(dirname "$SCRIPT_DIR")/notifications_service"
+notifications_DIR="/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend/notifications_service"
 
 if [ ! -d "$notifications_DIR" ]; then
     echo "❌ notifications service directory not found at: $notifications_DIR"

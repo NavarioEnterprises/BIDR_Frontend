@@ -14,6 +14,7 @@ from .services import NotificationDeliveryService
 class NotificationTemplateViewSet(viewsets.ModelViewSet):
     """ViewSet for notification templates"""
     queryset = NotificationTemplate.objects.all()
+    permission_classes = [permissions.AllowAny]
     
     def list(self, request):
         return Response({"message": "NotificationTemplate list endpoint"})
@@ -31,6 +32,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
 class NotificationPreferenceViewSet(viewsets.ModelViewSet):
     """ViewSet for notification preferences"""
     queryset = NotificationPreference.objects.all()
+    permission_classes = [permissions.AllowAny]
     
     def list(self, request):
         return Response({"message": "NotificationPreference list endpoint"})
@@ -39,6 +41,7 @@ class NotificationPreferenceViewSet(viewsets.ModelViewSet):
 class NotificationBatchViewSet(viewsets.ModelViewSet):
     """ViewSet for notification batches"""
     queryset = NotificationBatch.objects.all()
+    permission_classes = [permissions.AllowAny]
     
     def list(self, request):
         return Response({"message": "NotificationBatch list endpoint"})
@@ -47,6 +50,7 @@ class NotificationBatchViewSet(viewsets.ModelViewSet):
 class NotificationQueueViewSet(viewsets.ModelViewSet):
     """ViewSet for notification queue"""
     queryset = NotificationQueue.objects.all()
+    permission_classes = [permissions.AllowAny]
     
     def list(self, request):
         return Response({"message": "NotificationQueue list endpoint"})
@@ -54,6 +58,7 @@ class NotificationQueueViewSet(viewsets.ModelViewSet):
 
 class SendNotificationView(APIView):
     """Send a single notification with email and SMS support"""
+    permission_classes = [permissions.AllowAny]
     
     def post(self, request):
         """Send notification through multiple channels"""
@@ -123,6 +128,7 @@ class SendNotificationView(APIView):
 
 class SendOTPNotificationView(APIView):
     """Send OTP through multiple channels"""
+    permission_classes = [permissions.AllowAny]
     
     def post(self, request):
         """Send OTP via email and/or SMS"""
@@ -186,6 +192,7 @@ class SendOTPNotificationView(APIView):
 
 class BulkSendNotificationsView(APIView):
     """Send bulk notifications"""
+    permission_classes = [permissions.AllowAny]
     
     def post(self, request):
         """Send notifications in bulk"""
