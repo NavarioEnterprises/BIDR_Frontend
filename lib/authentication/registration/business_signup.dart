@@ -238,7 +238,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       // Optional: Auto-debounced address validation
       _debounceAddressValidation();
     });
-    
+
     // Load saved form progress
     _loadFormProgress();
   }
@@ -323,39 +323,40 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   // URL validation helper
   bool _isValidURL(String url) {
     if (url.trim().isEmpty) return true; // Optional field
-    
+
     try {
       final trimmedUrl = url.trim();
-      
+
       // Add protocol if missing
       String urlToValidate = trimmedUrl;
-      if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
+      if (!trimmedUrl.startsWith('http://') &&
+          !trimmedUrl.startsWith('https://')) {
         urlToValidate = 'https://$trimmedUrl';
       }
-      
+
       final uri = Uri.parse(urlToValidate);
-      
+
       // Must have a host
       if (uri.host.isEmpty) {
         return false;
       }
-      
+
       // Host must contain at least one dot (domain.extension)
       if (!uri.host.contains('.')) {
         return false;
       }
-      
+
       // Basic domain validation - must have at least domain.tld
       final hostParts = uri.host.split('.');
       if (hostParts.length < 2 || hostParts.any((part) => part.isEmpty)) {
         return false;
       }
-      
+
       // Last part must be at least 2 characters (TLD)
       if (hostParts.last.length < 2) {
         return false;
       }
-      
+
       return true;
     } catch (e) {
       return false;
@@ -481,7 +482,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       );
       return false;
     }
-    if (_websiteUrlController.text.trim().isNotEmpty && !_isValidURL(_websiteUrlController.text)) {
+    if (_websiteUrlController.text.trim().isNotEmpty &&
+        !_isValidURL(_websiteUrlController.text)) {
       _showFieldValidationError(
         'Please enter a valid website URL (e.g., example.com or https://example.com)',
         focusNodes['websiteUrl']!,
@@ -846,11 +848,14 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       final Map<String, String> formData = {
         'business_company_name': _companyNameController.text.trim(),
         'business_trading_name': _tradingNameController.text.trim(),
-        'business_registration_number': _registrationNumberController.text.trim(),
+        'business_registration_number': _registrationNumberController.text
+            .trim(),
         'business_website_url': _websiteUrlController.text.trim(),
         'business_year_established': _yearEstablishedController.text.trim(),
-        'business_contact_person_name': _contactPersonNameController.text.trim(),
-        'business_contact_telephone': _contactPersonTelephoneController.text.trim(),
+        'business_contact_person_name': _contactPersonNameController.text
+            .trim(),
+        'business_contact_telephone': _contactPersonTelephoneController.text
+            .trim(),
         'business_contact_email': _contactPersonEmailController.text.trim(),
         'business_platform_email': _platformWorkflowEmailController.text.trim(),
         'business_account_holder': _accountHolderController.text.trim(),
@@ -908,7 +913,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       if (progress != null) {
         setState(() {
           currentStep = progress['currentStep'] ?? 0;
-          
+
           final formData = progress['formData'] as Map<String, dynamic>? ?? {};
           _firstNameController.text = formData['firstName'] ?? '';
           _lastNameController.text = formData['lastName'] ?? '';
@@ -916,23 +921,30 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           _userPhoneController.text = formData['userPhone'] ?? '';
           _companyNameController.text = formData['companyName'] ?? '';
           _tradingNameController.text = formData['tradingName'] ?? '';
-          _registrationNumberController.text = formData['registrationNumber'] ?? '';
+          _registrationNumberController.text =
+              formData['registrationNumber'] ?? '';
           _vatNumberController.text = formData['vatNumber'] ?? '';
           _websiteUrlController.text = formData['websiteUrl'] ?? '';
           _yearEstablishedController.text = formData['yearEstablished'] ?? '';
           _postalAddressController.text = formData['postalAddress'] ?? '';
           _physicalAddressController.text = formData['physicalAddress'] ?? '';
-          _contactPersonNameController.text = formData['contactPersonName'] ?? '';
-          _contactPersonTelephoneController.text = formData['contactPersonTelephone'] ?? '';
-          _contactPersonEmailController.text = formData['contactPersonEmail'] ?? '';
-          _platformWorkflowEmailController.text = formData['platformWorkflowEmail'] ?? '';
+          _contactPersonNameController.text =
+              formData['contactPersonName'] ?? '';
+          _contactPersonTelephoneController.text =
+              formData['contactPersonTelephone'] ?? '';
+          _contactPersonEmailController.text =
+              formData['contactPersonEmail'] ?? '';
+          _platformWorkflowEmailController.text =
+              formData['platformWorkflowEmail'] ?? '';
           _accountNumberController.text = formData['accountNumber'] ?? '';
           _accountHolderController.text = formData['accountHolder'] ?? '';
-          
-          selectedCategories = List<String>.from(progress['selectedCategories'] ?? []);
+
+          selectedCategories = List<String>.from(
+            progress['selectedCategories'] ?? [],
+          );
           _selectedBank = progress['selectedBank'];
           _selectedBranchCode = progress['selectedBranchCode'];
-          
+
           // Mark completed steps
           for (int i = 0; i < currentStep; i++) {
             if (i < steps.length) {
@@ -940,7 +952,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
             }
           }
         });
-        
+
         // Navigate to saved step
         WidgetsBinding.instance.addPostFrameCallback((_) {
           pageController.jumpToPage(currentStep);
@@ -1357,11 +1369,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         padding: EdgeInsets.all(0),
         child: Container(
           width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            border: MediaQuery.of(context).size.width < 800
-                ? null
-                : Border.all(color: Constants.gtaColorLight, width: 20),
-          ),
+          decoration: BoxDecoration(border: null),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -2103,8 +2111,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
-            color: const Color(0xFFF8F9FA),
+            border: Border.all(color: Colors.black, width: 2),
+            color: Colors.white,
           ),
           child: InkWell(
             onTap: _showLocationPickerDialog,
@@ -2115,7 +2123,9 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                 children: [
                   Icon(
                     Icons.location_on,
-                    color: _selectedLocationText != null && _selectedLocationText!.isNotEmpty
+                    color:
+                        _selectedLocationText != null &&
+                            _selectedLocationText!.isNotEmpty
                         ? Constants.ctaColorLight
                         : const Color(0xFF666666),
                     size: 20,
@@ -2123,11 +2133,14 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      _selectedLocationText != null && _selectedLocationText!.isNotEmpty
+                      _selectedLocationText != null &&
+                              _selectedLocationText!.isNotEmpty
                           ? _selectedLocationText!
                           : 'Select Location on Map',
                       style: GoogleFonts.manrope(
-                        color: _selectedLocationText != null && _selectedLocationText!.isNotEmpty
+                        color:
+                            _selectedLocationText != null &&
+                                _selectedLocationText!.isNotEmpty
                             ? const Color(0xFF333333)
                             : const Color(0xFF999999),
                         fontSize: 16,
@@ -2202,8 +2215,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
-            color: const Color(0xFFF8F9FA),
+            border: Border.all(color: Colors.black, width: 2),
+            color: Colors.white,
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
@@ -2263,8 +2276,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
-            color: const Color(0xFFF8F9FA),
+            border: Border.all(color: Colors.black, width: 2),
+            color: Colors.white,
           ),
           child: Text(
             _selectedBranchCode ?? 'Select a bank first',
@@ -2553,8 +2566,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
-            color: const Color(0xFFF8F9FA),
+            border: Border.all(color: Colors.black, width: 2),
+            color: Colors.white,
           ),
           child: TextFormField(
             controller: controller,
@@ -2653,10 +2666,10 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
                         border: Border.all(
-                          color: const Color(0xFFE0E0E0),
+                          color: Colors.black,
                           width: 2,
                         ),
-                        color: const Color(0xFFF8F9FA),
+                        color: Colors.white,
                       ),
                       child: TextFormField(
                         controller: fieldController,
@@ -2709,7 +2722,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFE0E0E0)),
+                        border: Border.all(color: Colors.black),
                       ),
                       child: ListView.builder(
                         shrinkWrap: true,
@@ -2727,7 +2740,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                 border: Border(
                                   bottom: BorderSide(
                                     color: index < options.length - 1
-                                        ? const Color(0xFFE0E0E0)
+                                        ? Colors.black
                                         : Colors.transparent,
                                     width: 1,
                                   ),
@@ -2811,10 +2824,10 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(
-                      color: const Color(0xFFE0E0E0),
+                      color: Colors.black,
                       width: 2,
                     ),
-                    color: const Color(0xFFF8F9FA),
+                    color: Colors.white,
                   ),
                   child: TextFormField(
                     controller: controller,
@@ -2852,7 +2865,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE0E0E0)),
+                    border: Border.all(color: Colors.black),
                   ),
                   child: ListView.builder(
                     shrinkWrap: true,
@@ -2870,7 +2883,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                             border: Border(
                               bottom: BorderSide(
                                 color: index < options.length - 1
-                                    ? const Color(0xFFE0E0E0)
+                                    ? Colors.black
                                     : Colors.transparent,
                                 width: 1,
                               ),
@@ -2979,8 +2992,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
-              color: const Color(0xFFF8F9FA),
+              border: Border.all(color: Colors.black, width: 2),
+              color: Colors.white,
             ),
             child: Row(
               children: [
@@ -3007,7 +3020,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE0E0E0)),
+              border: Border.all(color: Colors.black),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -3499,7 +3512,10 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Constants.ctaColorLight, Constants.ctaColorLight.withOpacity(0.8)],
+                  colors: [
+                    Constants.ctaColorLight,
+                    Constants.ctaColorLight.withOpacity(0.8),
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -3555,8 +3571,8 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      color: const Color(0xFFF8F9FA),
-                      border: Border.all(color: const Color(0xFFE0E0E0)),
+                      color: Colors.white,
+                      border: Border.all(color: Colors.black),
                     ),
                     child: TextField(
                       controller: _searchController,
@@ -3605,7 +3621,8 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
                       onChanged: (value) {
                         // Debounce search
                         Future.delayed(const Duration(milliseconds: 500), () {
-                          if (_searchController.text == value && value.isNotEmpty) {
+                          if (_searchController.text == value &&
+                              value.isNotEmpty) {
                             _searchPlaces(value);
                           }
                         });
@@ -3620,7 +3637,7 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFE0E0E0)),
+                        border: Border.all(color: Colors.black),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.08),
@@ -3650,7 +3667,8 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
                                     Container(
                                       padding: const EdgeInsets.all(6),
                                       decoration: BoxDecoration(
-                                        color: Constants.ctaColorLight.withOpacity(0.1),
+                                        color: Constants.ctaColorLight
+                                            .withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Icon(
@@ -3701,7 +3719,7 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border(
-                  top: BorderSide(color: const Color(0xFFE0E0E0), width: 1),
+                  top: BorderSide(color: Colors.black, width: 1),
                 ),
               ),
               padding: const EdgeInsets.all(20),
@@ -3711,11 +3729,14 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
                   if (_currentAddress.isNotEmpty)
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8F9FA),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFE0E0E0)),
+                        border: Border.all(color: Colors.black),
                       ),
                       child: Row(
                         children: [
@@ -3764,7 +3785,7 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            side: BorderSide(color: const Color(0xFFE0E0E0)),
+                            side: BorderSide(color: Colors.black),
                           ),
                           child: Text(
                             'Cancel',

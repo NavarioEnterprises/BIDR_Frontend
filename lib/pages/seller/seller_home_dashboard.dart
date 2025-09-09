@@ -6758,6 +6758,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     final totalAmount =
         order['total_amount']?.toString() ?? order['amount']?.toString() ?? '0';
     final currency = order['currency'] ?? 'ZAR';
+    print("dfggh $order");
     final buyerName =
         order['buyer_name'] ?? order['buyerName'] ?? 'Unknown Buyer';
     final orderStatus = order['status']?.toString().toUpperCase() ?? 'PAID';
@@ -6969,6 +6970,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     final currency = order['currency'] ?? 'ZAR';
     final buyerName =
         order['buyer_name'] ?? order['buyerName'] ?? 'Unknown Buyer';
+    print("dfggh $order");
     final orderStatus =
         order['status']?.toString().toUpperCase() ?? 'COMPLETED';
 
@@ -7367,7 +7369,10 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   void _showPinConfirmationDialog(Map<String, dynamic> order) {
-    final List<TextEditingController> pinControllers = List.generate(4, (index) => TextEditingController());
+    final List<TextEditingController> pinControllers = List.generate(
+      4,
+      (index) => TextEditingController(),
+    );
     final List<FocusNode> focusNodes = List.generate(4, (index) => FocusNode());
 
     showDialog(
@@ -7525,13 +7530,11 @@ class _SellerDashboardState extends State<SellerDashboard>
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      String pin = pinControllers.map((controller) => controller.text).join();
+                      String pin = pinControllers
+                          .map((controller) => controller.text)
+                          .join();
                       if (pin.length == 4) {
-                        _confirmDeliveryWithPin(
-                          order,
-                          pin,
-                          context,
-                        );
+                        _confirmDeliveryWithPin(order, pin, context);
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -7640,23 +7643,26 @@ class _SellerDashboardState extends State<SellerDashboard>
             // Show success message
             MotionToast.success(
               title: Text(
-                'Success',
-                style: GoogleFonts.manrope(fontSize: 16, fontWeight: FontWeight.w700),
+                'Pin verified successfully',
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
-              description: Text(
-                'Delivery confirmed successfully!',
-                style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
-              ),
+              description: Text(''),
               animationType: AnimationType.slideInFromBottom,
               width: 300,
-              height: 80,
+              height: 45,
               borderRadius: 12,
               toastDuration: const Duration(seconds: 3),
             ).show(context);
           }
         } else {
           // API returned success=false
-          _showErrorMessage(data['message'] ?? 'Invalid PIN or PIN has expired');
+          _showErrorMessage(
+            data['message'] ?? 'Invalid PIN or PIN has expired',
+          );
         }
       } else {
         // Non-200 status code

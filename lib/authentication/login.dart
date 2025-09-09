@@ -124,14 +124,7 @@ class _LoginPageState extends State<LoginPage> {
         padding: const EdgeInsets.all(0.0),
         child: Container(
           width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            border: MediaQuery.of(context).size.width > 800
-                ? Border.all(
-                    color: Constants.gtaColorLight,
-                    width: (MediaQuery.of(context).size.width > 800) ? 20 : 0,
-                  )
-                : null,
-          ),
+          decoration: BoxDecoration(border: null),
           child: Row(
             children: [
               if (MediaQuery.of(context).size.width > 800)
