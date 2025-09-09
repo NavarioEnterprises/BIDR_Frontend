@@ -1,4 +1,5 @@
 import 'package:bidr/constants/Constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -58,48 +59,42 @@ class _ProfileManagementMobileState extends State<ProfileManagementMobile> with 
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          // Header
-          Container(
-            decoration: BoxDecoration(
-              color: Constants.ftaColorLight,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: EdgeInsets.all(spacing.paddingMedium),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: HugeIcon(
-                        icon: HugeIcons.strokeRoundedArrowLeft01,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                    SizedBox(width: spacing.spacingSmall),
-                    ResponsiveText(
-                      text: 'Profile',
-                      type: TextType.medium,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ],
-                ),
-              ),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:IconButton(
+          onPressed:(){
+            Navigator.pop(context);
+            setState(() {
+
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-
-          // Profile Menu List
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        title: Text(
+          "Profile",
+          style: GoogleFonts.manrope(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
           Expanded(
             child: ListView(
               padding: EdgeInsets.all(spacing.paddingMedium),
@@ -449,113 +444,140 @@ class _EditProfilePageState extends State<EditProfilePage> with SnackBarMixin {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _buildHeader(context, 'Edit Profile', typography, spacing),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(spacing.paddingLarge),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Personal Information',
-                    style: GoogleFonts.manrope(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Update your personal details',
-                    style: GoogleFonts.manrope(fontSize: 13, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 32),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:IconButton(
+          onPressed:(){
+            Navigator.pop(context);
+            setState(() {
 
-                  _buildMobileInputField(
-                    'First Name',
-                    'Enter First Name',
-                    _firstNameController,
-                    _firstNameFocusNode,
-                    TextInputAction.next,
-                    typography,
-                    spacing,
-                    onSubmitted: (value) => _lastNameFocusNode.requestFocus(),
-                  ),
-                  const SizedBox(height: 24),
-
-                  _buildMobileInputField(
-                    'Last Name',
-                    'Enter Last Name',
-                    _lastNameController,
-                    _lastNameFocusNode,
-                    TextInputAction.next,
-                    typography,
-                    spacing,
-                    onSubmitted: (value) => _mobileFocusNode.requestFocus(),
-                  ),
-                  const SizedBox(height: 24),
-
-                  _buildMobileInputField(
-                    'Mobile Number',
-                    'Enter Mobile Number',
-                    _mobileController,
-                    _mobileFocusNode,
-                    TextInputAction.next,
-                    typography,
-                    spacing,
-                    onSubmitted: (value) => _emailFocusNode.requestFocus(),
-                  ),
-                  const SizedBox(height: 24),
-
-                  _buildMobileInputField(
-                    'Email',
-                    'Enter Email',
-                    _emailController,
-                    _emailFocusNode,
-                    TextInputAction.done,
-                    typography,
-                    spacing,
-                  ),
-                  const SizedBox(height: 32),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _saveChanges,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Constants.ctaColorLight,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(360),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                          : Text(
-                        'Save Changes',
-                        style: GoogleFonts.manrope(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-        ],
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        title: Text(
+          "Edit Profile",
+          style: GoogleFonts.manrope(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(spacing.paddingLarge),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Personal Information',
+              style: GoogleFonts.manrope(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Update your personal details',
+              style: GoogleFonts.manrope(fontSize: 13, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 32),
+
+            _buildMobileInputField(
+              'First Name',
+              'Enter First Name',
+              _firstNameController,
+              _firstNameFocusNode,
+              TextInputAction.next,
+              typography,
+              spacing,
+              onSubmitted: (value) => _lastNameFocusNode.requestFocus(),
+            ),
+            const SizedBox(height: 24),
+
+            _buildMobileInputField(
+              'Last Name',
+              'Enter Last Name',
+              _lastNameController,
+              _lastNameFocusNode,
+              TextInputAction.next,
+              typography,
+              spacing,
+              onSubmitted: (value) => _mobileFocusNode.requestFocus(),
+            ),
+            const SizedBox(height: 24),
+
+            _buildMobileInputField(
+              'Mobile Number',
+              'Enter Mobile Number',
+              _mobileController,
+              _mobileFocusNode,
+              TextInputAction.next,
+              typography,
+              spacing,
+              onSubmitted: (value) => _emailFocusNode.requestFocus(),
+            ),
+            const SizedBox(height: 24),
+
+            _buildMobileInputField(
+              'Email',
+              'Enter Email',
+              _emailController,
+              _emailFocusNode,
+              TextInputAction.done,
+              typography,
+              spacing,
+            ),
+            const SizedBox(height: 32),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _saveChanges,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(360),
+                  ),
+                  elevation: 0,
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                    : Text(
+                  'Save Changes',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -722,9 +744,43 @@ class _EditSellerProfilePageState extends State<EditSellerProfilePage> with Snac
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:IconButton(
+          onPressed:(){
+            Navigator.pop(context);
+            setState(() {
+
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        title: Text(
+          "Edit Seller Profile",
+          style: GoogleFonts.manrope(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: Column(
         children: [
-          _buildHeader(context, 'Edit Seller Profile', typography, spacing),
+
           Expanded(
             child: isLoadingProfile && sellerProfileData == null
                 ? Center(
@@ -784,7 +840,10 @@ class _EditSellerProfilePageState extends State<EditSellerProfilePage> with Snac
                         itemCount: _sections.length,
                         itemBuilder: (context, index) {
                           final section = _sections[index];
-                          return _buildSectionItem(section, typography, spacing);
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: _buildSectionItem(section, typography, spacing),
+                          );
                         },
                       ),
           ),
@@ -804,48 +863,41 @@ class _EditSellerProfilePageState extends State<EditSellerProfilePage> with Snac
         color: Colors.transparent,
         child: InkWell(
           onTap: () => _navigateToSection(section.title),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(360),
           child: Container(
-            padding: EdgeInsets.all(spacing.paddingLarge),
+            padding: EdgeInsets.all(spacing.spacingSmall+3),
             decoration: BoxDecoration(
-              color: Constants.ctaColorLight.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Constants.ctaColorLight.withOpacity(0.2),
-                width: 1,
-              ),
+              color: Constants.ctaColorLight.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(360),
+
             ),
             child: Row(
               children: [
-                Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Constants.ctaColorLight.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    section.icon,
-                    size: 20,
-                    color: Constants.ctaColorLight,
-                  ),
-                ),
-                SizedBox(width: spacing.spacingMedium),
+                SizedBox(width: spacing.spacingLarge),
                 Expanded(
                   child: Text(
                     section.title.toUpperCase(),
                     style: GoogleFonts.manrope(
-                      fontSize: typography.normal,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: Constants.ctaColorLight,
                       letterSpacing: 0.5,
                     ),
                   ),
                 ),
-                Icon(
-                  HugeIcons.strokeRoundedArrowRight01,
-                  size: 16,
-                  color: Constants.ctaColorLight,
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(360),
+                  ),
+                  child:  Icon(
+                    CupertinoIcons.arrow_up_right,
+                    size: 18,
+                    color: Constants.ctaColorLight,
+                  ),
                 ),
+
               ],
             ),
           ),
@@ -1198,56 +1250,83 @@ class _PersonalDetailsPageState extends State<PersonalDetailsPage> with SnackBar
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _buildHeader(context, 'Personal Details', typography, spacing),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(spacing.paddingLarge),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ResponsiveText(
-                    text: 'Personal Information',
-                    type: TextType.subHeading,
-                    fontWeight: FontWeight.w600,
-                    color: Constants.ftaColorLight,
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:IconButton(
+          onPressed:(){
+            Navigator.pop(context);
+            setState(() {
 
-                  _buildInputField(
-                    'Full Name',
-                    'Enter Full Name',
-                    widget.personalFullNameController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Mobile Number',
-                    'Enter Mobile Number',
-                    widget.personalMobileController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Email',
-                    'Enter Email',
-                    widget.personalEmailController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  _buildSaveButton(typography, spacing, _savePersonalDetails),
-                ],
-              ),
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-        ],
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        title: Text(
+          "Personal Details",
+          style: GoogleFonts.manrope(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(spacing.paddingLarge),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ResponsiveText(
+              text: 'Personal Information',
+              type: TextType.subHeading,
+              fontWeight: FontWeight.w600,
+              color: Constants.ftaColorLight,
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            _buildInputField(
+              'Full Name',
+              'Enter Full Name',
+              widget.personalFullNameController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Mobile Number',
+              'Enter Mobile Number',
+              widget.personalMobileController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Email',
+              'Enter Email',
+              widget.personalEmailController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            _buildSaveButton(typography, spacing, _savePersonalDetails),
+          ],
+        ),
       ),
     );
   }
@@ -1300,102 +1379,129 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> with SnackBarMi
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _buildHeader(context, 'Change Password', typography, spacing),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(spacing.paddingLarge),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Update Password',
-                    style: GoogleFonts.manrope(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Enter your current password and new password',
-                    style: GoogleFonts.manrope(fontSize: 13, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 32),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:IconButton(
+          onPressed:(){
+            Navigator.pop(context);
+            setState(() {
 
-                  CustomInputTransparent4(
-                    hintText: 'Enter current password',
-                    labelText: 'Current Password',
-                    controller: _currentPasswordController,
-                    focusNode: FocusNode(),
-                    textInputAction: TextInputAction.next,
-                    isPasswordField: true,
-                    onChanged: (value) {},
-                    onSubmitted: (value) {},
-                  ),
-                  const SizedBox(height: 24),
-
-                  CustomInputTransparent4(
-                    hintText: 'Enter new password',
-                    labelText: 'New Password',
-                    controller: _newPasswordController,
-                    focusNode: FocusNode(),
-                    textInputAction: TextInputAction.next,
-                    isPasswordField: true,
-                    onChanged: (value) {},
-                    onSubmitted: (value) {},
-                  ),
-                  const SizedBox(height: 24),
-
-                  CustomInputTransparent4(
-                    hintText: 'Confirm new password',
-                    labelText: 'Confirm New Password',
-                    controller: _confirmPasswordController,
-                    focusNode: FocusNode(),
-                    textInputAction: TextInputAction.done,
-                    isPasswordField: true,
-                    onChanged: (value) {},
-                    onSubmitted: (value) {},
-                  ),
-                  const SizedBox(height: 32),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _changePassword,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Constants.ctaColorLight,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(360),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                          : Text(
-                        'Change Password',
-                        style: GoogleFonts.manrope(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-        ],
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        title: Text(
+          "Change Password",
+          style: GoogleFonts.manrope(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(spacing.paddingLarge),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Update Password',
+              style: GoogleFonts.manrope(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Enter your current password and new password',
+              style: GoogleFonts.manrope(fontSize: 13, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 32),
+
+            CustomInputTransparent4(
+              hintText: 'Enter current password',
+              labelText: 'Current Password',
+              controller: _currentPasswordController,
+              focusNode: FocusNode(),
+              textInputAction: TextInputAction.next,
+              isPasswordField: true,
+              onChanged: (value) {},
+              onSubmitted: (value) {},
+            ),
+            const SizedBox(height: 24),
+
+            CustomInputTransparent4(
+              hintText: 'Enter new password',
+              labelText: 'New Password',
+              controller: _newPasswordController,
+              focusNode: FocusNode(),
+              textInputAction: TextInputAction.next,
+              isPasswordField: true,
+              onChanged: (value) {},
+              onSubmitted: (value) {},
+            ),
+            const SizedBox(height: 24),
+
+            CustomInputTransparent4(
+              hintText: 'Confirm new password',
+              labelText: 'Confirm New Password',
+              controller: _confirmPasswordController,
+              focusNode: FocusNode(),
+              textInputAction: TextInputAction.done,
+              isPasswordField: true,
+              onChanged: (value) {},
+              onSubmitted: (value) {},
+            ),
+            const SizedBox(height: 32),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _changePassword,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(360),
+                  ),
+                  elevation: 0,
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                    : Text(
+                  'Change Password',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1463,94 +1569,121 @@ class _GetQuotePageState extends State<GetQuotePage> with SnackBarMixin {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _buildHeader(context, 'Get Quote', typography, spacing),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(spacing.paddingLarge),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Request Quote',
-                    style: GoogleFonts.manrope(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tell us about your project requirements',
-                    style: GoogleFonts.manrope(fontSize: 13, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 32),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:IconButton(
+          onPressed:(){
+            Navigator.pop(context);
+            setState(() {
 
-                  CustomInputTransparent4(
-                    hintText: 'Enter your email',
-                    labelText: 'Email',
-                    controller: _emailController,
-                    focusNode: FocusNode(),
-                    textInputAction: TextInputAction.next,
-                    isPasswordField: false,
-                    onChanged: (value) {},
-                    onSubmitted: (value) {},
-                  ),
-                  const SizedBox(height: 24),
-
-                  CustomInputTransparent4(
-                    hintText: 'Enter company name',
-                    labelText: 'Company Name',
-                    controller: _companyController,
-                    focusNode: FocusNode(),
-                    textInputAction: TextInputAction.next,
-                    isPasswordField: false,
-                    onChanged: (value) {},
-                    onSubmitted: (value) {},
-                  ),
-                  const SizedBox(height: 24),
-
-                  CustomInputTransparent4(
-                    hintText: 'Describe your project requirements',
-                    labelText: 'Project Details',
-                    controller: _projectDetailsController,
-                    focusNode: FocusNode(),
-                    textInputAction: TextInputAction.done,
-                    isPasswordField: false,
-                    maxLines: 5,
-                    onChanged: (value) {},
-                    onSubmitted: (value) {},
-                  ),
-                  const SizedBox(height: 32),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _requestQuote,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Constants.ctaColorLight,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(360),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'Request Quote',
-                        style: GoogleFonts.manrope(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-        ],
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        title: Text(
+          "Get Quote",
+          style: GoogleFonts.manrope(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body:SingleChildScrollView(
+        padding: EdgeInsets.all(spacing.paddingLarge),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Request Quote',
+              style: GoogleFonts.manrope(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Tell us about your project requirements',
+              style: GoogleFonts.manrope(fontSize: 13, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 32),
+
+            CustomInputTransparent4(
+              hintText: 'Enter your email',
+              labelText: 'Email',
+              controller: _emailController,
+              focusNode: FocusNode(),
+              textInputAction: TextInputAction.next,
+              isPasswordField: false,
+              onChanged: (value) {},
+              onSubmitted: (value) {},
+            ),
+            const SizedBox(height: 24),
+
+            CustomInputTransparent4(
+              hintText: 'Enter company name',
+              labelText: 'Company Name',
+              controller: _companyController,
+              focusNode: FocusNode(),
+              textInputAction: TextInputAction.next,
+              isPasswordField: false,
+              onChanged: (value) {},
+              onSubmitted: (value) {},
+            ),
+            const SizedBox(height: 24),
+
+            CustomInputTransparent4(
+              hintText: 'Describe your project requirements',
+              labelText: 'Project Details',
+              controller: _projectDetailsController,
+              focusNode: FocusNode(),
+              textInputAction: TextInputAction.done,
+              isPasswordField: false,
+              maxLines: 5,
+              onChanged: (value) {},
+              onSubmitted: (value) {},
+            ),
+            const SizedBox(height: 32),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _requestQuote,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(360),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'Request Quote',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1664,9 +1797,9 @@ Widget _buildSaveButton(TypographyConfig typography, SpacingConfig spacing, Void
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(
               backgroundColor: Constants.ctaColorLight,
-              padding: EdgeInsets.symmetric(vertical: spacing.paddingMedium),
+              padding: EdgeInsets.symmetric(vertical: spacing.paddingMedium+8),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(360),
               ),
             ),
             child: ResponsiveText(
@@ -1716,102 +1849,129 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> with SnackBarMi
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _buildHeader(context, 'Company Details', typography, spacing),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(spacing.paddingLarge),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ResponsiveText(
-                    text: 'Company Information',
-                    type: TextType.subHeading,
-                    fontWeight: FontWeight.w600,
-                    color: Constants.ftaColorLight,
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:IconButton(
+          onPressed:(){
+            Navigator.pop(context);
+            setState(() {
 
-                  _buildInputField(
-                    'Registered Company Name (CIPC)*',
-                    'Enter Registered Company Name',
-                    widget.companyNameController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Trading Name',
-                    'Enter Company Trading Name',
-                    widget.tradingNameController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Registration Number',
-                    'Enter Registration Number',
-                    widget.registrationNumberController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'VAT Number',
-                    'Enter VAT Number',
-                    widget.vatNumberController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Website URL',
-                    'Enter Website URL',
-                    widget.websiteUrlController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _saveCompanyDetails,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Constants.ctaColorLight,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: spacing.paddingMedium),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : ResponsiveText(
-                              text: 'Save Changes',
-                              type: TextType.medium,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
-                    ),
-                  ),
-                ],
-              ),
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-        ],
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        title: Text(
+          "Company Details",
+          style: GoogleFonts.manrope(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(spacing.paddingLarge),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ResponsiveText(
+              text: 'Company Information',
+              type: TextType.subHeading,
+              fontWeight: FontWeight.w600,
+              color: Constants.ftaColorLight,
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            _buildInputField(
+              'Registered Company Name (CIPC)*',
+              'Enter Registered Company Name',
+              widget.companyNameController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Trading Name',
+              'Enter Company Trading Name',
+              widget.tradingNameController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Registration Number',
+              'Enter Registration Number',
+              widget.registrationNumberController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'VAT Number',
+              'Enter VAT Number',
+              widget.vatNumberController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Website URL',
+              'Enter Website URL',
+              widget.websiteUrlController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _saveCompanyDetails,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: spacing.paddingMedium+8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(360),
+                  ),
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                    : ResponsiveText(
+                  text: 'Save Changes',
+                  type: TextType.medium,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1868,137 +2028,164 @@ class _CompanyAddressPageState extends State<CompanyAddressPage> with SnackBarMi
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _buildHeader(context, 'Company Address', typography, spacing),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(spacing.paddingLarge),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ResponsiveText(
-                    text: 'Address & Contact Information',
-                    type: TextType.subHeading,
-                    fontWeight: FontWeight.w600,
-                    color: Constants.ftaColorLight,
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:IconButton(
+          onPressed:(){
+            Navigator.pop(context);
+            setState(() {
 
-                  _buildInputField(
-                    'Postal Address',
-                    'Enter Postal Address',
-                    widget.postalAddressController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Physical Address',
-                    'Enter Physical Address',
-                    widget.physicalAddressController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'GPS Location',
-                    'Enter GPS Location',
-                    widget.gpsLocationController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Google Maps Link',
-                    'Enter Google Maps Link',
-                    widget.googleMapsLinkController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  ResponsiveText(
-                    text: 'Contact Person Details',
-                    type: TextType.medium,
-                    fontWeight: FontWeight.w600,
-                    color: Constants.ftaColorLight,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Contact Person Name',
-                    'Enter Contact Person Name',
-                    widget.contactPersonNameController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Contact Person Telephone',
-                    'Enter Contact Person Telephone',
-                    widget.contactPersonPhoneController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Contact Person Email Address',
-                    'Enter Contact Person Email Address',
-                    widget.contactPersonEmailController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Platform Workflow Email Address',
-                    'Enter Platform Workflow Email Address',
-                    widget.workflowEmailController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _saveCompanyAddress,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Constants.ctaColorLight,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: spacing.paddingMedium),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : ResponsiveText(
-                              text: 'Save Changes',
-                              type: TextType.medium,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
-                    ),
-                  ),
-                ],
-              ),
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-        ],
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        title: Text(
+          "Company Address",
+          style: GoogleFonts.manrope(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(spacing.paddingLarge),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ResponsiveText(
+              text: 'Address & Contact Information',
+              type: TextType.subHeading,
+              fontWeight: FontWeight.w600,
+              color: Constants.ftaColorLight,
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            _buildInputField(
+              'Postal Address',
+              'Enter Postal Address',
+              widget.postalAddressController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Physical Address',
+              'Enter Physical Address',
+              widget.physicalAddressController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'GPS Location',
+              'Enter GPS Location',
+              widget.gpsLocationController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Google Maps Link',
+              'Enter Google Maps Link',
+              widget.googleMapsLinkController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            ResponsiveText(
+              text: 'Contact Person Details',
+              type: TextType.medium,
+              fontWeight: FontWeight.w600,
+              color: Constants.ftaColorLight,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Contact Person Name',
+              'Enter Contact Person Name',
+              widget.contactPersonNameController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Contact Person Telephone',
+              'Enter Contact Person Telephone',
+              widget.contactPersonPhoneController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Contact Person Email Address',
+              'Enter Contact Person Email Address',
+              widget.contactPersonEmailController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Platform Workflow Email Address',
+              'Enter Platform Workflow Email Address',
+              widget.workflowEmailController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _saveCompanyAddress,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: spacing.paddingMedium+8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(360),
+                  ),
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                    : ResponsiveText(
+                  text: 'Save Changes',
+                  type: TextType.medium,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2053,180 +2240,207 @@ class _CompanyAccountPageState extends State<CompanyAccountPage> with SnackBarMi
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _buildHeader(context, 'Company Account', typography, spacing),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(spacing.paddingLarge),
-              child: Column(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading:IconButton(
+            onPressed:(){
+              Navigator.pop(context);
+              setState(() {
+
+              });
+            },
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Constants.ftaColorLight,
+              elevation: 5,
+              shadowColor: Colors.black54,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            icon: Icon(
+              CupertinoIcons.back,
+              color: Constants.ftaColorLight,
+            ),
+          ),
+          title: Text(
+            "Company Account",
+            style: GoogleFonts.manrope(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          centerTitle: true,
+        ),
+      body:SingleChildScrollView(
+        padding: EdgeInsets.all(spacing.paddingLarge),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ResponsiveText(
+              text: 'Banking Information',
+              type: TextType.subHeading,
+              fontWeight: FontWeight.w600,
+              color: Constants.ftaColorLight,
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            // Account Type Dropdown
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: spacing.paddingSmall),
+                  child: ResponsiveText(
+                    text: 'Bank Account Type',
+                    type: TextType.normal,
+                    color: Constants.ftaColorLight,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                ResponsiveGap(type: SpacingType.small),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(360),
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedAccountType,
+                    decoration: InputDecoration(
+                      hintText: 'Select Account Type',
+                      hintStyle: GoogleFonts.manrope(
+                        color: Colors.grey[500],
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                    items: _accountTypes.map((String type) {
+                      return DropdownMenuItem<String>(
+                        value: type,
+                        child: Text(
+                          type,
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedAccountType = value;
+                      });
+                    },
+                    icon: const Icon(Icons.arrow_drop_down),
+                  ),
+                ),
+              ],
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Bank Name',
+              'Enter Bank Name',
+              widget.bankNameController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Bank Account Number',
+              'Enter Bank Account Number',
+              widget.bankAccountNumberController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            _buildInputField(
+              'Bank Branch Code',
+              'Enter Bank Branch Code',
+              widget.bankBranchCodeController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            // Information Note
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(360),
+                border: Border.all(
+                  color: Colors.blue[200]!,
+                  width: 1,
+                ),
+              ),
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ResponsiveText(
-                    text: 'Banking Information',
-                    type: TextType.subHeading,
-                    fontWeight: FontWeight.w600,
-                    color: Constants.ftaColorLight,
+                  Icon(
+                    HugeIcons.strokeRoundedInformationCircle,
+                    color: Colors.blue[600],
+                    size: 20,
                   ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  // Account Type Dropdown
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: spacing.paddingSmall),
-                        child: ResponsiveText(
-                          text: 'Bank Account Type',
-                          type: TextType.normal,
-                          color: Constants.ftaColorLight,
-                          fontWeight: FontWeight.w500,
-                        ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Banking information is stored securely and used for payment processing. This information is currently saved locally and will be integrated with payment systems in future updates.',
+                      style: GoogleFonts.manrope(
+                        fontSize: 12,
+                        color: Colors.blue[700],
+                        fontWeight: FontWeight.w400,
                       ),
-                      ResponsiveGap(type: SpacingType.small),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: DropdownButtonFormField<String>(
-                          value: _selectedAccountType,
-                          decoration: InputDecoration(
-                            hintText: 'Select Account Type',
-                            hintStyle: GoogleFonts.manrope(
-                              color: Colors.grey[500],
-                              fontSize: 14,
-                              fontWeight: FontWeight.w300,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                          items: _accountTypes.map((String type) {
-                            return DropdownMenuItem<String>(
-                              value: type,
-                              child: Text(
-                                type,
-                                style: GoogleFonts.manrope(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (String? value) {
-                            setState(() {
-                              _selectedAccountType = value;
-                            });
-                          },
-                          icon: const Icon(Icons.arrow_drop_down),
-                        ),
-                      ),
-                    ],
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Bank Name',
-                    'Enter Bank Name',
-                    widget.bankNameController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Bank Account Number',
-                    'Enter Bank Account Number',
-                    widget.bankAccountNumberController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  _buildInputField(
-                    'Bank Branch Code',
-                    'Enter Bank Branch Code',
-                    widget.bankBranchCodeController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  // Information Note
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Colors.blue[200]!,
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          HugeIcons.strokeRoundedInformationCircle,
-                          color: Colors.blue[600],
-                          size: 20,
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Banking information is stored securely and used for payment processing. This information is currently saved locally and will be integrated with payment systems in future updates.',
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              color: Colors.blue[700],
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _saveCompanyAccount,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Constants.ctaColorLight,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: spacing.paddingMedium),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : ResponsiveText(
-                              text: 'Save Changes',
-                              type: TextType.medium,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            ResponsiveGap(type: SpacingType.large),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _saveCompanyAccount,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: spacing.paddingMedium+8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(360),
+                  ),
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                    : ResponsiveText(
+                  text: 'Save Changes',
+                  type: TextType.medium,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2276,111 +2490,138 @@ class _ProductCategoriesPageState extends State<ProductCategoriesPage> with Snac
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _buildHeader(context, 'Product Categories', typography, spacing),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(spacing.paddingLarge),
-              child: Column(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:IconButton(
+          onPressed:(){
+            Navigator.pop(context);
+            setState(() {
+
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        title: Text(
+          "Product Categories",
+          style: GoogleFonts.manrope(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(spacing.paddingLarge),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ResponsiveText(
+              text: 'Select Product Categories',
+              type: TextType.subHeading,
+              fontWeight: FontWeight.w600,
+              color: Constants.ftaColorLight,
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Choose the product categories that best describe your business',
+              style: GoogleFonts.manrope(
+                fontSize: 13,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            // Category checkboxes
+            ..._localCategories.entries.map((entry) => _buildCategoryCheckbox(
+              entry.key,
+              entry.value,
+              spacing,
+            )).toList(),
+
+            ResponsiveGap(type: SpacingType.large),
+
+            // Information Note
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.orange[50],
+                borderRadius: BorderRadius.circular(360),
+                border: Border.all(
+                  color: Colors.orange[200]!,
+                  width: 1,
+                ),
+              ),
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ResponsiveText(
-                    text: 'Select Product Categories',
-                    type: TextType.subHeading,
-                    fontWeight: FontWeight.w600,
-                    color: Constants.ftaColorLight,
+                  Icon(
+                    HugeIcons.strokeRoundedInformationCircle,
+                    color: Colors.orange[600],
+                    size: 20,
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Choose the product categories that best describe your business',
-                    style: GoogleFonts.manrope(
-                      fontSize: 13,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  // Category checkboxes
-                  ..._localCategories.entries.map((entry) => _buildCategoryCheckbox(
-                    entry.key,
-                    entry.value,
-                    spacing,
-                  )).toList(),
-
-                  ResponsiveGap(type: SpacingType.large),
-
-                  // Information Note
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.orange[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Colors.orange[200]!,
-                        width: 1,
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Select the categories that best match your product offerings. This helps customers find your products more easily.',
+                      style: GoogleFonts.manrope(
+                        fontSize: 12,
+                        color: Colors.orange[700],
+                        fontWeight: FontWeight.w400,
                       ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          HugeIcons.strokeRoundedInformationCircle,
-                          color: Colors.orange[600],
-                          size: 20,
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Select the categories that best match your product offerings. This helps customers find your products more easily.',
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              color: Colors.orange[700],
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _saveProductCategories,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Constants.ctaColorLight,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: spacing.paddingMedium),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : ResponsiveText(
-                              text: 'Save Changes',
-                              type: TextType.medium,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            ResponsiveGap(type: SpacingType.large),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _saveProductCategories,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: spacing.paddingMedium+8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(360),
+                  ),
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                    : ResponsiveText(
+                  text: 'Save Changes',
+                  type: TextType.medium,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2390,7 +2631,7 @@ class _ProductCategoriesPageState extends State<ProductCategoriesPage> with Snac
       margin: EdgeInsets.only(bottom: spacing.marginSmall),
       decoration: BoxDecoration(
         color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(360),
         border: Border.all(color: Constants.ftaColorLight.withOpacity(0.2)),
       ),
       child: Theme(
@@ -2483,205 +2724,232 @@ class _DisplayedOnPlatformPageState extends State<DisplayedOnPlatformPage> with 
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _buildHeader(context, 'Displayed On Platform', typography, spacing),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(spacing.paddingLarge),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading:IconButton(
+          onPressed:(){
+            Navigator.pop(context);
+            setState(() {
+
+            });
+          },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Constants.ftaColorLight,
+            elevation: 5,
+            shadowColor: Colors.black54,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          icon: Icon(
+            CupertinoIcons.back,
+            color: Constants.ftaColorLight,
+          ),
+        ),
+        title: Text(
+          "Displayed On Platform",
+          style: GoogleFonts.manrope(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(spacing.paddingLarge),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ResponsiveText(
+              text: 'Display Preferences',
+              type: TextType.subHeading,
+              fontWeight: FontWeight.w600,
+              color: Constants.ftaColorLight,
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Configure how your business name appears to customers on the platform',
+              style: GoogleFonts.manrope(
+                fontSize: 13,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            // Registered Name Checkbox
+            _buildCheckboxField(
+              'Use Registered Name',
+              _localRegisteredName,
+                  (bool? value) {
+                setState(() {
+                  _localRegisteredName = value ?? false;
+                });
+              },
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.medium),
+
+            // Trading Name Input
+            _buildInputField(
+              'Trading Name',
+              'Enter Trading Name',
+              widget.displayTradingNameController,
+              typography,
+              spacing,
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            // Preview Section
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Constants.ctaColorLight.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: Constants.ctaColorLight.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ResponsiveText(
-                    text: 'Display Preferences',
-                    type: TextType.subHeading,
-                    fontWeight: FontWeight.w600,
-                    color: Constants.ftaColorLight,
+                  Row(
+                    children: [
+                      Icon(
+                        HugeIcons.strokeRoundedEye,
+                        color: Constants.ctaColorLight,
+                        size: 20,
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        'Preview',
+                        style: GoogleFonts.manrope(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Constants.ctaColorLight,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 12),
                   Text(
-                    'Configure how your business name appears to customers on the platform',
+                    'Your business will be displayed as:',
                     style: GoogleFonts.manrope(
-                      fontSize: 13,
+                      fontSize: 12,
                       color: Colors.grey[600],
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  // Registered Name Checkbox
-                  _buildCheckboxField(
-                    'Use Registered Name',
-                    _localRegisteredName,
-                    (bool? value) {
-                      setState(() {
-                        _localRegisteredName = value ?? false;
-                      });
-                    },
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.medium),
-
-                  // Trading Name Input
-                  _buildInputField(
-                    'Trading Name',
-                    'Enter Trading Name',
-                    widget.displayTradingNameController,
-                    typography,
-                    spacing,
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  // Preview Section
+                  SizedBox(height: 8),
                   Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Constants.ctaColorLight.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Constants.ctaColorLight.withOpacity(0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              HugeIcons.strokeRoundedEye,
-                              color: Constants.ctaColorLight,
-                              size: 20,
-                            ),
-                            SizedBox(width: 12),
-                            Text(
-                              'Preview',
-                              style: GoogleFonts.manrope(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Constants.ctaColorLight,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          'Your business will be displayed as:',
-                          style: GoogleFonts.manrope(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: Colors.grey[300]!),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                HugeIcons.strokeRoundedBuilding02,
-                                color: Constants.ctaColorLight,
-                                size: 16,
-                              ),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _localRegisteredName 
-                                    ? 'Registered Company Name' 
-                                    : (widget.displayTradingNameController.text.isEmpty 
-                                        ? 'Trading Name' 
-                                        : widget.displayTradingNameController.text),
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  // Information Note
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Colors.blue[200]!,
-                        width: 1,
-                      ),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.grey[300]!),
                     ),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(
-                          HugeIcons.strokeRoundedInformationCircle,
-                          color: Colors.blue[600],
-                          size: 20,
+                          HugeIcons.strokeRoundedBuilding02,
+                          color: Constants.ctaColorLight,
+                          size: 16,
                         ),
-                        SizedBox(width: 12),
+                        SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'This setting determines which name customers will see when they view your business profile and products on the platform.',
+                            _localRegisteredName
+                                ? 'Registered Company Name'
+                                : (widget.displayTradingNameController.text.isEmpty
+                                ? 'Trading Name'
+                                : widget.displayTradingNameController.text),
                             style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              color: Colors.blue[700],
-                              fontWeight: FontWeight.w400,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
                             ),
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                  ResponsiveGap(type: SpacingType.large),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _saveDisplayPreferences,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Constants.ctaColorLight,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: spacing.paddingMedium),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : ResponsiveText(
-                              text: 'Save Changes',
-                              type: TextType.medium,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            ResponsiveGap(type: SpacingType.large),
+
+            // Information Note
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(360),
+                border: Border.all(
+                  color: Colors.blue[200]!,
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    HugeIcons.strokeRoundedInformationCircle,
+                    color: Colors.blue[600],
+                    size: 20,
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'This setting determines which name customers will see when they view your business profile and products on the platform.',
+                      style: GoogleFonts.manrope(
+                        fontSize: 12,
+                        color: Colors.blue[700],
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ResponsiveGap(type: SpacingType.large),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _saveDisplayPreferences,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: spacing.paddingMedium+8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(360),
+                  ),
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                    : ResponsiveText(
+                  text: 'Save Changes',
+                  type: TextType.medium,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2753,18 +3021,6 @@ class _DisplayedOnPlatformPageState extends State<DisplayedOnPlatformPage> with 
     } finally {
       setState(() => _isLoading = false);
     }
-  }
-}
-
-class AuthorizationForCompanyPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return _buildComingSoonPage(
-      context,
-      'Authorization For Company',
-      'Company authorization and verification',
-      HugeIcons.strokeRoundedShield01,
-    );
   }
 }
 
