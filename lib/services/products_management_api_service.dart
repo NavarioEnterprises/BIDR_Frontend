@@ -1059,7 +1059,9 @@ class ApiService {
   }
 
   /// Get quotes for a specific request by the current seller
-  static Future<Map<String, dynamic>> getQuotesForRequest(String requestId) async {
+  static Future<Map<String, dynamic>> getQuotesForRequest(
+    String requestId,
+  ) async {
     if (kDebugMode) {
       print('Fetching quotes for request: $requestId');
     }
@@ -1071,9 +1073,10 @@ class ApiService {
           'error': 'No user UID found',
         };
       }
-      
-      final url = '${GlobalVariables.productsServiceUrl}api/v1/quotes/quotes/by_request/?request_id=$requestId&seller_id=${Constants.currentUser!.uid}';
-      
+
+      final url =
+          '${GlobalVariables.productsServiceUrl}api/v1/quotes/quotes/by_request/?request_id=$requestId&seller_id=${Constants.currentUser!.uid}';
+
       if (kDebugMode) {
         print('Get quotes for request URL: $url');
       }
@@ -1111,6 +1114,44 @@ class ApiService {
         'success': false,
         'message': 'Failed to fetch quotes for request',
         'error': e.toString(),
+      };
+    }
+  }
+
+  // Get detailed product request information
+  static Future<Map<String, dynamic>> getProductRequestDetails(
+    String requestId,
+  ) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}/products/requests/$requestId/details/',
+        ),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (kDebugMode) {
+        print('Product Request Details Response: ${response.statusCode}');
+        print('Product Request Details Body: ${response.body}');
+      }
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        return {'success': true, 'data': data};
+      } else {
+        return {
+          'success': false,
+          'message':
+              'Failed to fetch product request details: ${response.statusCode}',
+        };
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching product request details: $e');
+      }
+      return {
+        'success': false,
+        'message': 'Error fetching product request details: $e',
       };
     }
   }

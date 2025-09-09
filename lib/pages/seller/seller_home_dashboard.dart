@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/config/environment_config.dart';
+import 'package:bidr/global_values.dart';
 import 'package:bidr/pages/notification.dart';
 import 'package:bidr/pages/seller/profile_management.dart';
 import 'package:bidr/pages/seller/rating_and_review.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -79,8 +81,15 @@ class _SellerDashboardState extends State<SellerDashboard>
   bool isLoadingOrders = true;
   String? ordersError;
 
+  // Paid and Completed bids data
+  List<dynamic> paidBids = [];
+  List<dynamic> completedBids = [];
+  int totalPaidBids = 0;
+  int totalCompletedBids = 0;
+
   // Tab and pagination state
-  int selectedRequestTab = 0; // 0: New Requests, 1: My Bids
+  int selectedRequestTab =
+      0; // 0: New Requests, 1: My Bids, 2: Paid Bids, 3: Completed Bids
   int currentPage = 1;
   int itemsPerPage = 8; // 8 items per page (3 rows of 3, minus 1)
 
@@ -983,8 +992,33 @@ class _SellerDashboardState extends State<SellerDashboard>
 
         setState(() {
           sellerOrders = ordersData;
+
+          // Filter orders for this seller
+          final myOrders = ordersData
+              .where((order) => order['seller_id'] == Constants.myUid)
+              .toList();
+
+          // Separate paid and completed bids
+          paidBids = myOrders.where((order) {
+            final status = order['status']?.toString().toUpperCase() ?? '';
+            return status == 'PAID' || status == 'PAYMENT CONFIRMED';
+          }).toList();
+
+          completedBids = myOrders.where((order) {
+            final status = order['status']?.toString().toUpperCase() ?? '';
+            return status == 'PURCHASED' ||
+                status == 'COMPLETED' ||
+                status == 'DELIVERED';
+          }).toList();
+
+          totalPaidBids = paidBids.length;
+          totalCompletedBids = completedBids.length;
+
           isLoadingOrders = false;
           print('DEBUG: Loaded ${ordersData.length} seller orders');
+          print(
+            'DEBUG: Paid bids: ${totalPaidBids}, Completed bids: ${totalCompletedBids}',
+          );
           if (ordersData.isNotEmpty) {
             print('DEBUG: First order: ${ordersData.first}');
             print('DEBUG: Order keys: ${ordersData.first.keys.toList()}');
@@ -1007,7 +1041,7 @@ class _SellerDashboardState extends State<SellerDashboard>
   void _showNotificationDialog() {
     // Always refresh notifications when dialog is opened for the latest data
     _loadNotificationsFromApi();
-    
+
     _animationController.forward();
     showDialog(
       context: context,
@@ -1030,69 +1064,74 @@ class _SellerDashboardState extends State<SellerDashboard>
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'ALERT',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
                       Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          IconButton(
-                            icon: Icon(Icons.refresh, 
-                              size: 20,
-                              color: _isLoadingNotifications ? Colors.grey : Constants.ctaColorLight,
+                          const Text(
+                            'ALERT',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
                             ),
-                            onPressed: _isLoadingNotifications ? null : () {
-                              _loadNotificationsFromApi();
-                              // Update dialog state to show refresh immediately
-                              setDialogState(() {});
-                            },
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            tooltip: 'Refresh notifications',
                           ),
-                          const SizedBox(width: 8),
-                          IconButton(
-                            icon: const Icon(Icons.close, size: 20),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.refresh,
+                                  size: 20,
+                                  color: _isLoadingNotifications
+                                      ? Colors.grey
+                                      : Constants.ctaColorLight,
+                                ),
+                                onPressed: _isLoadingNotifications
+                                    ? null
+                                    : () {
+                                        _loadNotificationsFromApi();
+                                        // Update dialog state to show refresh immediately
+                                        setDialogState(() {});
+                                      },
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                tooltip: 'Refresh notifications',
+                              ),
+                              const SizedBox(width: 8),
+                              IconButton(
+                                icon: const Icon(Icons.close, size: 20),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _buildAlertStats(),
-                  const SizedBox(height: 20),
-                  _buildRecentNotifications(),
-                  const SizedBox(height: 16),
-                  Center(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        tabActiveIndex = 6;
-                        sellerHomeValueNotifier.value++;
-                        setState(() {});
-                      },
-                      child: Text(
-                        'More Notifications',
-                        style: TextStyle(
-                          color: Constants.ctaColorLight,
-                          fontWeight: FontWeight.w600,
+                      const SizedBox(height: 16),
+                      _buildAlertStats(),
+                      const SizedBox(height: 20),
+                      _buildRecentNotifications(),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            tabActiveIndex = 6;
+                            sellerHomeValueNotifier.value++;
+                            setState(() {});
+                          },
+                          child: Text(
+                            'More Notifications',
+                            style: TextStyle(
+                              color: Constants.ctaColorLight,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
                     ],
                   ),
                 ),
@@ -1253,11 +1292,15 @@ class _SellerDashboardState extends State<SellerDashboard>
       onTap: () async {
         // Mark as read if it's unread
         if (!notification.read) {
-          final success = await _notificationApiService.markAsRead(notification.id);
+          final success = await _notificationApiService.markAsRead(
+            notification.id,
+          );
           if (success) {
             // Update the notification in the list
             setState(() {
-              final index = notifications.indexWhere((n) => n.id == notification.id);
+              final index = notifications.indexWhere(
+                (n) => n.id == notification.id,
+              );
               if (index != -1) {
                 notifications[index] = WebNotification(
                   id: notification.id,
@@ -1277,68 +1320,72 @@ class _SellerDashboardState extends State<SellerDashboard>
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: notification.read ? Colors.transparent : Colors.blue.withOpacity(0.05),
+          color: notification.read
+              ? Colors.transparent
+              : Colors.blue.withOpacity(0.05),
           borderRadius: BorderRadius.circular(8),
-          border: notification.read ? null : Border.all(color: Colors.blue.withOpacity(0.2)),
+          border: notification.read
+              ? null
+              : Border.all(color: Colors.blue.withOpacity(0.2)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          Stack(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Constants.ctaColorLight.withOpacity(0.1),
-                  shape: BoxShape.circle,
+            Stack(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Constants.ctaColorLight.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    _getIconForType(notification.type),
+                    color: Constants.ctaColorLight,
+                    size: 20,
+                  ),
                 ),
-                child: Icon(
-                  _getIconForType(notification.type),
-                  color: Constants.ctaColorLight,
-                  size: 20,
-                ),
-              ),
-              if (!notification.read)
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                if (!notification.read)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
                     ),
                   ),
-                ),
-            ],
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  notification.title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: notification.read
-                        ? FontWeight.normal
-                        : FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  notification.body,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  maxLines: isCompact ? 1 : 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
               ],
             ),
-          ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    notification.title,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: notification.read
+                          ? FontWeight.normal
+                          : FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    notification.body,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    maxLines: isCompact ? 1 : 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -1471,11 +1518,17 @@ class _SellerDashboardState extends State<SellerDashboard>
                         1,
                         totalQuotes,
                       ),
-                      // Approved Bids Tab
+                      // Paid Bids Tab
                       _buildRequestMenuItem(
-                        'Approved Bids',
+                        'Paid Bids ($totalPaidBids)',
                         2,
-                        0, // We'll update this when we have the count
+                        totalPaidBids,
+                      ),
+                      // Completed Bids Tab
+                      _buildRequestMenuItem(
+                        'Completed Bids ($totalCompletedBids)',
+                        3,
+                        totalCompletedBids,
                       ),
                     ],
                   ),
@@ -1492,7 +1545,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                       else if (selectedRequestTab == 1)
                         _buildQuotesContent(myQuotes, 'my bids')
                       else if (selectedRequestTab == 2)
-                        _buildApprovedBidsContent(),
+                        _buildPaidBidsContent()
+                      else if (selectedRequestTab == 3)
+                        _buildCompletedBidsContent(),
                     ],
                   ),
                 ),
@@ -3443,11 +3498,18 @@ class _SellerDashboardState extends State<SellerDashboard>
         // Show success dialog with alternate bid option
         _showSuccessDialog(context, 'Bid submitted successfully!');
 
-        // Refresh data to show new bid in "My Bids"
-        await _fetchRequestsData();
-        await _fetchQuotesData();
+        // Add the new bid to myQuotes list directly from the API response
+        if (result['data'] != null) {
+          setState(() {
+            myQuotes.insert(
+              0,
+              result['data'],
+            ); // Insert at beginning to show latest first
+            totalQuotes = myQuotes.length;
+          });
+        }
 
-        // Switch to "My Bids" tab
+        // Switch to "My Bids" tab without additional API calls
         setState(() {
           selectedRequestTab = 1;
         });
@@ -3482,6 +3544,7 @@ class _SellerDashboardState extends State<SellerDashboard>
 
     try {
       final result = await ApiService.getQuotesForRequest(requestId);
+      print("dsjdhjhggh ${result}");
 
       setState(() {
         _isLoadingPreviousBids = false;
@@ -3579,7 +3642,15 @@ class _SellerDashboardState extends State<SellerDashboard>
                         width: double.infinity,
                         height: 40,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            // Navigate to Completed Bids tab and reload data
+                            setState(() {
+                              selectedRequestTab = 3; // Completed Bids tab
+                              currentPage = 1; // Reset to first page
+                            });
+                            _loadSellerOrders(); // Reload orders to show updated data
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Constants.ctaColorLight,
                             foregroundColor: Colors.white,
@@ -6416,6 +6487,635 @@ class _SellerDashboardState extends State<SellerDashboard>
     );
   }
 
+  // Build paid bids content
+  Widget _buildPaidBidsContent() {
+    print('Building paid bids content');
+
+    // Show loading state
+    if (isLoadingOrders) {
+      return Container(
+        padding: EdgeInsets.all(64),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Constants.ftaColorLight),
+          ),
+        ),
+      );
+    }
+
+    // Show error if any
+    if (ordersError != null) {
+      return Container(
+        padding: EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.red.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.red.shade200),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.red, size: 48),
+            SizedBox(height: 16),
+            Text(
+              'Error loading paid bids',
+              style: GoogleFonts.manrope(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.red.shade700,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              ordersError!,
+              style: GoogleFonts.manrope(
+                color: Colors.red.shade600,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(onPressed: _loadSellerOrders, child: Text('Retry')),
+          ],
+        ),
+      );
+    }
+
+    // Show empty state if no paid bids
+    if (paidBids.isEmpty) {
+      return _buildEmptyPaidBids();
+    }
+
+    // Calculate pagination
+    final totalPages = (paidBids.length / itemsPerPage).ceil();
+    final startIndex = (currentPage - 1) * itemsPerPage;
+    final endIndex = startIndex + itemsPerPage;
+    final paginatedBids = paidBids.sublist(
+      startIndex,
+      endIndex > paidBids.length ? paidBids.length : endIndex,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 3 items per row with intrinsic height
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final double itemWidth =
+                (constraints.maxWidth - 32) /
+                3; // 3 items per row with 16px spacing
+            return Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: paginatedBids.asMap().entries.map((entry) {
+                final index = entry.key;
+                final bid = entry.value;
+                final globalIndex = startIndex + index + 1;
+                return IntrinsicHeight(
+                  child: SizedBox(
+                    width: itemWidth,
+                    child: _buildPaidBidCard(bid),
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
+        SizedBox(height: 16),
+        // Pagination
+        if (totalPages > 1) _buildPagination(totalPages, paidBids.length),
+      ],
+    );
+  }
+
+  // Build empty state for paid bids
+  Widget _buildEmptyPaidBids() {
+    return Container(
+      padding: EdgeInsets.all(40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.payment_outlined, size: 80, color: Colors.grey[400]),
+          SizedBox(height: 20),
+          Text(
+            'No Paid Bids',
+            style: GoogleFonts.manrope(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Orders that have been paid by buyers will appear here',
+            style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[500]),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build completed bids content
+  Widget _buildCompletedBidsContent() {
+    print('Building completed bids content');
+
+    // Show loading state
+    if (isLoadingOrders) {
+      return Container(
+        padding: EdgeInsets.all(64),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Constants.ftaColorLight),
+          ),
+        ),
+      );
+    }
+
+    // Show error if any
+    if (ordersError != null) {
+      return Container(
+        padding: EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.red.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.red.shade200),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.red, size: 48),
+            SizedBox(height: 16),
+            Text(
+              'Error loading completed bids',
+              style: GoogleFonts.manrope(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.red.shade700,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              ordersError!,
+              style: GoogleFonts.manrope(
+                color: Colors.red.shade600,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(onPressed: _loadSellerOrders, child: Text('Retry')),
+          ],
+        ),
+      );
+    }
+
+    // Show empty state if no completed bids
+    if (completedBids.isEmpty) {
+      return _buildEmptyCompletedBids();
+    }
+
+    // Calculate pagination
+    final totalPages = (completedBids.length / itemsPerPage).ceil();
+    final startIndex = (currentPage - 1) * itemsPerPage;
+    final endIndex = startIndex + itemsPerPage;
+    final paginatedBids = completedBids.sublist(
+      startIndex,
+      endIndex > completedBids.length ? completedBids.length : endIndex,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 3 items per row with intrinsic height
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final double itemWidth =
+                (constraints.maxWidth - 32) /
+                3; // 3 items per row with 16px spacing
+            return Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: paginatedBids.asMap().entries.map((entry) {
+                final index = entry.key;
+                final bid = entry.value;
+                final globalIndex = startIndex + index + 1;
+                return IntrinsicHeight(
+                  child: SizedBox(
+                    width: itemWidth,
+                    child: _buildCompletedBidCard(bid),
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
+        SizedBox(height: 16),
+        // Pagination
+        if (totalPages > 1) _buildPagination(totalPages, completedBids.length),
+      ],
+    );
+  }
+
+  // Build empty state for completed bids
+  Widget _buildEmptyCompletedBids() {
+    return Container(
+      padding: EdgeInsets.all(40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.check_circle_outline, size: 80, color: Colors.grey[400]),
+          SizedBox(height: 20),
+          Text(
+            'No Completed Bids',
+            style: GoogleFonts.manrope(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Orders that have been completed and delivered will appear here',
+            style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[500]),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build individual paid bid card
+  Widget _buildPaidBidCard(Map<String, dynamic> order) {
+    final requestId = order['order_id']?.toString() ?? '';
+    final title = order['product_name'] ?? order['productName'] ?? 'Order';
+    final createdAt =
+        order['created_at'] ??
+        order['orderDate'] ??
+        DateTime.now().toIso8601String();
+    final totalAmount =
+        order['total_amount']?.toString() ?? order['amount']?.toString() ?? '0';
+    final currency = order['currency'] ?? 'ZAR';
+    final buyerName =
+        order['buyer_name'] ?? order['buyerName'] ?? 'Unknown Buyer';
+    final orderStatus = order['status']?.toString().toUpperCase() ?? 'PAID';
+
+    // Calculate time since order creation
+    final DateTime createdDate = DateTime.tryParse(createdAt) ?? DateTime.now();
+    final Duration timeSinceCreated = DateTime.now().difference(createdDate);
+
+    String timeElapsedText = '';
+    int progressValue = 0;
+
+    if (timeSinceCreated.inDays > 0) {
+      timeElapsedText = '${timeSinceCreated.inDays}d';
+      progressValue = (timeSinceCreated.inDays * 10).clamp(0, 100);
+    } else if (timeSinceCreated.inHours > 0) {
+      timeElapsedText = '${timeSinceCreated.inHours}h';
+      progressValue = (timeSinceCreated.inHours * 4).clamp(0, 100);
+    } else {
+      timeElapsedText = '${timeSinceCreated.inMinutes}m';
+      progressValue = (timeSinceCreated.inMinutes * 2).clamp(0, 100);
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.1),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // UUID and Timer Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // UUID Display
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    requestId.length >= 6
+                        ? requestId.substring(0, 6).toUpperCase()
+                        : requestId.toUpperCase(),
+                    style: GoogleFonts.manrope(
+                      color: Colors.grey[700],
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              // Timer
+              Row(
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      value: progressValue / 100,
+                      strokeWidth: 2,
+                      backgroundColor: Colors.grey[300],
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.green,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    timeElapsedText,
+                    style: GoogleFonts.manrope(
+                      color: Colors.green,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Status Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              'Paid',
+              style: GoogleFonts.manrope(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Description
+          Text(
+            'Order - $title',
+            style: GoogleFonts.manrope(
+              color: Colors.grey[700],
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 8),
+          // Additional Notes
+          Text(
+            'Buyer: $buyerName • Amount: $currency $totalAmount',
+            style: GoogleFonts.manrope(
+              color: Colors.grey[600],
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 16),
+          // Action Buttons
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () => _showPinConfirmationDialog({
+                    'orderNumber':
+                        order['order_number'] ??
+                        order['orderNumber'] ??
+                        'Unknown',
+                    'productName': title,
+                    'amount': double.tryParse(totalAmount) ?? 0.0,
+                  }),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE8F5E9),
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Confirm Delivery',
+                    style: GoogleFonts.manrope(
+                      color: Colors.green[700],
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () => _showPaidBidDetails(order),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFEBEE),
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'View Details',
+                    style: GoogleFonts.manrope(
+                      color: Colors.red[700],
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build individual completed bid card
+  Widget _buildCompletedBidCard(Map<String, dynamic> order) {
+    final requestId = order['order_id']?.toString() ?? '';
+    final title = order['product_name'] ?? order['productName'] ?? 'Order';
+    final createdAt =
+        order['created_at'] ??
+        order['orderDate'] ??
+        DateTime.now().toIso8601String();
+    final totalAmount =
+        order['total_amount']?.toString() ?? order['amount']?.toString() ?? '0';
+    final currency = order['currency'] ?? 'ZAR';
+    final buyerName =
+        order['buyer_name'] ?? order['buyerName'] ?? 'Unknown Buyer';
+    final orderStatus =
+        order['status']?.toString().toUpperCase() ?? 'COMPLETED';
+
+    // Calculate time since order creation
+    final DateTime createdDate = DateTime.tryParse(createdAt) ?? DateTime.now();
+    final Duration timeSinceCreated = DateTime.now().difference(createdDate);
+
+    String timeElapsedText = '';
+
+    if (timeSinceCreated.inDays > 0) {
+      timeElapsedText = '${timeSinceCreated.inDays}d ago';
+    } else if (timeSinceCreated.inHours > 0) {
+      timeElapsedText = '${timeSinceCreated.inHours}h ago';
+    } else {
+      timeElapsedText = '${timeSinceCreated.inMinutes}m ago';
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.1),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // UUID and Status Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // UUID Display
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: Constants.ctaColorLight,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    requestId.length >= 6
+                        ? requestId.substring(0, 6).toUpperCase()
+                        : requestId.toUpperCase(),
+                    style: GoogleFonts.manrope(
+                      color: Colors.grey[700],
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              // Completed icon
+              Icon(Icons.check_circle, color: Colors.green, size: 24),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Status Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: Constants.ftaColorLight,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              'Completed',
+              style: GoogleFonts.manrope(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Description
+          Text(
+            'Order - $title',
+            style: GoogleFonts.manrope(
+              color: Colors.grey[700],
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 8),
+          // Additional Notes
+          Text(
+            'Buyer: $buyerName • Amount: $currency $totalAmount',
+            style: GoogleFonts.manrope(
+              color: Colors.grey[600],
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 8),
+          // Completion time
+          Text(
+            'Completed $timeElapsedText',
+            style: GoogleFonts.manrope(
+              color: Colors.green,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Action Button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _showCompletedBidDetails(order),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFE3F2FD),
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'View Details',
+                style: GoogleFonts.manrope(
+                  color: Colors.green[700],
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // Build individual approved bid card - same design as My Bids
   Widget _buildApprovedBidCard(Map<String, dynamic> bid) {
     final requestId = bid['request_id'] ?? '';
@@ -6662,273 +7362,212 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   // Show approved bid details dialog
-  void _showApprovedBidDetails(Map<String, dynamic> bid) {
-    showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Container(
-            width: 400,
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Approved Bid Details',
-                  style: GoogleFonts.manrope(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1A1A1A),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Title: ${bid['title'] ?? 'N/A'}',
-                  style: GoogleFonts.manrope(fontSize: 14),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Amount: ${bid['currency'] ?? 'ZAR'} ${bid['total_amount'] ?? '0'}',
-                  style: GoogleFonts.manrope(fontSize: 14),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Buyer: ${bid['buyerName'] ?? 'Unknown'}',
-                  style: GoogleFonts.manrope(fontSize: 14),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Close'),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+  Future<void> _showApprovedBidDetails(Map<String, dynamic> bid) async {
+    await _navigateToSellerBidDetailScreen(bid, 'approved');
   }
 
-  // Show PIN confirmation dialog for sellers
   void _showPinConfirmationDialog(Map<String, dynamic> order) {
-    final TextEditingController pinController = TextEditingController();
+    final List<TextEditingController> pinControllers = List.generate(4, (index) => TextEditingController());
+    final List<FocusNode> focusNodes = List.generate(4, (index) => FocusNode());
 
-    showDialog<void>(
+    showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
-          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
           child: Container(
-            width: 400,
-            padding: EdgeInsets.all(24),
+            width: MediaQuery.of(context).size.width * 0.3,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Icon
-                Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Constants.ctaColorLight.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Icon(
-                    Icons.lock_outline,
-                    size: 32,
-                    color: Constants.ctaColorLight,
-                  ),
+                // Warning Icon
+                Icon(
+                  CupertinoIcons.lock_fill,
+                  color:
+                      Constants.ctaColorLight ??
+                      Colors.orange, // Null safety fix
+                  size: 60,
                 ),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Title
                 Text(
-                  'Confirm Delivery',
+                  'Confirm Delivery !',
                   style: GoogleFonts.manrope(
                     fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Constants.ftaColorLight,
-                  ),
-                ),
-
-                SizedBox(height: 8),
-
-                Text(
-                  "By clicking the pay button you accept the offer made by this seller",
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.manrope(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                SizedBox(height: 12),
-
-                // Subtitle
-                Text(
-                  'Enter the 4-digit PIN provided by the buyer',
-                  style: GoogleFonts.manrope(
-                    fontSize: 14,
-                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF2B3A5C),
                   ),
                   textAlign: TextAlign.center,
                 ),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 16),
 
-                // Order info
-                Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade200),
+                // Description
+                Text(
+                  'By confirming this delivery, you acknowledge that the goods have been successfully handed over to the buyer.',
+                  style: GoogleFonts.manrope(
+                    fontSize: 14,
+                    color: Colors.grey[600] ?? Colors.grey,
+                    height: 1.4,
                   ),
-                  child: Column(
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 20),
+
+                // Unique Identifier Text
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Order Number:',
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          Text(
-                            "${order['orderNumber']?.toString().isNotEmpty == true ? (order['orderNumber'].toString().length > 8 ? order['orderNumber'].toString().substring(0, 8) : order['orderNumber'].toString()) : 'N/A'}",
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Constants.ftaColorLight,
-                            ),
-                          ),
-                        ],
+                      TextSpan(
+                        text: 'Enter the ',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          color: Colors.grey[600] ?? Colors.grey,
+                        ),
                       ),
-                      SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Amount:',
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          Text(
-                            'R ${order['amount'].toStringAsFixed(2)}',
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Constants.ctaColorLight,
-                            ),
-                          ),
-                        ],
+                      TextSpan(
+                        text: '4-digit PIN',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          color: const Color(0xFF2B3A5C),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' provided by the buyer to confirm delivery',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          color: Colors.grey[600] ?? Colors.grey,
+                        ),
                       ),
                     ],
                   ),
                 ),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-                // PIN input field
-                TextField(
-                  controller: pinController,
-                  keyboardType: TextInputType.number,
-                  maxLength: 4,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.manrope(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 8,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: '0000',
-                    hintStyle: GoogleFonts.manrope(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 8,
-                      color: Colors.grey[400],
+                // 4-Digit PIN Input Field
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(4, (index) {
+                    return Container(
+                      width: 60,
+                      height: 60,
+                      margin: EdgeInsets.symmetric(horizontal: 8),
+                      child: TextField(
+                        controller: pinControllers[index],
+                        focusNode: focusNodes[index],
+                        keyboardType: TextInputType.number,
+                        maxLength: 1,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.manrope(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF2B3A5C),
+                        ),
+                        decoration: InputDecoration(
+                          counterText: '',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: Colors.grey.withOpacity(0.35),
+                              width: 1,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: Colors.grey.withOpacity(0.35),
+                              width: 1,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: Constants.ctaColorLight,
+                              width: 2,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.withOpacity(0.35),
+                          contentPadding: EdgeInsets.all(0),
+                        ),
+                        onChanged: (value) {
+                          if (value.isNotEmpty && index < 3) {
+                            // Move to next field
+                            focusNodes[index + 1].requestFocus();
+                          } else if (value.isEmpty && index > 0) {
+                            // Move to previous field
+                            focusNodes[index - 1].requestFocus();
+                          }
+                        },
+                      ),
+                    );
+                  }),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Confirm Delivery Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      String pin = pinControllers.map((controller) => controller.text).join();
+                      if (pin.length == 4) {
+                        _confirmDeliveryWithPin(
+                          order,
+                          pin,
+                          context,
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(360),
+                      ),
+                      elevation: 0,
                     ),
-                    counterText: '',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Constants.ctaColorLight,
-                        width: 2,
+                    child: Text(
+                      'Confirm Delivery',
+                      style: GoogleFonts.manrope(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
-                    filled: true,
-                    fillColor: Colors.grey.shade50,
-                    contentPadding: EdgeInsets.symmetric(vertical: 16),
                   ),
                 ),
 
-                SizedBox(height: 24),
+                const SizedBox(height: 12),
 
-                // Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        child: Text(
-                          'Cancel',
-                          style: GoogleFonts.manrope(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ),
+                // Cancel Button
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      color: Colors.grey[600] ?? Colors.grey,
+                      fontWeight: FontWeight.w500,
                     ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _confirmDeliveryWithPin(
-                            order,
-                            pinController.text,
-                            context,
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Constants.ctaColorLight,
-                          padding: EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          'Confirm',
-                          style: GoogleFonts.manrope(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -6975,20 +7614,49 @@ class _SellerDashboardState extends State<SellerDashboard>
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        if (data['success'] == true) {
+        // Check if response contains an error (API returns 200 even for errors)
+        if (data.containsKey('error')) {
+          // API returned an error message
+          _showErrorMessage(data['error']);
+          return;
+        }
+
+        // Check for success field or assume success if no error
+        if (data['success'] == true || !data.containsKey('error')) {
           // Success - delivery confirmed
           if (mounted) {
             Navigator.of(context).pop(); // Close dialog
 
-            // Show custom pin verification dialog
-            _verifyPinDialog(context);
+            // Set PIN verification as successful and navigate to completed bids
+            setState(() {
+              isPinVerifiedSuccessful = true;
+              selectedRequestTab = 3; // Navigate to Completed Bids tab
+              currentPage = 1; // Reset to first page
+            });
 
-            // Refresh the approved bids list to reflect changes
+            // Refresh the seller orders to show updated data
             _loadSellerOrders();
+
+            // Show success message
+            MotionToast.success(
+              title: Text(
+                'Success',
+                style: GoogleFonts.manrope(fontSize: 16, fontWeight: FontWeight.w700),
+              ),
+              description: Text(
+                'Delivery confirmed successfully!',
+                style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
+              ),
+              animationType: AnimationType.slideInFromBottom,
+              width: 300,
+              height: 80,
+              borderRadius: 12,
+              toastDuration: const Duration(seconds: 3),
+            ).show(context);
           }
         } else {
           // API returned success=false
-          _showErrorMessage(data['error'] ?? 'Invalid PIN or PIN has expired');
+          _showErrorMessage(data['message'] ?? 'Invalid PIN or PIN has expired');
         }
       } else {
         // Non-200 status code
@@ -7020,6 +7688,1121 @@ class _SellerDashboardState extends State<SellerDashboard>
       borderRadius: 12,
       toastDuration: const Duration(seconds: 3),
     ).show(context);
+  }
+
+  // Show paid bid details dialog
+  Future<void> _showPaidBidDetails(Map<String, dynamic> order) async {
+    await _navigateToSellerBidDetailScreen(order, 'paid');
+  }
+
+  // Show completed bid details dialog
+  Future<void> _showCompletedBidDetails(Map<String, dynamic> order) async {
+    await _navigateToSellerBidDetailScreen(order, 'completed');
+  }
+
+  // Navigate to detailed bid screen with backend data
+  Future<void> _navigateToSellerBidDetailScreen(
+    Map<String, dynamic> bidData,
+    String type,
+  ) async {
+    try {
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(color: Constants.ctaColorLight),
+                SizedBox(height: 16),
+                Text(
+                  'Loading details...',
+                  style: GoogleFonts.manrope(fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      // Fetch detailed data from backend
+      final detailResponse = await _fetchDetailedBidData(bidData, type);
+      Navigator.pop(context); // Close loading dialog
+
+      if (detailResponse != null && detailResponse['success'] == true) {
+        final requestData = detailResponse['data'];
+        final category =
+            requestData['category'] ??
+            requestData['product_category'] ??
+            'VEHICLE_SPARES';
+
+        // Navigate based on category similar to buyer dashboard
+        switch (category.toString().toUpperCase()) {
+          case "VEHICLE_SPARES":
+          case "Vehicle Spares":
+            SellerSparesDetailScreen.showAsDialog(
+              context,
+              request: requestData,
+              bidData: bidData,
+              type: type,
+            );
+            break;
+          case "TYRES_RIMS":
+          case "Vehicle Tyres and Rims":
+            SellerRimTyreDetailScreen.showAsDialog(
+              context,
+              request: requestData,
+              bidData: bidData,
+              type: type,
+            );
+            break;
+          case "ELECTRONICS":
+          case "Consumer Electronics":
+            SellerConsumerElectronicsDetailScreen.showAsDialog(
+              context,
+              request: requestData,
+              bidData: bidData,
+              type: type,
+            );
+            break;
+          default:
+            // Fallback to generic detail screen
+            SellerSparesDetailScreen.showAsDialog(
+              context,
+              request: requestData,
+              bidData: bidData,
+              type: type,
+            );
+        }
+      } else {
+        print('Failed to load bid details');
+      }
+    } catch (e) {
+      Navigator.pop(context); // Close loading dialog if still open
+      print('Error loading bid details: $e');
+    }
+  }
+
+  // Fetch detailed bid/order data from backend
+  Future<Map<String, dynamic>?> _fetchDetailedBidData(
+    Map<String, dynamic> bidData,
+    String type,
+  ) async {
+    try {
+      final requestId =
+          bidData['request_id'] ??
+          bidData['product_request_id'] ??
+          bidData['order_id'];
+      final orderId = bidData['order_id'] ?? bidData['id'];
+
+      if (requestId == null) {
+        throw Exception('Request ID not found');
+      }
+
+      // Call API to get detailed request data
+      return await ApiService.getProductRequestDetails(requestId.toString());
+    } catch (e) {
+      print('Error fetching detailed bid data: $e');
+      return null;
+    }
+  }
+}
+
+// Seller Spares Detail Screen
+class SellerSparesDetailScreen extends StatefulWidget {
+  final Map<String, dynamic> request;
+  final Map<String, dynamic> bidData;
+  final String type;
+
+  const SellerSparesDetailScreen({
+    Key? key,
+    required this.request,
+    required this.bidData,
+    required this.type,
+  }) : super(key: key);
+
+  @override
+  State<SellerSparesDetailScreen> createState() =>
+      _SellerSparesDetailScreenState();
+
+  static void showAsDialog(
+    BuildContext context, {
+    required Map<String, dynamic> request,
+    required Map<String, dynamic> bidData,
+    required String type,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.9,
+            child: SellerSparesDetailScreen(
+              request: request,
+              bidData: bidData,
+              type: type,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SellerSparesDetailScreenState extends State<SellerSparesDetailScreen> {
+  @override
+  Widget build(BuildContext context) {
+    final autoSpare =
+        widget.request['auto_spares'] ?? widget.request['autoSpares'];
+    final vehicle = autoSpare?['vehicle'] ?? {};
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          // Header
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Constants.ctaColorLight,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${_getTypeTitle()} Details',
+                    style: GoogleFonts.manrope(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.close, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+
+          // Content
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Vehicle Details Section
+                  _buildSection('Vehicle Details', [
+                    _buildDetailRow('Make', vehicle['make'] ?? 'N/A'),
+                    _buildDetailRow('Model', vehicle['model'] ?? 'N/A'),
+                    _buildDetailRow(
+                      'Year',
+                      vehicle['year']?.toString() ?? 'N/A',
+                    ),
+                    _buildDetailRow(
+                      'Engine Size',
+                      '${vehicle['engine_size'] ?? 'N/A'}L',
+                    ),
+                    _buildDetailRow('Fuel Type', vehicle['fuel_type'] ?? 'N/A'),
+                  ]),
+
+                  SizedBox(height: 20),
+
+                  // Part Details Section
+                  _buildSection('Part Details', [
+                    _buildDetailRow(
+                      'Part Name',
+                      autoSpare?['part_name'] ?? 'N/A',
+                    ),
+                    _buildDetailRow(
+                      'Part Number',
+                      autoSpare?['part_number'] ?? 'N/A',
+                    ),
+                    _buildDetailRow(
+                      'Condition',
+                      autoSpare?['condition'] ?? 'N/A',
+                    ),
+                    _buildDetailRow('Brand', autoSpare?['brand'] ?? 'N/A'),
+                  ]),
+
+                  SizedBox(height: 20),
+
+                  // Bid Information Section
+                  _buildSection('Bid Information', [
+                    _buildDetailRow(
+                      'Your Bid Amount',
+                      '${widget.bidData['currency'] ?? 'ZAR'} ${widget.bidData['total_amount'] ?? widget.bidData['amount'] ?? '0'}',
+                    ),
+                    _buildDetailRow('Status', _getStatusText()),
+                    _buildDetailRow(
+                      'Buyer',
+                      widget.bidData['buyer_name'] ??
+                          widget.bidData['buyerName'] ??
+                          'Unknown',
+                    ),
+                    _buildDetailRow(
+                      'Order Date',
+                      _formatDate(
+                        widget.bidData['created_at'] ?? widget.bidData['date'],
+                      ),
+                    ),
+                  ]),
+
+                  // Images Section
+                  if (_getImages().isNotEmpty) ...[
+                    SizedBox(height: 20),
+                    _buildSection('Images', [
+                      Container(
+                        height: 120,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _getImages().length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: EdgeInsets.only(right: 12),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  _getFullImageUrl(_getImages()[index]),
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 120,
+                                      height: 120,
+                                      color: Colors.grey.shade200,
+                                      child: Icon(Icons.image_not_supported),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ]),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getTypeTitle() {
+    switch (widget.type) {
+      case 'paid':
+        return 'Paid Bid';
+      case 'completed':
+        return 'Completed Bid';
+      case 'approved':
+        return 'Approved Bid';
+      default:
+        return 'Bid';
+    }
+  }
+
+  String _getStatusText() {
+    switch (widget.type) {
+      case 'paid':
+        return 'Paid - Awaiting Delivery Confirmation';
+      case 'completed':
+        return 'Completed and Delivered';
+      case 'approved':
+        return 'Approved';
+      default:
+        return widget.bidData['status'] ?? 'N/A';
+    }
+  }
+
+  List<String> _getImages() {
+    final List<String> allImages = [];
+
+    // Get images from auto_spares/autoSpares
+    final autoSpare =
+        widget.request['auto_spares'] ?? widget.request['autoSpares'];
+    if (autoSpare?['images'] != null) {
+      allImages.addAll(List<String>.from(autoSpare['images']));
+    }
+
+    // Get product images
+    if (widget.request['product_images'] != null) {
+      allImages.addAll(List<String>.from(widget.request['product_images']));
+    }
+
+    // Get other images
+    if (widget.request['images'] != null) {
+      allImages.addAll(List<String>.from(widget.request['images']));
+    }
+
+    // Get VIN images
+    if (widget.request['vin_images'] != null) {
+      allImages.addAll(List<String>.from(widget.request['vin_images']));
+    }
+
+    return allImages;
+  }
+
+  String _getFullImageUrl(String imagePath) {
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    // Remove leading slash if present
+    final cleanPath = imagePath.startsWith('/')
+        ? imagePath.substring(1)
+        : imagePath;
+    // Build full URL using the products service URL
+    String baseUrl = GlobalVariables.productsServiceUrl;
+    return '$baseUrl$cleanPath';
+  }
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null) return 'N/A';
+    try {
+      final date = DateTime.parse(dateStr);
+      return '${date.day}/${date.month}/${date.year}';
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
+  Widget _buildSection(String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.manrope(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Constants.ctaColorLight,
+          ),
+        ),
+        SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              '$label:',
+              style: GoogleFonts.manrope(
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.manrope(fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Seller Rim Tyre Detail Screen
+class SellerRimTyreDetailScreen extends StatefulWidget {
+  final Map<String, dynamic> request;
+  final Map<String, dynamic> bidData;
+  final String type;
+
+  const SellerRimTyreDetailScreen({
+    Key? key,
+    required this.request,
+    required this.bidData,
+    required this.type,
+  }) : super(key: key);
+
+  @override
+  State<SellerRimTyreDetailScreen> createState() =>
+      _SellerRimTyreDetailScreenState();
+
+  static void showAsDialog(
+    BuildContext context, {
+    required Map<String, dynamic> request,
+    required Map<String, dynamic> bidData,
+    required String type,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.9,
+            child: SellerRimTyreDetailScreen(
+              request: request,
+              bidData: bidData,
+              type: type,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SellerRimTyreDetailScreenState extends State<SellerRimTyreDetailScreen> {
+  @override
+  Widget build(BuildContext context) {
+    final rimTyre = widget.request['rim_tyre'] ?? widget.request['rimTyre'];
+    final vehicle = rimTyre?['vehicle'] ?? {};
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          // Header - similar to SellerSparesDetailScreen
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Constants.ctaColorLight,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${_getTypeTitle()} Details',
+                    style: GoogleFonts.manrope(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.close, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+
+          // Content with rim/tyre specific fields
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Vehicle Details Section
+                  _buildSection('Vehicle Details', [
+                    _buildDetailRow('Make', vehicle['make'] ?? 'N/A'),
+                    _buildDetailRow('Model', vehicle['model'] ?? 'N/A'),
+                    _buildDetailRow(
+                      'Year',
+                      vehicle['year']?.toString() ?? 'N/A',
+                    ),
+                  ]),
+
+                  SizedBox(height: 20),
+
+                  // Rim/Tyre Details Section
+                  _buildSection('Rim/Tyre Details', [
+                    _buildDetailRow('Type', rimTyre?['type'] ?? 'N/A'),
+                    _buildDetailRow('Size', rimTyre?['size'] ?? 'N/A'),
+                    _buildDetailRow('Brand', rimTyre?['brand'] ?? 'N/A'),
+                    _buildDetailRow(
+                      'Condition',
+                      rimTyre?['condition'] ?? 'N/A',
+                    ),
+                    _buildDetailRow(
+                      'Width',
+                      rimTyre?['width']?.toString() ?? 'N/A',
+                    ),
+                    _buildDetailRow(
+                      'Profile',
+                      rimTyre?['profile']?.toString() ?? 'N/A',
+                    ),
+                    _buildDetailRow(
+                      'Diameter',
+                      rimTyre?['diameter']?.toString() ?? 'N/A',
+                    ),
+                  ]),
+
+                  SizedBox(height: 20),
+
+                  // Bid Information Section
+                  _buildSection('Bid Information', [
+                    _buildDetailRow(
+                      'Your Bid Amount',
+                      '${widget.bidData['currency'] ?? 'ZAR'} ${widget.bidData['total_amount'] ?? widget.bidData['amount'] ?? '0'}',
+                    ),
+                    _buildDetailRow('Status', _getStatusText()),
+                    _buildDetailRow(
+                      'Buyer',
+                      widget.bidData['buyer_name'] ??
+                          widget.bidData['buyerName'] ??
+                          'Unknown',
+                    ),
+                    _buildDetailRow(
+                      'Order Date',
+                      _formatDate(
+                        widget.bidData['created_at'] ?? widget.bidData['date'],
+                      ),
+                    ),
+                  ]),
+
+                  // Images Section
+                  if (_getImages().isNotEmpty) ...[
+                    SizedBox(height: 20),
+                    _buildSection('Images', [
+                      Container(
+                        height: 120,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _getImages().length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: EdgeInsets.only(right: 12),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  _getFullImageUrl(_getImages()[index]),
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 120,
+                                      height: 120,
+                                      color: Colors.grey.shade200,
+                                      child: Icon(Icons.image_not_supported),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ]),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<String> _getImages() {
+    final List<String> allImages = [];
+
+    // Get images from rim_tyre/rimTyre
+    final rimTyre = widget.request['rim_tyre'] ?? widget.request['rimTyre'];
+    if (rimTyre?['images'] != null) {
+      allImages.addAll(List<String>.from(rimTyre['images']));
+    }
+
+    // Get product images
+    if (widget.request['product_images'] != null) {
+      allImages.addAll(List<String>.from(widget.request['product_images']));
+    }
+
+    // Get other images
+    if (widget.request['images'] != null) {
+      allImages.addAll(List<String>.from(widget.request['images']));
+    }
+
+    // Get VIN images
+    if (widget.request['vin_images'] != null) {
+      allImages.addAll(List<String>.from(widget.request['vin_images']));
+    }
+
+    return allImages;
+  }
+
+  String _getFullImageUrl(String imagePath) {
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    // Remove leading slash if present
+    final cleanPath = imagePath.startsWith('/')
+        ? imagePath.substring(1)
+        : imagePath;
+    // Build full URL using the products service URL
+    String baseUrl = GlobalVariables.productsServiceUrl;
+    return '$baseUrl$cleanPath';
+  }
+
+  // Same helper methods as SellerSparesDetailScreen
+  String _getTypeTitle() {
+    switch (widget.type) {
+      case 'paid':
+        return 'Paid Bid';
+      case 'completed':
+        return 'Completed Bid';
+      case 'approved':
+        return 'Approved Bid';
+      default:
+        return 'Bid';
+    }
+  }
+
+  String _getStatusText() {
+    switch (widget.type) {
+      case 'paid':
+        return 'Paid - Awaiting Delivery Confirmation';
+      case 'completed':
+        return 'Completed and Delivered';
+      case 'approved':
+        return 'Approved';
+      default:
+        return widget.bidData['status'] ?? 'N/A';
+    }
+  }
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null) return 'N/A';
+    try {
+      final date = DateTime.parse(dateStr);
+      return '${date.day}/${date.month}/${date.year}';
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
+  Widget _buildSection(String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.manrope(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Constants.ctaColorLight,
+          ),
+        ),
+        SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              '$label:',
+              style: GoogleFonts.manrope(
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.manrope(fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Seller Consumer Electronics Detail Screen
+class SellerConsumerElectronicsDetailScreen extends StatefulWidget {
+  final Map<String, dynamic> request;
+  final Map<String, dynamic> bidData;
+  final String type;
+
+  const SellerConsumerElectronicsDetailScreen({
+    Key? key,
+    required this.request,
+    required this.bidData,
+    required this.type,
+  }) : super(key: key);
+
+  @override
+  State<SellerConsumerElectronicsDetailScreen> createState() =>
+      _SellerConsumerElectronicsDetailScreenState();
+
+  static void showAsDialog(
+    BuildContext context, {
+    required Map<String, dynamic> request,
+    required Map<String, dynamic> bidData,
+    required String type,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.9,
+            child: SellerConsumerElectronicsDetailScreen(
+              request: request,
+              bidData: bidData,
+              type: type,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SellerConsumerElectronicsDetailScreenState
+    extends State<SellerConsumerElectronicsDetailScreen> {
+  @override
+  Widget build(BuildContext context) {
+    final electronics =
+        widget.request['consumer_electronics'] ??
+        widget.request['consumerElectronics'];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          // Header
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Constants.ctaColorLight,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${_getTypeTitle()} Details',
+                    style: GoogleFonts.manrope(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.close, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+
+          // Content with electronics specific fields
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Electronics Details Section
+                  _buildSection('Electronics Details', [
+                    _buildDetailRow(
+                      'Product Name',
+                      electronics?['product_name'] ?? 'N/A',
+                    ),
+                    _buildDetailRow('Brand', electronics?['brand'] ?? 'N/A'),
+                    _buildDetailRow('Model', electronics?['model'] ?? 'N/A'),
+                    _buildDetailRow(
+                      'Category',
+                      electronics?['category'] ?? 'N/A',
+                    ),
+                    _buildDetailRow(
+                      'Condition',
+                      electronics?['condition'] ?? 'N/A',
+                    ),
+                    _buildDetailRow('Color', electronics?['color'] ?? 'N/A'),
+                    _buildDetailRow(
+                      'Storage',
+                      electronics?['storage'] ?? 'N/A',
+                    ),
+                  ]),
+
+                  SizedBox(height: 20),
+
+                  // Bid Information Section
+                  _buildSection('Bid Information', [
+                    _buildDetailRow(
+                      'Your Bid Amount',
+                      '${widget.bidData['currency'] ?? 'ZAR'} ${widget.bidData['total_amount'] ?? widget.bidData['amount'] ?? '0'}',
+                    ),
+                    _buildDetailRow('Status', _getStatusText()),
+                    _buildDetailRow(
+                      'Buyer',
+                      widget.bidData['buyer_name'] ??
+                          widget.bidData['buyerName'] ??
+                          'Unknown',
+                    ),
+                    _buildDetailRow(
+                      'Order Date',
+                      _formatDate(
+                        widget.bidData['created_at'] ?? widget.bidData['date'],
+                      ),
+                    ),
+                  ]),
+
+                  // Images Section
+                  if (_getImages().isNotEmpty) ...[
+                    SizedBox(height: 20),
+                    _buildSection('Images', [
+                      Container(
+                        height: 120,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _getImages().length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: EdgeInsets.only(right: 12),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  _getFullImageUrl(_getImages()[index]),
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 120,
+                                      height: 120,
+                                      color: Colors.grey.shade200,
+                                      child: Icon(Icons.image_not_supported),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ]),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<String> _getImages() {
+    final List<String> allImages = [];
+
+    // Get images from consumer_electronics/consumerElectronics
+    final electronics =
+        widget.request['consumer_electronics'] ??
+        widget.request['consumerElectronics'];
+    if (electronics?['images'] != null) {
+      allImages.addAll(List<String>.from(electronics['images']));
+    }
+
+    // Get product images
+    if (widget.request['product_images'] != null) {
+      allImages.addAll(List<String>.from(widget.request['product_images']));
+    }
+
+    // Get other images
+    if (widget.request['images'] != null) {
+      allImages.addAll(List<String>.from(widget.request['images']));
+    }
+
+    // Get VIN images (if any)
+    if (widget.request['vin_images'] != null) {
+      allImages.addAll(List<String>.from(widget.request['vin_images']));
+    }
+
+    return allImages;
+  }
+
+  String _getFullImageUrl(String imagePath) {
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    // Remove leading slash if present
+    final cleanPath = imagePath.startsWith('/')
+        ? imagePath.substring(1)
+        : imagePath;
+    // Build full URL using the products service URL
+    String baseUrl = GlobalVariables.productsServiceUrl;
+    return '$baseUrl$cleanPath';
+  }
+
+  // Same helper methods as other detail screens
+  String _getTypeTitle() {
+    switch (widget.type) {
+      case 'paid':
+        return 'Paid Bid';
+      case 'completed':
+        return 'Completed Bid';
+      case 'approved':
+        return 'Approved Bid';
+      default:
+        return 'Bid';
+    }
+  }
+
+  String _getStatusText() {
+    switch (widget.type) {
+      case 'paid':
+        return 'Paid - Awaiting Delivery Confirmation';
+      case 'completed':
+        return 'Completed and Delivered';
+      case 'approved':
+        return 'Approved';
+      default:
+        return widget.bidData['status'] ?? 'N/A';
+    }
+  }
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null) return 'N/A';
+    try {
+      final date = DateTime.parse(dateStr);
+      return '${date.day}/${date.month}/${date.year}';
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
+  Widget _buildSection(String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.manrope(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Constants.ctaColorLight,
+          ),
+        ),
+        SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              '$label:',
+              style: GoogleFonts.manrope(
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.manrope(fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
