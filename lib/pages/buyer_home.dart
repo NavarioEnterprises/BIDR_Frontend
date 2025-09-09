@@ -46,6 +46,7 @@ MyNotifier? myNotifier;
 MyNotifier? mySellerNotifier;
 final buyerHomeValueNotifier = ValueNotifier<int>(0);
 final sellerHomeValueNotifier = ValueNotifier<int>(0);
+double _maxDistance = 1.0;
 
 class _BuyerHomePageState extends State<BuyerHomePage>
     with TickerProviderStateMixin {
@@ -54,6 +55,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
   int selectedIndex = -1;
   int index = 0;
   List<WebNotification> notifications = [];
+  double _maxDistance = 0;
 
   // Animation Controllers
   late AnimationController _fadeController;
@@ -413,7 +415,8 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                     ).animate(_slideController),
                                     child: Center(
                                       child: FooterSection(
-                                        logo: "lib/assets/images/bidr_logo2.png",
+                                        logo:
+                                            "lib/assets/images/bidr_logo2.png",
                                         onFooterLinkTap: (String text) {
                                           switch (text) {
                                             case 'Home':
@@ -484,7 +487,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                       ? Expanded(
                           child: NotificationPage(notifications: notifications),
                         )
-                      : Container(),
+                      : const SizedBox.shrink(),
                 ],
               ),
             ),
@@ -1027,6 +1030,12 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   String? _selectedManufacturer;
   String? _selectedMakeModel;
 
+  // Autocomplete controllers
+  final TextEditingController _manufacturerController = TextEditingController();
+  final TextEditingController _makeModelController = TextEditingController();
+  final FocusNode _manufacturerFocus = FocusNode();
+  final FocusNode _makeModelFocus = FocusNode();
+
   // Manufacturer to Models mapping
   final Map<String, List<String>> _manufacturerModels = {
     'Toyota': [
@@ -1149,6 +1158,17 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     ],
   };
 
+  // Manufacturers list for autocomplete
+  final List<String> _manufacturers = [
+    'Toyota',
+    'Honda',
+    'Ford',
+    'BMW',
+    'Mercedes',
+    'Audi',
+    'Volkswagen',
+  ];
+
   // Get models for selected manufacturer
   List<String> _getModelsForManufacturer(String? manufacturer) {
     if (manufacturer == null || manufacturer == 'Select Manufacturer') {
@@ -1167,7 +1187,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   String? _selectedBodyType;
 
   // Range slider value
-  double _maxDistance = 50.0;
+
   final TextEditingController _maxDistanceController = TextEditingController();
   final FocusNode _maxDistanceFocus = FocusNode();
 
@@ -1184,11 +1204,43 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   List<XFile> _vinImages = [];
   Map<String, Uint8List> _vinImageBytes = {};
 
+  // Size limit for images and videos (10MB in bytes)
+  static const int maxFileSizeBytes = 10 * 1024 * 1024; // 10MB
+
+  // Helper method to check file size
+  Future<bool> _isFileSizeValid(XFile file) async {
+    try {
+      final int fileSize = await file.length();
+      return fileSize <= maxFileSizeBytes;
+    } catch (e) {
+      print('Error checking file size: $e');
+      return false;
+    }
+  }
+
+  // Helper method to format file size for display
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) {
+      return '${bytes}B';
+    } else if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)}KB';
+    } else {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)}MB';
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     // Set initial values
     _maxDistanceController.text = _maxDistance.round().toString();
+    
+    // Add listener to manufacturer controller to update makes/models
+    _manufacturerController.addListener(() {
+      setState(() {
+        // This will trigger a rebuild and update the makes/models options
+      });
+    });
   }
 
   @override
@@ -1201,6 +1253,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     _partNumberController.dispose();
     _mileageController.dispose();
     _maxDistanceController.dispose();
+    _manufacturerController.dispose();
+    _makeModelController.dispose();
 
     // Dispose focus nodes
     _vinFocus.dispose();
@@ -1210,6 +1264,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     _partNumberFocus.dispose();
     _mileageFocus.dispose();
     _maxDistanceFocus.dispose();
+    _manufacturerFocus.dispose();
+    _makeModelFocus.dispose();
 
     super.dispose();
   }
@@ -1332,6 +1388,150 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             onChanged: onChanged,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAutocomplete(
+    String label,
+    TextEditingController controller,
+    FocusNode focusNode,
+    List<String> options,
+    Function(String) onSelected,
+  ) {
+    return Container(
+      width: double.infinity,
+      height: 48,
+      child: Autocomplete<String>(
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          if (textEditingValue.text.isEmpty) {
+            return const Iterable<String>.empty();
+          }
+          final String query = textEditingValue.text.toLowerCase();
+          return options.where((String option) {
+            return option.toLowerCase().contains(query) &&
+                   option.toLowerCase() != query;
+          }).take(5); // Limit to 5 suggestions
+        },
+        onSelected: onSelected,
+        fieldViewBuilder:
+            (
+              BuildContext context,
+              TextEditingController fieldController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
+              // Sync the field controller with our controller
+              if (controller.text != fieldController.text) {
+                fieldController.text = controller.text;
+              }
+              // Listen to changes in the field controller and update our controller
+              fieldController.addListener(() {
+                if (controller.text != fieldController.text) {
+                  controller.text = fieldController.text;
+                }
+              });
+              
+              return TextField(
+                controller: fieldController,
+                focusNode: fieldFocusNode,
+                decoration: InputDecoration(
+                  labelText: label,
+                  labelStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'YuGothic',
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Constants.ftaColorLight),
+                    borderRadius: BorderRadius.circular(36),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Constants.ctaColorLight),
+                    borderRadius: BorderRadius.circular(36),
+                  ),
+                  hintText: label.replaceAll('*', ''),
+                  hintStyle: GoogleFonts.manrope(
+                    color: Colors.grey.withOpacity(0.35),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+                style: GoogleFonts.manrope(
+                  color: Colors.black,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300,
+                ),
+                onSubmitted: (String value) {
+                  onFieldSubmitted();
+                },
+              );
+            },
+        optionsViewBuilder:
+            (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
+              return Align(
+                alignment: Alignment.topLeft,
+                child: Material(
+                  elevation: 4.0,
+                  borderRadius: BorderRadius.circular(16),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: 200,
+                      maxWidth: 400,
+                    ),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Constants.ftaColorLight.withOpacity(0.3)),
+                      ),
+                      child: ListView.builder(
+                        padding: EdgeInsets.all(8.0),
+                        itemCount: options.length,
+                        shrinkWrap: true,
+                        itemBuilder: (BuildContext context, int index) {
+                          final String option = options.elementAt(index);
+                          return GestureDetector(
+                            onTap: () {
+                              onSelected(option);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              margin: EdgeInsets.symmetric(vertical: 2),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.grey.withOpacity(0.05),
+                              ),
+                              child: Text(
+                                option,
+                                style: GoogleFonts.manrope(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
       ),
     );
   }
@@ -1649,39 +1849,82 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     try {
       final List<XFile>? images = await _imagePicker.pickMultiImage();
       if (images != null && images.isNotEmpty) {
-        if (kIsWeb) {
-          // For web: keep XFile references directly (preserve blob URLs)
-          setState(() {
-            _selectedImages.addAll(images);
-          });
-        } else {
-          // For mobile: use byte-based approach
-          List<XFile> validImages = [];
+        List<XFile> validImages = [];
+        List<String> oversizedFiles = [];
 
-          for (final image in images) {
-            try {
-              final bytes = await image.readAsBytes();
-              _imageBytes[image.path] = bytes;
-              validImages.add(image);
-            } catch (e) {
-              print('Failed to read image bytes: $e');
-            }
+        // Check file sizes first
+        for (final image in images) {
+          final bool isValidSize = await _isFileSizeValid(image);
+          if (isValidSize) {
+            validImages.add(image);
+          } else {
+            final int fileSize = await image.length();
+            oversizedFiles.add('${image.name} (${_formatFileSize(fileSize)})');
           }
+        }
 
-          if (validImages.isNotEmpty) {
+        // Show error for oversized files
+        if (oversizedFiles.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'The following files exceed 10MB limit and were not added:\n${oversizedFiles.join('\n')}',
+              ),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+
+        // Process valid images
+        if (validImages.isNotEmpty) {
+          if (kIsWeb) {
+            // For web: keep XFile references directly (preserve blob URLs)
             setState(() {
               _selectedImages.addAll(validImages);
             });
-          } else if (images.isNotEmpty) {
+          } else {
+            // For mobile: use byte-based approach
+            List<XFile> processedImages = [];
+
+            for (final image in validImages) {
+              try {
+                final bytes = await image.readAsBytes();
+                _imageBytes[image.path] = bytes;
+                processedImages.add(image);
+              } catch (e) {
+                print('Failed to read image bytes: $e');
+              }
+            }
+
+            if (processedImages.isNotEmpty) {
+              setState(() {
+                _selectedImages.addAll(processedImages);
+              });
+            }
+          }
+
+          // Show success message if any images were added
+          if (validImages.isNotEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Unable to load selected images. Please try again.',
+                  '${validImages.length} image${validImages.length > 1 ? 's' : ''} added successfully',
                 ),
-                backgroundColor: Colors.orange,
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 2),
               ),
             );
           }
+        } else if (images.isNotEmpty && oversizedFiles.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Unable to load selected images. Please try again.',
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
         }
       }
     } catch (e) {
@@ -1745,33 +1988,33 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
               Expanded(child: _buildVinField()),
               SizedBox(width: 16),
               Expanded(
-                child: _buildCustomDropdown(
+                child: _buildAutocomplete(
                   'Manufacturer*',
-                  _selectedManufacturer,
-                  [
-                    'Select Manufacturer',
-                    'Toyota',
-                    'Honda',
-                    'Ford',
-                    'BMW',
-                    'Mercedes',
-                    'Audi',
-                    'Volkswagen',
-                  ],
+                  _manufacturerController,
+                  _manufacturerFocus,
+                  _manufacturers,
                   (value) => setState(() {
                     _selectedManufacturer = value;
+                    _manufacturerController.text = value;
                     // Reset model selection when manufacturer changes
                     _selectedMakeModel = null;
+                    _makeModelController.clear();
                   }),
                 ),
               ),
               SizedBox(width: 16),
               Expanded(
-                child: _buildCustomDropdown(
+                child: _buildAutocomplete(
                   'Makes & Models*',
-                  _selectedMakeModel,
-                  _getModelsForManufacturer(_selectedManufacturer),
-                  (value) => setState(() => _selectedMakeModel = value),
+                  _makeModelController,
+                  _makeModelFocus,
+                  _getModelsForManufacturer(
+                    _manufacturerController.text.isNotEmpty ? _manufacturerController.text : _selectedManufacturer,
+                  ).where((model) => model != 'Select Makes & Models').toList(),
+                  (value) => setState(() {
+                    _selectedMakeModel = value;
+                    _makeModelController.text = value;
+                  }),
                 ),
               ),
             ],
@@ -1860,8 +2103,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 child: _buildSliderField(
                   'Max Distance You Want to Travel (km)*',
                   _maxDistance,
-                  0,
-                  200,
+                  1,
+                  1,
                   (value) => setState(() => _maxDistance = value),
                 ),
               ),
@@ -1974,7 +2217,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 ),
               ),
               SizedBox(width: 16),
-              Expanded(child: Container()), // Empty space for alignment
+              const Expanded(child: SizedBox.shrink()), // Empty space for alignment
             ],
           ),
         ]),
@@ -2217,8 +2460,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
 
     try {
       final result = await ApiService.submitVehicleRequest(
-        selectedManufacturer: _selectedManufacturer,
-        selectedMakeModel: _selectedMakeModel,
+        selectedManufacturer: _manufacturerController.text,
+        selectedMakeModel: _makeModelController.text,
         selectedYear: _selectedYear,
         selectedType: _selectedType,
         selectedNewUsedPart: _selectedNewUsedPart,
@@ -2283,8 +2526,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
 
     try {
       final result = await ApiService.submitVehicleRequest(
-        selectedManufacturer: _selectedManufacturer,
-        selectedMakeModel: _selectedMakeModel,
+        selectedManufacturer: _manufacturerController.text,
+        selectedMakeModel: _makeModelController.text,
         selectedYear: _selectedYear,
         selectedType: _selectedType,
         selectedNewUsedPart: _selectedNewUsedPart,
@@ -2467,10 +2710,10 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   bool _validateForm() {
     List<String> errors = [];
 
-    if (_selectedManufacturer == null || _selectedManufacturer!.isEmpty) {
+    if (_manufacturerController.text.trim().isEmpty) {
       errors.add('Manufacturer is required');
     }
-    if (_selectedMakeModel == null || _selectedMakeModel!.isEmpty) {
+    if (_makeModelController.text.trim().isEmpty) {
       errors.add('Make & Model is required');
     }
     if (_selectedYear == null || _selectedYear!.isEmpty) {
@@ -2484,6 +2727,9 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     }
     if (_descriptionController.text.trim().isEmpty) {
       errors.add('Description is required');
+    }
+    if (_maxDistance < 1.0) {
+      errors.add('Max Distance value must be greater than 0..min 1.');
     }
 
     if (errors.isNotEmpty) {
@@ -2509,6 +2755,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       _descriptionController.clear();
       _partNumberController.clear();
       _mileageController.clear();
+      _manufacturerController.clear();
+      _makeModelController.clear();
 
       // Reset dropdowns
       _selectedManufacturer = null;
@@ -2523,7 +2771,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       _selectedBodyType = null;
 
       // Reset slider
-      _maxDistance = 50.0;
+      _maxDistance = 1.0;
 
       // Reset checkboxes
       _agreeToTerms = false;
@@ -2541,39 +2789,82 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     try {
       final List<XFile>? images = await _imagePicker.pickMultiImage();
       if (images != null && images.isNotEmpty) {
-        if (kIsWeb) {
-          // For web: keep XFile references directly (preserve blob URLs)
-          setState(() {
-            _vinImages.addAll(images);
-          });
-        } else {
-          // For mobile: use byte-based approach
-          List<XFile> validImages = [];
+        List<XFile> validImages = [];
+        List<String> oversizedFiles = [];
 
-          for (final image in images) {
-            try {
-              final bytes = await image.readAsBytes();
-              _vinImageBytes[image.path] = bytes;
-              validImages.add(image);
-            } catch (e) {
-              print('Failed to read image bytes: $e');
-            }
+        // Check file sizes first
+        for (final image in images) {
+          final bool isValidSize = await _isFileSizeValid(image);
+          if (isValidSize) {
+            validImages.add(image);
+          } else {
+            final int fileSize = await image.length();
+            oversizedFiles.add('${image.name} (${_formatFileSize(fileSize)})');
           }
+        }
 
-          if (validImages.isNotEmpty) {
+        // Show error for oversized files
+        if (oversizedFiles.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'The following VIN image files exceed 10MB limit and were not added:\n${oversizedFiles.join('\n')}',
+              ),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+
+        // Process valid images
+        if (validImages.isNotEmpty) {
+          if (kIsWeb) {
+            // For web: keep XFile references directly (preserve blob URLs)
             setState(() {
               _vinImages.addAll(validImages);
             });
-          } else if (images.isNotEmpty) {
+          } else {
+            // For mobile: use byte-based approach
+            List<XFile> processedImages = [];
+
+            for (final image in validImages) {
+              try {
+                final bytes = await image.readAsBytes();
+                _vinImageBytes[image.path] = bytes;
+                processedImages.add(image);
+              } catch (e) {
+                print('Failed to read image bytes: $e');
+              }
+            }
+
+            if (processedImages.isNotEmpty) {
+              setState(() {
+                _vinImages.addAll(processedImages);
+              });
+            }
+          }
+
+          // Show success message if any images were added
+          if (validImages.isNotEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Unable to load selected images. Please try again.',
+                  '${validImages.length} VIN image${validImages.length > 1 ? 's' : ''} added successfully',
                 ),
-                backgroundColor: Colors.orange,
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 2),
               ),
             );
           }
+        } else if (images.isNotEmpty && oversizedFiles.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Unable to load selected VIN images. Please try again.',
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
         }
       }
     } catch (e) {
@@ -2986,115 +3277,111 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   }
 
   Widget _buildVinField() {
-    return GestureDetector(
-      onTap: _vinImages.isEmpty ? _pickVinImages : _showVinImages,
-      child: Container(
-        height: 55,
-        child: TextField(
-          controller: _vinController,
-          focusNode: _vinFocus,
-          enabled: false,
-          decoration: InputDecoration(
-            labelText: 'VIN (Vehicle Identification Number)*',
-            labelStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 13.5,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'YuGothic',
-            ),
-            floatingLabelBehavior: FloatingLabelBehavior.always,
-            hintText: 'Click to upload images or use upload button',
-            hintStyle: GoogleFonts.manrope(
-              color: Colors.grey.shade500,
-              fontSize: 14,
-            ),
-            filled: true,
-            fillColor: Colors.grey.shade50,
-            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-              borderRadius: BorderRadius.circular(36),
-            ),
-            disabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-              borderRadius: BorderRadius.circular(36),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-              borderRadius: BorderRadius.circular(36),
-            ),
-            prefixIcon: _vinImages.isNotEmpty
-                ? InkWell(
-                    onTap: _showVinImages,
-                    child: Container(
-                      margin: EdgeInsets.all(8),
-                      padding: EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade50,
-                        borderRadius: BorderRadius.circular(360),
-                        border: Border.all(color: Colors.green.shade300),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.check_circle,
-                            color: Colors.green,
-                            size: 16,
+    return Container(
+      height: 55,
+      child: TextField(
+        controller: _vinController,
+        focusNode: _vinFocus,
+        style: GoogleFonts.manrope(
+          color: Colors.black,
+          fontSize: 14,
+          fontWeight: FontWeight.w300,
+        ),
+        decoration: InputDecoration(
+          labelText: 'VIN (Vehicle Identification Number)*',
+          labelStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'YuGothic',
+          ),
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          hintText: 'Enter VIN Number',
+          hintStyle: GoogleFonts.manrope(
+            color: Colors.grey.withOpacity(0.35),
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Constants.ftaColorLight),
+            borderRadius: BorderRadius.circular(36),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Constants.ctaColorLight),
+            borderRadius: BorderRadius.circular(36),
+          ),
+          prefixIcon: _vinImages.isNotEmpty
+              ? InkWell(
+                  onTap: _showVinImages,
+                  child: Container(
+                    margin: EdgeInsets.all(8),
+                    padding: EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(360),
+                      border: Border.all(color: Colors.green.shade300),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: 16,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          '${_vinImages.length} image${_vinImages.length > 1 ? 's' : ''}',
+                          style: GoogleFonts.manrope(
+                            color: Colors.green.shade700,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
-                          SizedBox(width: 4),
-                          Text(
-                            '${_vinImages.length} image${_vinImages.length > 1 ? 's' : ''}',
-                            style: GoogleFonts.manrope(
+                        ),
+                        SizedBox(width: 4),
+                        GestureDetector(
+                          child: Container(
+                            padding: EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              color: Colors.green.shade100,
+                            ),
+                            child: Icon(
+                              Icons.visibility,
                               color: Colors.green.shade700,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                              size: 16,
                             ),
                           ),
-                          SizedBox(width: 4),
-                          GestureDetector(
-                            child: Container(
-                              padding: EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                color: Colors.green.shade100,
-                              ),
-                              child: Icon(
-                                Icons.visibility,
-                                color: Colors.green.shade700,
-                                size: 16,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  )
-                : null,
-            suffixIcon: GestureDetector(
-              onTap: _pickVinImages,
-              child: Container(
-                margin: EdgeInsets.all(8),
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Color(0xFF2C3E50),
-                  borderRadius: BorderRadius.circular(360),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.camera_alt, color: Colors.white, size: 16),
-                    SizedBox(width: 6),
-                    Text(
-                      'Upload Photo',
-                      style: GoogleFonts.manrope(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  ),
+                )
+              : null,
+          suffixIcon: GestureDetector(
+            onTap: _pickVinImages,
+            child: Container(
+              margin: EdgeInsets.all(8),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Color(0xFF2C3E50),
+                borderRadius: BorderRadius.circular(360),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.camera_alt, color: Colors.white, size: 16),
+                  SizedBox(width: 6),
+                  Text(
+                    'Upload Photo',
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -3684,22 +3971,26 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       // 1. Create a backend endpoint that proxies Google Places API calls
       // 2. Use google_maps_flutter_web with JavaScript interop
       // 3. Use @dart-js interop to call Google Places JavaScript API directly
-      print('Location autocomplete disabled on web due to CORS restrictions. Backend proxy needed.');
+      print(
+        'Location autocomplete disabled on web due to CORS restrictions. Backend proxy needed.',
+      );
       return [];
     }
 
     try {
-      final String baseURL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-      final String request = '$baseURL?input=$pattern&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&components=country:za&language=en';
-      
+      final String baseURL =
+          'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+      final String request =
+          '$baseURL?input=$pattern&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&components=country:za&language=en';
+
       final response = await http.get(Uri.parse(request));
-      
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        
+
         if (data['status'] == 'OK' && data['predictions'] != null) {
           final List<dynamic> predictions = data['predictions'];
-          
+
           return predictions.map((prediction) {
             return Prediction(
               description: prediction['description'],
@@ -3713,7 +4004,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
           }).toList();
         }
       }
-      
+
       return [];
     } catch (e) {
       print('Error in _searchPlacesAutocomplete: $e');
@@ -3744,22 +4035,25 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         }
       } else if (suggestion.placeId != null) {
         // Handle Google Places API placeId using HTTP API
-        final String baseURL = 'https://maps.googleapis.com/maps/api/place/details/json';
-        final String request = '$baseURL?place_id=${suggestion.placeId}&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&fields=geometry';
-        
+        final String baseURL =
+            'https://maps.googleapis.com/maps/api/place/details/json';
+        final String request =
+            '$baseURL?place_id=${suggestion.placeId}&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&fields=geometry';
+
         final response = await http.get(Uri.parse(request));
-        
+
         if (response.statusCode == 200) {
           final Map<String, dynamic> data = json.decode(response.body);
-          
-          if (data['status'] == 'OK' && data['result']?['geometry']?['location'] != null) {
+
+          if (data['status'] == 'OK' &&
+              data['result']?['geometry']?['location'] != null) {
             final location = data['result']['geometry']['location'];
             final lat = location['lat']?.toDouble();
             final lng = location['lng']?.toDouble();
-            
+
             if (lat != null && lng != null) {
               final newLatLng = LatLng(lat, lng);
-              
+
               setState(() {
                 _selectedLocation = newLatLng;
                 _selectedAddress = suggestion.description ?? '';
@@ -4041,43 +4335,101 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
     );
   }
 
+  Future<bool> _isFileSizeValid(XFile file) async {
+    final int fileSize = await file.length();
+    return fileSize <= 10 * 1024 * 1024; // 10MB limit
+  }
+
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) {
+      return '$bytes B';
+    } else if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    } else {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
+  }
+
   Future<void> _pickImages() async {
     try {
       final List<XFile>? images = await _imagePicker.pickMultiImage();
       if (images != null && images.isNotEmpty) {
-        if (kIsWeb) {
-          // For web: keep XFile references directly (preserve blob URLs)
-          setState(() {
-            _selectedImages.addAll(images);
-          });
-        } else {
-          // For mobile: use byte-based approach
-          List<XFile> validImages = [];
+        List<XFile> validImages = [];
+        List<String> oversizedFiles = [];
 
-          for (final image in images) {
-            try {
-              final bytes = await image.readAsBytes();
-              _imageBytes[image.path] = bytes;
-              validImages.add(image);
-            } catch (e) {
-              print('Failed to read image bytes: $e');
-            }
+        // Check file sizes first
+        for (final image in images) {
+          final bool isValidSize = await _isFileSizeValid(image);
+          if (isValidSize) {
+            validImages.add(image);
+          } else {
+            final int fileSize = await image.length();
+            oversizedFiles.add('${image.name} (${_formatFileSize(fileSize)})');
           }
+        }
 
-          if (validImages.isNotEmpty) {
+        // Show error for oversized files
+        if (oversizedFiles.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'The following files exceed 10MB limit and were not added:\n${oversizedFiles.join('\n')}',
+              ),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+
+        // Process valid images
+        if (validImages.isNotEmpty) {
+          if (kIsWeb) {
+            // For web: keep XFile references directly (preserve blob URLs)
             setState(() {
               _selectedImages.addAll(validImages);
             });
-          } else if (images.isNotEmpty) {
+          } else {
+            // For mobile: use byte-based approach
+            List<XFile> processedImages = [];
+
+            for (final image in validImages) {
+              try {
+                final bytes = await image.readAsBytes();
+                _imageBytes[image.path] = bytes;
+                processedImages.add(image);
+              } catch (e) {
+                print('Failed to read image bytes: $e');
+              }
+            }
+
+            if (processedImages.isNotEmpty) {
+              setState(() {
+                _selectedImages.addAll(processedImages);
+              });
+            }
+          }
+
+          // Show success message if any images were added
+          if (validImages.isNotEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Unable to load selected images. Please try again.',
+                  '${validImages.length} image${validImages.length > 1 ? 's' : ''} added successfully',
                 ),
-                backgroundColor: Colors.orange,
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 2),
               ),
             );
           }
+        } else if (images.isNotEmpty && oversizedFiles.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Unable to load selected images. Please try again.',
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
         }
       }
     } catch (e) {
@@ -4758,6 +5110,9 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
     if (_locationController.text.trim().isEmpty) {
       errors.add('Location is required');
     }
+    if (_maxDistance < 1.0) {
+      errors.add('Max Distance value must be greater than 0..min 1.');
+    }
 
     if (errors.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -5232,43 +5587,101 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     );
   }
 
+  Future<bool> _isFileSizeValid(XFile file) async {
+    final int fileSize = await file.length();
+    return fileSize <= 10 * 1024 * 1024; // 10MB limit
+  }
+
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) {
+      return '$bytes B';
+    } else if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    } else {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
+  }
+
   Future<void> _pickImages() async {
     try {
       final List<XFile>? images = await _imagePicker.pickMultiImage();
       if (images != null && images.isNotEmpty) {
-        if (kIsWeb) {
-          // For web: keep XFile references directly (preserve blob URLs)
-          setState(() {
-            _selectedImages.addAll(images);
-          });
-        } else {
-          // For mobile: use byte-based approach
-          List<XFile> validImages = [];
+        List<XFile> validImages = [];
+        List<String> oversizedFiles = [];
 
-          for (final image in images) {
-            try {
-              final bytes = await image.readAsBytes();
-              _imageBytes[image.path] = bytes;
-              validImages.add(image);
-            } catch (e) {
-              print('Failed to read image bytes: $e');
-            }
+        // Check file sizes first
+        for (final image in images) {
+          final bool isValidSize = await _isFileSizeValid(image);
+          if (isValidSize) {
+            validImages.add(image);
+          } else {
+            final int fileSize = await image.length();
+            oversizedFiles.add('${image.name} (${_formatFileSize(fileSize)})');
           }
+        }
 
-          if (validImages.isNotEmpty) {
+        // Show error for oversized files
+        if (oversizedFiles.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'The following files exceed 10MB limit and were not added:\n${oversizedFiles.join('\n')}',
+              ),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+
+        // Process valid images
+        if (validImages.isNotEmpty) {
+          if (kIsWeb) {
+            // For web: keep XFile references directly (preserve blob URLs)
             setState(() {
               _selectedImages.addAll(validImages);
             });
-          } else if (images.isNotEmpty) {
+          } else {
+            // For mobile: use byte-based approach
+            List<XFile> processedImages = [];
+
+            for (final image in validImages) {
+              try {
+                final bytes = await image.readAsBytes();
+                _imageBytes[image.path] = bytes;
+                processedImages.add(image);
+              } catch (e) {
+                print('Failed to read image bytes: $e');
+              }
+            }
+
+            if (processedImages.isNotEmpty) {
+              setState(() {
+                _selectedImages.addAll(processedImages);
+              });
+            }
+          }
+
+          // Show success message if any images were added
+          if (validImages.isNotEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Unable to load selected images. Please try again.',
+                  '${validImages.length} image${validImages.length > 1 ? 's' : ''} added successfully',
                 ),
-                backgroundColor: Colors.orange,
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 2),
               ),
             );
           }
+        } else if (images.isNotEmpty && oversizedFiles.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Unable to load selected images. Please try again.',
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
         }
       }
     } catch (e) {
@@ -5492,9 +5905,9 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
             children: [
               Expanded(child: _buildLocationField()),
               SizedBox(width: 16),
-              Expanded(child: Container()),
+              const Expanded(child: SizedBox.shrink()),
               SizedBox(width: 16),
-              Expanded(child: Container()),
+              const Expanded(child: SizedBox.shrink()),
             ],
           ),
         ]),
@@ -5824,6 +6237,9 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     }
     if (_locationController.text.trim().isEmpty) {
       errors.add('Location is required');
+    }
+    if (_maxDistance < 1.0) {
+      errors.add('Max Distance value must be greater than 0..min 1.');
     }
 
     if (errors.isNotEmpty) {
@@ -6330,8 +6746,6 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
     }
   }
 
-
-
   // TypeAhead-specific methods for LocationPickerDialog
   Future<List<Prediction>> _getPlacePredictionsTypeAhead(String query) async {
     if (query.trim().isEmpty) {
@@ -6346,22 +6760,26 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
       // 1. Create a backend endpoint that proxies Google Places API calls
       // 2. Use google_maps_flutter_web with JavaScript interop
       // 3. Use @dart-js interop to call Google Places JavaScript API directly
-      print('Location autocomplete disabled on web due to CORS restrictions. Backend proxy needed.');
+      print(
+        'Location autocomplete disabled on web due to CORS restrictions. Backend proxy needed.',
+      );
       return [];
     }
 
     try {
-      final String baseURL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-      final String request = '$baseURL?input=$query&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&components=country:za&language=en';
-      
+      final String baseURL =
+          'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+      final String request =
+          '$baseURL?input=$query&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&components=country:za&language=en';
+
       final response = await http.get(Uri.parse(request));
-      
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        
+
         if (data['status'] == 'OK' && data['predictions'] != null) {
           final List<dynamic> predictions = data['predictions'];
-          
+
           return predictions.map((prediction) {
             return Prediction(
               description: prediction['description'],
@@ -6375,7 +6793,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
           }).toList();
         }
       }
-      
+
       return [];
     } catch (e) {
       print('Error in _getPlacePredictionsTypeAhead: $e');
@@ -6414,22 +6832,25 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
         }
       } else if (prediction.placeId != null) {
         // Handle Google Places API placeId using HTTP API
-        final String baseURL = 'https://maps.googleapis.com/maps/api/place/details/json';
-        final String request = '$baseURL?place_id=${prediction.placeId}&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&fields=geometry';
-        
+        final String baseURL =
+            'https://maps.googleapis.com/maps/api/place/details/json';
+        final String request =
+            '$baseURL?place_id=${prediction.placeId}&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&fields=geometry';
+
         final response = await http.get(Uri.parse(request));
-        
+
         if (response.statusCode == 200) {
           final Map<String, dynamic> data = json.decode(response.body);
-          
-          if (data['status'] == 'OK' && data['result']?['geometry']?['location'] != null) {
+
+          if (data['status'] == 'OK' &&
+              data['result']?['geometry']?['location'] != null) {
             final location = data['result']['geometry']['location'];
             final lat = location['lat']?.toDouble();
             final lng = location['lng']?.toDouble();
-            
+
             if (lat != null && lng != null) {
               final newLatLng = LatLng(lat, lng);
-              
+
               setState(() {
                 _selectedLocation = newLatLng;
                 _selectedAddress = prediction.description ?? '';

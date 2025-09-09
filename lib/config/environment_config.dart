@@ -85,8 +85,7 @@ class AppConfig {
       productsServiceUrl: "https://products-management.bidr.co.za/",
       authServiceUrl: "https://api.bidr.co.za/",
       chatServiceUrl: "http://chat-service.bidr.co.za/",
-      paymentServiceUrl:
-          "https://bidr-payment-1756963524.westus.azurecontainer.io:8003/",
+      paymentServiceUrl: "https://resolutions.bidr.co.za/",
       resolutionServiceUrl:
           "https://bidr-resolution-1756963788.westus.azurecontainer.io:8004/",
       notificationsServiceUrl: "https://notifications.bidr.co.za/",
@@ -116,7 +115,7 @@ class AppConfig {
     ),
     EnvironmentType.prod: EnvironmentConfig(
       // Service URLs (Production URLs)
-      authServiceUrl: "https://api.bidr.co.za/",
+      authServiceUrl: "https://bidr-auth.ngrok.io/",
       chatServiceUrl: "https://bidr-chat.ngrok.io/",
       paymentServiceUrl: "https://bidr-payment.ngrok.io/",
       resolutionServiceUrl: "https://bidr-resolution.ngrok.io/",

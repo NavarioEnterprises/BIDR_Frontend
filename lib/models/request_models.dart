@@ -340,6 +340,8 @@ class AutoSparesRequest {
   final DateTime createdAt;
   final AutoSpares autoSpares;
   final List<dynamic> sellerOffers;
+  final List<String>? productImages;
+  final List<String>? images;
 
   AutoSparesRequest({
     required this.id,
@@ -348,6 +350,8 @@ class AutoSparesRequest {
     required this.autoSpares,
     required this.sellerOffers,
     required this.category,
+    this.productImages,
+    this.images,
   });
 
   factory AutoSparesRequest.fromJson(Map<String, dynamic> json) {
@@ -358,6 +362,12 @@ class AutoSparesRequest {
       createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
       autoSpares: AutoSpares.fromJson(json['auto_spares'] ?? {}),
       sellerOffers: json['seller_offers'] as List<dynamic>? ?? [],
+      productImages: (json['product_images'] as List<dynamic>?)
+          ?.map((image) => image.toString())
+          .toList(),
+      images: (json['images'] as List<dynamic>?)
+          ?.map((image) => image.toString())
+          .toList(),
     );
   }
 
@@ -366,6 +376,8 @@ class AutoSparesRequest {
       'id': id,
       'created_at': createdAt.toIso8601String(),
       'autoSpares': autoSpares.toJson(),
+      'product_images': productImages,
+      'images': images,
     };
   }
 }
@@ -506,6 +518,8 @@ class ConsumerElectronicsRequest {
   final String category;
   final ConsumerElectronics consumerElectronics;
   final List<dynamic> sellerOffers;
+  final List<String>? productImages;
+  final List<String>? images;
 
   ConsumerElectronicsRequest({
     required this.id,
@@ -514,6 +528,8 @@ class ConsumerElectronicsRequest {
     required this.createdAt,
     required this.consumerElectronics,
     required this.sellerOffers,
+    this.productImages,
+    this.images,
   });
 
   factory ConsumerElectronicsRequest.fromJson(Map<String, dynamic> json) {
@@ -526,6 +542,12 @@ class ConsumerElectronicsRequest {
         json['consumer_electronics'] ?? {},
       ),
       sellerOffers: json['seller_offers'] as List<dynamic>? ?? [],
+      productImages: (json['product_images'] as List<dynamic>?)
+          ?.map((image) => image.toString())
+          .toList(),
+      images: (json['images'] as List<dynamic>?)
+          ?.map((image) => image.toString())
+          .toList(),
     );
   }
 
@@ -534,6 +556,8 @@ class ConsumerElectronicsRequest {
       'id': id,
       'created_at': createdAt.toIso8601String(),
       'consumerElectronics': consumerElectronics.toJson(),
+      'product_images': productImages,
+      'images': images,
     };
   }
 }
@@ -659,6 +683,8 @@ class RimTyreRequest {
   final DateTime createdAt;
   final RimTyre rimTyre;
   final List<dynamic> sellerOffers;
+  final List<String>? productImages;
+  final List<String>? images;
 
   RimTyreRequest({
     required this.id,
@@ -667,6 +693,8 @@ class RimTyreRequest {
     required this.createdAt,
     required this.rimTyre,
     required this.sellerOffers,
+    this.productImages,
+    this.images,
   });
 
   factory RimTyreRequest.fromJson(Map<String, dynamic> json) {
@@ -677,6 +705,12 @@ class RimTyreRequest {
       createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
       rimTyre: RimTyre.fromJson(json['rim_tyre'] ?? {}),
       sellerOffers: json['seller_offers'] as List<dynamic>? ?? [],
+      productImages: (json['product_images'] as List<dynamic>?)
+          ?.map((image) => image.toString())
+          .toList(),
+      images: (json['images'] as List<dynamic>?)
+          ?.map((image) => image.toString())
+          .toList(),
     );
   }
 
@@ -685,6 +719,8 @@ class RimTyreRequest {
       'id': id,
       'created_at': createdAt.toIso8601String(),
       'rimTyre': rimTyre.toJson(),
+      'product_images': productImages,
+      'images': images,
     };
   }
 }

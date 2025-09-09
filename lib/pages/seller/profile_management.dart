@@ -107,7 +107,6 @@ class _ProfileManagementState extends State<ProfileManagement>
     'Batteries': false,
   };
 
-  bool grantApproval = false;
   bool registeredName = false;
 
   // Seller profile data
@@ -652,10 +651,6 @@ class _ProfileManagementState extends State<ProfileManagement>
                             'Displayed On Platform',
                             HugeIcons.strokeRoundedWork,
                           ),
-                          _buildSellerMenuItem(
-                            'Authorization For Company',
-                            HugeIcons.strokeRoundedAuthorized,
-                          ),
                         ],
                       ),
                     ),
@@ -878,7 +873,7 @@ class _ProfileManagementState extends State<ProfileManagement>
       case 'Sign Out':
         return _buildSignOutContent();
       default:
-        return Container();
+        return const SizedBox.shrink();
     }
   }
 
@@ -1110,10 +1105,8 @@ class _ProfileManagementState extends State<ProfileManagement>
         return _buildCompanyCategories();
       case 'Displayed On Platform':
         return _buildDisplayedOnPlatform();
-      case 'Authorization For Company':
-        return _buildAuthorizationForCompany();
       default:
-        return Container();
+        return const SizedBox.shrink();
     }
   }
 
@@ -1177,7 +1170,7 @@ class _ProfileManagementState extends State<ProfileManagement>
           ),
           const SizedBox(height: 40),
           _buildAnimatedInputField(
-            'Registered Company Name (CIPC)',
+            'Registered Company Name (CIPC)*',
             'Enter Registered Company Name',
             companyNameController,
             FocusNode(),
@@ -1442,30 +1435,6 @@ class _ProfileManagementState extends State<ProfileManagement>
     );
   }
 
-  Widget _buildAuthorizationForCompany() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Authorization for Company and Director Background and Police Clearance Checks',
-            style: GoogleFonts.manrope(
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 40),
-          _buildAnimatedCheckboxField('Grant Approval', grantApproval, (value) {
-            setState(() {
-              grantApproval = value!;
-            });
-          }, 0),
-          const SizedBox(height: 40),
-          _buildAnimatedSaveButton(1),
-        ],
-      ),
-    );
-  }
 
   Widget _buildChangePassword() {
     return Column(

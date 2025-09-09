@@ -13,6 +13,7 @@ import '../../customWdget/custom_dialogs.dart';
 import '../../pages/buyer_home.dart';
 import '../login.dart';
 import '../otp_screen.dart';
+import '../../services/shared_preferences.dart';
 
 class BuyerSignUpPage extends StatefulWidget {
   final String userRole;
@@ -130,6 +131,11 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
             result['statusCode'] != 500) {
           // Success case
           final message = result['message'] ?? 'User registered successfully';
+
+          // Save form data for future suggestions if registration successful
+          if (result['success'] == true) {
+            await _saveBuyerFormDataForSuggestions();
+          }
 
           // Navigate to OTP verification
           if (result['success'] == true) {
@@ -277,6 +283,170 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     }
 
     return true;
+  }
+
+  Future<void> _saveBuyerFormDataForSuggestions() async {
+    try {
+      final Map<String, String> formData = {
+        'buyer_full_name': _fullNameController.text.trim(),
+        'buyer_mobile_number': _mobileController.text.trim(),
+        'buyer_email': _emailController.text.trim(),
+      };
+
+      // Remove empty values
+      formData.removeWhere((key, value) => value.isEmpty);
+
+      if (formData.isNotEmpty) {
+        await FormDataService.saveMultipleFieldSuggestions(formData);
+      }
+    } catch (e) {
+      print('Error saving buyer form data for suggestions: $e');
+    }
+  }
+
+  Widget _buildSuggestionTextField(
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocusNode,
+    String fieldKey, {
+    Widget? suffixIcon,
+    bool? isPasswordField,
+    bool? integersOnly,
+    bool? isName,
+  }) {
+    return FutureBuilder<List<String>>(
+      future: FormDataService.getFieldSuggestions(fieldKey),
+      builder: (context, snapshot) {
+        final suggestions = snapshot.data ?? [];
+        
+        if (suggestions.isEmpty || isPasswordField == true) {
+          // If no suggestions or password field, use regular field
+          return _buildCustomTextField(
+            hintText,
+            controller,
+            focusNode,
+            nextFocusNode,
+            suffixIcon: suffixIcon,
+            isPasswordField: isPasswordField,
+            integersOnly: integersOnly,
+            isName: isName,
+          );
+        }
+        
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Autocomplete<String>(
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                if (textEditingValue.text.isEmpty) {
+                  return suggestions.take(3); // Show recent suggestions when empty
+                }
+                return suggestions.where((String suggestion) {
+                  return suggestion.toLowerCase().contains(textEditingValue.text.toLowerCase());
+                }).take(3);
+              },
+              fieldViewBuilder: (context, fieldController, fieldFocusNode, onEditingComplete) {
+                // Sync with our main controller
+                if (controller.text != fieldController.text) {
+                  fieldController.text = controller.text;
+                }
+                
+                fieldController.addListener(() {
+                  if (controller.text != fieldController.text) {
+                    controller.text = fieldController.text;
+                    // Save suggestion when user types
+                    if (fieldController.text.trim().isNotEmpty) {
+                      FormDataService.saveFieldSuggestion(fieldKey, fieldController.text.trim());
+                    }
+                  }
+                });
+
+                return _buildCustomTextField(
+                  hintText,
+                  fieldController,
+                  focusNode,
+                  nextFocusNode,
+                  suffixIcon: suffixIcon,
+                  isPasswordField: isPasswordField,
+                  integersOnly: integersOnly,
+                  isName: isName,
+                );
+              },
+              optionsViewBuilder: (context, onSelected, options) {
+                if (options.isEmpty) return Container();
+                
+                return Align(
+                  alignment: Alignment.topLeft,
+                  child: Material(
+                    elevation: 4,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      width: 300,
+                      constraints: const BoxConstraints(maxHeight: 150),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFE0E0E0)),
+                      ),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: options.length,
+                        itemBuilder: (context, index) {
+                          final option = options.elementAt(index);
+                          return InkWell(
+                            onTap: () => onSelected(option),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: index < options.length - 1
+                                        ? const Color(0xFFE0E0E0)
+                                        : Colors.transparent,
+                                    width: 0.5,
+                                  ),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.history,
+                                    size: 14,
+                                    color: const Color(0xFF666666),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      option,
+                                      style: GoogleFonts.manrope(
+                                        color: const Color(0xFF333333),
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              },
+              onSelected: (String selection) {
+                controller.text = selection;
+                FormDataService.saveFieldSuggestion(fieldKey, selection);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildCustomTextField(
@@ -658,11 +828,12 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                             width: (MediaQuery.of(context).size.width > 800)
                                 ? MediaQuery.of(context).size.width * 0.5
                                 : MediaQuery.of(context).size.width * 0.85,
-                            child: _buildCustomTextField(
+                            child: _buildSuggestionTextField(
                               'Full Name*',
                               _fullNameController,
                               _fullNameFocusNode,
                               _mobileFocusNode,
+                              'buyer_full_name',
                               isName: true,
                             ),
                           ),
@@ -674,11 +845,12 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                             width: (MediaQuery.of(context).size.width > 800)
                                 ? MediaQuery.of(context).size.width * 0.5
                                 : MediaQuery.of(context).size.width * 0.85,
-                            child: _buildCustomTextField(
+                            child: _buildSuggestionTextField(
                               'Mobile Number*',
                               _mobileController,
                               _mobileFocusNode,
                               _emailFocusNode,
+                              'buyer_mobile_number',
                               integersOnly: true,
                             ),
                           ),
@@ -690,11 +862,12 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                             width: (MediaQuery.of(context).size.width > 800)
                                 ? MediaQuery.of(context).size.width * 0.5
                                 : MediaQuery.of(context).size.width * 0.85,
-                            child: _buildCustomTextField(
+                            child: _buildSuggestionTextField(
                               'Email*',
                               _emailController,
                               _emailFocusNode,
                               _passwordFocusNode,
+                              'buyer_email',
                             ),
                           ),
                           const SizedBox(height: 24),

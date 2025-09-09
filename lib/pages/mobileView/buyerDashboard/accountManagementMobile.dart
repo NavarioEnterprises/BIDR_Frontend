@@ -496,7 +496,7 @@ class _AccountManagementMobileState extends State<AccountManagementMobile>
           const SizedBox(height: 24),
           
           _buildMobileInputField(
-            'Company Name',
+            'Company Name*',
             'Enter company name',
             _companyController,
             FocusNode(),

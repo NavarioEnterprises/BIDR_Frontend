@@ -1057,4 +1057,61 @@ class ApiService {
       };
     }
   }
+
+  /// Get quotes for a specific request by the current seller
+  static Future<Map<String, dynamic>> getQuotesForRequest(String requestId) async {
+    if (kDebugMode) {
+      print('Fetching quotes for request: $requestId');
+    }
+    try {
+      if (Constants.currentUser?.uid == null) {
+        return {
+          'success': false,
+          'message': 'User not authenticated',
+          'error': 'No user UID found',
+        };
+      }
+      
+      final url = '${GlobalVariables.productsServiceUrl}api/v1/quotes/quotes/by_request/?request_id=$requestId&seller_id=${Constants.currentUser!.uid}';
+      
+      if (kDebugMode) {
+        print('Get quotes for request URL: $url');
+      }
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (kDebugMode) {
+        print('Get quotes for request response status: ${response.statusCode}');
+        print('Get quotes for request response body: ${response.body}');
+      }
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        return {
+          'success': true,
+          'message': 'Quotes fetched successfully',
+          'data': responseData,
+        };
+      } else {
+        final errorData = json.decode(response.body);
+        return {
+          'success': false,
+          'message': errorData['message'] ?? 'Failed to fetch quotes',
+          'error': errorData,
+        };
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Get quotes for request error: $e');
+      }
+      return {
+        'success': false,
+        'message': 'Failed to fetch quotes for request',
+        'error': e.toString(),
+      };
+    }
+  }
 }

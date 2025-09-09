@@ -120,47 +120,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Padding(
-          padding: EdgeInsets.only(left: 20),
-          child: GestureDetector(
-            onTap: () {
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              } else {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/dashboard',
-                  (route) => false,
-                );
-              }
-            },
-            child: Container(
-              margin: EdgeInsets.only(top: 8, bottom: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.arrow_back_ios_new,
-                color: Color(0xFF1B3B5C),
-                size: 18,
-              ),
-            ),
-          ),
-        ),
-
-        centerTitle: true,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(0.0),
         child: Container(
@@ -251,16 +210,16 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 24),
 
                           // Email input
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width > 800
-                                ? MediaQuery.of(context).size.height * 0.5
-                                : MediaQuery.of(context).size.height * 0.8,
+                          Container(
+                            constraints: BoxConstraints(maxWidth: 500),
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 8),
                                 _buildCustomTextField(
-                                  // floatingLabel: 'Email',
                                   'Enter Email',
                                   _emailController,
                                   _emailFocusNode,
@@ -273,16 +232,16 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 24),
 
                           // Password input
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width > 800
-                                ? MediaQuery.of(context).size.height * 0.5
-                                : MediaQuery.of(context).size.height * 0.8,
+                          Container(
+                            constraints: BoxConstraints(maxWidth: 500),
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 8),
                                 _buildCustomTextField(
-                                  // floatingLabel: 'Email',
                                   'Enter Password',
                                   _passwordController,
                                   _passwordFocusNode,
@@ -295,8 +254,11 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 12),
 
                           // Forgot password
-                          SizedBox(
-                            width: MediaQuery.of(context).size.height * 0.5,
+                          Container(
+                            constraints: BoxConstraints(maxWidth: 500),
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: TextButton(
@@ -323,8 +285,11 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 24),
 
                           // Sign in button
-                          SizedBox(
-                            width: MediaQuery.of(context).size.height * 0.5,
+                          Container(
+                            constraints: BoxConstraints(maxWidth: 500),
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
                             height: 45,
                             child: ElevatedButton(
                               onPressed: _isLoading ? null : _handleLogin,
@@ -360,8 +325,11 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 12),
 
                           // Sign up link
-                          SizedBox(
-                            width: MediaQuery.of(context).size.height * 0.5,
+                          Container(
+                            constraints: BoxConstraints(maxWidth: 500),
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
                             child: MouseRegion(
                               cursor: SystemMouseCursors.click,
                               child: GestureDetector(

@@ -684,7 +684,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
               ),
               const SizedBox(height: 24),
               _buildCustomInputField(
-                'Company Name',
+                'Company Name*',
                 'Enter company name',
                 _companyController,
                 FocusNode(),

@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
+import '../config/environment_config.dart';
 import '../customWdget/dropdownMenu.dart';
 import '../models/request_models.dart';
 import '../models/product_request_api.dart';
@@ -1981,7 +1982,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                               onTap: () =>
                                   _navigateToDetailScreen(request, index),
                               child: Text(
-                                "View Details",
+                                "View Details2",
                                 style: GoogleFonts.manrope(
                                   color: Constants.ftaColorLight,
                                   fontSize: 11,
@@ -2021,26 +2022,87 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
               ),
             ),
 
+            // Product Images Section
+            if (_getRequestImages(request).isNotEmpty) ...[
+              SizedBox(height: 12),
+              Container(
+                height: 80,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _getRequestImages(request).length,
+                  itemBuilder: (context, index) {
+                    final imageUrl = _getRequestImages(request)[index];
+                    return Padding(
+                      padding: EdgeInsets.only(right: 8),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          _getFullImageUrl(imageUrl),
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.image_not_supported,
+                                color: Colors.grey.shade400,
+                                size: 24,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+
             SizedBox(height: 20),
 
             // Countdown Timer
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildTimerCircle("0", "D"),
+                _buildTimerCircle(
+                  _getRemainingTime(
+                    request.createdAt,
+                    _getUrgencyForRequest(request),
+                    'days',
+                  ),
+                  "D",
+                ),
                 SizedBox(width: 12),
                 _buildTimerCircle(
-                  _getElapsedTime(request.createdAt, 'hours'),
+                  _getRemainingTime(
+                    request.createdAt,
+                    _getUrgencyForRequest(request),
+                    'hours',
+                  ),
                   "H",
                 ),
                 SizedBox(width: 12),
                 _buildTimerCircle(
-                  _getElapsedTime(request.createdAt, 'minutes'),
+                  _getRemainingTime(
+                    request.createdAt,
+                    _getUrgencyForRequest(request),
+                    'minutes',
+                  ),
                   "M",
                 ),
                 SizedBox(width: 12),
                 _buildTimerCircle(
-                  _getElapsedTime(request.createdAt, 'seconds'),
+                  _getRemainingTime(
+                    request.createdAt,
+                    _getUrgencyForRequest(request),
+                    'seconds',
+                  ),
                   "S",
                 ),
               ],
@@ -2508,6 +2570,71 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       case 'seconds':
         // Seconds remaining after accounting for minutes (0-59)
         final remainingSeconds = difference.inSeconds % 60;
+        return remainingSeconds.toString();
+      default:
+        return "0";
+    }
+  }
+
+  String _getRemainingTime(
+    DateTime? createdAt,
+    String urgencyTimeline,
+    String unit,
+  ) {
+    if (createdAt == null) return "0";
+
+    // Calculate the deadline based on urgency timeline
+    DateTime deadline;
+    switch (urgencyTimeline) {
+      case 'ASAP':
+        deadline = createdAt.add(Duration(hours: 12)); // ASAP is 12 hours
+        break;
+      case '12_HOURS':
+        deadline = createdAt.add(Duration(hours: 12));
+        break;
+      case '24_HOURS':
+        deadline = createdAt.add(Duration(hours: 24));
+        break;
+      case '2-3_DAYS':
+        deadline = createdAt.add(
+          Duration(days: 3),
+        ); // Use 3 days for 2-3 days range
+        break;
+      case '1_WEEK':
+        deadline = createdAt.add(Duration(days: 7));
+        break;
+      case '2_WEEKS':
+        deadline = createdAt.add(Duration(days: 14));
+        break;
+      case '1_MONTH':
+        deadline = createdAt.add(Duration(days: 30));
+        break;
+      default:
+        deadline = createdAt.add(Duration(days: 7)); // Default to 1 week
+    }
+
+    // Calculate remaining time
+    final remaining = deadline.difference(DateTime.now());
+
+    // If time has expired, return 0
+    if (remaining.isNegative) {
+      return "0";
+    }
+
+    switch (unit) {
+      case 'days':
+        return remaining.inDays.toString();
+      case 'hours':
+        // Hours remaining after accounting for days (0-23)
+        final remainingHours = remaining.inHours % 24;
+        return remainingHours.toString();
+      case 'minutes':
+        // Minutes remaining after accounting for hours (0-59)
+        final remainingMinutes = remaining.inMinutes % 60;
+        return remainingMinutes.toString();
+      case 'seconds':
+        // Seconds remaining after accounting for minutes (0-59)
+        final remainingSeconds = remaining.inSeconds % 60;
         return remainingSeconds.toString();
       default:
         return "0";
@@ -3892,6 +4019,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       createdAt: item.createdAt,
       autoSpares: autoSpares,
       sellerOffers: item.quotes, // Use real quotes from API
+      productImages: item.productImages,
+      images: item.images,
     );
   }
 
@@ -3937,6 +4066,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       createdAt: item.createdAt,
       rimTyre: rimTyre,
       sellerOffers: item.quotes, // Use real quotes from API
+      productImages: item.productImages,
+      images: item.images,
     );
   }
 
@@ -3984,6 +4115,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       createdAt: item.createdAt,
       consumerElectronics: consumerElectronics,
       sellerOffers: item.quotes, // Use real quotes from API
+      productImages: item.productImages,
+      images: item.images,
     );
   }
 
@@ -3999,6 +4132,68 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       default:
         return '1 Week';
     }
+  }
+
+  String _getUrgencyForRequest(dynamic request) {
+    // Handle ProductRequestItem from API response
+    if (request is ProductRequestItem) {
+      return request.urgencyTimeline;
+    }
+
+    // Handle transformed request models
+    if (request is AutoSparesRequest) {
+      // Get urgency from the nested structure and map it
+      final urgencyText = request.autoSpares?.partDetails?.urgency;
+      return _mapTimeframeToUrgency(urgencyText);
+    } else if (request is ConsumerElectronicsRequest) {
+      final urgencyText = request.consumerElectronics?.budgetTimeline?.urgency;
+      return _mapTimeframeToUrgency(urgencyText);
+    } else if (request is RimTyreRequest) {
+      final urgencyText = request.rimTyre?.productDetails?.urgency;
+      return _mapTimeframeToUrgency(urgencyText);
+    }
+
+    // Default fallback
+    return '1_WEEK';
+  }
+
+  List<String> _getRequestImages(dynamic request) {
+    // Handle ProductRequestItem from API response
+    if (request is ProductRequestItem) {
+      final List<String> allImages = [];
+
+      // Add product images
+      if (request.productImages != null) {
+        allImages.addAll(request.productImages!);
+      }
+
+      // Add other images
+      if (request.images != null) {
+        allImages.addAll(request.images!);
+      }
+
+      return allImages;
+    }
+
+    // For other request types, return empty list for now
+    // TODO: Add image handling for transformed request models if needed
+    return [];
+  }
+
+  String _getFullImageUrl(String imagePath) {
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+
+    // Remove leading slash if present
+    final cleanPath = imagePath.startsWith('/')
+        ? imagePath.substring(1)
+        : imagePath;
+
+    // Build full URL using the products service URL
+    String baseUrl = GlobalVariables.productsServiceUrl;
+    return '$baseUrl$cleanPath';
   }
 
   String _extractBrandFromTitle(String title) {
@@ -4571,6 +4766,7 @@ class SparesDetailScreen extends StatefulWidget {
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
+        print("dggfgf ${request.autoSpares.toJson()}");
         return Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -4716,6 +4912,71 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
         return difference.inMinutes.toString();
       case 'seconds':
         return difference.inSeconds.toString();
+      default:
+        return "0";
+    }
+  }
+
+  String _getRemainingTime(
+    DateTime? createdAt,
+    String urgencyTimeline,
+    String unit,
+  ) {
+    if (createdAt == null) return "0";
+
+    // Calculate the deadline based on urgency timeline
+    DateTime deadline;
+    switch (urgencyTimeline) {
+      case 'ASAP':
+        deadline = createdAt.add(Duration(hours: 12)); // ASAP is 12 hours
+        break;
+      case '12_HOURS':
+        deadline = createdAt.add(Duration(hours: 12));
+        break;
+      case '24_HOURS':
+        deadline = createdAt.add(Duration(hours: 24));
+        break;
+      case '2-3_DAYS':
+        deadline = createdAt.add(
+          Duration(days: 3),
+        ); // Use 3 days for 2-3 days range
+        break;
+      case '1_WEEK':
+        deadline = createdAt.add(Duration(days: 7));
+        break;
+      case '2_WEEKS':
+        deadline = createdAt.add(Duration(days: 14));
+        break;
+      case '1_MONTH':
+        deadline = createdAt.add(Duration(days: 30));
+        break;
+      default:
+        deadline = createdAt.add(Duration(days: 7)); // Default to 1 week
+    }
+
+    // Calculate remaining time
+    final remaining = deadline.difference(DateTime.now());
+
+    // If time has expired, return 0
+    if (remaining.isNegative) {
+      return "0";
+    }
+
+    switch (unit) {
+      case 'days':
+        return remaining.inDays.toString();
+      case 'hours':
+        // Hours remaining after accounting for days (0-23)
+        final remainingHours = remaining.inHours % 24;
+        return remainingHours.toString();
+      case 'minutes':
+        // Minutes remaining after accounting for hours (0-59)
+        final remainingMinutes = remaining.inMinutes % 60;
+        return remainingMinutes.toString();
+      case 'seconds':
+        // Seconds remaining after accounting for minutes (0-59)
+        final remainingSeconds = remaining.inSeconds % 60;
+        return remainingSeconds.toString();
       default:
         return "0";
     }
@@ -4938,31 +5199,49 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                               ),
                             ),
                             SizedBox(height: 16),
-                            // Status dots - showing elapsed time
+                            // Status dots - showing remaining time
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                _buildTimerCircle("0", "D"),
+                                _buildTimerCircle(
+                                  _getRemainingTime(
+                                    widget.request.createdAt,
+                                    _mapTimeframeToUrgency(
+                                      widget.autoSpare.partDetails.urgency,
+                                    ),
+                                    'days',
+                                  ),
+                                  "D",
+                                ),
                                 SizedBox(width: 12),
                                 _buildTimerCircle(
-                                  _getElapsedTime(
+                                  _getRemainingTime(
                                     widget.request.createdAt,
+                                    _mapTimeframeToUrgency(
+                                      widget.autoSpare.partDetails.urgency,
+                                    ),
                                     'hours',
                                   ),
                                   "H",
                                 ),
                                 SizedBox(width: 12),
                                 _buildTimerCircle(
-                                  _getElapsedTime(
+                                  _getRemainingTime(
                                     widget.request.createdAt,
+                                    _mapTimeframeToUrgency(
+                                      widget.autoSpare.partDetails.urgency,
+                                    ),
                                     'minutes',
                                   ),
                                   "M",
                                 ),
                                 SizedBox(width: 12),
                                 _buildTimerCircle(
-                                  _getElapsedTime(
+                                  _getRemainingTime(
                                     widget.request.createdAt,
+                                    _mapTimeframeToUrgency(
+                                      widget.autoSpare.partDetails.urgency,
+                                    ),
                                     'seconds',
                                   ),
                                   "S",
@@ -5558,6 +5837,33 @@ class ConsumerElectronicsDetailScreen extends StatefulWidget {
       },
     );
   }
+
+  static String _mapTimeframeToUrgency(String? timeframe) {
+    switch (timeframe) {
+      case 'ASAP':
+        return 'ASAP';
+      case '12 Hours':
+        return '12_HOURS';
+      case '24 Hours':
+        return '12_HOURS'; // Map to 12_HOURS since 24_HOURS is not valid
+      case '2-3 Days':
+        return '1_WEEK';
+      case '1 Week':
+        return '1_WEEK';
+      case '2 Weeks':
+        return '1_MONTH'; // Map to 1_MONTH since 2_WEEKS is not valid
+      case 'Within a Month':
+        return '1_MONTH';
+      case 'Immediately':
+        return '12_HOURS';
+      case 'Within a week':
+        return '1_WEEK';
+      case 'Within a month':
+        return '1_MONTH';
+      default:
+        return '1_WEEK'; // Default to 1_WEEK
+    }
+  }
 }
 
 class _ConsumerElectronicsDetailScreenState
@@ -5687,6 +5993,71 @@ class _ConsumerElectronicsDetailScreenState
         return difference.inMinutes.toString();
       case 'seconds':
         return difference.inSeconds.toString();
+      default:
+        return "0";
+    }
+  }
+
+  String _getRemainingTime(
+    DateTime? createdAt,
+    String urgencyTimeline,
+    String unit,
+  ) {
+    if (createdAt == null) return "0";
+
+    // Calculate the deadline based on urgency timeline
+    DateTime deadline;
+    switch (urgencyTimeline) {
+      case 'ASAP':
+        deadline = createdAt.add(Duration(hours: 12)); // ASAP is 12 hours
+        break;
+      case '12_HOURS':
+        deadline = createdAt.add(Duration(hours: 12));
+        break;
+      case '24_HOURS':
+        deadline = createdAt.add(Duration(hours: 24));
+        break;
+      case '2-3_DAYS':
+        deadline = createdAt.add(
+          Duration(days: 3),
+        ); // Use 3 days for 2-3 days range
+        break;
+      case '1_WEEK':
+        deadline = createdAt.add(Duration(days: 7));
+        break;
+      case '2_WEEKS':
+        deadline = createdAt.add(Duration(days: 14));
+        break;
+      case '1_MONTH':
+        deadline = createdAt.add(Duration(days: 30));
+        break;
+      default:
+        deadline = createdAt.add(Duration(days: 7)); // Default to 1 week
+    }
+
+    // Calculate remaining time
+    final remaining = deadline.difference(DateTime.now());
+
+    // If time has expired, return 0
+    if (remaining.isNegative) {
+      return "0";
+    }
+
+    switch (unit) {
+      case 'days':
+        return remaining.inDays.toString();
+      case 'hours':
+        // Hours remaining after accounting for days (0-23)
+        final remainingHours = remaining.inHours % 24;
+        return remainingHours.toString();
+      case 'minutes':
+        // Minutes remaining after accounting for hours (0-59)
+        final remainingMinutes = remaining.inMinutes % 60;
+        return remainingMinutes.toString();
+      case 'seconds':
+        // Seconds remaining after accounting for minutes (0-59)
+        final remainingSeconds = remaining.inSeconds % 60;
+        return remainingSeconds.toString();
       default:
         return "0";
     }
@@ -5909,31 +6280,61 @@ class _ConsumerElectronicsDetailScreenState
                               ),
                             ),
                             SizedBox(height: 16),
-                            // Status dots - showing elapsed time
+                            // Status dots - showing remaining time
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                _buildTimerCircle("0", "D"),
+                                _buildTimerCircle(
+                                  _getRemainingTime(
+                                    widget.request.createdAt,
+                                    _mapTimeframeToUrgency(
+                                      widget
+                                          .consumerElectronics
+                                          .budgetTimeline
+                                          .urgency,
+                                    ),
+                                    'days',
+                                  ),
+                                  "D",
+                                ),
                                 SizedBox(width: 12),
                                 _buildTimerCircle(
-                                  _getElapsedTime(
+                                  _getRemainingTime(
                                     widget.request.createdAt,
+                                    _mapTimeframeToUrgency(
+                                      widget
+                                          .consumerElectronics
+                                          .budgetTimeline
+                                          .urgency,
+                                    ),
                                     'hours',
                                   ),
                                   "H",
                                 ),
                                 SizedBox(width: 12),
                                 _buildTimerCircle(
-                                  _getElapsedTime(
+                                  _getRemainingTime(
                                     widget.request.createdAt,
+                                    _mapTimeframeToUrgency(
+                                      widget
+                                          .consumerElectronics
+                                          .budgetTimeline
+                                          .urgency,
+                                    ),
                                     'minutes',
                                   ),
                                   "M",
                                 ),
                                 SizedBox(width: 12),
                                 _buildTimerCircle(
-                                  _getElapsedTime(
+                                  _getRemainingTime(
                                     widget.request.createdAt,
+                                    _mapTimeframeToUrgency(
+                                      widget
+                                          .consumerElectronics
+                                          .budgetTimeline
+                                          .urgency,
+                                    ),
                                     'seconds',
                                   ),
                                   "S",
@@ -6556,6 +6957,33 @@ class _ConsumerElectronicsDetailScreenState
       },
     );
   }
+
+  static String _mapTimeframeToUrgency(String? timeframe) {
+    switch (timeframe) {
+      case 'ASAP':
+        return 'ASAP';
+      case '12 Hours':
+        return '12_HOURS';
+      case '24 Hours':
+        return '12_HOURS'; // Map to 12_HOURS since 24_HOURS is not valid
+      case '2-3 Days':
+        return '1_WEEK';
+      case '1 Week':
+        return '1_WEEK';
+      case '2 Weeks':
+        return '1_MONTH'; // Map to 1_MONTH since 2_WEEKS is not valid
+      case 'Within a Month':
+        return '1_MONTH';
+      case 'Immediately':
+        return '12_HOURS';
+      case 'Within a week':
+        return '1_WEEK';
+      case 'Within a month':
+        return '1_MONTH';
+      default:
+        return '1_WEEK'; // Default to 1_WEEK
+    }
+  }
 }
 
 class RimTyreDetailScreen extends StatefulWidget {
@@ -6731,6 +7159,71 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
         return difference.inMinutes.toString();
       case 'seconds':
         return difference.inSeconds.toString();
+      default:
+        return "0";
+    }
+  }
+
+  String _getRemainingTime(
+    DateTime? createdAt,
+    String urgencyTimeline,
+    String unit,
+  ) {
+    if (createdAt == null) return "0";
+
+    // Calculate the deadline based on urgency timeline
+    DateTime deadline;
+    switch (urgencyTimeline) {
+      case 'ASAP':
+        deadline = createdAt.add(Duration(hours: 12)); // ASAP is 12 hours
+        break;
+      case '12_HOURS':
+        deadline = createdAt.add(Duration(hours: 12));
+        break;
+      case '24_HOURS':
+        deadline = createdAt.add(Duration(hours: 24));
+        break;
+      case '2-3_DAYS':
+        deadline = createdAt.add(
+          Duration(days: 3),
+        ); // Use 3 days for 2-3 days range
+        break;
+      case '1_WEEK':
+        deadline = createdAt.add(Duration(days: 7));
+        break;
+      case '2_WEEKS':
+        deadline = createdAt.add(Duration(days: 14));
+        break;
+      case '1_MONTH':
+        deadline = createdAt.add(Duration(days: 30));
+        break;
+      default:
+        deadline = createdAt.add(Duration(days: 7)); // Default to 1 week
+    }
+
+    // Calculate remaining time
+    final remaining = deadline.difference(DateTime.now());
+
+    // If time has expired, return 0
+    if (remaining.isNegative) {
+      return "0";
+    }
+
+    switch (unit) {
+      case 'days':
+        return remaining.inDays.toString();
+      case 'hours':
+        // Hours remaining after accounting for days (0-23)
+        final remainingHours = remaining.inHours % 24;
+        return remainingHours.toString();
+      case 'minutes':
+        // Minutes remaining after accounting for hours (0-59)
+        final remainingMinutes = remaining.inMinutes % 60;
+        return remainingMinutes.toString();
+      case 'seconds':
+        // Seconds remaining after accounting for minutes (0-59)
+        final remainingSeconds = remaining.inSeconds % 60;
+        return remainingSeconds.toString();
       default:
         return "0";
     }
@@ -6953,31 +7446,49 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                               ),
                             ),
                             SizedBox(height: 16),
-                            // Status dots - showing elapsed time
+                            // Status dots - showing remaining time
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                _buildTimerCircle("0", "D"),
+                                _buildTimerCircle(
+                                  _getRemainingTime(
+                                    widget.request.createdAt,
+                                    _mapTimeframeToUrgency(
+                                      widget.rimTyre.productDetails.urgency,
+                                    ),
+                                    'days',
+                                  ),
+                                  "D",
+                                ),
                                 SizedBox(width: 12),
                                 _buildTimerCircle(
-                                  _getElapsedTime(
+                                  _getRemainingTime(
                                     widget.request.createdAt,
+                                    _mapTimeframeToUrgency(
+                                      widget.rimTyre.productDetails.urgency,
+                                    ),
                                     'hours',
                                   ),
                                   "H",
                                 ),
                                 SizedBox(width: 12),
                                 _buildTimerCircle(
-                                  _getElapsedTime(
+                                  _getRemainingTime(
                                     widget.request.createdAt,
+                                    _mapTimeframeToUrgency(
+                                      widget.rimTyre.productDetails.urgency,
+                                    ),
                                     'minutes',
                                   ),
                                   "M",
                                 ),
                                 SizedBox(width: 12),
                                 _buildTimerCircle(
-                                  _getElapsedTime(
+                                  _getRemainingTime(
                                     widget.request.createdAt,
+                                    _mapTimeframeToUrgency(
+                                      widget.rimTyre.productDetails.urgency,
+                                    ),
                                     'seconds',
                                   ),
                                   "S",
@@ -7762,6 +8273,33 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
       ],
     );
   }
+
+  static String _mapTimeframeToUrgency(String? timeframe) {
+    switch (timeframe) {
+      case 'ASAP':
+        return 'ASAP';
+      case '12 Hours':
+        return '12_HOURS';
+      case '24 Hours':
+        return '12_HOURS'; // Map to 12_HOURS since 24_HOURS is not valid
+      case '2-3 Days':
+        return '1_WEEK';
+      case '1 Week':
+        return '1_WEEK';
+      case '2 Weeks':
+        return '1_MONTH'; // Map to 1_MONTH since 2_WEEKS is not valid
+      case 'Within a Month':
+        return '1_MONTH';
+      case 'Immediately':
+        return '12_HOURS';
+      case 'Within a week':
+        return '1_WEEK';
+      case 'Within a month':
+        return '1_MONTH';
+      default:
+        return '1_WEEK'; // Default to 1_WEEK
+    }
+  }
 }
 
 // Custom painter for pie chart
@@ -7858,4 +8396,31 @@ Widget _buildStatusDot(String letter, String time) {
       ),
     ],
   );
+}
+
+String _mapTimeframeToUrgency(String? timeframe) {
+  switch (timeframe) {
+    case 'ASAP':
+      return 'ASAP';
+    case '12 Hours':
+      return '12_HOURS';
+    case '24 Hours':
+      return '12_HOURS'; // Map to 12_HOURS since 24_HOURS is not valid
+    case '2-3 Days':
+      return '1_WEEK';
+    case '1 Week':
+      return '1_WEEK';
+    case '2 Weeks':
+      return '1_MONTH'; // Map to 1_MONTH since 2_WEEKS is not valid
+    case 'Within a Month':
+      return '1_MONTH';
+    case 'Immediately':
+      return '12_HOURS';
+    case 'Within a week':
+      return '1_WEEK';
+    case 'Within a month':
+      return '1_MONTH';
+    default:
+      return '1_WEEK'; // Default to 1_WEEK
+  }
 }

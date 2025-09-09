@@ -52,6 +52,8 @@ class ProductRequestItem {
   final String? vehicleSparesSummary;
   final String? consumerElectronicsSummary;
   final List<QuoteItem> quotes;
+  final List<String>? productImages;
+  final List<String>? images;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -74,6 +76,8 @@ class ProductRequestItem {
     this.vehicleSparesSummary,
     this.consumerElectronicsSummary,
     required this.quotes,
+    this.productImages,
+    this.images,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -105,6 +109,12 @@ class ProductRequestItem {
       quotes: (json['quotes'] as List<dynamic>? ?? [])
           .map((quote) => QuoteItem.fromJson(quote))
           .toList(),
+      productImages: (json['product_images'] as List<dynamic>?)
+          ?.map((image) => image.toString())
+          .toList(),
+      images: (json['images'] as List<dynamic>?)
+          ?.map((image) => image.toString())
+          .toList(),
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );
@@ -130,6 +140,8 @@ class ProductRequestItem {
       'vehicle_spares_summary': vehicleSparesSummary,
       'consumer_electronics_summary': consumerElectronicsSummary,
       'quotes': quotes.map((quote) => quote.toJson()).toList(),
+      'product_images': productImages,
+      'images': images,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };

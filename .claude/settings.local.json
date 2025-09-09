@@ -54,7 +54,8 @@
       "Bash(ls:*)",
       "Bash(curl:*)",
       "Bash(pkill:*)",
-      "Bash(dart run:*)"
+      "Bash(dart run:*)",
+      "Bash(sed:*)"
     ],
     "deny": [],
     "ask": []

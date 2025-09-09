@@ -23,6 +23,7 @@ import '../otp_screen.dart';
 import 'complete_business_registration.dart';
 import '../../pages/seller/seller_home_dashboard.dart';
 import 'business_signup_mobile.dart';
+import '../../services/shared_preferences.dart';
 
 class BusinessSignUpPage extends StatefulWidget {
   const BusinessSignUpPage({super.key});
@@ -38,7 +39,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   Set<Marker> _markers = {};
   bool _isLoadingLocation = false;
   PageController pageController = PageController();
-
+  bool isApproval = false;
   // Step 0 - User Information Controllers
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -63,6 +64,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       TextEditingController();
   final TextEditingController _vatNumberController = TextEditingController();
   final TextEditingController _websiteUrlController = TextEditingController();
+  final TextEditingController _yearEstablishedController =
+      TextEditingController();
 
   // Step 2 - Company Address Controllers
   final TextEditingController _postalAddressController =
@@ -129,14 +132,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
-  // Step 6 - Authorization
-  final TextEditingController _authPersonNameController =
-      TextEditingController();
-  final TextEditingController _authPersonEmailController =
-      TextEditingController();
-  final TextEditingController _authPersonPhoneController =
-      TextEditingController();
-
   // Focus Nodes
   final Map<String, FocusNode> focusNodes = {};
 
@@ -151,7 +146,9 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with actual API key
   final TextEditingController _locationController = TextEditingController();
   bool _isRegisteredNameSelected = false;
-  bool isApproval = false;
+
+  // Scroll controller for scrollbar
+  final ScrollController _scrollController = ScrollController();
 
   final List<StepInfo> steps = [
     StepInfo(
@@ -187,11 +184,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     StepInfo(
       title: 'Display On Platform',
       subtitle: 'Enter Name of Trading Name',
-      isCompleted: false,
-    ),
-    StepInfo(
-      title: 'Authorization For Company',
-      subtitle: 'Enter Company Authorization',
       isCompleted: false,
     ),
   ];
@@ -246,6 +238,9 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       // Optional: Auto-debounced address validation
       _debounceAddressValidation();
     });
+    
+    // Load saved form progress
+    _loadFormProgress();
   }
 
   void _initializeFocusNodes() {
@@ -255,6 +250,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       'registrationNumber',
       'vatNumber',
       'websiteUrl',
+      'yearEstablished',
       'postalAddress',
       'physicalAddress',
       'contactPersonName',
@@ -279,6 +275,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     focusNodes.values.forEach((node) => node.dispose());
     _postalAddressController.dispose();
     _physicalAddressController.dispose();
@@ -301,9 +298,12 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     final cleanPhone = phone.replaceAll(RegExp(r'[^0-9+]'), '');
     if (cleanPhone.startsWith('+')) {
       final digits = cleanPhone.substring(1);
-      return digits.length >= 10 && digits.length <= 12 && RegExp(r'^[0-9]+$').hasMatch(digits);
+      return digits.length >= 10 &&
+          digits.length <= 12 &&
+          RegExp(r'^[0-9]+$').hasMatch(digits);
     } else {
-      return cleanPhone.length == 10 && RegExp(r'^[0-9]+$').hasMatch(cleanPhone);
+      return cleanPhone.length == 10 &&
+          RegExp(r'^[0-9]+$').hasMatch(cleanPhone);
     }
   }
 
@@ -318,6 +318,48 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     if (minLength != null && cleanValue.length < minLength) return false;
     if (maxLength != null && cleanValue.length > maxLength) return false;
     return RegExp(r'^[0-9]+$').hasMatch(cleanValue);
+  }
+
+  // URL validation helper
+  bool _isValidURL(String url) {
+    if (url.trim().isEmpty) return true; // Optional field
+    
+    try {
+      final trimmedUrl = url.trim();
+      
+      // Add protocol if missing
+      String urlToValidate = trimmedUrl;
+      if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
+        urlToValidate = 'https://$trimmedUrl';
+      }
+      
+      final uri = Uri.parse(urlToValidate);
+      
+      // Must have a host
+      if (uri.host.isEmpty) {
+        return false;
+      }
+      
+      // Host must contain at least one dot (domain.extension)
+      if (!uri.host.contains('.')) {
+        return false;
+      }
+      
+      // Basic domain validation - must have at least domain.tld
+      final hostParts = uri.host.split('.');
+      if (hostParts.length < 2 || hostParts.any((part) => part.isEmpty)) {
+        return false;
+      }
+      
+      // Last part must be at least 2 characters (TLD)
+      if (hostParts.last.length < 2) {
+        return false;
+      }
+      
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   // User Information Form Validation
@@ -418,6 +460,31 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       _showFieldValidationError(
         'VAT number must be at least 10 digits',
         focusNodes['vatNumber']!,
+      );
+      return false;
+    }
+    if (_yearEstablishedController.text.trim().isEmpty) {
+      _showFieldValidationError(
+        'Year Established is required',
+        focusNodes['yearEstablished']!,
+      );
+      return false;
+    }
+    final currentYear = DateTime.now().year;
+    final enteredYear = int.tryParse(_yearEstablishedController.text.trim());
+    if (enteredYear == null ||
+        enteredYear < (currentYear - 100) ||
+        enteredYear > currentYear) {
+      _showFieldValidationError(
+        'Please enter a valid year between ${currentYear - 100} and $currentYear',
+        focusNodes['yearEstablished']!,
+      );
+      return false;
+    }
+    if (_websiteUrlController.text.trim().isNotEmpty && !_isValidURL(_websiteUrlController.text)) {
+      _showFieldValidationError(
+        'Please enter a valid website URL (e.g., example.com or https://example.com)',
+        focusNodes['websiteUrl']!,
       );
       return false;
     }
@@ -576,19 +643,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     return true;
   }
 
-  // Authorization Form Validation
-  bool _validateAuthorizationForm() {
-    if (!isApproval) {
-      CustomDialogs.showErrorDialog(
-        context,
-        'Please grant approval for company authorization',
-        onRetry: () {},
-      );
-      return false;
-    }
-    return true;
-  }
-
   // Show field validation error with focus
   void _showFieldValidationError(String message, FocusNode focusNode) {
     CustomDialogs.showErrorDialog(
@@ -605,6 +659,9 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       setState(() {
         steps[currentStep].isCompleted = true;
       });
+
+      // Save progress before moving to next step
+      _saveFormProgress();
 
       if (currentStep < steps.length - 1) {
         setState(() {
@@ -732,6 +789,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           'registration_number': _registrationNumberController.text,
           'vat_number': _vatNumberController.text,
           'website_url': _websiteUrlController.text,
+          'year_established': _yearEstablishedController.text,
           'product_category': selectedCategories.join(', '),
           'product_subcategory': selectedCategories.isNotEmpty
               ? selectedCategories.first
@@ -743,6 +801,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           'registration_number': _registrationNumberController.text,
           'vat_number': _vatNumberController.text,
           'website_url': _websiteUrlController.text,
+          'year_established': _yearEstablishedController.text,
         },
         'contact_info': {
           'postal_address': _postalAddressController.text,
@@ -768,10 +827,127 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         businessRegistrationData,
       );
 
+      // Save form data for future suggestions if submission is successful
+      if (result != null && result['success'] != false) {
+        await _saveFormDataForSuggestions();
+        // Clear form progress on successful submission
+        await FormProgressService.clearBusinessFormProgress();
+      }
+
       return result;
     } catch (e) {
       print('Error in _submitBusinessRegistration: $e');
       return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<void> _saveFormDataForSuggestions() async {
+    try {
+      final Map<String, String> formData = {
+        'business_company_name': _companyNameController.text.trim(),
+        'business_trading_name': _tradingNameController.text.trim(),
+        'business_registration_number': _registrationNumberController.text.trim(),
+        'business_website_url': _websiteUrlController.text.trim(),
+        'business_year_established': _yearEstablishedController.text.trim(),
+        'business_contact_person_name': _contactPersonNameController.text.trim(),
+        'business_contact_telephone': _contactPersonTelephoneController.text.trim(),
+        'business_contact_email': _contactPersonEmailController.text.trim(),
+        'business_platform_email': _platformWorkflowEmailController.text.trim(),
+        'business_account_holder': _accountHolderController.text.trim(),
+      };
+
+      // Remove empty values
+      formData.removeWhere((key, value) => value.isEmpty);
+
+      if (formData.isNotEmpty) {
+        await FormDataService.saveMultipleFieldSuggestions(formData);
+      }
+    } catch (e) {
+      print('Error saving form data for suggestions: $e');
+    }
+  }
+
+  Future<void> _saveFormProgress() async {
+    try {
+      final Map<String, String> formData = {
+        'firstName': _firstNameController.text.trim(),
+        'lastName': _lastNameController.text.trim(),
+        'userEmail': _userEmailController.text.trim(),
+        'userPhone': _userPhoneController.text.trim(),
+        'companyName': _companyNameController.text.trim(),
+        'tradingName': _tradingNameController.text.trim(),
+        'registrationNumber': _registrationNumberController.text.trim(),
+        'vatNumber': _vatNumberController.text.trim(),
+        'websiteUrl': _websiteUrlController.text.trim(),
+        'yearEstablished': _yearEstablishedController.text.trim(),
+        'postalAddress': _postalAddressController.text.trim(),
+        'physicalAddress': _physicalAddressController.text.trim(),
+        'contactPersonName': _contactPersonNameController.text.trim(),
+        'contactPersonTelephone': _contactPersonTelephoneController.text.trim(),
+        'contactPersonEmail': _contactPersonEmailController.text.trim(),
+        'platformWorkflowEmail': _platformWorkflowEmailController.text.trim(),
+        'accountNumber': _accountNumberController.text.trim(),
+        'accountHolder': _accountHolderController.text.trim(),
+      };
+
+      await FormProgressService.saveBusinessFormProgress(
+        currentStep: currentStep,
+        formData: formData,
+        selectedCategories: selectedCategories,
+        selectedBank: _selectedBank,
+        selectedBranchCode: _selectedBranchCode,
+      );
+    } catch (e) {
+      print('Error saving form progress: $e');
+    }
+  }
+
+  Future<void> _loadFormProgress() async {
+    try {
+      final progress = await FormProgressService.getBusinessFormProgress();
+      if (progress != null) {
+        setState(() {
+          currentStep = progress['currentStep'] ?? 0;
+          
+          final formData = progress['formData'] as Map<String, dynamic>? ?? {};
+          _firstNameController.text = formData['firstName'] ?? '';
+          _lastNameController.text = formData['lastName'] ?? '';
+          _userEmailController.text = formData['userEmail'] ?? '';
+          _userPhoneController.text = formData['userPhone'] ?? '';
+          _companyNameController.text = formData['companyName'] ?? '';
+          _tradingNameController.text = formData['tradingName'] ?? '';
+          _registrationNumberController.text = formData['registrationNumber'] ?? '';
+          _vatNumberController.text = formData['vatNumber'] ?? '';
+          _websiteUrlController.text = formData['websiteUrl'] ?? '';
+          _yearEstablishedController.text = formData['yearEstablished'] ?? '';
+          _postalAddressController.text = formData['postalAddress'] ?? '';
+          _physicalAddressController.text = formData['physicalAddress'] ?? '';
+          _contactPersonNameController.text = formData['contactPersonName'] ?? '';
+          _contactPersonTelephoneController.text = formData['contactPersonTelephone'] ?? '';
+          _contactPersonEmailController.text = formData['contactPersonEmail'] ?? '';
+          _platformWorkflowEmailController.text = formData['platformWorkflowEmail'] ?? '';
+          _accountNumberController.text = formData['accountNumber'] ?? '';
+          _accountHolderController.text = formData['accountHolder'] ?? '';
+          
+          selectedCategories = List<String>.from(progress['selectedCategories'] ?? []);
+          _selectedBank = progress['selectedBank'];
+          _selectedBranchCode = progress['selectedBranchCode'];
+          
+          // Mark completed steps
+          for (int i = 0; i < currentStep; i++) {
+            if (i < steps.length) {
+              steps[i].isCompleted = true;
+            }
+          }
+        });
+        
+        // Navigate to saved step
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          pageController.jumpToPage(currentStep);
+        });
+      }
+    } catch (e) {
+      print('Error loading form progress: $e');
     }
   }
 
@@ -791,8 +967,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         return _validateProductCategoriesForm();
       case 6: // Display On Platform
         return _validateDisplayOnPlatformForm();
-      case 7: // Authorization For Company
-        return _validateAuthorizationForm();
       default:
         return true;
     }
@@ -1142,8 +1316,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         final address =
             '${placemark.street}, ${placemark.locality}, ${placemark.administrativeArea}, ${placemark.country}';
 
-        // Optionally update the physical address controller with the new address
-        // _physicalAddressController.text = address;
+        // Update the physical address controller with the new address
+        _physicalAddressController.text = address;
 
         print('Address for coordinates: $address');
       }
@@ -1224,18 +1398,23 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: SingleChildScrollView(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 24.0,
-                                    vertical: 24.0,
-                                  ),
-                                  child: Column(
-                                    children: steps.asMap().entries.map((
-                                      entry,
-                                    ) {
-                                      int index = entry.key;
-                                      return _buildStepItem(index);
-                                    }).toList(),
+                                child: Scrollbar(
+                                  controller: _scrollController,
+                                  thumbVisibility: true,
+                                  child: SingleChildScrollView(
+                                    controller: _scrollController,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24.0,
+                                      vertical: 24.0,
+                                    ),
+                                    child: Column(
+                                      children: steps.asMap().entries.map((
+                                        entry,
+                                      ) {
+                                        int index = entry.key;
+                                        return _buildStepItem(index);
+                                      }).toList(),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1265,7 +1444,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               // Header
-                              currentStep == steps.length - 1 && isApproval
+                              currentStep == steps.length - 1
                                   ? SizedBox.shrink()
                                   : SizedBox(
                                       width:
@@ -1313,7 +1492,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                         ],
                                       ),
                                     ),
-                              currentStep == steps.length - 1 && isApproval
+                              currentStep == steps.length - 1
                                   ? SizedBox.shrink()
                                   : (currentStep > 0
                                         ? SizedBox.shrink()
@@ -1365,10 +1544,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                           _buildBankAccountForm(),
                                           _buildProductCategoriesForm(),
                                           _buildDisplayOnPlatformForm(),
-                                          currentStep == steps.length - 1 &&
-                                                  isApproval
-                                              ? BusinessRegistrationCompleteWidget()
-                                              : _buildAuthorizationForm(),
+                                          BusinessRegistrationCompleteWidget(),
                                         ],
                                       ),
                                     ),
@@ -1378,7 +1554,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
 
                               // Navigation Button
                               const SizedBox(height: 24),
-                              currentStep == steps.length - 1 && isApproval
+                              currentStep == steps.length - 1
                                   ? Center(
                                       child: AnimatedContainer(
                                         duration: const Duration(
@@ -1421,7 +1597,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                                     ),
                                                   )
                                                 : Text(
-                                                    'Enter BIDR Word',
+                                                    'Enter BIDR World',
                                                     key: ValueKey(
                                                       'text_${currentStep}',
                                                     ),
@@ -1798,25 +1974,29 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 32),
-          _buildInputField(
-            'Registered Company Name (CIPC)',
+          _buildSuggestionField(
+            'Registered Company Name (CIPC)*',
             'Enter Registered Company Name',
             _companyNameController,
             focusNodes['companyName']!,
+            'business_company_name',
+            isName: true,
           ),
           const SizedBox(height: 24),
-          _buildInputField(
+          _buildSuggestionField(
             'Trading Name',
             'Enter Company Trading Name',
             _tradingNameController,
             focusNodes['tradingName']!,
+            'business_trading_name',
           ),
           const SizedBox(height: 24),
-          _buildInputField(
+          _buildSuggestionField(
             'Registration Number',
             'Enter Registration Number',
             _registrationNumberController,
             focusNodes['registrationNumber']!,
+            'business_registration_number',
           ),
           const SizedBox(height: 24),
           _buildInputField(
@@ -1827,12 +2007,15 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
             integersOnly: true,
           ),
           const SizedBox(height: 24),
-          _buildInputField(
+          _buildSuggestionField(
             'Website URL',
             'Enter Company Website URL',
             _websiteUrlController,
             focusNodes['websiteUrl']!,
+            'business_website_url',
           ),
+          const SizedBox(height: 24),
+          _buildYearAutocomplete(),
           const SizedBox(height: 24),
           _buildFileUploadField(),
         ],
@@ -1846,43 +2029,48 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 32),
-          _buildInputField(
-            'Postal Address',
+          _buildAddressField(
+            'Postal Address*',
             'Enter Postal Address',
             _postalAddressController,
             focusNodes['postalAddress']!,
+            showPinIcon: true,
           ),
           const SizedBox(height: 24),
-          _buildInputField(
-            'Physical Address',
+          _buildAddressField(
+            'Physical Address*',
             'Enter Physical Address',
             _physicalAddressController,
             focusNodes['physicalAddress']!,
+            showPinIcon: true,
           ),
           const SizedBox(height: 24),
           _buildLocationDropdown(),
           const SizedBox(height: 24),
-          _buildInputField(
+          _buildSuggestionField(
             'Contact Person Name',
             'Enter Contact Person Name',
             _contactPersonNameController,
             focusNodes['contactPersonName']!,
+            'business_contact_person_name',
             isName: true,
           ),
           const SizedBox(height: 24),
-          _buildInputField(
+          _buildSuggestionField(
             'Contact Person Telephone',
             'Enter Contact Person Telephone',
             _contactPersonTelephoneController,
             focusNodes['contactPersonTelephone']!,
+            'business_contact_telephone',
             integersOnly: true,
           ),
           const SizedBox(height: 24),
-          _buildInputField(
+          _buildSuggestionField(
             'Contact Person Email Address',
             'Enter Contact Person Email Address',
             _contactPersonEmailController,
             focusNodes['contactPersonEmail']!,
+            'business_contact_email',
             isEmail: true,
           ),
           const SizedBox(height: 24),
@@ -1902,61 +2090,60 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Show selected location in uneditable field if location is selected
-        if (_selectedLocationText != null && _selectedLocationText!.isNotEmpty)
-          Column(
-            children: [
-              _buildCustomTextField(
-                'Selected Location',
-                _locationController,
-                FocusNode(),
-                null,
-                isReadOnly: true,
-              ),
-              const SizedBox(height: 12),
-            ],
-          ),
         Text(
-          'Location',
+          'Location*',
           style: GoogleFonts.manrope(
+            color: const Color(0xFF333333),
             fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey[700],
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
-        SizedBox(
+        Container(
           width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: _showLocationPickerDialog,
-            icon: Icon(
-              Icons.location_on_outlined,
-              color: _selectedLocationText != null
-                  ? Colors.white
-                  : Colors.grey[600],
-              size: 20,
-            ),
-            label: Text(
-              _selectedLocationText != null
-                  ? 'Change Location'
-                  : 'Select Location',
-              style: GoogleFonts.manrope(
-                color: _selectedLocationText != null
-                    ? Colors.white
-                    : Colors.grey[600],
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
+            color: const Color(0xFFF8F9FA),
+          ),
+          child: InkWell(
+            onTap: _showLocationPickerDialog,
+            borderRadius: BorderRadius.circular(30),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    color: _selectedLocationText != null && _selectedLocationText!.isNotEmpty
+                        ? Constants.ctaColorLight
+                        : const Color(0xFF666666),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _selectedLocationText != null && _selectedLocationText!.isNotEmpty
+                          ? _selectedLocationText!
+                          : 'Select Location on Map',
+                      style: GoogleFonts.manrope(
+                        color: _selectedLocationText != null && _selectedLocationText!.isNotEmpty
+                            ? const Color(0xFF333333)
+                            : const Color(0xFF999999),
+                        fontSize: 16,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.map_outlined,
+                    color: const Color(0xFF666666),
+                    size: 18,
+                  ),
+                ],
               ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _selectedLocationText != null
-                  ? const Color(0xFFF5A623)
-                  : Colors.grey[100],
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: BorderSide(color: Colors.grey[300]!),
-              ),
-              alignment: Alignment.centerLeft,
             ),
           ),
         ),
@@ -2004,19 +2191,19 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         Text(
           'Bank Name*',
           style: GoogleFonts.manrope(
+            color: const Color(0xFF333333),
             fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey[700],
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
-            color: Colors.white,
+            color: const Color(0xFFF8F9FA),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
@@ -2025,7 +2212,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
               hint: Text(
                 'Select Bank',
                 style: GoogleFonts.manrope(
-                  color: Colors.grey[600],
+                  color: const Color(0xFF999999),
                   fontSize: 16,
                 ),
               ),
@@ -2035,7 +2222,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                   child: Text(
                     bank,
                     style: GoogleFonts.manrope(
-                      color: Colors.black87,
+                      color: const Color(0xFF333333),
                       fontSize: 16,
                     ),
                   ),
@@ -2044,7 +2231,9 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
               onChanged: (String? newValue) {
                 setState(() {
                   _selectedBank = newValue;
-                  _selectedBranchCode = newValue != null ? _southAfricanBanks[newValue] : null;
+                  _selectedBranchCode = newValue != null
+                      ? _southAfricanBanks[newValue]
+                      : null;
                   _bankNameController.text = newValue ?? '';
                   _branchCodeController.text = _selectedBranchCode ?? '';
                 });
@@ -2063,9 +2252,9 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         Text(
           'Branch Code*',
           style: GoogleFonts.manrope(
+            color: const Color(0xFF333333),
             fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey[700],
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
@@ -2075,12 +2264,14 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
-            color: Colors.grey[50],
+            color: const Color(0xFFF8F9FA),
           ),
           child: Text(
             _selectedBranchCode ?? 'Select a bank first',
             style: GoogleFonts.manrope(
-              color: _selectedBranchCode != null ? Colors.black87 : Colors.grey[600],
+              color: _selectedBranchCode != null
+                  ? const Color(0xFF333333)
+                  : const Color(0xFF999999),
               fontSize: 16,
             ),
           ),
@@ -2292,70 +2483,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     );
   }
 
-  Widget _buildApprovalNameWithCheckbox(String desName) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 32),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            border: Border.all(color: Constants.ftaColorLight),
-            borderRadius: BorderRadius.circular(360),
-            color: Colors.white,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  desName,
-                  style: GoogleFonts.manrope(color: Colors.black, fontSize: 14),
-                ),
-              ),
-              const SizedBox(width: 12),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isApproval = !isApproval;
-                  });
-                },
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: isApproval
-                        ? Constants.ctaColorLight
-                        : Colors.transparent,
-                    border: Border.all(
-                      color: isApproval
-                          ? Constants.ctaColorLight
-                          : Colors.grey[400]!,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(360),
-                  ),
-                  child: isApproval
-                      ? const Icon(Icons.check, color: Colors.white, size: 16)
-                      : null,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAuthorizationForm() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [_buildApprovalNameWithCheckbox("Grant Approval")],
-      ),
-    );
-  }
-
   Widget _buildInputField(
     String label,
     String hint,
@@ -2382,6 +2509,396 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     );
   }
 
+  String _formatFileSize(int bytes) {
+    if (bytes >= 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    } else if (bytes >= 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    } else {
+      return '$bytes B';
+    }
+  }
+
+  List<String> _getRecentYears() {
+    final currentYear = DateTime.now().year;
+    final List<String> years = [];
+
+    // Add years from current year back to 50 years ago
+    for (int i = 0; i <= 50; i++) {
+      years.add((currentYear - i).toString());
+    }
+
+    return years;
+  }
+
+  Widget _buildAddressField(
+    String label,
+    String hint,
+    TextEditingController controller,
+    FocusNode focusNode, {
+    bool showPinIcon = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.manrope(
+            color: const Color(0xFF333333),
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
+            color: const Color(0xFFF8F9FA),
+          ),
+          child: TextFormField(
+            controller: controller,
+            focusNode: focusNode,
+            maxLines: 4,
+            minLines: 4,
+            style: GoogleFonts.manrope(
+              color: const Color(0xFF333333),
+              fontSize: 16,
+            ),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: GoogleFonts.manrope(
+                color: const Color(0xFF999999),
+                fontSize: 16,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              suffixIcon: showPinIcon
+                  ? Icon(Icons.location_pin, color: const Color(0xFF666666))
+                  : null,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSuggestionField(
+    String label,
+    String hint,
+    TextEditingController controller,
+    FocusNode focusNode,
+    String fieldKey, {
+    bool integersOnly = false,
+    bool isName = false,
+    bool isEmail = false,
+    bool isPassword = false,
+    Widget? suffixIcon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.manrope(
+            color: const Color(0xFF333333),
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        FutureBuilder<List<String>>(
+          future: FormDataService.getFieldSuggestions(fieldKey),
+          builder: (context, snapshot) {
+            final suggestions = snapshot.data ?? [];
+
+            return Autocomplete<String>(
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                if (textEditingValue.text.isEmpty) {
+                  return suggestions.take(
+                    5,
+                  ); // Show recent suggestions when empty
+                }
+                return suggestions
+                    .where((String suggestion) {
+                      return suggestion.toLowerCase().contains(
+                        textEditingValue.text.toLowerCase(),
+                      );
+                    })
+                    .take(5);
+              },
+              fieldViewBuilder:
+                  (
+                    context,
+                    fieldController,
+                    fieldFocusNode,
+                    onEditingComplete,
+                  ) {
+                    // Sync with our main controller
+                    if (controller.text != fieldController.text) {
+                      fieldController.text = controller.text;
+                    }
+
+                    // Add listener to update main controller
+                    fieldController.addListener(() {
+                      if (controller.text != fieldController.text) {
+                        controller.text = fieldController.text;
+                      }
+                    });
+
+                    return Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: const Color(0xFFE0E0E0),
+                          width: 2,
+                        ),
+                        color: const Color(0xFFF8F9FA),
+                      ),
+                      child: TextFormField(
+                        controller: fieldController,
+                        focusNode: focusNode,
+                        keyboardType: integersOnly
+                            ? TextInputType.number
+                            : TextInputType.text,
+                        obscureText: isPassword,
+                        style: GoogleFonts.manrope(
+                          color: const Color(0xFF333333),
+                          fontSize: 16,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: hint,
+                          hintStyle: GoogleFonts.manrope(
+                            color: const Color(0xFF999999),
+                            fontSize: 16,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
+                          suffixIcon: suffixIcon,
+                        ),
+                        onEditingComplete: onEditingComplete,
+                        onChanged: (value) {
+                          // Save suggestion when user types
+                          if (value.trim().isNotEmpty) {
+                            FormDataService.saveFieldSuggestion(
+                              fieldKey,
+                              value.trim(),
+                            );
+                          }
+                        },
+                      ),
+                    );
+                  },
+              optionsViewBuilder: (context, onSelected, options) {
+                if (options.isEmpty) return Container();
+
+                return Align(
+                  alignment: Alignment.topLeft,
+                  child: Material(
+                    elevation: 4,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      width: 300,
+                      constraints: const BoxConstraints(maxHeight: 200),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFE0E0E0)),
+                      ),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: options.length,
+                        itemBuilder: (context, index) {
+                          final option = options.elementAt(index);
+                          return InkWell(
+                            onTap: () => onSelected(option),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: index < options.length - 1
+                                        ? const Color(0xFFE0E0E0)
+                                        : Colors.transparent,
+                                    width: 1,
+                                  ),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.history,
+                                    size: 16,
+                                    color: const Color(0xFF666666),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      option,
+                                      style: GoogleFonts.manrope(
+                                        color: const Color(0xFF333333),
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              },
+              onSelected: (String selection) {
+                controller.text = selection;
+                FormDataService.saveFieldSuggestion(fieldKey, selection);
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildYearAutocomplete() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Year Established*',
+          style: GoogleFonts.manrope(
+            color: const Color(0xFF333333),
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Autocomplete<String>(
+          optionsBuilder: (TextEditingValue textEditingValue) {
+            if (textEditingValue.text.isEmpty) {
+              return const Iterable<String>.empty();
+            }
+            return _getRecentYears().where((String year) {
+              return year.contains(textEditingValue.text.toLowerCase());
+            });
+          },
+          fieldViewBuilder:
+              (context, controller, focusNode, onEditingComplete) {
+                // Sync with our main controller
+                if (_yearEstablishedController.text != controller.text) {
+                  controller.text = _yearEstablishedController.text;
+                }
+
+                // Add listener to update main controller
+                controller.addListener(() {
+                  if (_yearEstablishedController.text != controller.text) {
+                    _yearEstablishedController.text = controller.text;
+                  }
+                });
+
+                return Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: const Color(0xFFE0E0E0),
+                      width: 2,
+                    ),
+                    color: const Color(0xFFF8F9FA),
+                  ),
+                  child: TextFormField(
+                    controller: controller,
+                    focusNode: focusNodes['yearEstablished']!,
+                    keyboardType: TextInputType.number,
+                    style: GoogleFonts.manrope(
+                      color: const Color(0xFF333333),
+                      fontSize: 16,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Enter Year Established',
+                      hintStyle: GoogleFonts.manrope(
+                        color: const Color(0xFF999999),
+                        fontSize: 16,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
+                    ),
+                    onEditingComplete: onEditingComplete,
+                  ),
+                );
+              },
+          optionsViewBuilder: (context, onSelected, options) {
+            return Align(
+              alignment: Alignment.topLeft,
+              child: Material(
+                elevation: 4,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  width: 300,
+                  constraints: const BoxConstraints(maxHeight: 200),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE0E0E0)),
+                  ),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: options.length,
+                    itemBuilder: (context, index) {
+                      final option = options.elementAt(index);
+                      return InkWell(
+                        onTap: () => onSelected(option),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: index < options.length - 1
+                                    ? const Color(0xFFE0E0E0)
+                                    : Colors.transparent,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            option,
+                            style: GoogleFonts.manrope(
+                              color: const Color(0xFF333333),
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            );
+          },
+          onSelected: (String selection) {
+            _yearEstablishedController.text = selection;
+          },
+        ),
+      ],
+    );
+  }
+
   Future<void> _pickFiles() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -2393,8 +2910,18 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       );
 
       if (result != null) {
+        List<String> oversizedFiles = [];
+
         setState(() {
           for (var file in result.files) {
+            // Check file size (10MB = 10 * 1024 * 1024 bytes)
+            final fileSize = kIsWeb ? (file.bytes?.length ?? 0) : (file.size);
+
+            if (fileSize > 10 * 1024 * 1024) {
+              oversizedFiles.add('${file.name} (${_formatFileSize(fileSize)})');
+              continue;
+            }
+
             // On web: file.bytes is available
             // On mobile: file.path is available
             if (kIsWeb ? file.bytes != null : file.path != null) {
@@ -2402,6 +2929,19 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
             }
           }
         });
+
+        if (oversizedFiles.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'The following files exceed 10MB limit:\n${oversizedFiles.join('\n')}',
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -2673,13 +3213,19 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       isPasswordField: isPassword,
       isEditable: !isReadOnly,
       integersOnly: integersOnly,
-      maxLength: integersOnly && (hintText.toLowerCase().contains('phone') || hintText.toLowerCase().contains('telephone')) ? 13 : (integersOnly ? 10 : null),
+      maxLength:
+          integersOnly &&
+              (hintText.toLowerCase().contains('phone') ||
+                  hintText.toLowerCase().contains('telephone'))
+          ? 13
+          : (integersOnly ? 10 : null),
       suffix: suffixIcon,
       onChanged: (value) {
         // Real-time validation and formatting
         if (integersOnly) {
           // For phone number fields, allow + and digits
-          if (hintText.toLowerCase().contains('phone') || hintText.toLowerCase().contains('telephone')) {
+          if (hintText.toLowerCase().contains('phone') ||
+              hintText.toLowerCase().contains('telephone')) {
             final phoneAllowed = value.replaceAll(RegExp(r'[^0-9+]'), '');
             if (phoneAllowed != value) {
               controller.value = TextEditingValue(
@@ -2721,7 +3267,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
               hintText.toLowerCase().contains('telephone')) {
             if (!_isValidPhoneNumber(value)) {
               isValid = false;
-              errorMessage = 'Phone number must be 10 digits or include country code with + (max 13 digits total)';
+              errorMessage =
+                  'Phone number must be 10 digits or include country code with + (max 13 digits total)';
             }
           } else if (hintText.toLowerCase().contains('account number')) {
             if (!_isValidNumbersOnly(value, minLength: 8, maxLength: 12)) {
@@ -2781,6 +3328,8 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
   String _currentAddress = '';
   Set<Marker> _markers = {};
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _physicalAddressController =
+      TextEditingController();
   List<Map<String, dynamic>> _searchSuggestions = [];
   bool _isSearching = false;
 
@@ -2836,13 +3385,24 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
           placemark.administrativeArea,
           placemark.country,
         ].where((s) => s != null && s.isNotEmpty).join(', ');
+
+        // Update the physical address controller with actual address
+        setState(() {
+          _physicalAddressController.text = _currentAddress;
+        });
       } else {
         _currentAddress =
             '${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)}';
+        setState(() {
+          _physicalAddressController.text = _currentAddress;
+        });
       }
     } catch (e) {
       _currentAddress =
           '${location.latitude.toStringAsFixed(4)}, ${location.longitude.toStringAsFixed(4)}';
+      setState(() {
+        _physicalAddressController.text = _currentAddress;
+      });
     }
 
     _updateMarker();
@@ -2927,129 +3487,194 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      clipBehavior: Clip.antiAlias,
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        height: MediaQuery.of(context).size.height * 0.7,
+        width: MediaQuery.of(context).size.width * 0.85,
+        height: MediaQuery.of(context).size.height * 0.75,
         child: Column(
           children: [
-            // Header
+            // Modern Header with gradient
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
-                color: Constants.ctaColorLight,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
+                gradient: LinearGradient(
+                  colors: [Constants.ctaColorLight, Constants.ctaColorLight.withOpacity(0.8)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.location_on, color: Colors.white),
-                  const SizedBox(width: 8),
-                  const Expanded(
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.location_on_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
                     child: Text(
                       'Select Location',
-                      style: TextStyle(
+                      style: GoogleFonts.manrope(
                         color: Colors.white,
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white),
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(
+                          Icons.close_rounded,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            // Search Bar
+            // Compact Search Section
             Container(
-              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search for a location...',
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: Constants.ctaColorLight,
-                      ),
-                      suffixIcon: _isSearching
-                          ? SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(Icons.clear),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _searchSuggestions.clear();
-                                });
-                              },
-                            )
-                          : null,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Constants.ctaColorLight),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: const Color(0xFFF8F9FA),
+                      border: Border.all(color: const Color(0xFFE0E0E0)),
                     ),
-                    onChanged: (value) {
-                      // Debounce search
-                      Future.delayed(Duration(milliseconds: 500), () {
-                        if (_searchController.text == value &&
-                            value.isNotEmpty) {
-                          _searchPlaces(value);
-                        }
-                      });
-                    },
+                    child: TextField(
+                      controller: _searchController,
+                      style: GoogleFonts.manrope(fontSize: 16),
+                      decoration: InputDecoration(
+                        hintText: 'Search location...',
+                        hintStyle: GoogleFonts.manrope(
+                          color: const Color(0xFF999999),
+                          fontSize: 16,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search_rounded,
+                          color: Constants.ctaColorLight,
+                          size: 22,
+                        ),
+                        suffixIcon: _isSearching
+                            ? Container(
+                                padding: const EdgeInsets.all(12),
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Constants.ctaColorLight,
+                                  ),
+                                ),
+                              )
+                            : _searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear_rounded, size: 20),
+                                color: const Color(0xFF666666),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _searchSuggestions.clear();
+                                  });
+                                },
+                              )
+                            : null,
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                      ),
+                      onChanged: (value) {
+                        // Debounce search
+                        Future.delayed(const Duration(milliseconds: 500), () {
+                          if (_searchController.text == value && value.isNotEmpty) {
+                            _searchPlaces(value);
+                          }
+                        });
+                      },
+                    ),
                   ),
-                  // Search Suggestions
+                  // Compact Search Suggestions
                   if (_searchSuggestions.isNotEmpty)
                     Container(
-                      margin: EdgeInsets.only(top: 8),
-                      constraints: BoxConstraints(maxHeight: 200),
+                      margin: const EdgeInsets.only(top: 8),
+                      constraints: const BoxConstraints(maxHeight: 160),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFE0E0E0)),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            spreadRadius: 2,
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
                       child: ListView.builder(
                         shrinkWrap: true,
+                        padding: EdgeInsets.zero,
                         itemCount: _searchSuggestions.length,
                         itemBuilder: (context, index) {
                           final suggestion = _searchSuggestions[index];
-                          return ListTile(
-                            leading: Icon(
-                              Icons.location_on,
-                              color: Constants.ctaColorLight,
+                          return Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () => _selectSuggestion(suggestion),
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: Constants.ctaColorLight.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Icon(
+                                        Icons.location_on_rounded,
+                                        color: Constants.ctaColorLight,
+                                        size: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        suggestion['address'],
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 14,
+                                          color: const Color(0xFF333333),
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                            title: Text(
-                              suggestion['address'],
-                              style: TextStyle(fontSize: 14),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            onTap: () => _selectSuggestion(suggestion),
                           );
                         },
                       ),
@@ -3071,33 +3696,115 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
                 onTap: _onMapTap,
               ),
             ),
-            // Footer
+            // Modern Footer
             Container(
-              padding: const EdgeInsets.all(16),
-              child: Row(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  top: BorderSide(color: const Color(0xFFE0E0E0), width: 1),
+                ),
+              ),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: Text(
-                      _currentAddress.isNotEmpty
-                          ? _currentAddress
-                          : 'Tap on the map to select a location',
-                      style: const TextStyle(fontSize: 14),
+                  if (_currentAddress.isNotEmpty)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8F9FA),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFE0E0E0)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_rounded,
+                            color: Constants.ctaColorLight,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _currentAddress,
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                color: const Color(0xFF333333),
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        'Tap on the map to select a location',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          color: const Color(0xFF666666),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      widget.onLocationSelected(
-                        _currentLocation,
-                        _currentAddress,
-                      );
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Constants.ctaColorLight,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Select'),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            side: BorderSide(color: const Color(0xFFE0E0E0)),
+                          ),
+                          child: Text(
+                            'Cancel',
+                            style: GoogleFonts.manrope(
+                              color: const Color(0xFF666666),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _currentAddress.isNotEmpty
+                              ? () {
+                                  widget.onLocationSelected(
+                                    _currentLocation,
+                                    _currentAddress,
+                                  );
+                                  Navigator.pop(context);
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Constants.ctaColorLight,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'Confirm Location',
+                            style: GoogleFonts.manrope(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

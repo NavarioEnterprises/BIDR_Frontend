@@ -387,3 +387,274 @@ class EncryptedSharedPreferences {
     return null;
   }
 }
+
+// Form Data Suggestions Service
+class FormDataService {
+  static const String _formSuggestionsKey = 'FORM_SUGGESTIONS';
+  
+  // Save form field suggestions
+  static Future<bool> saveFieldSuggestion(String fieldKey, String value) async {
+    if (value.trim().isEmpty) return false;
+    
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      
+      // Get existing suggestions
+      final existingSuggestionsJson = prefs.getString(_formSuggestionsKey);
+      Map<String, dynamic> suggestions = {};
+      
+      if (existingSuggestionsJson != null) {
+        suggestions = jsonDecode(existingSuggestionsJson);
+      }
+      
+      // Get or create field suggestions list
+      List<String> fieldSuggestions = [];
+      if (suggestions.containsKey(fieldKey)) {
+        fieldSuggestions = List<String>.from(suggestions[fieldKey]);
+      }
+      
+      // Add new suggestion if it doesn't exist (case insensitive)
+      final lowercaseValue = value.trim().toLowerCase();
+      if (!fieldSuggestions.any((s) => s.toLowerCase() == lowercaseValue)) {
+        fieldSuggestions.add(value.trim());
+        
+        // Keep only the last 10 suggestions per field
+        if (fieldSuggestions.length > 10) {
+          fieldSuggestions = fieldSuggestions.sublist(fieldSuggestions.length - 10);
+        }
+        
+        suggestions[fieldKey] = fieldSuggestions;
+        
+        // Save back to preferences
+        return await prefs.setString(_formSuggestionsKey, jsonEncode(suggestions));
+      }
+      
+      return true;
+    } catch (e) {
+      print('Error saving form suggestion: $e');
+      return false;
+    }
+  }
+  
+  // Get suggestions for a specific field
+  static Future<List<String>> getFieldSuggestions(String fieldKey) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final suggestionsJson = prefs.getString(_formSuggestionsKey);
+      
+      if (suggestionsJson != null) {
+        final Map<String, dynamic> suggestions = jsonDecode(suggestionsJson);
+        if (suggestions.containsKey(fieldKey)) {
+          return List<String>.from(suggestions[fieldKey]);
+        }
+      }
+    } catch (e) {
+      print('Error getting form suggestions: $e');
+    }
+    
+    return [];
+  }
+  
+  // Get filtered suggestions based on current input
+  static Future<List<String>> getFilteredSuggestions(String fieldKey, String currentInput) async {
+    final allSuggestions = await getFieldSuggestions(fieldKey);
+    
+    if (currentInput.trim().isEmpty) {
+      return allSuggestions;
+    }
+    
+    final lowerInput = currentInput.toLowerCase();
+    return allSuggestions
+        .where((suggestion) => suggestion.toLowerCase().contains(lowerInput))
+        .toList();
+  }
+  
+  // Save multiple field data at once (useful for form submission)
+  static Future<bool> saveMultipleFieldSuggestions(Map<String, String> fieldData) async {
+    try {
+      for (final entry in fieldData.entries) {
+        await saveFieldSuggestion(entry.key, entry.value);
+      }
+      return true;
+    } catch (e) {
+      print('Error saving multiple form suggestions: $e');
+      return false;
+    }
+  }
+  
+  // Clear suggestions for a specific field
+  static Future<bool> clearFieldSuggestions(String fieldKey) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final suggestionsJson = prefs.getString(_formSuggestionsKey);
+      
+      if (suggestionsJson != null) {
+        final Map<String, dynamic> suggestions = jsonDecode(suggestionsJson);
+        suggestions.remove(fieldKey);
+        return await prefs.setString(_formSuggestionsKey, jsonEncode(suggestions));
+      }
+      
+      return true;
+    } catch (e) {
+      print('Error clearing field suggestions: $e');
+      return false;
+    }
+  }
+  
+  // Clear all form suggestions
+  static Future<bool> clearAllSuggestions() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      return await prefs.remove(_formSuggestionsKey);
+    } catch (e) {
+      print('Error clearing all suggestions: $e');
+      return false;
+    }
+  }
+}
+
+// Form Progress Persistence Service
+class FormProgressService {
+  static const String _businessFormProgressKey = 'BUSINESS_FORM_PROGRESS';
+  static const String _buyerFormProgressKey = 'BUYER_FORM_PROGRESS';
+  
+  // Save business form progress
+  static Future<bool> saveBusinessFormProgress({
+    required int currentStep,
+    required Map<String, String> formData,
+    required List<String> selectedCategories,
+    String? selectedBank,
+    String? selectedBranchCode,
+  }) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      
+      final progressData = {
+        'currentStep': currentStep,
+        'formData': formData,
+        'selectedCategories': selectedCategories,
+        'selectedBank': selectedBank,
+        'selectedBranchCode': selectedBranchCode,
+        'timestamp': DateTime.now().toIso8601String(),
+      };
+      
+      return await prefs.setString(_businessFormProgressKey, jsonEncode(progressData));
+    } catch (e) {
+      print('Error saving business form progress: $e');
+      return false;
+    }
+  }
+  
+  // Get business form progress
+  static Future<Map<String, dynamic>?> getBusinessFormProgress() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final progressJson = prefs.getString(_businessFormProgressKey);
+      
+      if (progressJson != null) {
+        final progress = jsonDecode(progressJson) as Map<String, dynamic>;
+        
+        // Check if progress is recent (within 7 days)
+        final timestamp = DateTime.tryParse(progress['timestamp'] ?? '');
+        if (timestamp != null && 
+            DateTime.now().difference(timestamp).inDays <= 7) {
+          return progress;
+        } else {
+          // Clear old progress
+          await clearBusinessFormProgress();
+        }
+      }
+    } catch (e) {
+      print('Error getting business form progress: $e');
+    }
+    
+    return null;
+  }
+  
+  // Save buyer form progress
+  static Future<bool> saveBuyerFormProgress({
+    required Map<String, String> formData,
+  }) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      
+      final progressData = {
+        'formData': formData,
+        'timestamp': DateTime.now().toIso8601String(),
+      };
+      
+      return await prefs.setString(_buyerFormProgressKey, jsonEncode(progressData));
+    } catch (e) {
+      print('Error saving buyer form progress: $e');
+      return false;
+    }
+  }
+  
+  // Get buyer form progress
+  static Future<Map<String, dynamic>?> getBuyerFormProgress() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final progressJson = prefs.getString(_buyerFormProgressKey);
+      
+      if (progressJson != null) {
+        final progress = jsonDecode(progressJson) as Map<String, dynamic>;
+        
+        // Check if progress is recent (within 7 days)
+        final timestamp = DateTime.tryParse(progress['timestamp'] ?? '');
+        if (timestamp != null && 
+            DateTime.now().difference(timestamp).inDays <= 7) {
+          return progress;
+        } else {
+          // Clear old progress
+          await clearBuyerFormProgress();
+        }
+      }
+    } catch (e) {
+      print('Error getting buyer form progress: $e');
+    }
+    
+    return null;
+  }
+  
+  // Clear business form progress
+  static Future<bool> clearBusinessFormProgress() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      return await prefs.remove(_businessFormProgressKey);
+    } catch (e) {
+      print('Error clearing business form progress: $e');
+      return false;
+    }
+  }
+  
+  // Clear buyer form progress
+  static Future<bool> clearBuyerFormProgress() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      return await prefs.remove(_buyerFormProgressKey);
+    } catch (e) {
+      print('Error clearing buyer form progress: $e');
+      return false;
+    }
+  }
+  
+  // Check if there's any incomplete registration
+  static Future<Map<String, dynamic>?> getIncompleteRegistration() async {
+    final businessProgress = await getBusinessFormProgress();
+    final buyerProgress = await getBuyerFormProgress();
+    
+    if (businessProgress != null) {
+      return {
+        'type': 'business',
+        'progress': businessProgress,
+      };
+    } else if (buyerProgress != null) {
+      return {
+        'type': 'buyer', 
+        'progress': buyerProgress,
+      };
+    }
+    
+    return null;
+  }
+}

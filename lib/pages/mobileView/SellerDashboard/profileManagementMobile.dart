@@ -91,7 +91,6 @@ class _ProfileManagementMobileState extends State<ProfileManagementMobile>
     'Batteries': false,
   };
 
-  bool grantApproval = false;
   bool registeredName = false;
 
   // Seller profile data
@@ -617,7 +616,7 @@ class _ProfileManagementMobileState extends State<ProfileManagementMobile>
             ),
             ResponsiveGap(type: SpacingType.large),
             _buildMobileInputField(
-              'Registered Company Name (CIPC)',
+              'Registered Company Name (CIPC)*',
               'Enter Registered Company Name',
               companyNameController,
               typography,

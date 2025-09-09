@@ -1083,7 +1083,7 @@ class _GetQuotePageState extends State<GetQuotePage>
               SizedBox(height: 24),
 
               _buildMobileInputField(
-                'Company Name',
+                'Company Name*',
                 'Enter company name',
                 _companyController,
                 _companyFocusNode,

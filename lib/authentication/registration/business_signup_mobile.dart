@@ -27,7 +27,8 @@ class BusinessSignUpPageMobile extends StatefulWidget {
   const BusinessSignUpPageMobile({super.key});
 
   @override
-  State<BusinessSignUpPageMobile> createState() => _BusinessSignUpPageMobileState();
+  State<BusinessSignUpPageMobile> createState() =>
+      _BusinessSignUpPageMobileState();
 }
 
 class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
@@ -37,6 +38,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
   Set<Marker> _markers = {};
   bool _isLoadingLocation = false;
   PageController pageController = PageController();
+  bool isApproval = false;
 
   // Step 0 - User Information Controllers
   final TextEditingController _firstNameController = TextEditingController();
@@ -44,7 +46,8 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
   final TextEditingController _userEmailController = TextEditingController();
   final TextEditingController _userPhoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   // Focus nodes for user information
   final FocusNode _firstNameFocusNode = FocusNode();
@@ -57,23 +60,32 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
   // Step 1 - Company Details Controllers
   final TextEditingController _companyNameController = TextEditingController();
   final TextEditingController _tradingNameController = TextEditingController();
-  final TextEditingController _registrationNumberController = TextEditingController();
+  final TextEditingController _registrationNumberController =
+      TextEditingController();
   final TextEditingController _vatNumberController = TextEditingController();
   final TextEditingController _websiteUrlController = TextEditingController();
 
   // Step 2 - Company Address Controllers
-  final TextEditingController _postalAddressController = TextEditingController();
-  final TextEditingController _physicalAddressController = TextEditingController();
-  final TextEditingController _contactPersonNameController = TextEditingController();
-  final TextEditingController _contactPersonTelephoneController = TextEditingController();
-  final TextEditingController _contactPersonEmailController = TextEditingController();
-  final TextEditingController _platformWorkflowEmailController = TextEditingController();
+  final TextEditingController _postalAddressController =
+      TextEditingController();
+  final TextEditingController _physicalAddressController =
+      TextEditingController();
+  final TextEditingController _contactPersonNameController =
+      TextEditingController();
+  final TextEditingController _contactPersonTelephoneController =
+      TextEditingController();
+  final TextEditingController _contactPersonEmailController =
+      TextEditingController();
+  final TextEditingController _platformWorkflowEmailController =
+      TextEditingController();
 
   // Step 3 - Bank Account Controllers
   final TextEditingController _bankNameController = TextEditingController();
-  final TextEditingController _accountNumberController = TextEditingController();
+  final TextEditingController _accountNumberController =
+      TextEditingController();
   final TextEditingController _branchCodeController = TextEditingController();
-  final TextEditingController _accountHolderController = TextEditingController();
+  final TextEditingController _accountHolderController =
+      TextEditingController();
 
   // Step 4 - Product Categories
   List<String> selectedCategories = [];
@@ -86,13 +98,17 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
   ];
 
   // Step 5 - Display on Platform
-  final TextEditingController _tradingDisplayNameController = TextEditingController();
+  final TextEditingController _tradingDisplayNameController =
+      TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
   // Step 6 - Authorization
-  final TextEditingController _authPersonNameController = TextEditingController();
-  final TextEditingController _authPersonEmailController = TextEditingController();
-  final TextEditingController _authPersonPhoneController = TextEditingController();
+  final TextEditingController _authPersonNameController =
+      TextEditingController();
+  final TextEditingController _authPersonEmailController =
+      TextEditingController();
+  final TextEditingController _authPersonPhoneController =
+      TextEditingController();
 
   // Focus Nodes
   final Map<String, FocusNode> focusNodes = {};
@@ -104,10 +120,10 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
   // Location picker variables
   LatLng? _selectedLocation;
   String _selectedAddress = '';
-  final String _googleMapsApiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with actual API key
+  final String _googleMapsApiKey =
+      "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with actual API key
   final TextEditingController _locationController = TextEditingController();
   bool _isRegisteredNameSelected = false;
-  bool isApproval = false;
 
   final List<StepInfo> steps = [
     StepInfo(
@@ -145,11 +161,6 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
       subtitle: 'Trading Name',
       isCompleted: false,
     ),
-    StepInfo(
-      title: 'Authorization',
-      subtitle: 'Company Auth',
-      isCompleted: false,
-    ),
   ];
 
   Timer? _addressValidationTimer;
@@ -160,12 +171,14 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
     super.initState();
     _initializeFocusNodes();
     _physicalAddressController.addListener(() {
-      if (_selectedLocationText != null && _physicalAddressController.text.isNotEmpty) {
+      if (_selectedLocationText != null &&
+          _physicalAddressController.text.isNotEmpty) {
         setState(() {
           _selectedLocationText = null;
         });
       }
-      if (_physicalAddressController.text.isEmpty && _selectedLocationText != null) {
+      if (_physicalAddressController.text.isEmpty &&
+          _selectedLocationText != null) {
         setState(() {
           _selectedLocationText = null;
         });
@@ -176,11 +189,26 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
 
   void _initializeFocusNodes() {
     List<String> fieldNames = [
-      'companyName', 'tradingName', 'registrationNumber', 'vatNumber', 'websiteUrl',
-      'postalAddress', 'physicalAddress', 'contactPersonName', 'contactPersonTelephone',
-      'contactPersonEmail', 'platformWorkflowEmail', 'bankName', 'accountNumber',
-      'branchCode', 'accountHolder', 'tradingDisplayName', 'description',
-      'authPersonName', 'authPersonEmail', 'authPersonPhone',
+      'companyName',
+      'tradingName',
+      'registrationNumber',
+      'vatNumber',
+      'websiteUrl',
+      'postalAddress',
+      'physicalAddress',
+      'contactPersonName',
+      'contactPersonTelephone',
+      'contactPersonEmail',
+      'platformWorkflowEmail',
+      'bankName',
+      'accountNumber',
+      'branchCode',
+      'accountHolder',
+      'tradingDisplayName',
+      'description',
+      'authPersonName',
+      'authPersonEmail',
+      'authPersonPhone',
     ];
 
     for (String name in fieldNames) {
@@ -250,7 +278,10 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
       return false;
     }
     if (!_isValidName(_firstNameController.text)) {
-      _showFieldValidationError('First name must contain only letters and spaces', _firstNameFocusNode);
+      _showFieldValidationError(
+        'First name must contain only letters and spaces',
+        _firstNameFocusNode,
+      );
       return false;
     }
     if (_lastNameController.text.trim().isEmpty) {
@@ -258,7 +289,10 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
       return false;
     }
     if (!_isValidName(_lastNameController.text)) {
-      _showFieldValidationError('Last name must contain only letters and spaces', _lastNameFocusNode);
+      _showFieldValidationError(
+        'Last name must contain only letters and spaces',
+        _lastNameFocusNode,
+      );
       return false;
     }
     if (_userEmailController.text.trim().isEmpty) {
@@ -266,15 +300,24 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
       return false;
     }
     if (!_isValidEmail(_userEmailController.text)) {
-      _showFieldValidationError('Please enter a valid email address', _userEmailFocusNode);
+      _showFieldValidationError(
+        'Please enter a valid email address',
+        _userEmailFocusNode,
+      );
       return false;
     }
     if (_userPhoneController.text.trim().isEmpty) {
-      _showFieldValidationError('Phone number is required', _userPhoneFocusNode);
+      _showFieldValidationError(
+        'Phone number is required',
+        _userPhoneFocusNode,
+      );
       return false;
     }
     if (!_isValidPhoneNumber(_userPhoneController.text)) {
-      _showFieldValidationError('Phone number must be exactly 10 digits', _userPhoneFocusNode);
+      _showFieldValidationError(
+        'Phone number must be exactly 10 digits',
+        _userPhoneFocusNode,
+      );
       return false;
     }
     if (_passwordController.text.isEmpty) {
@@ -282,11 +325,17 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
       return false;
     }
     if (_passwordController.text.length < 8) {
-      _showFieldValidationError('Password must be at least 8 characters', _passwordFocusNode);
+      _showFieldValidationError(
+        'Password must be at least 8 characters',
+        _passwordFocusNode,
+      );
       return false;
     }
     if (_confirmPasswordController.text != _passwordController.text) {
-      _showFieldValidationError('Passwords do not match', _confirmPasswordFocusNode);
+      _showFieldValidationError(
+        'Passwords do not match',
+        _confirmPasswordFocusNode,
+      );
       return false;
     }
     return true;
@@ -294,20 +343,32 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
 
   bool _validateCompanyDetailsForm() {
     if (_companyNameController.text.trim().isEmpty) {
-      _showFieldValidationError('Company name is required', focusNodes['companyName']!);
+      _showFieldValidationError(
+        'Company name is required',
+        focusNodes['companyName']!,
+      );
       return false;
     }
     if (_tradingNameController.text.trim().isEmpty) {
-      _showFieldValidationError('Trading name is required', focusNodes['tradingName']!);
+      _showFieldValidationError(
+        'Trading name is required',
+        focusNodes['tradingName']!,
+      );
       return false;
     }
     if (_registrationNumberController.text.trim().isEmpty) {
-      _showFieldValidationError('Registration number is required', focusNodes['registrationNumber']!);
+      _showFieldValidationError(
+        'Registration number is required',
+        focusNodes['registrationNumber']!,
+      );
       return false;
     }
-    if (_vatNumberController.text.trim().isNotEmpty && 
+    if (_vatNumberController.text.trim().isNotEmpty &&
         !_isValidNumbersOnly(_vatNumberController.text, minLength: 10)) {
-      _showFieldValidationError('VAT number must be at least 10 digits', focusNodes['vatNumber']!);
+      _showFieldValidationError(
+        'VAT number must be at least 10 digits',
+        focusNodes['vatNumber']!,
+      );
       return false;
     }
     return true;
@@ -315,43 +376,73 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
 
   bool _validateCompanyAddressForm() {
     if (_postalAddressController.text.trim().isEmpty) {
-      _showFieldValidationError('Postal address is required', focusNodes['postalAddress']!);
+      _showFieldValidationError(
+        'Postal address is required',
+        focusNodes['postalAddress']!,
+      );
       return false;
     }
     if (_physicalAddressController.text.trim().isEmpty) {
-      _showFieldValidationError('Physical address is required', focusNodes['physicalAddress']!);
+      _showFieldValidationError(
+        'Physical address is required',
+        focusNodes['physicalAddress']!,
+      );
       return false;
     }
     if (_contactPersonNameController.text.trim().isEmpty) {
-      _showFieldValidationError('Contact person name is required', focusNodes['contactPersonName']!);
+      _showFieldValidationError(
+        'Contact person name is required',
+        focusNodes['contactPersonName']!,
+      );
       return false;
     }
     if (!_isValidName(_contactPersonNameController.text)) {
-      _showFieldValidationError('Contact person name must contain only letters and spaces', focusNodes['contactPersonName']!);
+      _showFieldValidationError(
+        'Contact person name must contain only letters and spaces',
+        focusNodes['contactPersonName']!,
+      );
       return false;
     }
     if (_contactPersonTelephoneController.text.trim().isEmpty) {
-      _showFieldValidationError('Contact person telephone is required', focusNodes['contactPersonTelephone']!);
+      _showFieldValidationError(
+        'Contact person telephone is required',
+        focusNodes['contactPersonTelephone']!,
+      );
       return false;
     }
     if (!_isValidPhoneNumber(_contactPersonTelephoneController.text)) {
-      _showFieldValidationError('Contact telephone must be exactly 10 digits', focusNodes['contactPersonTelephone']!);
+      _showFieldValidationError(
+        'Contact telephone must be exactly 10 digits',
+        focusNodes['contactPersonTelephone']!,
+      );
       return false;
     }
     if (_contactPersonEmailController.text.trim().isEmpty) {
-      _showFieldValidationError('Contact person email is required', focusNodes['contactPersonEmail']!);
+      _showFieldValidationError(
+        'Contact person email is required',
+        focusNodes['contactPersonEmail']!,
+      );
       return false;
     }
     if (!_isValidEmail(_contactPersonEmailController.text)) {
-      _showFieldValidationError('Please enter a valid contact person email', focusNodes['contactPersonEmail']!);
+      _showFieldValidationError(
+        'Please enter a valid contact person email',
+        focusNodes['contactPersonEmail']!,
+      );
       return false;
     }
     if (_platformWorkflowEmailController.text.trim().isEmpty) {
-      _showFieldValidationError('Platform workflow email is required', focusNodes['platformWorkflowEmail']!);
+      _showFieldValidationError(
+        'Platform workflow email is required',
+        focusNodes['platformWorkflowEmail']!,
+      );
       return false;
     }
     if (!_isValidEmail(_platformWorkflowEmailController.text)) {
-      _showFieldValidationError('Please enter a valid platform workflow email', focusNodes['platformWorkflowEmail']!);
+      _showFieldValidationError(
+        'Please enter a valid platform workflow email',
+        focusNodes['platformWorkflowEmail']!,
+      );
       return false;
     }
     return true;
@@ -359,28 +450,54 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
 
   bool _validateBankAccountForm() {
     if (_bankNameController.text.trim().isEmpty) {
-      _showFieldValidationError('Bank name is required', focusNodes['bankName']!);
+      _showFieldValidationError(
+        'Bank name is required',
+        focusNodes['bankName']!,
+      );
       return false;
     }
     if (_accountNumberController.text.trim().isEmpty) {
-      _showFieldValidationError('Account number is required', focusNodes['accountNumber']!);
+      _showFieldValidationError(
+        'Account number is required',
+        focusNodes['accountNumber']!,
+      );
       return false;
     }
-    if (!_isValidNumbersOnly(_accountNumberController.text, minLength: 8, maxLength: 12)) {
-      _showFieldValidationError('Account number must be between 8-12 digits', focusNodes['accountNumber']!);
+    if (!_isValidNumbersOnly(
+      _accountNumberController.text,
+      minLength: 8,
+      maxLength: 12,
+    )) {
+      _showFieldValidationError(
+        'Account number must be between 8-12 digits',
+        focusNodes['accountNumber']!,
+      );
       return false;
     }
     if (_branchCodeController.text.trim().isNotEmpty &&
-        !_isValidNumbersOnly(_branchCodeController.text, minLength: 6, maxLength: 6)) {
-      _showFieldValidationError('Branch code must be exactly 6 digits', focusNodes['branchCode']!);
+        !_isValidNumbersOnly(
+          _branchCodeController.text,
+          minLength: 6,
+          maxLength: 6,
+        )) {
+      _showFieldValidationError(
+        'Branch code must be exactly 6 digits',
+        focusNodes['branchCode']!,
+      );
       return false;
     }
     if (_accountHolderController.text.trim().isEmpty) {
-      _showFieldValidationError('Account holder name is required', focusNodes['accountHolder']!);
+      _showFieldValidationError(
+        'Account holder name is required',
+        focusNodes['accountHolder']!,
+      );
       return false;
     }
     if (!_isValidName(_accountHolderController.text)) {
-      _showFieldValidationError('Account holder name must contain only letters and spaces', focusNodes['accountHolder']!);
+      _showFieldValidationError(
+        'Account holder name must contain only letters and spaces',
+        focusNodes['accountHolder']!,
+      );
       return false;
     }
     return true;
@@ -399,19 +516,11 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
   }
 
   bool _validateDisplayOnPlatformForm() {
-    if (!_isRegisteredNameSelected && _tradingNameController.text.trim().isEmpty) {
-      _showFieldValidationError('Please select registered name or enter trading name', focusNodes['tradingName']!);
-      return false;
-    }
-    return true;
-  }
-
-  bool _validateAuthorizationForm() {
-    if (!isApproval) {
-      CustomDialogs.showErrorDialog(
-        context,
-        'Please grant approval for company authorization',
-        onRetry: () {},
+    if (!_isRegisteredNameSelected &&
+        _tradingNameController.text.trim().isEmpty) {
+      _showFieldValidationError(
+        'Please select registered name or enter trading name',
+        focusNodes['tradingName']!,
       );
       return false;
     }
@@ -444,8 +553,6 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
         return _validateProductCategoriesForm();
       case 6:
         return _validateDisplayOnPlatformForm();
-      case 7:
-        return _validateAuthorizationForm();
       default:
         return true;
     }
@@ -573,7 +680,8 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
           } else if (result['message'] != null) {
             errorMessage = result['message'].toString();
           } else if (result['statusCode'] == 500) {
-            errorMessage = 'Server error. Please check your password requirements.';
+            errorMessage =
+                'Server error. Please check your password requirements.';
           }
 
           CustomDialogs.showErrorDialog(
@@ -650,14 +758,19 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
 
         _navigateToSellerDashboard();
       } else {
-        String errorMessage = result?['error'] ?? 'Registration failed. Please try again.';
-        _showSubmissionError("Network error occurred. Please check your connection and try again.");
+        String errorMessage =
+            result?['error'] ?? 'Registration failed. Please try again.';
+        _showSubmissionError(
+          "Network error occurred. Please check your connection and try again.",
+        );
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      _showSubmissionError('Network error occurred. Please check your connection and try again.');
+      _showSubmissionError(
+        'Network error occurred. Please check your connection and try again.',
+      );
     }
   }
 
@@ -682,7 +795,9 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
           'vat_number': _vatNumberController.text,
           'website_url': _websiteUrlController.text,
           'product_category': selectedCategories.join(', '),
-          'product_subcategory': selectedCategories.isNotEmpty ? selectedCategories.first : null,
+          'product_subcategory': selectedCategories.isNotEmpty
+              ? selectedCategories.first
+              : null,
         },
         'company_info': {
           'company_name': _companyNameController.text,
@@ -710,7 +825,9 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
         'product_categories': selectedCategories,
       };
 
-      final result = await authApiService.submitBusinessRegistration(businessRegistrationData);
+      final result = await authApiService.submitBusinessRegistration(
+        businessRegistrationData,
+      );
       return result;
     } catch (e) {
       print('Error in _submitBusinessRegistration: $e');
@@ -784,12 +901,14 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
                 LinearProgressIndicator(
                   value: (currentStep + 1) / steps.length,
                   backgroundColor: Colors.grey[300],
-                  valueColor: AlwaysStoppedAnimation<Color>(Constants.ctaColorLight),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Constants.ctaColorLight,
+                  ),
                 ),
               ],
             ),
           ),
-          
+
           // Form Content
           Expanded(
             child: PageView(
@@ -807,9 +926,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
                 _buildBankAccountForm(),
                 _buildProductCategoriesForm(),
                 _buildDisplayOnPlatformForm(),
-                currentStep == steps.length - 1 && isApproval
-                    ? BusinessRegistrationCompleteWidget()
-                    : _buildAuthorizationForm(),
+                BusinessRegistrationCompleteWidget(),
               ],
             ),
           ),
@@ -845,12 +962,16 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : Text(
                           currentStep == steps.length - 1
-                              ? (isApproval ? 'Enter BIDR Word' : 'Submit Application')
+                              ? (isApproval
+                                    ? 'Enter BIDR Word'
+                                    : 'Submit Application')
                               : 'Next',
                           style: GoogleFonts.manrope(
                             fontSize: 16,
@@ -886,7 +1007,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
           ),
           const SizedBox(height: 24),
-          
+
           _buildCustomTextField(
             'Enter first name',
             _firstNameController,
@@ -959,15 +1080,15 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             ),
           ),
           const SizedBox(height: 24),
-          
+
           _buildInputField(
-            'Registered Company Name (CIPC)',
+            'Registered Company Name (CIPC)*',
             'Enter Registered Company Name',
             _companyNameController,
             focusNodes['companyName']!,
           ),
           const SizedBox(height: 16),
-          
+
           _buildInputField(
             'Trading Name',
             'Enter Company Trading Name',
@@ -975,7 +1096,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             focusNodes['tradingName']!,
           ),
           const SizedBox(height: 16),
-          
+
           _buildInputField(
             'Registration Number',
             'Enter Registration Number',
@@ -983,7 +1104,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             focusNodes['registrationNumber']!,
           ),
           const SizedBox(height: 16),
-          
+
           _buildInputField(
             'VAT Number',
             'Enter VAT Number',
@@ -992,7 +1113,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             integersOnly: true,
           ),
           const SizedBox(height: 16),
-          
+
           _buildInputField(
             'Website URL',
             'Enter Company Website URL',
@@ -1000,7 +1121,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             focusNodes['websiteUrl']!,
           ),
           const SizedBox(height: 16),
-          
+
           _buildFileUploadField(),
         ],
       ),
@@ -1022,7 +1143,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             ),
           ),
           const SizedBox(height: 24),
-          
+
           _buildInputField(
             'Postal Address',
             'Enter Postal Address',
@@ -1030,7 +1151,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             focusNodes['postalAddress']!,
           ),
           const SizedBox(height: 16),
-          
+
           _buildInputField(
             'Physical Address',
             'Enter Physical Address',
@@ -1038,10 +1159,10 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             focusNodes['physicalAddress']!,
           ),
           const SizedBox(height: 16),
-          
+
           _buildLocationDropdown(),
           const SizedBox(height: 16),
-          
+
           _buildInputField(
             'Contact Person Name',
             'Enter Contact Person Name',
@@ -1050,7 +1171,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             isName: true,
           ),
           const SizedBox(height: 16),
-          
+
           _buildInputField(
             'Contact Person Telephone',
             'Enter Contact Person Telephone',
@@ -1059,7 +1180,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             integersOnly: true,
           ),
           const SizedBox(height: 16),
-          
+
           _buildInputField(
             'Contact Person Email Address',
             'Enter Contact Person Email Address',
@@ -1068,7 +1189,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             isEmail: true,
           ),
           const SizedBox(height: 16),
-          
+
           _buildInputField(
             'Platform Workflow Email Address',
             'Enter Platform Workflow Email Address',
@@ -1096,7 +1217,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             ),
           ),
           const SizedBox(height: 24),
-          
+
           _buildInputField(
             'Bank Name',
             'Enter Bank Name',
@@ -1104,7 +1225,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             focusNodes['bankName']!,
           ),
           const SizedBox(height: 16),
-          
+
           _buildInputField(
             'Account Number',
             'Enter Account Number',
@@ -1113,7 +1234,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             integersOnly: true,
           ),
           const SizedBox(height: 16),
-          
+
           _buildInputField(
             'Branch Code',
             'Enter Branch Code',
@@ -1122,7 +1243,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             integersOnly: true,
           ),
           const SizedBox(height: 16),
-          
+
           _buildInputField(
             'Account Holder Name',
             'Enter Account Holder Name',
@@ -1155,21 +1276,28 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
           ),
           const SizedBox(height: 24),
-          
+
           ...availableCategories.map((category) {
             bool isSelected = selectedCategories.contains(category);
             return Container(
               margin: EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: isSelected ? Constants.ctaColorLight : Colors.grey[300]!,
+                  color: isSelected
+                      ? Constants.ctaColorLight
+                      : Colors.grey[300]!,
                   width: isSelected ? 2 : 1,
                 ),
                 borderRadius: BorderRadius.circular(12),
-                color: isSelected ? Constants.ctaColorLight.withOpacity(0.1) : Colors.white,
+                color: isSelected
+                    ? Constants.ctaColorLight.withOpacity(0.1)
+                    : Colors.white,
               ),
               child: ListTile(
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 title: Text(
                   category,
                   style: GoogleFonts.manrope(
@@ -1214,38 +1342,16 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             ),
           ),
           const SizedBox(height: 24),
-          
+
           _buildRegisteredNameWithCheckbox("Use Registered Name"),
           const SizedBox(height: 20),
-          
+
           _buildInputField(
             'Trading Name',
             'Enter Trading Name',
             _tradingNameController,
             focusNodes['tradingName']!,
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAuthorizationForm() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Authorization',
-            style: GoogleFonts.manrope(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 24),
-          
-          _buildApprovalNameWithCheckbox("I grant approval for company authorization"),
         ],
       ),
     );
@@ -1303,7 +1409,9 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
       labelText: hintText,
       controller: controller,
       focusNode: focusNode,
-      textInputAction: nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+      textInputAction: nextFocusNode != null
+          ? TextInputAction.next
+          : TextInputAction.done,
       isPasswordField: isPassword,
       isEditable: !isReadOnly,
       integersOnly: integersOnly,
@@ -1464,17 +1572,25 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
             },
             icon: Icon(
               Icons.location_on_outlined,
-              color: _selectedLocationText != null ? Colors.white : Colors.grey[600],
+              color: _selectedLocationText != null
+                  ? Colors.white
+                  : Colors.grey[600],
               size: 20,
             ),
             label: Text(
-              _selectedLocationText != null ? 'Change Location' : 'Select Location',
+              _selectedLocationText != null
+                  ? 'Change Location'
+                  : 'Select Location',
               style: GoogleFonts.manrope(
-                color: _selectedLocationText != null ? Colors.white : Colors.grey[600],
+                color: _selectedLocationText != null
+                    ? Colors.white
+                    : Colors.grey[600],
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: _selectedLocationText != null ? const Color(0xFFF5A623) : Colors.grey[100],
+              backgroundColor: _selectedLocationText != null
+                  ? const Color(0xFFF5A623)
+                  : Colors.grey[100],
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               shape: RoundedRectangleBorder(
@@ -1498,15 +1614,25 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          border: Border.all(color: _isRegisteredNameSelected ? Constants.ctaColorLight : Colors.grey[300]!),
+          border: Border.all(
+            color: _isRegisteredNameSelected
+                ? Constants.ctaColorLight
+                : Colors.grey[300]!,
+          ),
           borderRadius: BorderRadius.circular(12),
-          color: _isRegisteredNameSelected ? Constants.ctaColorLight.withOpacity(0.1) : Colors.white,
+          color: _isRegisteredNameSelected
+              ? Constants.ctaColorLight.withOpacity(0.1)
+              : Colors.white,
         ),
         child: Row(
           children: [
             Icon(
-              _isRegisteredNameSelected ? Icons.check_circle : Icons.circle_outlined,
-              color: _isRegisteredNameSelected ? Constants.ctaColorLight : Colors.grey[400],
+              _isRegisteredNameSelected
+                  ? Icons.check_circle
+                  : Icons.circle_outlined,
+              color: _isRegisteredNameSelected
+                  ? Constants.ctaColorLight
+                  : Colors.grey[400],
               size: 24,
             ),
             const SizedBox(width: 12),
@@ -1514,7 +1640,9 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
               child: Text(
                 desName,
                 style: GoogleFonts.manrope(
-                  color: _isRegisteredNameSelected ? Constants.ctaColorLight : Colors.black,
+                  color: _isRegisteredNameSelected
+                      ? Constants.ctaColorLight
+                      : Colors.black,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1526,42 +1654,18 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
     );
   }
 
-  Widget _buildApprovalNameWithCheckbox(String desName) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          isApproval = !isApproval;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          border: Border.all(color: isApproval ? Constants.ctaColorLight : Colors.grey[300]!),
-          borderRadius: BorderRadius.circular(12),
-          color: isApproval ? Constants.ctaColorLight.withOpacity(0.1) : Colors.white,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              isApproval ? Icons.check_circle : Icons.circle_outlined,
-              color: isApproval ? Constants.ctaColorLight : Colors.grey[400],
-              size: 24,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                desName,
-                style: GoogleFonts.manrope(
-                  color: isApproval ? Constants.ctaColorLight : Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  // Size limit for files (10MB in bytes)
+  static const int maxFileSizeBytes = 10 * 1024 * 1024; // 10MB
+
+  // Helper method to format file size for display
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) {
+      return '${bytes}B';
+    } else if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)}KB';
+    } else {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)}MB';
+    }
   }
 
   Future<void> _pickFiles() async {
@@ -1575,13 +1679,50 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
       );
 
       if (result != null) {
-        setState(() {
-          for (var file in result.files) {
-            if (kIsWeb ? file.bytes != null : file.path != null) {
-              _uploadedDocuments.add(file);
+        List<PlatformFile> validFiles = [];
+        List<String> oversizedFiles = [];
+
+        // Check file sizes
+        for (var file in result.files) {
+          if (kIsWeb ? file.bytes != null : file.path != null) {
+            final int fileSize = file.size;
+            if (fileSize <= maxFileSizeBytes) {
+              validFiles.add(file);
+            } else {
+              oversizedFiles.add('${file.name} (${_formatFileSize(fileSize)})');
             }
           }
-        });
+        }
+
+        // Show error for oversized files
+        if (oversizedFiles.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'The following files exceed 10MB limit and were not added:\n${oversizedFiles.join('\n')}',
+              ),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+
+        // Add valid files
+        if (validFiles.isNotEmpty) {
+          setState(() {
+            _uploadedDocuments.addAll(validFiles);
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${validFiles.length} file${validFiles.length > 1 ? 's' : ''} added successfully',
+              ),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -17,7 +17,7 @@ class CustomVideoPlayerWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CustomVideoPlayerWidgetState createState() => _CustomVideoPlayerWidgetState();
+  State<CustomVideoPlayerWidget> createState() => _CustomVideoPlayerWidgetState();
 }
 
 class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
@@ -66,7 +66,7 @@ class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
       }
 
       await _videoPlayerController!.initialize().timeout(
-        Duration(seconds: 30),
+        const Duration(seconds: 30),
         onTimeout: () {
           throw Exception('Video initialization timeout.');
         },
@@ -114,8 +114,8 @@ class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.grey[900]!,
-            Colors.grey[800]!,
+            Colors.grey.shade900,
+            Colors.grey.shade800,
           ],
         ),
         boxShadow: [
@@ -166,7 +166,7 @@ class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
               child: Icon(
                 Icons.play_arrow_rounded,
                 size: 50,
-                color: Colors.red[600],
+                color: Colors.red.shade600,
               ),
             ),
           ),
@@ -207,7 +207,7 @@ class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
                   children: [
                     Icon(
                       Icons.error_outline,
-                      color: Colors.red[400],
+                      color: Colors.red.shade400,
                       size: 48,
                     ),
                     SizedBox(height: 12),
@@ -293,7 +293,7 @@ class _CustomVideoPlayerWidgetState extends State<CustomVideoPlayerWidget> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
+        backgroundColor: Colors.grey.shade900,
         title: Text(
           'Video Error',
           style: TextStyle(color: Colors.white),
@@ -369,7 +369,7 @@ class _VideoDialog extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _VideoDialogState createState() => _VideoDialogState();
+  State<_VideoDialog> createState() => _VideoDialogState();
 }
 
 class _VideoDialogState extends State<_VideoDialog> {
@@ -395,8 +395,8 @@ class _VideoDialogState extends State<_VideoDialog> {
       materialProgressColors: ChewieProgressColors(
         playedColor: Colors.red,
         handleColor: Colors.red,
-        backgroundColor: Colors.grey[600]!,
-        bufferedColor: Colors.grey[400]!,
+        backgroundColor: Colors.grey.shade600,
+        bufferedColor: Colors.grey.shade400,
       ),
       placeholder: Container(
         color: Colors.black,
@@ -407,7 +407,7 @@ class _VideoDialogState extends State<_VideoDialog> {
     );
 
     // Auto-hide controls after 3 seconds
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         setState(() {
           _showControls = false;

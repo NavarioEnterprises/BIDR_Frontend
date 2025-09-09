@@ -52,6 +52,13 @@ class _SellerDashboardState extends State<SellerDashboard>
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _commentsController = TextEditingController();
 
+  // Store current request for alternate bids
+  Map<String, dynamic>? _currentRequestForAlternateBid;
+
+  // Store previous bids for the current request
+  List<dynamic> _previousBids = [];
+  bool _isLoadingPreviousBids = false;
+
   // API data state variables
   List<dynamic> newRequests = [];
   List<dynamic> processedRequests = [];
@@ -831,7 +838,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                       ),
                     ),
                   ] else ...[
-                    Container(),
+                    const SizedBox.shrink(),
                   ],
                   SizedBox(height: 24),
                   FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
@@ -892,7 +899,8 @@ class _SellerDashboardState extends State<SellerDashboard>
     }
 
     try {
-      final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+      final accessToken =
+          await Sharedprefs.getUserAccessTokenSharedPreference();
       if (accessToken == null || accessToken.isEmpty) {
         setState(() {
           earningsError = 'Authentication required. Please log in again.';
@@ -908,14 +916,14 @@ class _SellerDashboardState extends State<SellerDashboard>
 
       if (response != null && response.containsKey('results')) {
         final List<dynamic> newEarnings = response['results'] ?? [];
-        
+
         setState(() {
           if (page == 1) {
             earningHistory = newEarnings;
           } else {
             earningHistory.addAll(newEarnings);
           }
-          
+
           currentEarningsPage = page;
           totalEarningsCount = response['count'] ?? 0;
           hasNextEarningsPage = response['next'] != null;
@@ -924,7 +932,8 @@ class _SellerDashboardState extends State<SellerDashboard>
         });
       } else {
         setState(() {
-          earningsError = response?['error'] ?? 'Failed to load earning history';
+          earningsError =
+              response?['error'] ?? 'Failed to load earning history';
           isLoadingEarnings = false;
         });
       }
@@ -995,90 +1004,32 @@ class _SellerDashboardState extends State<SellerDashboard>
     }
   }
 
-  void _loadSampleNotifications() {
-    setState(() {
-      notifications = [
-        WebNotification(
-          id: '1',
-          title: 'Request Accept',
-          body: 'John Doe has accepted the concern. He help...',
-          description:
-              'John Doe has accepted the concern. He will help you with your request.',
-          type: 'accept',
-          read: false,
-          createdAt: DateTime.now(),
-        ),
-        WebNotification(
-          id: '2',
-          title: 'Bank Details Update Succesfully',
-          body: 'Lorem ipsum is a placeholder text commonly',
-          description:
-              'Lorem ipsum is a placeholder text commonly used in the printing industry.',
-          type: 'update',
-          read: false,
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        ),
-        WebNotification(
-          id: '3',
-          title: 'Your Profile Is Update Succesfully',
-          body: 'Lorem ipsum is a placeholder text commonly',
-          description:
-              'Lorem ipsum is a placeholder text commonly used in the printing industry.',
-          type: 'update',
-          read: true,
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        ),
-        WebNotification(
-          id: '4',
-          title: 'Seller Profile Update Succesfully',
-          body: 'Lorem ipsum is a placeholder text commonly',
-          description:
-              'Lorem ipsum is a placeholder text commonly used in the printing industry.',
-          type: 'update',
-          read: true,
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        ),
-        WebNotification(
-          id: '5',
-          title: 'New Order Received',
-          body: 'You have received a new order from customer',
-          description:
-              'You have received a new order from customer. Please check your dashboard.',
-          type: 'order',
-          read: false,
-          createdAt: DateTime.now().subtract(const Duration(days: 3)),
-        ),
-      ];
-      _isLoadingNotifications = false;
-    });
-  }
-
   void _showNotificationDialog() {
-    // Only refresh notifications if we don't have any yet
-    if (notifications.isEmpty && !_isLoadingNotifications) {
-      _loadNotificationsFromApi();
-    }
+    // Always refresh notifications when dialog is opened for the latest data
+    _loadNotificationsFromApi();
+    
     _animationController.forward();
     showDialog(
       context: context,
       barrierDismissible: true,
-
       barrierColor: Colors.black.withOpacity(0.3),
       builder: (BuildContext context) {
         return ScaleTransition(
           scale: _scaleAnimation,
-          child: Dialog(
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Container(
-              width: 320,
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+          child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setDialogState) {
+              return Dialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Container(
+                  width: 320,
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -1090,13 +1041,33 @@ class _SellerDashboardState extends State<SellerDashboard>
                           letterSpacing: 0.5,
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.close, size: 20),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.refresh, 
+                              size: 20,
+                              color: _isLoadingNotifications ? Colors.grey : Constants.ctaColorLight,
+                            ),
+                            onPressed: _isLoadingNotifications ? null : () {
+                              _loadNotificationsFromApi();
+                              // Update dialog state to show refresh immediately
+                              setDialogState(() {});
+                            },
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            tooltip: 'Refresh notifications',
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: const Icon(Icons.close, size: 20),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -1122,9 +1093,11 @@ class _SellerDashboardState extends State<SellerDashboard>
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         );
       },
@@ -1276,23 +1249,71 @@ class _SellerDashboardState extends State<SellerDashboard>
     WebNotification notification, {
     bool isCompact = false,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Constants.ctaColorLight.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _getIconForType(notification.type),
-              color: Constants.ctaColorLight,
-              size: 20,
-            ),
+    return GestureDetector(
+      onTap: () async {
+        // Mark as read if it's unread
+        if (!notification.read) {
+          final success = await _notificationApiService.markAsRead(notification.id);
+          if (success) {
+            // Update the notification in the list
+            setState(() {
+              final index = notifications.indexWhere((n) => n.id == notification.id);
+              if (index != -1) {
+                notifications[index] = WebNotification(
+                  id: notification.id,
+                  title: notification.title,
+                  body: notification.body,
+                  description: notification.description,
+                  type: notification.type,
+                  read: true, // Mark as read
+                  createdAt: notification.createdAt,
+                );
+              }
+            });
+          }
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: notification.read ? Colors.transparent : Colors.blue.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(8),
+          border: notification.read ? null : Border.all(color: Colors.blue.withOpacity(0.2)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Stack(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Constants.ctaColorLight.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  _getIconForType(notification.type),
+                  color: Constants.ctaColorLight,
+                  size: 20,
+                ),
+              ),
+              if (!notification.read)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1318,7 +1339,8 @@ class _SellerDashboardState extends State<SellerDashboard>
               ],
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -2943,7 +2965,19 @@ class _SellerDashboardState extends State<SellerDashboard>
     );
   }
 
-  void _showBidDialog(BuildContext context, Map<String, dynamic> request) {
+  void _showBidDialog(
+    BuildContext context,
+    Map<String, dynamic> request, {
+    bool isAlternateBid = false,
+  }) {
+    // Fetch previous bids if this is an alternate bid
+    if (isAlternateBid) {
+      final requestId = request['request_id']?.toString();
+      if (requestId != null) {
+        _fetchPreviousBids(requestId);
+      }
+    }
+
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -2969,7 +3003,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Enter Bid Details',
+                      isAlternateBid
+                          ? 'Enter Alternate Bid Details'
+                          : 'Enter Bid Details',
                       style: GoogleFonts.manrope(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -2994,6 +3030,200 @@ class _SellerDashboardState extends State<SellerDashboard>
                   ],
                 ),
                 SizedBox(height: 24),
+
+                // Alternate bid indicator
+                if (isAlternateBid)
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(16),
+                    margin: EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.blue[200]!),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.refresh,
+                              color: Colors.blue[700],
+                              size: 18,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Submitting Alternate Bid',
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.blue[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Request: ${request['product_type'] ?? request['category'] ?? 'Product Request'}',
+                          style: GoogleFonts.manrope(
+                            fontSize: 12,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        if (request['description'] != null)
+                          Text(
+                            'Description: ${request['description'].toString().length > 50 ? request['description'].toString().substring(0, 50) + '...' : request['description']}',
+                            style: GoogleFonts.manrope(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                // Previous bids section for alternate bids
+                if (isAlternateBid)
+                  Container(
+                    width: double.infinity,
+                    margin: EdgeInsets.only(bottom: 16),
+                    child: StatefulBuilder(
+                      builder: (context, setState) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.history,
+                                  color: Colors.grey[600],
+                                  size: 16,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Your Previous Bids',
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            if (_isLoadingPreviousBids)
+                              Container(
+                                height: 40,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            else if (_previousBids.isEmpty)
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'No previous bids found',
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              )
+                            else
+                              Container(
+                                constraints: BoxConstraints(maxHeight: 120),
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: _previousBids.length,
+                                  itemBuilder: (context, index) {
+                                    final bid = _previousBids[index];
+                                    return Container(
+                                      margin: EdgeInsets.only(bottom: 8),
+                                      padding: EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[50],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: Colors.grey[200]!,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'R${bid['total_amount'] ?? 'N/A'}',
+                                                style: GoogleFonts.manrope(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                              if (bid['seller_notes'] != null)
+                                                Text(
+                                                  '${bid['seller_notes']}',
+                                                  style: GoogleFonts.manrope(
+                                                    fontSize: 11,
+                                                    color: Colors.grey[600],
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: bid['status'] == 'PENDING'
+                                                  ? Colors.orange[100]
+                                                  : bid['status'] == 'ACCEPTED'
+                                                  ? Colors.green[100]
+                                                  : Colors.red[100],
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              '${bid['status'] ?? 'PENDING'}',
+                                              style: GoogleFonts.manrope(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w500,
+                                                color:
+                                                    bid['status'] == 'PENDING'
+                                                    ? Colors.orange[700]
+                                                    : bid['status'] ==
+                                                          'ACCEPTED'
+                                                    ? Colors.green[700]
+                                                    : Colors.red[700],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+
                 Text(
                   'Best Price Advice',
                   style: GoogleFonts.manrope(
@@ -3200,6 +3430,9 @@ class _SellerDashboardState extends State<SellerDashboard>
       Navigator.of(context).pop();
 
       if (result['success'] == true) {
+        // Store current request for potential alternate bids
+        _currentRequestForAlternateBid = Map<String, dynamic>.from(request);
+
         // Close bid dialog
         Navigator.of(context).pop();
 
@@ -3207,7 +3440,7 @@ class _SellerDashboardState extends State<SellerDashboard>
         _priceController.clear();
         _commentsController.clear();
 
-        // Show success dialog
+        // Show success dialog with alternate bid option
         _showSuccessDialog(context, 'Bid submitted successfully!');
 
         // Refresh data to show new bid in "My Bids"
@@ -3238,6 +3471,32 @@ class _SellerDashboardState extends State<SellerDashboard>
           backgroundColor: Colors.red,
         ),
       );
+    }
+  }
+
+  /// Fetch previous bids for a specific request
+  Future<void> _fetchPreviousBids(String requestId) async {
+    setState(() {
+      _isLoadingPreviousBids = true;
+    });
+
+    try {
+      final result = await ApiService.getQuotesForRequest(requestId);
+
+      setState(() {
+        _isLoadingPreviousBids = false;
+        if (result['success'] == true) {
+          _previousBids = result['data'] ?? [];
+        } else {
+          _previousBids = [];
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingPreviousBids = false;
+        _previousBids = [];
+      });
+      print('Error fetching previous bids: $e');
     }
   }
 
@@ -3792,10 +4051,14 @@ class _SellerDashboardState extends State<SellerDashboard>
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      // Navigate back to "My Requests" tab
-                      setState(() {
-                        selectedRequestTab = 0;
-                      });
+                      // Show the bid dialog for alternate bid
+                      if (_currentRequestForAlternateBid != null) {
+                        _showBidDialog(
+                          context,
+                          _currentRequestForAlternateBid!,
+                          isAlternateBid: true,
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Constants.ctaColorLight, // Orange color
@@ -4455,9 +4718,9 @@ class _SellerDashboardState extends State<SellerDashboard>
         ),
         SizedBox(height: 20),
         // Content based on selected tab
-        selectedSubIndex == 0 
-          ? _buildEarningHistoryContent()
-          : _buildWithdrawHistoryContent(),
+        selectedSubIndex == 0
+            ? _buildEarningHistoryContent()
+            : _buildWithdrawHistoryContent(),
       ],
     );
   }
@@ -4468,9 +4731,7 @@ class _SellerDashboardState extends State<SellerDashboard>
         width: MediaQuery.of(context).size.width * 0.5,
         height: 300,
         child: Center(
-          child: CircularProgressIndicator(
-            color: Constants.ctaColorLight,
-          ),
+          child: CircularProgressIndicator(color: Constants.ctaColorLight),
         ),
       );
     }
@@ -4483,18 +4744,11 @@ class _SellerDashboardState extends State<SellerDashboard>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 48,
-              ),
+              Icon(Icons.error_outline, color: Colors.red, size: 48),
               SizedBox(height: 16),
               Text(
                 earningsError!,
-                style: GoogleFonts.manrope(
-                  color: Colors.red,
-                  fontSize: 14,
-                ),
+                style: GoogleFonts.manrope(color: Colors.red, fontSize: 14),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 16),
@@ -4574,13 +4828,14 @@ class _SellerDashboardState extends State<SellerDashboard>
               },
             );
           }).toList(),
-          
+
           // Load more button if there are more pages
           if (hasNextEarningsPage)
             Padding(
               padding: const EdgeInsets.only(top: 16),
               child: ElevatedButton(
-                onPressed: () => _loadEarningHistory(page: currentEarningsPage + 1),
+                onPressed: () =>
+                    _loadEarningHistory(page: currentEarningsPage + 1),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Constants.ctaColorLight,
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -4625,10 +4880,7 @@ class _SellerDashboardState extends State<SellerDashboard>
             SizedBox(height: 8),
             Text(
               'Withdrawal functionality will be available soon.\nStay tuned for updates!',
-              style: GoogleFonts.manrope(
-                fontSize: 14,
-                color: Colors.grey[500],
-              ),
+              style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[500]),
               textAlign: TextAlign.center,
             ),
           ],
@@ -4644,7 +4896,7 @@ class _SellerDashboardState extends State<SellerDashboard>
         setState(() {
           selectedSubIndex = index;
         });
-        
+
         // Load earning history when switching to earning history tab
         if (index == 0 && earningHistory.isEmpty && !isLoadingEarnings) {
           _loadEarningHistory();
@@ -4753,7 +5005,8 @@ class _SellerDashboardState extends State<SellerDashboard>
     final buyerEmail = earning['buyer']?['email'] ?? '';
     final orderId = earning['order_id']?.toString() ?? '';
     final earningsStatus = earning['earnings_status'] ?? 'Completed';
-    final productInfo = earning['quote']?['product_service_info'] ?? 'Product/Service';
+    final productInfo =
+        earning['quote']?['product_service_info'] ?? 'Product/Service';
 
     // Format the date
     String formattedDate = '';
@@ -4767,7 +5020,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     // Status color
     Color statusColor = Constants.ctaColorLight;
     IconData statusIcon = Icons.check_circle;
-    
+
     switch (earningsStatus.toLowerCase()) {
       case 'completed':
       case 'captured':
@@ -4807,11 +5060,7 @@ class _SellerDashboardState extends State<SellerDashboard>
               color: statusColor.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              statusIcon,
-              color: statusColor,
-              size: 20,
-            ),
+            child: Icon(statusIcon, color: statusColor, size: 20),
           ),
           SizedBox(width: 16),
           Expanded(
@@ -4842,9 +5091,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                 ),
                 SizedBox(height: 4),
                 Text(
-                  productInfo.length > 30 
-                    ? '${productInfo.substring(0, 30)}...' 
-                    : productInfo,
+                  productInfo.length > 30
+                      ? '${productInfo.substring(0, 30)}...'
+                      : productInfo,
                   style: GoogleFonts.manrope(
                     color: Colors.grey.shade600,
                     fontSize: 12,
