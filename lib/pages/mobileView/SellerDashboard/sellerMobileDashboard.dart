@@ -1,4 +1,5 @@
 import 'package:bidr/constants/Constants.dart';
+import 'package:bidr/pages/mobileView/SellerDashboard/RequestInfoMobile.dart';
 import 'package:bidr/pages/mobileView/SellerDashboard/profileManagementMobile.dart';
 import 'package:bidr/pages/mobileView/SellerDashboard/ratingReviewsMobile.dart';
 import 'package:bidr/pages/mobileView/SellerDashboard/sellerDashboardGrid.dart';
@@ -680,21 +681,54 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
       body: Column(
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 66, vertical: 12),
+            padding: EdgeInsets.symmetric(horizontal: 0, vertical: 12),
             decoration: BoxDecoration(color: Constants.ftaColorLight),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(
-                  'Complete Registration',
+                OutlinedButton(
 
-                  style: GoogleFonts.manrope(
-                    color: Colors.white,
-                    fontSize: 18,
-                    decoration: TextDecoration.underline,
-                    decorationColor: Colors.white,
-                    fontWeight: FontWeight.w600,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder:
+                            (
+                            context,
+                            animation,
+                            secondaryAnimation,
+                            ) => ProfileManagementMobile(),
+                        transitionsBuilder:
+                            (
+                            context,
+                            animation,
+                            secondaryAnimation,
+                            child,
+                            ) {
+                          return SlideTransition(
+                            position: Tween<Offset>(
+                              begin: Offset(1.0, 0.0),
+                              end: Offset.zero,
+                            ).animate(animation),
+                            child: child,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(side: BorderSide.none),
+                  child: Text(
+                    'Complete Registration',
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 18,
+                      decoration: TextDecoration.underline,
+                      decorationStyle: TextDecorationStyle.solid,
+                      textStyle: TextStyle(color: Colors.white),
+                      decorationColor: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
 
@@ -709,9 +743,9 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"BookKeeper" ,onTap: (){},backgroundColor: Constants.ctaColorLight,)),
+                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"My BookKeeper" ,onTap: (){},backgroundColor: Constants.ctaColorLight,)),
                 SizedBox(width: 16,),
-                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"BookKeeper" ,onTap: (){},backgroundColor: Constants.ctaColorLight,))
+                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"Support" ,onTap: (){},backgroundColor: Constants.ctaColorLight,))
               ],
             ),
           ),
@@ -721,9 +755,9 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"BookKeeper" ,onTap: (){},backgroundColor: Constants.ctaColorLight,)),
+                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"Refer a Friend/Business" ,onTap: (){},backgroundColor: Constants.ctaColorLight,)),
                 SizedBox(width: 16,),
-                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"BookKeeper" ,onTap: (){},backgroundColor: Constants.ctaColorLight,))
+                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"Reviews & Rating Manager" ,onTap: (){},backgroundColor: Constants.ctaColorLight,))
               ],
             ),
           ),
@@ -1242,31 +1276,31 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Header
+        SizedBox(height: 24),
         Row(
           children: [
             Text(
               'LEADS/REQUESTS',
               style: GoogleFonts.manrope(
                 fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Constants.ftaColorLight,
+                fontWeight: FontWeight.w700,
+                color: Colors.black87,
               ),
             ),
             Spacer(),
-            if (isLoadingRequests)
-              SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Constants.ftaColorLight,
-                  ),
-                ),
+            OutlinedButton(
+                onPressed: (){
+
+                }, child:Text(
+              "view all",
+              style: GoogleFonts.manrope(
+                color: Colors.grey.shade400,
+                fontSize: 14,
               ),
+            ))
           ],
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 8),
 
         // Error handling
         if (requestsError != null)
@@ -1304,44 +1338,55 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
           )
         // Main content with tabs
         else
-          Row(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // Left sidebar with tabs (bookkeeper style)
+
               Container(
-                width: 180,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+               width: MediaQuery.of(context).size.width,
+                height: 80,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(height: 10),
                     // New Requests Tab
-                    _buildRequestMenuItem(
-                      'New Requests ($totalNewRequests)',
-                      0,
-                      totalNewRequests,
+                    Expanded(
+                      child: _buildRequestMenuItem(
+                        'New Requests ($totalNewRequests)',
+                        0,
+                        totalNewRequests,
+                      ),
                     ),
                     // My Bids Tab
-                    _buildRequestMenuItem(
-                      'My Bids ($totalQuotes)',
-                      1,
-                      totalQuotes,
+                    //SizedBox(width: 16,),
+                    Expanded(
+                      child: _buildRequestMenuItem(
+                        'My Bids ($totalQuotes)',
+                        1,
+                        totalQuotes,
+                      ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(width: 20),
+              SizedBox(height: 16),
               // Main content area
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Content based on selected tab
-                    if (selectedRequestTab == 0)
-                      _buildRequestContent(newRequests, 'new requests')
-                    else
-                      _buildQuotesContent(myQuotes, 'my bids'),
-                  ],
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Content based on selected tab
+                        if (selectedRequestTab == 0)
+                          Expanded(child: _buildRequestContent(newRequests, 'new requests'))
+                        else
+                          Expanded(child: _buildQuotesContent(myQuotes, 'my bids')),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -1812,8 +1857,7 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
         LayoutBuilder(
           builder: (context, constraints) {
             final double itemWidth =
-                (constraints.maxWidth - 32) /
-                3; // 3 items per row with 16px spacing
+                (constraints.maxWidth - 16);// 3 items per row with 16px spacing
 
             return Wrap(
               spacing: 16,
@@ -1953,8 +1997,7 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
         LayoutBuilder(
           builder: (context, constraints) {
             final double itemWidth =
-                (constraints.maxWidth - 32) /
-                3; // 3 items per row with 16px spacing
+                (constraints.maxWidth - 16); // 3 items per row with 16px spacing
 
             return Wrap(
               spacing: 16,
@@ -2279,7 +2322,32 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
                   ),
                   InkWell(
                     onTap: () {
-                      _showRequestInfoDialog(context, request);
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (
+                              context,
+                              animation,
+                              secondaryAnimation,
+                              ) => RequestInfoWidget(request: request),
+                          transitionsBuilder:
+                              (
+                              context,
+                              animation,
+                              secondaryAnimation,
+                              child,
+                              ) {
+                            return SlideTransition(
+                              position: Tween<Offset>(
+                                begin: Offset(1.0, 0.0),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
                     },
                     child: Text(
                       'Full Description',
@@ -5260,7 +5328,8 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
   void _showRequestInfoDialog(
     BuildContext context,
     Map<String, dynamic> request,
-  ) {
+  )
+  {
     final requestId = request['request_id']?.toString() ?? '';
     final title = request['title']?.toString() ?? '';
     final description = request['description']?.toString() ?? '';

@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HelperWidget extends StatelessWidget {
   final IconData icon;
@@ -79,12 +80,12 @@ class HelperWidget extends StatelessWidget {
               // Title and subtitle
               Text(
                 title,
-                style: TextStyle(
+                style: GoogleFonts.manrope(
                   color: textColor,
                   fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               if (subtitle != null) ...[
