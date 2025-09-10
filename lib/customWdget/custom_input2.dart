@@ -1035,6 +1035,8 @@ class CustomInputTransparent4 extends StatefulWidget {
   final String? labelText;
   final bool? isEditable;
   final int? maxLength;
+  final bool? hasError;
+  final String? errorText;
 
   CustomInputTransparent4({
     required this.hintText,
@@ -1052,6 +1054,8 @@ class CustomInputTransparent4 extends StatefulWidget {
     this.labelText,
     this.isEditable,
     this.maxLength,
+    this.hasError = false,
+    this.errorText,
   });
 
   @override
@@ -1064,90 +1068,123 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(left: 2, right: 2, top: 8, bottom: 0),
-      width: MediaQuery.of(context).size.width,
-      height: 55,
-      child: TextField(
-        enabled: widget.isEditable ?? true,
-        obscureText: widget.isPasswordField && !_isPasswordVisible,
-        focusNode: widget.focusNode,
-        onChanged: widget.onChanged,
-        onSubmitted: widget.onSubmitted,
-        controller: widget.controller,
-        maxLines: 1,
-        textInputAction: widget.textInputAction,
-        inputFormatters: widget.integersOnly == true
-            ? <TextInputFormatter>[
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9+]')),
-                LengthLimitingTextInputFormatter(widget.maxLength ?? 15),
-              ]
-            : widget.maxLength != null
-            ? <TextInputFormatter>[
-                LengthLimitingTextInputFormatter(widget.maxLength!),
-              ]
-            : null,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: widget.hintText,
-          labelText: widget.labelText,
-
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          floatingLabelAlignment: FloatingLabelAlignment.start,
-          prefixIcon: widget.prefix,
-          suffixIcon: widget.suffix != null
-              ? widget.suffix
-              : widget.isPasswordField
-              ? IconButton(
-                  icon: Icon(
-                    _isPasswordVisible ? Iconsax.eye : Iconsax.eye_slash,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
-                  },
-                )
-              : null,
-          filled: true,
-          fillColor: Colors.transparent,
-          hintStyle: GoogleFonts.inter(
-            textStyle: TextStyle(
-              fontSize: 13,
-              color: Colors.grey.withOpacity(0.35),
-              letterSpacing: 0,
+    Color borderColor = widget.hasError == true ? Colors.red : Colors.black;
+    Color focusedBorderColor = widget.hasError == true ? Colors.red : Color(0xffED7D32);
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: EdgeInsets.only(left: 2, right: 2, top: 8, bottom: 0),
+          width: MediaQuery.of(context).size.width,
+          height: 55,
+          child: TextField(
+            enabled: widget.isEditable ?? true,
+            obscureText: widget.isPasswordField && !_isPasswordVisible,
+            focusNode: widget.focusNode,
+            onChanged: widget.onChanged,
+            onSubmitted: widget.onSubmitted,
+            controller: widget.controller,
+            maxLines: 1,
+            textInputAction: widget.textInputAction,
+            inputFormatters: widget.integersOnly == true
+                ? <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9+]')),
+                    LengthLimitingTextInputFormatter(widget.maxLength ?? 15),
+                  ]
+                : widget.maxLength != null
+                ? <TextInputFormatter>[
+                    LengthLimitingTextInputFormatter(widget.maxLength!),
+                  ]
+                : null,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: widget.hintText,
+              labelText: widget.labelText,
+              errorText: widget.hasError == true ? widget.errorText : null,
+              errorStyle: TextStyle(
+                color: Colors.red,
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+              ),
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              floatingLabelAlignment: FloatingLabelAlignment.start,
+              prefixIcon: widget.prefix,
+              suffixIcon: widget.suffix != null
+                  ? widget.suffix
+                  : widget.isPasswordField
+                  ? IconButton(
+                      icon: Icon(
+                        _isPasswordVisible ? Iconsax.eye : Iconsax.eye_slash,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    )
+                  : null,
+              filled: true,
+              fillColor: widget.hasError == true ? Colors.red.withOpacity(0.05) : Colors.transparent,
+              hintStyle: GoogleFonts.inter(
+                textStyle: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey.withOpacity(0.35),
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'YuGothic',
+                ),
+              ),
+              labelStyle: TextStyle(
+                color: widget.hasError == true ? Colors.red : Colors.black,
+                fontSize: 13.5,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'YuGothic',
+              ),
+              contentPadding: EdgeInsets.only(left: 16, top: 16),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: borderColor, width: widget.hasError == true ? 2 : 1),
+                borderRadius: BorderRadius.circular(36),
+              ),
+              disabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey.withOpacity(0.55)),
+                borderRadius: BorderRadius.circular(36),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: focusedBorderColor, width: 2),
+                borderRadius: BorderRadius.circular(36),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red, width: 2),
+                borderRadius: BorderRadius.circular(36),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red, width: 2),
+                borderRadius: BorderRadius.circular(36),
+              ),
+            ),
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 13.5,
               fontWeight: FontWeight.w500,
               fontFamily: 'YuGothic',
             ),
           ),
-          labelStyle: TextStyle(
-            color: Colors.black,
-            fontSize: 13.5,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'YuGothic',
-          ),
-          contentPadding: EdgeInsets.only(left: 16, top: 16),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black),
-            borderRadius: BorderRadius.circular(36),
-          ),
-          disabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.withOpacity(0.55)),
-            borderRadius: BorderRadius.circular(36),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Color(0xffED7D32)),
-            borderRadius: BorderRadius.circular(36),
-          ),
         ),
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 13.5,
-          fontWeight: FontWeight.w500,
-          fontFamily: 'YuGothic',
-        ),
-      ),
+        if (widget.hasError == true && widget.errorText != null)
+          Padding(
+            padding: EdgeInsets.only(left: 18, top: 4),
+            child: Text(
+              widget.errorText!,
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -1394,6 +1431,107 @@ class _CustomInputTransparent3bState extends State<CustomInputTransparent3b> {
           fontFamily: 'YuGothic',
         ),
       ),
+    );
+  }
+}
+
+class CustomErrorDropdown<T> extends StatelessWidget {
+  final String labelText;
+  final String? hintText;
+  final T? value;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?>? onChanged;
+  final bool hasError;
+  final String? errorText;
+  final bool isRequired;
+
+  const CustomErrorDropdown({
+    Key? key,
+    required this.labelText,
+    this.hintText,
+    this.value,
+    required this.items,
+    this.onChanged,
+    this.hasError = false,
+    this.errorText,
+    this.isRequired = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Color borderColor = hasError ? Colors.red : Constants.ftaColorLight;
+    Color focusedBorderColor = hasError ? Colors.red : Constants.ctaColorLight;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          height: 48,
+          child: InputDecorator(
+            decoration: InputDecoration(
+              labelText: labelText + (isRequired ? ' *' : ''),
+              labelStyle: TextStyle(
+                color: hasError ? Colors.red : Colors.black,
+                fontSize: 13.5,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'YuGothic',
+              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: borderColor, width: hasError ? 2 : 1),
+                borderRadius: BorderRadius.circular(36),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: focusedBorderColor, width: 2),
+                borderRadius: BorderRadius.circular(36),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red, width: 2),
+                borderRadius: BorderRadius.circular(36),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red, width: 2),
+                borderRadius: BorderRadius.circular(36),
+              ),
+              filled: true,
+              fillColor: hasError ? Colors.red.withOpacity(0.05) : Colors.transparent,
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<T>(
+                menuMaxHeight: 200,
+                dropdownColor: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                value: value,
+                hint: Text(
+                  hintText ?? labelText.replaceAll('*', ''),
+                  style: GoogleFonts.manrope(
+                    color: Colors.grey,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+                isExpanded: true,
+                icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
+                items: items,
+                onChanged: onChanged,
+              ),
+            ),
+          ),
+        ),
+        if (hasError && errorText != null)
+          Padding(
+            padding: EdgeInsets.only(left: 18, top: 4),
+            child: Text(
+              errorText!,
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

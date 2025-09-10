@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:js' as js;
 import 'package:http/http.dart' as http;
 import 'package:bidr/pages/seller/seller_home_dashboard.dart';
 import 'package:flutter/material.dart';
@@ -184,6 +185,11 @@ class _BuyerHomePageState extends State<BuyerHomePage>
       "icon2": "lib/assets/images/ele_light.png",
       "name": "Consumer \nElectronics",
     },
+    {
+      "icon": "lib/assets/images/auction_icon.png",
+      "icon2": "lib/assets/images/auction_icon.png",
+      "name": "Vehicle\nAuctions",
+    },
   ];
 
   @override
@@ -217,174 +223,213 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                   Constants.buyerAppBarValue == 0
                       ? Expanded(
                           child: Container(
-                            child: SingleChildScrollView(
+                            child: Scrollbar(
                               controller: _scrollController,
-                              child: Column(
-                                children: [
-                                  Container(
-                                    constraints: BoxConstraints(maxWidth: 1600),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        SizedBox(height: 24),
+                              thumbVisibility: true,
+                              trackVisibility: true,
+                              thickness: 12,
+                              radius: Radius.circular(6),
+                              child: SingleChildScrollView(
+                                controller: _scrollController,
+                                physics: BouncingScrollPhysics(),
+                                scrollDirection: Axis.vertical,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      constraints: BoxConstraints(
+                                        maxWidth: 1600,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          SizedBox(height: 24),
 
-                                        // Animated Banner Section
-                                        ScaleTransition(
-                                          scale: _scaleAnimation,
-                                          child: Padding(
-                                            padding: EdgeInsets.only(
-                                              left:
-                                                  Breakpoints.isTablet(context)
-                                                  ? 24
-                                                  : 32,
-                                              right:
-                                                  Breakpoints.isTablet(context)
-                                                  ? 24
-                                                  : 32,
-                                            ),
-                                            child: Center(
-                                              child: _buildAnimatedBannerSection(
-                                                "lib/assets/images/competitive.png",
+                                          // Animated Banner Section
+                                          ScaleTransition(
+                                            scale: _scaleAnimation,
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                left:
+                                                    Breakpoints.isTablet(
+                                                      context,
+                                                    )
+                                                    ? 24
+                                                    : 32,
+                                                right:
+                                                    Breakpoints.isTablet(
+                                                      context,
+                                                    )
+                                                    ? 24
+                                                    : 32,
                                               ),
-                                            ),
-                                          ),
-                                        ),
-
-                                        SizedBox(height: 24),
-
-                                        // Animated Category Section
-                                        Center(
-                                          child: SlideTransition(
-                                            position: _slideAnimation,
-                                            child: FadeTransition(
-                                              opacity: _categoryAnimation,
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                  left:
-                                                      Breakpoints.isTablet(
-                                                        context,
-                                                      )
-                                                      ? 24
-                                                      : 64,
-                                                  right:
-                                                      Breakpoints.isTablet(
-                                                        context,
-                                                      )
-                                                      ? 24
-                                                      : 64,
-                                                ),
-                                                child: Center(
-                                                  child: _buildCategoryItems(),
+                                              child: Center(
+                                                child: _buildAnimatedBannerSection(
+                                                  "lib/assets/images/competitive.png",
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
 
-                                        // Animated Form Section
-                                        AnimatedSwitcher(
-                                          duration: Duration(milliseconds: 500),
-                                          transitionBuilder:
-                                              (
-                                                Widget child,
-                                                Animation<double> animation,
-                                              ) {
-                                                return SlideTransition(
-                                                  position: Tween<Offset>(
-                                                    begin: Offset(0.0, 0.3),
-                                                    end: Offset.zero,
-                                                  ).animate(animation),
-                                                  child: FadeTransition(
-                                                    opacity: animation,
-                                                    child: child,
+                                          SizedBox(height: 24),
+
+                                          // Animated Category Section
+                                          Center(
+                                            child: SlideTransition(
+                                              position: _slideAnimation,
+                                              child: FadeTransition(
+                                                opacity: _categoryAnimation,
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(
+                                                    left:
+                                                        Breakpoints.isTablet(
+                                                          context,
+                                                        )
+                                                        ? 24
+                                                        : 64,
+                                                    right:
+                                                        Breakpoints.isTablet(
+                                                          context,
+                                                        )
+                                                        ? 24
+                                                        : 64,
                                                   ),
-                                                );
-                                              },
-                                          child: Center(
-                                            key: ValueKey(selectedIndex),
-                                            child: selectedIndex == 0
-                                                ? Padding(
-                                                    padding: EdgeInsets.only(
-                                                      left:
-                                                          Breakpoints.isTablet(
-                                                            context,
-                                                          )
-                                                          ? 24
-                                                          : 64,
-                                                      right: 64,
-                                                    ),
+                                                  child: Center(
                                                     child:
-                                                        VehicleDetailsQuoteForm(),
-                                                  )
-                                                : selectedIndex == 1
-                                                ? Padding(
-                                                    padding: EdgeInsets.only(
-                                                      left:
-                                                          Breakpoints.isTablet(
-                                                            context,
-                                                          )
-                                                          ? 24
-                                                          : 64,
-                                                      right:
-                                                          Breakpoints.isTablet(
-                                                            context,
-                                                          )
-                                                          ? 24
-                                                          : 64,
-                                                    ),
-                                                    child:
-                                                        TireProductQuoteForm(),
-                                                  )
-                                                : selectedIndex == 2
-                                                ? Padding(
-                                                    padding: EdgeInsets.only(
-                                                      left:
-                                                          Breakpoints.isTablet(
-                                                            context,
-                                                          )
-                                                          ? 24
-                                                          : 64,
-                                                      right:
-                                                          Breakpoints.isTablet(
-                                                            context,
-                                                          )
-                                                          ? 24
-                                                          : 64,
-                                                    ),
-                                                    child: ProductQuoteForm(),
-                                                  )
-                                                : SizedBox.shrink(),
+                                                        _buildCategoryItems(),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      ],
+
+                                          // Animated Form Section
+                                          AnimatedSwitcher(
+                                            duration: Duration(
+                                              milliseconds: 500,
+                                            ),
+                                            transitionBuilder:
+                                                (
+                                                  Widget child,
+                                                  Animation<double> animation,
+                                                ) {
+                                                  return SlideTransition(
+                                                    position: Tween<Offset>(
+                                                      begin: Offset(0.0, 0.3),
+                                                      end: Offset.zero,
+                                                    ).animate(animation),
+                                                    child: FadeTransition(
+                                                      opacity: animation,
+                                                      child: child,
+                                                    ),
+                                                  );
+                                                },
+                                            child: Center(
+                                              key: ValueKey(selectedIndex),
+                                              child: selectedIndex == 0
+                                                  ? Padding(
+                                                      padding: EdgeInsets.only(
+                                                        left:
+                                                            Breakpoints.isTablet(
+                                                              context,
+                                                            )
+                                                            ? 24
+                                                            : 64,
+                                                        right: 64,
+                                                      ),
+                                                      child:
+                                                          VehicleDetailsQuoteForm(),
+                                                    )
+                                                  : selectedIndex == 1
+                                                  ? Padding(
+                                                      padding: EdgeInsets.only(
+                                                        left:
+                                                            Breakpoints.isTablet(
+                                                              context,
+                                                            )
+                                                            ? 24
+                                                            : 64,
+                                                        right:
+                                                            Breakpoints.isTablet(
+                                                              context,
+                                                            )
+                                                            ? 24
+                                                            : 64,
+                                                      ),
+                                                      child:
+                                                          TireProductQuoteForm(),
+                                                    )
+                                                  : selectedIndex == 2
+                                                  ? Padding(
+                                                      padding: EdgeInsets.only(
+                                                        left:
+                                                            Breakpoints.isTablet(
+                                                              context,
+                                                            )
+                                                            ? 24
+                                                            : 64,
+                                                        right:
+                                                            Breakpoints.isTablet(
+                                                              context,
+                                                            )
+                                                            ? 24
+                                                            : 64,
+                                                      ),
+                                                      child: ProductQuoteForm(),
+                                                    )
+                                                  : selectedIndex == 3
+                                                  ? Padding(
+                                                      padding: EdgeInsets.only(
+                                                        left:
+                                                            Breakpoints.isTablet(
+                                                              context,
+                                                            )
+                                                            ? 24
+                                                            : 64,
+                                                        right:
+                                                            Breakpoints.isTablet(
+                                                              context,
+                                                            )
+                                                            ? 24
+                                                            : 64,
+                                                      ),
+                                                      child:
+                                                          _buildVehicleAuctionsComingSoon(),
+                                                    )
+                                                  : SizedBox.shrink(),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
 
-                                  // Animated About Us Section
-                                  selectedIndex < 0
-                                      ? SizedBox.shrink()
-                                      : SizedBox(height: 60),
-                                  TweenAnimationBuilder<double>(
-                                    tween: Tween<double>(begin: 0.0, end: 1.0),
-                                    duration: Duration(milliseconds: 1000),
-                                    builder: (context, value, child) {
-                                      return Transform.translate(
-                                        offset: Offset(0, 50 * (1 - value)),
-                                        child: Opacity(
-                                          opacity: value,
-                                          child: Center(
-                                            child: _buildAboutUsSection(),
+                                    // Animated About Us Section
+                                    selectedIndex < 0
+                                        ? SizedBox.shrink()
+                                        : SizedBox(height: 60),
+                                    TweenAnimationBuilder<double>(
+                                      tween: Tween<double>(
+                                        begin: 0.0,
+                                        end: 1.0,
+                                      ),
+                                      duration: Duration(milliseconds: 1000),
+                                      builder: (context, value, child) {
+                                        return Transform.translate(
+                                          offset: Offset(0, 50 * (1 - value)),
+                                          child: Opacity(
+                                            opacity: value,
+                                            child: Center(
+                                              child: _buildAboutUsSection(),
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                        );
+                                      },
+                                    ),
 
-                                  SizedBox(height: 24),
+                                    SizedBox(height: 24),
 
-                                  // Animated Bottom Banner
-                                  FadeTransition(
+                                    // Animated Bottom Banner
+                                    /* FadeTransition(
                                     opacity: _fadeAnimation,
                                     child: Container(
                                       constraints: BoxConstraints(
@@ -406,64 +451,76 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                         ),
                                       ),
                                     ),
-                                  ),
+                                  ),*/
+                                    SizedBox(height: 24),
 
-                                  SizedBox(height: 24),
-
-                                  // Animated Footer
-                                  SlideTransition(
-                                    position: Tween<Offset>(
-                                      begin: Offset(0, 1),
-                                      end: Offset.zero,
-                                    ).animate(_slideController),
-                                    child: Center(
-                                      child: FooterSection(
-                                        logo:
-                                            "lib/assets/images/bidr_logo2.png",
-                                        onFooterLinkTap: (String text) {
-                                          switch (text) {
-                                            case 'Home':
-                                              setState(() {
-                                                Constants.buyerAppBarValue = 0;
-                                                buyerHomeValueNotifier.value++;
-                                              });
-                                              break;
-                                            case 'Support':
-                                              setState(() {
-                                                Constants.buyerAppBarValue = 1;
-                                                buyerHomeValueNotifier.value++;
-                                              });
-                                              break;
-                                            case 'FAQs':
-                                              setState(() {
-                                                Constants.buyerAppBarValue = 2;
-                                                buyerHomeValueNotifier.value++;
-                                              });
-                                              break;
-                                            case 'Policies':
-                                              setState(() {
-                                                Constants.buyerAppBarValue = 3;
-                                                buyerHomeValueNotifier.value++;
-                                              });
-                                              break;
-                                            case 'Blogs':
-                                              setState(() {
-                                                Constants.buyerAppBarValue = 4;
-                                                buyerHomeValueNotifier.value++;
-                                              });
-                                              break;
-                                            case 'Contact Us':
-                                              setState(() {
-                                                Constants.buyerAppBarValue = 5;
-                                                buyerHomeValueNotifier.value++;
-                                              });
-                                              break;
-                                          }
-                                        },
+                                    // Animated Footer
+                                    SlideTransition(
+                                      position: Tween<Offset>(
+                                        begin: Offset(0, 1),
+                                        end: Offset.zero,
+                                      ).animate(_slideController),
+                                      child: Center(
+                                        child: FooterSection(
+                                          logo:
+                                              "lib/assets/images/bidr_logo2.png",
+                                          onFooterLinkTap: (String text) {
+                                            switch (text) {
+                                              case 'Home':
+                                                setState(() {
+                                                  Constants.buyerAppBarValue =
+                                                      0;
+                                                  buyerHomeValueNotifier
+                                                      .value++;
+                                                });
+                                                break;
+                                              case 'Support':
+                                                setState(() {
+                                                  Constants.buyerAppBarValue =
+                                                      1;
+                                                  buyerHomeValueNotifier
+                                                      .value++;
+                                                });
+                                                break;
+                                              case 'FAQs':
+                                                setState(() {
+                                                  Constants.buyerAppBarValue =
+                                                      2;
+                                                  buyerHomeValueNotifier
+                                                      .value++;
+                                                });
+                                                break;
+                                              case 'Policies':
+                                                setState(() {
+                                                  Constants.buyerAppBarValue =
+                                                      3;
+                                                  buyerHomeValueNotifier
+                                                      .value++;
+                                                });
+                                                break;
+                                              case 'Blogs':
+                                                setState(() {
+                                                  Constants.buyerAppBarValue =
+                                                      4;
+                                                  buyerHomeValueNotifier
+                                                      .value++;
+                                                });
+                                                break;
+                                              case 'Contact Us':
+                                                setState(() {
+                                                  Constants.buyerAppBarValue =
+                                                      5;
+                                                  buyerHomeValueNotifier
+                                                      .value++;
+                                                });
+                                                break;
+                                            }
+                                          },
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -516,53 +573,139 @@ class _BuyerHomePageState extends State<BuyerHomePage>
   Widget _buildAboutUsSection() {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 500,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Stack(
+      constraints: BoxConstraints(maxWidth: 1200),
+      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+      child: Column(
         children: [
-          Column(
+          // Section Title
+          Text(
+            'Why Choose BIDR?',
+            style: GoogleFonts.manrope(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Constants.ftaColorLight,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 40),
+
+          // Grid View with 3 cards
+          GridView.count(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            crossAxisCount: 3,
+            childAspectRatio: 0.8,
+            crossAxisSpacing: 24,
+            mainAxisSpacing: 24,
             children: [
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 200,
-                color: Colors.white,
+              _buildInfoCard(
+                icon: Icons.help_outline,
+                title: 'How it Works?',
+                subtitle:
+                    'Simple process: Create a request, receive bids from multiple sellers, choose the best offer. No more endless searching.',
+                color: Colors.orange,
+                index: 0,
               ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 300,
-                color: Constants.ftaColorLight,
+              _buildInfoCard(
+                icon: Icons.shopping_cart_outlined,
+                title: 'Why buyers should use this service?',
+                subtitle:
+                    'Save time and money. Get competitive prices from verified sellers. One request, multiple offers, best deals.',
+                color: Colors.blue,
+                index: 1,
+              ),
+              _buildInfoCard(
+                icon: Icons.business_outlined,
+                title: 'Why join as a business?',
+                subtitle:
+                    'Reach more customers, increase sales, compete fairly. Join our network of trusted sellers and grow your business.',
+                color: Colors.green,
+                index: 2,
               ),
             ],
           ),
-          Center(
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required int index,
+  }) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 600 + (index * 200)),
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 30 * (1 - value)),
+          child: Opacity(
+            opacity: value,
             child: Container(
-              constraints: BoxConstraints(maxWidth: 1600),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildAnimatedVideoSection(
-                    "About Us",
-                    "Created in 2024, BIDR™ is South Africa's newest e-commerce platform. Our unique buyer centric service makes searching for the best price for common goods easy. Headquartered in Johannesburg, we currently serve all of SA.BIDR was born out of its founders' frustrations of always trying to source the best deals for commonly required items such as vehicle tyres or spares, expensive mobile bills, and countless hours trying to negotiate with sellers to get the best deals.We have now taken our expertise and automated the process for you. Why not consider registering as a buyer or seller (as the case may be) and see how our system can save you time, money and stress.",
-                    "Why Join As A Buyer?",
-                    0,
-                  ),
-                  SizedBox(width: 16),
-                  _buildAnimatedVideoSection(
-                    "How It Works",
-                    "Unlike catalogue-based online shops, BIDR allows buyers to send out a single request to multiple sellers that are registered on our platform.The buyer simply specifies the area to search and all sellers within that area are notified of therequest. If the seller has the product (or similar products), they will make an offer. The sellers are continuously updated of the current market price offered by other sellers in the area, and should they opt to do so, they will have the opportunity of revising their bid with a best and final offer. No more long repetitive phone calls, waiting in queues, or countless hours browsing for special deals. With BIDR the sellers come to you with their best price.",
-                    "Why Join As A Business?",
-                    1,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: color, width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.1),
+                    blurRadius: 10,
+                    spreadRadius: 0,
+                    offset: Offset(0, 4),
                   ),
                 ],
               ),
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Icon
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Icon(icon, size: 40, color: Colors.white),
+                    ),
+                    SizedBox(height: 20),
+
+                    // Title
+                    Text(
+                      title,
+                      style: GoogleFonts.manrope(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 12),
+
+                    // Subtitle
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.manrope(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black54,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -896,7 +1039,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                 child: Text(
                   'Please click on one of the categories to begin',
                   style: GoogleFonts.manrope(
-                    fontSize: 13.5,
+                    fontSize: 15.5,
                     color: Colors.grey.shade500,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1014,6 +1157,72 @@ class _BuyerHomePageState extends State<BuyerHomePage>
       ),
     );
   }
+
+  Widget _buildVehicleAuctionsComingSoon() {
+    return Container(
+      padding: EdgeInsets.all(40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Color(0xFF072744).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.gavel, size: 40, color: Color(0xFF072744)),
+          ),
+          SizedBox(height: 24),
+          Text(
+            'Vehicle Auctions',
+            style: GoogleFonts.manrope(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF072744),
+            ),
+          ),
+          SizedBox(height: 12),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Color(0xFFF9A825),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              'COMING SOON',
+              style: GoogleFonts.manrope(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Get ready for an exciting new way to buy vehicles through our auction platform.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.manrope(
+              fontSize: 16,
+              color: Colors.grey[700],
+              height: 1.4,
+            ),
+          ),
+          SizedBox(height: 12),
+          Text(
+            'Participate in live auctions with real-time bidding, secure transactions, and access to premium vehicles from trusted sellers.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.manrope(
+              fontSize: 14,
+              color: Colors.grey[600],
+              height: 1.3,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class VehicleDetailsQuoteForm extends StatefulWidget {
@@ -1035,7 +1244,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   LatLng? _selectedLocation;
   String _selectedAddress = '';
   static const String _googleMapsApiKey =
-      'AIzaSyAKFP-Mf1TQ1z2o8vEBjx2P-_5SwB0lA-k';
+      'AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA';
 
   // Focus Nodes
   final FocusNode _vinFocus = FocusNode();
@@ -1577,7 +1786,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
           fontWeight: FontWeight.w500,
         ),
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        hintText: 'Enter range',
+        hintText: 'Enter distance (1-1500 km)',
         hintStyle: GoogleFonts.manrope(color: Colors.grey[500], fontSize: 14),
         fillColor: Colors.transparent,
         filled: true,
@@ -1652,7 +1861,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     color: Colors.white,
                     child: Text(
-                      'Upload Images Of The Product You Require*',
+                      'Upload Images Of The Product You Require',
                       style: GoogleFonts.manrope(
                         color: Colors.black,
                         fontSize: 14,
@@ -2126,7 +2335,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   'Max Distance You Want to Travel (km)*',
                   _maxDistance,
                   1,
-                  1,
+                  1500,
                   (value) => setState(() => _maxDistance = value),
                 ),
               ),
@@ -2137,6 +2346,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   _selectedTimeframe,
                   [
                     'Select Time',
+                    '1 Hour',
                     '12 Hours',
                     '24 Hours',
                     '2-3 Days',
@@ -2752,8 +2962,10 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     if (_descriptionController.text.trim().isEmpty) {
       errors.add('Description is required');
     }
-    if (_maxDistance < 1.0) {
-      errors.add('Max Distance value must be greater than 0..min 1.');
+    if (_maxDistance < 1.0 || _maxDistance > 1500.0) {
+      errors.add(
+        'Max Distance must be between 1 km and 1500 km (National coverage).',
+      );
     }
 
     if (errors.isNotEmpty) {
@@ -3983,27 +4195,27 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   Future<List<Prediction>> _searchPlacesAutocomplete(String pattern) async {
     if (pattern.length < 3) return [];
 
-    // Web platform check to prevent CORS errors
-    if (kIsWeb) {
-      // TODO: Implement backend proxy for Google Places API
-      // Direct API calls from Flutter web cause CORS errors.
-      // Solutions:
-      // 1. Create a backend endpoint that proxies Google Places API calls
-      // 2. Use google_maps_flutter_web with JavaScript interop
-      // 3. Use @dart-js interop to call Google Places JavaScript API directly
-      print(
-        'Location autocomplete disabled on web due to CORS restrictions. Backend proxy needed.',
-      );
-      return [];
-    }
-
     try {
-      final String baseURL =
-          'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-      final String request =
-          '$baseURL?input=$pattern&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&components=country:za&language=en';
+      // Use the updated API key
+      const String apiKey = 'AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA';
+      
+      // For web platform, use JavaScript interop to avoid CORS issues
+      if (kIsWeb) {
+        return await _getPlacePredictionsWeb(pattern);
+      }
+      
+      // Mobile platform - use direct API call
+      final String encodedQuery = Uri.encodeComponent(pattern.trim());
+      final String baseURL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+      final String request = '$baseURL?input=$encodedQuery&key=$apiKey&components=country:za&language=en&sessiontoken=${DateTime.now().millisecondsSinceEpoch}';
 
-      final response = await http.get(Uri.parse(request));
+      final response = await http.get(
+        Uri.parse(request),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ).timeout(Duration(seconds: 8));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
@@ -4011,14 +4223,14 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         if (data['status'] == 'OK' && data['predictions'] != null) {
           final List<dynamic> predictions = data['predictions'];
 
-          return predictions.map((prediction) {
+          return predictions.take(8).map((prediction) {
             return Prediction(
-              description: prediction['description'],
-              placeId: prediction['place_id'],
+              description: prediction['description'] ?? '',
+              placeId: prediction['place_id'] ?? '',
               reference: prediction['reference'] ?? '',
               matchedSubstrings: [],
               terms: [],
-              types: prediction['types']?.cast<String>() ?? [],
+              types: (prediction['types'] as List?)?.cast<String>() ?? [],
               structuredFormatting: null,
             );
           }).toList();
@@ -4028,6 +4240,115 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       return [];
     } catch (e) {
       print('Error in _searchPlacesAutocomplete: $e');
+      return [];
+    }
+  }
+
+  // Web-specific method using JavaScript interop (for ProductQuoteForm)
+  Future<List<Prediction>> _getPlacePredictionsWeb(String query) async {
+    try {
+      final Completer<List<Prediction>> completer = Completer<List<Prediction>>();
+      
+      // Wait for Google Maps API to be available with retries
+      bool apiAvailable = await _waitForGoogleMapsAPI();
+      if (!apiAvailable) {
+        print('Google Places JavaScript API not available after waiting');
+        return [];
+      }
+
+      // Call JavaScript function
+      js.context.callMethod('getPlacePredictions', [
+        query,
+        js.allowInterop((dynamic jsResults) {
+          try {
+            // Convert JavaScript array to Dart list
+            final List<dynamic> resultsList = List<dynamic>.from(jsResults);
+            final List<Prediction> predictions = resultsList.map((jsResult) {
+              // Convert each JavaScript object to Map safely
+              final Map<String, dynamic> result = _convertJsObjectToMap(jsResult);
+              return Prediction(
+                description: result['description']?.toString() ?? '',
+                placeId: result['placeId']?.toString() ?? '',
+                reference: result['reference']?.toString() ?? '',
+                matchedSubstrings: [],
+                terms: [],
+                types: _convertToStringList(result['types']),
+                structuredFormatting: null,
+              );
+            }).toList();
+            
+            if (!completer.isCompleted) {
+              completer.complete(predictions);
+            }
+          } catch (e) {
+            print('Error processing JavaScript results: $e');
+            if (!completer.isCompleted) {
+              completer.complete([]);
+            }
+          }
+        }),
+      ]);
+
+      // Add timeout
+      Timer(Duration(seconds: 8), () {
+        if (!completer.isCompleted) {
+          print('Places API timeout');
+          completer.complete([]);
+        }
+      });
+
+      return await completer.future;
+    } catch (e) {
+      print('Error in _getPlacePredictionsWeb: $e');
+      return [];
+    }
+  }
+
+  // Helper methods for JavaScript object conversion
+  Future<bool> _waitForGoogleMapsAPI() async {
+    // Check if already available
+    if (js.context.hasProperty('getPlacePredictions')) {
+      return true;
+    }
+
+    // Manual check with retries
+    for (int i = 0; i < 20; i++) {
+      await Future.delayed(Duration(milliseconds: 500));
+      if (js.context.hasProperty('getPlacePredictions')) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  Map<String, dynamic> _convertJsObjectToMap(dynamic jsObject) {
+    try {
+      if (jsObject == null) return {};
+      
+      // If it's already a Map, return it
+      if (jsObject is Map<String, dynamic>) {
+        return jsObject;
+      }
+      
+      // Convert JavaScript object using JSON serialization
+      final String jsonString = js.context['JSON'].callMethod('stringify', [jsObject]);
+      return Map<String, dynamic>.from(json.decode(jsonString));
+    } catch (e) {
+      print('Error converting JavaScript object: $e');
+      return {};
+    }
+  }
+
+  List<String> _convertToStringList(dynamic value) {
+    try {
+      if (value == null) return [];
+      if (value is List) {
+        return value.map((e) => e?.toString() ?? '').toList();
+      }
+      return [];
+    } catch (e) {
+      print('Error converting to string list: $e');
       return [];
     }
   }
@@ -4121,7 +4442,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
   LatLng? _selectedLocation;
   String _selectedAddress = '';
   static const String _googleMapsApiKey =
-      'AIzaSyAKFP-Mf1TQ1z2o8vEBjx2P-_5SwB0lA-k';
+      'AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA';
 
   // Focus Nodes
   final FocusNode _typeFocus = FocusNode();
@@ -5130,8 +5451,10 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
     if (_locationController.text.trim().isEmpty) {
       errors.add('Location is required');
     }
-    if (_maxDistance < 1.0) {
-      errors.add('Max Distance value must be greater than 0..min 1.');
+    if (_maxDistance < 1.0 || _maxDistance > 1500.0) {
+      errors.add(
+        'Max Distance must be between 1 km and 1500 km (National coverage).',
+      );
     }
 
     if (errors.isNotEmpty) {
@@ -5290,7 +5613,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
   LatLng? _selectedLocation;
   String _selectedAddress = '';
   static const String _googleMapsApiKey =
-      'AIzaSyAKFP-Mf1TQ1z2o8vEBjx2P-_5SwB0lA-k';
+      'AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA';
 
   // Focus Nodes
   final FocusNode _tyreWidthFocus = FocusNode();
@@ -5817,6 +6140,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
                   'How Soon Do You Need To Buy This Product?*',
                   _selectedTimeframe,
                   [
+                    '1 Hour',
                     '12 Hours',
                     '24 Hours',
                     '2-3 Days',
@@ -6258,8 +6582,10 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
     if (_locationController.text.trim().isEmpty) {
       errors.add('Location is required');
     }
-    if (_maxDistance < 1.0) {
-      errors.add('Max Distance value must be greater than 0..min 1.');
+    if (_maxDistance < 1.0 || _maxDistance > 1500.0) {
+      errors.add(
+        'Max Distance must be between 1 km and 1500 km (National coverage).',
+      );
     }
 
     if (errors.isNotEmpty) {
@@ -6768,31 +7094,35 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
 
   // TypeAhead-specific methods for LocationPickerDialog
   Future<List<Prediction>> _getPlacePredictionsTypeAhead(String query) async {
-    if (query.trim().isEmpty) {
-      return [];
-    }
-
-    // Web platform check to prevent CORS errors
-    if (kIsWeb) {
-      // TODO: Implement backend proxy for Google Places API
-      // Direct API calls from Flutter web cause CORS errors.
-      // Solutions:
-      // 1. Create a backend endpoint that proxies Google Places API calls
-      // 2. Use google_maps_flutter_web with JavaScript interop
-      // 3. Use @dart-js interop to call Google Places JavaScript API directly
-      print(
-        'Location autocomplete disabled on web due to CORS restrictions. Backend proxy needed.',
-      );
+    if (query.trim().isEmpty || query.length < 2) {
       return [];
     }
 
     try {
+      // Use the updated API key
+      const String apiKey = 'AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA';
+      final String encodedQuery = Uri.encodeComponent(query.trim());
+
+      // For web platform, use JavaScript interop to avoid CORS issues
+      if (kIsWeb) {
+        return await _getPlacePredictionsWeb(query);
+      }
+
+      // Mobile platform - use direct API call
       final String baseURL =
           'https://maps.googleapis.com/maps/api/place/autocomplete/json';
       final String request =
-          '$baseURL?input=$query&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&components=country:za&language=en';
+          '$baseURL?input=$encodedQuery&key=$apiKey&components=country:za&language=en&sessiontoken=${DateTime.now().millisecondsSinceEpoch}';
 
-      final response = await http.get(Uri.parse(request));
+      final response = await http
+          .get(
+            Uri.parse(request),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          )
+          .timeout(Duration(seconds: 8));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
@@ -6800,14 +7130,78 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
         if (data['status'] == 'OK' && data['predictions'] != null) {
           final List<dynamic> predictions = data['predictions'];
 
-          return predictions.map((prediction) {
+          return predictions.take(8).map((prediction) {
             return Prediction(
-              description: prediction['description'],
-              placeId: prediction['place_id'],
+              description: prediction['description'] ?? '',
+              placeId: prediction['place_id'] ?? '',
               reference: prediction['reference'] ?? '',
               matchedSubstrings: [],
               terms: [],
-              types: prediction['types']?.cast<String>() ?? [],
+              types: (prediction['types'] as List?)?.cast<String>() ?? [],
+              structuredFormatting: null,
+            );
+          }).toList();
+        } else if (data['status'] == 'ZERO_RESULTS') {
+          return [];
+        } else {
+          print(
+            'Places API error: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}',
+          );
+          return await _getGeocodingFallback(query);
+        }
+      } else {
+        print('HTTP error: ${response.statusCode} - ${response.body}');
+        return await _getGeocodingFallback(query);
+      }
+
+      return [];
+    } catch (e) {
+      print('Error in _getPlacePredictionsTypeAhead: $e');
+      // Fallback to geocoding if Places API fails
+      return await _getGeocodingFallback(query);
+    }
+  }
+
+  // Geocoding fallback for when Places API is not available
+  Future<List<Prediction>> _getGeocodingFallback(String query) async {
+    try {
+      const String apiKey = 'AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA';
+      final String encodedQuery = Uri.encodeComponent(query.trim());
+      final String geocodingURL =
+          'https://maps.googleapis.com/maps/api/geocode/json';
+      final String request =
+          '$geocodingURL?address=$encodedQuery&key=$apiKey&components=country:ZA&language=en';
+
+      final response = await http
+          .get(
+            Uri.parse(request),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          )
+          .timeout(Duration(seconds: 5));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        if (data['status'] == 'OK' && data['results'] != null) {
+          final List<dynamic> results = data['results'];
+
+          return results.take(5).map((result) {
+            final String description = result['formatted_address'] ?? query;
+            final Map<String, dynamic> geometry = result['geometry'] ?? {};
+            final Map<String, dynamic> location = geometry['location'] ?? {};
+            final double lat = (location['lat'] ?? 0.0).toDouble();
+            final double lng = (location['lng'] ?? 0.0).toDouble();
+
+            return Prediction(
+              description: description,
+              placeId: 'geocoding_${lat}_$lng',
+              reference: '',
+              matchedSubstrings: [],
+              terms: [],
+              types: (result['types'] as List?)?.cast<String>() ?? [],
               structuredFormatting: null,
             );
           }).toList();
@@ -6816,7 +7210,227 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
 
       return [];
     } catch (e) {
-      print('Error in _getPlacePredictionsTypeAhead: $e');
+      print('Error in geocoding fallback: $e');
+      return [];
+    }
+  }
+
+  // Wait for Google Maps API to be available
+  Future<bool> _waitForGoogleMapsAPI() async {
+    // Check if already available
+    if (js.context.hasProperty('getPlacePredictions') &&
+        js.context.hasProperty('geocodeAddress')) {
+      return true;
+    }
+
+    // Try to initialize if the function exists
+    if (js.context.hasProperty('waitForGoogleMaps')) {
+      final Completer<bool> completer = Completer<bool>();
+
+      try {
+        js.context.callMethod('waitForGoogleMaps', [
+          js.allowInterop((bool success) {
+            if (!completer.isCompleted) {
+              completer.complete(success);
+            }
+          }),
+        ]);
+
+        // Add timeout
+        Timer(Duration(seconds: 10), () {
+          if (!completer.isCompleted) {
+            completer.complete(false);
+          }
+        });
+
+        return await completer.future;
+      } catch (e) {
+        print('Error waiting for Google Maps API: $e');
+        return false;
+      }
+    }
+
+    // Manual check with retries
+    for (int i = 0; i < 20; i++) {
+      await Future.delayed(Duration(milliseconds: 500));
+      if (js.context.hasProperty('getPlacePredictions') &&
+          js.context.hasProperty('geocodeAddress')) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // Helper method to convert JavaScript objects to Dart Maps
+  Map<String, dynamic> _convertJsObjectToMap(dynamic jsObject) {
+    try {
+      if (jsObject == null) return {};
+
+      // If it's already a Map, return it
+      if (jsObject is Map<String, dynamic>) {
+        return jsObject;
+      }
+
+      // Convert JavaScript object using JSON serialization
+      final String jsonString = js.context['JSON'].callMethod('stringify', [
+        jsObject,
+      ]);
+      return Map<String, dynamic>.from(json.decode(jsonString));
+    } catch (e) {
+      print('Error converting JavaScript object: $e');
+      return {};
+    }
+  }
+
+  // Helper method to safely convert to string list
+  List<String> _convertToStringList(dynamic value) {
+    try {
+      if (value == null) return [];
+      if (value is List) {
+        return value.map((e) => e?.toString() ?? '').toList();
+      }
+      return [];
+    } catch (e) {
+      print('Error converting to string list: $e');
+      return [];
+    }
+  }
+
+  // Web-specific method using JavaScript interop
+  Future<List<Prediction>> _getPlacePredictionsWeb(String query) async {
+    try {
+      final Completer<List<Prediction>> completer =
+          Completer<List<Prediction>>();
+
+      // Wait for Google Maps API to be available with retries
+      bool apiAvailable = await _waitForGoogleMapsAPI();
+      if (!apiAvailable) {
+        print(
+          'Google Places JavaScript API not available after waiting, falling back to geocoding',
+        );
+        return await _getGeocodingFallbackWeb(query);
+      }
+
+      // Call JavaScript function
+      js.context.callMethod('getPlacePredictions', [
+        query,
+        js.allowInterop((dynamic jsResults) {
+          try {
+            // Convert JavaScript array to Dart list
+            final List<dynamic> resultsList = List<dynamic>.from(jsResults);
+            final List<Prediction> predictions = resultsList.map((jsResult) {
+              // Convert each JavaScript object to Map safely
+              final Map<String, dynamic> result = _convertJsObjectToMap(
+                jsResult,
+              );
+              return Prediction(
+                description: result['description']?.toString() ?? '',
+                placeId: result['placeId']?.toString() ?? '',
+                reference: result['reference']?.toString() ?? '',
+                matchedSubstrings: [],
+                terms: [],
+                types: _convertToStringList(result['types']),
+                structuredFormatting: null,
+              );
+            }).toList();
+
+            if (!completer.isCompleted) {
+              completer.complete(predictions);
+            }
+          } catch (e) {
+            print('Error processing JavaScript results: $e');
+            if (!completer.isCompleted) {
+              completer.complete([]);
+            }
+          }
+        }),
+      ]);
+
+      // Add timeout
+      Timer(Duration(seconds: 8), () {
+        if (!completer.isCompleted) {
+          print('Places API timeout, falling back to geocoding');
+          completer.complete([]);
+        }
+      });
+
+      final results = await completer.future;
+
+      // If no results from Places API, try geocoding fallback
+      if (results.isEmpty) {
+        return await _getGeocodingFallbackWeb(query);
+      }
+
+      return results;
+    } catch (e) {
+      print('Error in _getPlacePredictionsWeb: $e');
+      return await _getGeocodingFallbackWeb(query);
+    }
+  }
+
+  // Web-specific geocoding fallback using JavaScript interop
+  Future<List<Prediction>> _getGeocodingFallbackWeb(String query) async {
+    try {
+      final Completer<List<Prediction>> completer =
+          Completer<List<Prediction>>();
+
+      // Wait for API if not already available
+      if (!js.context.hasProperty('geocodeAddress')) {
+        bool apiAvailable = await _waitForGoogleMapsAPI();
+        if (!apiAvailable) {
+          print('Google Maps JavaScript API not available for geocoding');
+          return [];
+        }
+      }
+
+      // Call JavaScript geocoding function
+      js.context.callMethod('geocodeAddress', [
+        query,
+        js.allowInterop((dynamic jsResults) {
+          try {
+            // Convert JavaScript array to Dart list
+            final List<dynamic> resultsList = List<dynamic>.from(jsResults);
+            final List<Prediction> predictions = resultsList.map((jsResult) {
+              // Convert each JavaScript object to Map safely
+              final Map<String, dynamic> result = _convertJsObjectToMap(
+                jsResult,
+              );
+              return Prediction(
+                description: result['formattedAddress']?.toString() ?? query,
+                placeId:
+                    'geocoding_${result['latitude']}_${result['longitude']}',
+                reference: '',
+                matchedSubstrings: [],
+                terms: [],
+                types: _convertToStringList(result['types']),
+                structuredFormatting: null,
+              );
+            }).toList();
+
+            if (!completer.isCompleted) {
+              completer.complete(predictions);
+            }
+          } catch (e) {
+            print('Error processing geocoding results: $e');
+            if (!completer.isCompleted) {
+              completer.complete([]);
+            }
+          }
+        }),
+      ]);
+
+      // Add timeout
+      Timer(Duration(seconds: 5), () {
+        if (!completer.isCompleted) {
+          print('Geocoding timeout');
+          completer.complete([]);
+        }
+      });
+
+      return await completer.future;
+    } catch (e) {
+      print('Error in _getGeocodingFallbackWeb: $e');
       return [];
     }
   }
@@ -6962,39 +7576,34 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.only(),
-              child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Constants.ctaColorLight,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
+              padding: EdgeInsets.fromLTRB(20, 20, 12, 16),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.location_on_outlined,
+                    color: Colors.grey[700],
+                    size: 22,
                   ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.location_on, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Select Location',
-                          style: GoogleFonts.manrope(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                  SizedBox(width: 8),
+                  Text(
+                    'Select Location',
+                    style: GoogleFonts.manrope(
+                      color: Colors.grey[800],
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
                     ),
-                    IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: Icon(Icons.close, color: Colors.white),
+                  ),
+                  Spacer(),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.close, color: Colors.grey[600], size: 20),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.grey[100],
+                      padding: EdgeInsets.all(8),
+                      minimumSize: Size(36, 36),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
 
@@ -7016,45 +7625,36 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                           color: Colors.black87,
                         ),
                         decoration: InputDecoration(
-                          labelText: 'Search Location',
-                          labelStyle: GoogleFonts.manrope(
-                            color: Constants.ftaColorLight,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          hintText: 'Start typing to search...',
+                          hintText: 'Search for a location...',
                           hintStyle: GoogleFonts.manrope(
-                            color: Colors.grey.shade500,
-                            fontSize: 14,
+                            color: Colors.grey[500],
+                            fontSize: 15,
                           ),
                           filled: true,
-                          fillColor: Colors.grey.shade50,
+                          fillColor: Colors.grey[50],
                           contentPadding: EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
+                            horizontal: 16,
+                            vertical: 14,
                           ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey[300]!),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey[300]!),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(8),
                             borderSide: BorderSide(
-                              color: Constants.ctaColorLight,
-                              width: 2,
+                              color: Colors.grey[600]!,
+                              width: 1.5,
                             ),
                           ),
-                          prefixIcon: Container(
-                            padding: EdgeInsets.all(12),
-                            child: Icon(
-                              Icons.search,
-                              color: Constants.ftaColorLight,
-                              size: 24,
-                            ),
+                          prefixIcon: Icon(
+                            Icons.search_outlined,
+                            color: Colors.grey[500],
+                            size: 20,
                           ),
                           suffixIcon: controller.text.isNotEmpty
                               ? IconButton(
@@ -7080,29 +7680,22 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                       return Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: 12,
+                          vertical: 14,
                         ),
                         decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
-                              color: Colors.grey.shade200,
+                              color: Colors.grey[200]!,
                               width: 0.5,
                             ),
                           ),
                         ),
                         child: Row(
                           children: [
-                            Container(
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Constants.ctaColorLight.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                Icons.location_on,
-                                color: Constants.ctaColorLight,
-                                size: 20,
-                              ),
+                            Icon(
+                              Icons.location_on_outlined,
+                              color: Colors.grey[500],
+                              size: 18,
                             ),
                             SizedBox(width: 12),
                             Expanded(
@@ -7317,8 +7910,8 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                       padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: Colors.grey[200]!),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -7387,49 +7980,50 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                 ),
               ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(360),
-                          side: BorderSide(color: Constants.ftaColorLight),
-                        ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
                       ),
-                      child: Text(
-                        'Cancel',
-                        style: GoogleFonts.manrope(
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.w500,
-                        ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Cancel',
+                      style: GoogleFonts.manrope(
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-                  SizedBox(width: 22),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        final address = _selectedAddress.isNotEmpty
-                            ? _selectedAddress
-                            : 'Location: ${_selectedLocation.latitude.toStringAsFixed(4)}, ${_selectedLocation.longitude.toStringAsFixed(4)}';
-                        widget.onLocationSelected(_selectedLocation, address);
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Constants.ctaColorLight,
-                        foregroundColor: Colors.white,
-
-                        padding: EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(360),
-                        ),
+                  SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      final address = _selectedAddress.isNotEmpty
+                          ? _selectedAddress
+                          : 'Location: ${_selectedLocation.latitude.toStringAsFixed(4)}, ${_selectedLocation.longitude.toStringAsFixed(4)}';
+                      widget.onLocationSelected(_selectedLocation, address);
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[800],
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
                       ),
-                      child: Text(
-                        'Select Location',
-                        style: GoogleFonts.manrope(fontWeight: FontWeight.w500),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                    ),
+                    child: Text(
+                      'Select Location',
+                      style: GoogleFonts.manrope(fontWeight: FontWeight.w500),
                     ),
                   ),
                 ],

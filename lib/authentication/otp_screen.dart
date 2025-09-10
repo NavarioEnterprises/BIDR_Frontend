@@ -783,7 +783,7 @@ class _BidrOTPVerificationScreenState extends State<BidrOTPVerificationScreen>
               height: 55,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(360),
                 border: Border.all(
                   color: _otpFocusNodes[index].hasFocus
                       ? Constants.ctaColorLight
@@ -1505,7 +1505,7 @@ class _SellerOTPVerificationScreenState
               height: 55,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(360),
                 border: Border.all(
                   color: _otpFocusNodes[index].hasFocus
                       ? Constants.ctaColorLight

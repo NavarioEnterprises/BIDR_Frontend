@@ -83,6 +83,10 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
   String message = "";
   AuthApiService apiService = AuthApiService();
   
+  // Validation error states
+  Map<String, String?> _fieldErrors = {};
+  Map<String, bool> _fieldTouched = {};
+  
 
   @override
   void dispose() {
@@ -240,49 +244,85 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     }
   }
 
-  // Enhanced form validation using field-specific validation
+  // Enhanced form validation with visual feedback
   bool _validateForm() {
-    // Validate each field using the new validation method
+    setState(() {
+      _fieldErrors.clear();
+      _fieldTouched.clear();
+    });
+    
+    // Validate each field and collect errors
     final fields = [
       {
+        'key': 'fullName',
         'name': 'Full Name*',
         'value': _fullNameController.text,
         'focus': _fullNameFocusNode,
       },
       {
+        'key': 'mobile',
         'name': 'Mobile Number*',
         'value': _mobileController.text,
         'focus': _mobileFocusNode,
       },
       {
+        'key': 'email',
         'name': 'Email*',
         'value': _emailController.text,
         'focus': _emailFocusNode,
       },
       {
+        'key': 'password',
         'name': 'Password*',
         'value': _passwordController.text,
         'focus': _passwordFocusNode,
       },
       {
+        'key': 'confirmPassword',
         'name': 'Confirm Password*',
         'value': _confirmPasswordController.text,
         'focus': _confirmPasswordFocusNode,
       },
     ];
 
+    bool hasErrors = false;
     for (var field in fields) {
       String? error = _validateField(
         field['name'] as String,
         field['value'] as String,
       );
       if (error != null) {
-        _showFieldError(error, field['focus'] as FocusNode);
-        return false;
+        _fieldErrors[field['key'] as String] = error;
+        _fieldTouched[field['key'] as String] = true;
+        hasErrors = true;
       }
     }
 
+    if (hasErrors) {
+      setState(() {}); // Trigger rebuild to show errors
+      // Focus on first error field
+      for (var field in fields) {
+        if (_fieldErrors[field['key'] as String] != null) {
+          (field['focus'] as FocusNode).requestFocus();
+          break;
+        }
+      }
+      return false;
+    }
+
     return true;
+  }
+  
+  void _validateFieldRealTime(String fieldKey, String fieldName, String value) {
+    String? error = _validateField(fieldName, value);
+    setState(() {
+      _fieldTouched[fieldKey] = true;
+      if (error != null) {
+        _fieldErrors[fieldKey] = error;
+      } else {
+        _fieldErrors.remove(fieldKey);
+      }
+    });
   }
 
   Future<void> _saveBuyerFormDataForSuggestions() async {
@@ -315,6 +355,12 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     bool? integersOnly,
     bool? isName,
   }) {
+    // Map the fieldKey to validation key
+    String validationKey = fieldKey;
+    if (fieldKey == 'buyer_full_name') validationKey = 'fullName';
+    if (fieldKey == 'buyer_mobile_number') validationKey = 'mobile';
+    if (fieldKey == 'buyer_email') validationKey = 'email';
+    
     return FutureBuilder<List<String>>(
       future: FormDataService.getFieldSuggestions(fieldKey),
       builder: (context, snapshot) {
@@ -327,6 +373,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
             controller,
             focusNode,
             nextFocusNode,
+            validationKey,
             suffixIcon: suffixIcon,
             isPasswordField: isPasswordField,
             integersOnly: integersOnly,
@@ -367,6 +414,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                   fieldController,
                   focusNode,
                   nextFocusNode,
+                  validationKey,
                   suffixIcon: suffixIcon,
                   isPasswordField: isPasswordField,
                   integersOnly: integersOnly,
@@ -453,12 +501,15 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     String hintText,
     TextEditingController controller,
     FocusNode focusNode,
-    FocusNode? nextFocusNode, {
+    FocusNode? nextFocusNode, 
+    String fieldKey, {
     Widget? suffixIcon,
     bool? isPasswordField,
     bool? integersOnly,
     bool? isName,
   }) {
+    bool hasError = _fieldTouched[fieldKey] == true && _fieldErrors[fieldKey] != null;
+    
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
       labelText: hintText,
@@ -471,6 +522,8 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
       integersOnly: integersOnly,
       maxLength: integersOnly == true ? 15 : null,
       suffix: suffixIcon,
+      hasError: hasError,
+      errorText: _fieldErrors[fieldKey],
       onChanged: (value) {
         // Real-time validation and formatting
         if (integersOnly == true) {
@@ -503,13 +556,16 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
             );
           }
         }
+        
+        // Real-time validation
+        _validateFieldRealTime(fieldKey, hintText, controller.text);
       },
       onSubmitted: (value) {
         // Validate before moving to next field
-        String? error = _validateField(hintText, value);
-        if (error != null) {
-          _showFieldError(error, focusNode);
-          return;
+        _validateFieldRealTime(fieldKey, hintText, value);
+        
+        if (_fieldErrors[fieldKey] != null) {
+          return; // Don't proceed if there's an error
         }
 
         if (nextFocusNode != null) {
@@ -883,6 +939,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                               _passwordController,
                               _passwordFocusNode,
                               _confirmPasswordFocusNode,
+                              'password',
                               isPasswordField: true,
                             ),
                           ),
@@ -899,6 +956,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                               _confirmPasswordController,
                               _confirmPasswordFocusNode,
                               null,
+                              'confirmPassword',
                               isPasswordField: true,
                             ),
                           ),

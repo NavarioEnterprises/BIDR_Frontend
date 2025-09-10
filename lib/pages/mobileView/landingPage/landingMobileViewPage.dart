@@ -84,7 +84,7 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
     myBuyerMobileNotifier = MyNotifier(buyerHomeMobileValueNotifier, context);
     mySellerMobileNotifier = MyNotifier(sellerHomeMobileValueNotifier, context);
     buyerBackMobileButtonValueNotifier.addListener(() {
-      Constants.buyerAppBarValue =0;
+      Constants.buyerAppBarValue = 0;
       setState(() {});
     });
     sellerHomeMobileValueNotifier.addListener(() {
@@ -363,15 +363,15 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                             // Animated Bottom Banner
                             FadeTransition(
                               opacity: _fadeAnimation,
-                              child:Padding(
+                              child: Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal:
-                                  ResponsiveSpacing.getSpacing(
-                                    context,
-                                  ).paddingLarge *
+                                      ResponsiveSpacing.getSpacing(
+                                        context,
+                                      ).paddingLarge *
                                       2,
                                 ),
-                                child:  Center(
+                                child: Center(
                                   child: _buildAnimatedBannerSection(
                                     "lib/assets/images/mask_group.png",
                                     false,
@@ -390,8 +390,8 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
                                 context,
                               ).spacingMedium,
                             ),
-                            // Animated Footer
 
+                            // Animated Footer
                           ],
                         ),
                       ),
@@ -955,7 +955,7 @@ class _VehicleDetailsQuoteMobileFormState
   LatLng? _selectedLocation;
   String _selectedAddress = '';
   static const String _googleMapsApiKey =
-      'AIzaSyAKFP-Mf1TQ1z2o8vEBjx2P-_5SwB0lA-k';
+      'AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA';
 
   // Focus Nodes
   final FocusNode _vinFocus = FocusNode();
@@ -3070,7 +3070,7 @@ class _ProductQuoteMobileFormState extends State<ProductQuoteMobileForm> {
   LatLng? _selectedLocation;
   String _selectedAddress = '';
   static const String _googleMapsApiKey =
-      'AIzaSyAKFP-Mf1TQ1z2o8vEBjx2P-_5SwB0lA-k';
+      'AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA';
 
   // Focus Nodes
   final FocusNode _typeFocus = FocusNode();
@@ -4297,7 +4297,7 @@ class _TireProductQuoteMobileFormState
   LatLng? _selectedLocation;
   String _selectedAddress = '';
   static const String _googleMapsApiKey =
-      'AIzaSyAKFP-Mf1TQ1z2o8vEBjx2P-_5SwB0lA-k';
+      'AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA';
 
   // Focus Nodes
   final FocusNode _tyreWidthFocus = FocusNode();
@@ -5718,7 +5718,12 @@ class SocialMediaMobileButton extends StatelessWidget {
       onTap: _launchUrl,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(360.0),
-        child: Image.asset(imagePath, fit: BoxFit.contain, width: 30, height:30,),
+        child: Image.asset(
+          imagePath,
+          fit: BoxFit.contain,
+          width: 30,
+          height: 30,
+        ),
       ),
     );
   }

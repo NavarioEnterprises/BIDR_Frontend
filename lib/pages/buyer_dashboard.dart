@@ -4151,7 +4151,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       final urgencyText = request.consumerElectronics?.budgetTimeline?.urgency;
       return _mapTimeframeToUrgency(urgencyText);
     } else if (request is RimTyreRequest) {
-      final urgencyText = request.rimTyre?.productDetails?.urgency;
+      final urgencyText = request.rimTyre!.productDetails!.urgency;
       return _mapTimeframeToUrgency(urgencyText);
     }
 

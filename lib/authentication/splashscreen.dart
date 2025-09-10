@@ -25,16 +25,16 @@ class _SplashScreenState extends State<SplashScreen>
       'name': 'BUYER',
       'value': 'buyer',
       'description': 'Purchase products through competitive bidding',
-      'color': Colors.grey,
-      'selectedColor': Colors.grey[600],
+      'color': Constants.ctaColorLight,
+      'selectedColor': Constants.ftaColorLight,
     },
     {
       'icon': "lib/assets/svgs/Layer 1.svg",
       'name': 'BUSINESS',
       'value': 'seller',
       'description': 'List products and receive buyer requests',
-      'color': Colors.orange,
-      'selectedColor': Color(0xFF1B4D72), // Dark blue from the image
+      'color': Constants.ctaColorLight,
+      'selectedColor': Constants.ftaColorLight,
     },
   ];
 
@@ -388,19 +388,38 @@ class _SplashScreenState extends State<SplashScreen>
                 color: Colors.white,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? Constants.ftaColorLight : Colors.grey,
-                  width: 8,
+                  color: isSelected 
+                      ? Constants.ctaColorLight 
+                      : Constants.ctaColorLight.withOpacity(0.3),
+                  width: isSelected ? 8 : 4,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isSelected 
+                        ? Constants.ctaColorLight.withOpacity(0.3)
+                        : Constants.ctaColorLight.withOpacity(0.1),
+                    blurRadius: isSelected ? 16 : 8,
+                    spreadRadius: isSelected ? 2 : 0,
+                    offset: Offset(0, 4),
+                  ),
+                ],
               ),
               child: Container(
-                decoration: BoxDecoration(shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isSelected 
+                      ? Constants.ctaColorLight.withOpacity(0.05)
+                      : Constants.ctaColorLight.withOpacity(0.02),
+                ),
                 child: ClipOval(
                   child: Padding(
-                    padding: EdgeInsets.all(name == 'BUSINESS' ? 24.0 : 0.0),
+                    padding: EdgeInsets.all(name == 'BUSINESS' ? 24.0 : 20.0),
                     child: SvgPicture.asset(
                       icon,
                       fit: BoxFit.cover,
-                      color: isSelected ? Constants.ctaColorLight : Colors.grey,
+                      color: isSelected 
+                          ? Constants.ctaColorLight 
+                          : Constants.ctaColorLight.withOpacity(0.7),
                     ),
                   ),
                 ),
@@ -412,7 +431,9 @@ class _SplashScreenState extends State<SplashScreen>
               style: GoogleFonts.manrope(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? Constants.ctaColorLight : Colors.grey[600]!,
+                color: isSelected 
+                    ? Constants.ctaColorLight 
+                    : Constants.ftaColorLight.withOpacity(0.8),
                 letterSpacing: 1.2,
               ),
               child: Text(name),

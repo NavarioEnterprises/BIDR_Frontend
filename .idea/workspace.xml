@@ -4,22 +4,24 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="feat: enhance notification system with improved loading and filtering functionality">
-      <change beforePath="$PROJECT_DIR$/.idea/BIDR_Backend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BIDR_Backend.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="feat: enhance notification system with improved loading, filtering, and user interaction">
+      <change afterPath="$PROJECT_DIR$/lib/assets/images/auction_icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/assets/images/spares1.png.zip" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/pages/vehicle_auctions_coming_soon.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/google_places_helper.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flutter_config_example.dart" beforeDir="false" afterPath="$PROJECT_DIR$/flutter_config_example.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/https_environment_config.dart" beforeDir="false" afterPath="$PROJECT_DIR$/https_environment_config.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/https_gateway_environment_config.dart" beforeDir="false" afterPath="$PROJECT_DIR$/https_gateway_environment_config.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/authentication/otp_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/otp_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/authentication/registration/buyer_signup.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/registration/buyer_signup.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/authentication/splashscreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/splashscreen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customWdget/appbar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customWdget/appbar.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/alert.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/alert.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/pages/buyer/blog.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer/blog.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/pages/buyer/support.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer/support.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/customWdget/custom_input2.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customWdget/custom_input2.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/pages/buyer/contact_form.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer/contact_form.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/pages/buyer_dashboard.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer_dashboard.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/pages/buyer_home.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer_home.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/pages/seller/seller_home_dashboard.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/seller/seller_home_dashboard.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/notification_api_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/notification_api_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/pages/mobileView/landingPage/landingMobileViewPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/mobileView/landingPage/landingMobileViewPage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,7 +80,7 @@
     "io.flutter.reload.alreadyRun": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend",
+    "last_opened_file_path": "/Users/thulanimoyo/MEGA downloads/bidr 2/lib/assets/images",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -91,6 +93,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lib/assets/images" />
       <recent name="$PROJECT_DIR$/product_management_service" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -287,11 +290,22 @@
       <option name="project" value="LOCAL" />
       <updated>1757394794709</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="feat: enhance notification system with improved loading, filtering, and user interaction">
+      <option name="closed" value="true" />
+      <created>1757494170374</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1757494170374</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.py" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -313,7 +327,8 @@
     <MESSAGE value="chore: add private keys and deployment logs for debugging&#10;&#10;- Add `chat-service-privkey.pem` and `notifications-privkey.pem` for service configuration&#10;- Include product management service deployment logs for investigation" />
     <MESSAGE value="chore: add log file for product management service Azure deployment debugging" />
     <MESSAGE value="feat: enhance notification system with improved loading and filtering functionality" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance notification system with improved loading and filtering functionality" />
+    <MESSAGE value="feat: enhance notification system with improved loading, filtering, and user interaction" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance notification system with improved loading, filtering, and user interaction" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/BIDR_Backend$urls.coverage" NAME="urls Coverage Results" MODIFIED="1756578822990" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/reviews_and_ratings/rewards" />

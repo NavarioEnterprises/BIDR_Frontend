@@ -34,7 +34,25 @@
   <link rel="manifest" href="manifest.json">
 
   <!-- Google Maps JavaScript API -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&libraries=places"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA&libraries=places&callback=initGoogleMaps"></script>
+  
+  <!-- Google Places Helper -->
+  <script>
+    // Global callback function for Google Maps API
+    function initGoogleMaps() {
+      console.log('Google Maps API loaded via callback');
+      // Load the helper script after Google Maps is ready
+      const script = document.createElement('script');
+      script.src = 'google_places_helper.js';
+      script.onload = function() {
+        console.log('Google Places helper loaded successfully');
+      };
+      script.onerror = function() {
+        console.error('Failed to load Google Places helper');
+      };
+      document.head.appendChild(script);
+    }
+  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

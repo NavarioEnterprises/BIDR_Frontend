@@ -35,6 +35,10 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
   String _selectedSubject = ContactSubjectChoices.general;
   bool _isSubmitting = false;
 
+  // Validation error states
+  Map<String, String?> _fieldErrors = {};
+  Map<String, bool> _fieldTouched = {};
+
   // Animation Controllers
   late AnimationController _fadeController;
   late AnimationController _slideController;
@@ -90,31 +94,76 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
     super.dispose();
   }
 
-  Future<void> handleSubmit() async {
-    // Basic validation
-    if (nameController.text.trim().isEmpty ||
-        emailController.text.trim().isEmpty ||
-        messageController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please fill in all required fields'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
+  bool _validateForm() {
+    setState(() {
+      _fieldErrors.clear();
+      _fieldTouched.clear();
+    });
+    
+    bool hasErrors = false;
+    
+    // Validate required fields
+    if (nameController.text.trim().isEmpty) {
+      _fieldErrors['name'] = 'Full name is required';
+      _fieldTouched['name'] = true;
+      hasErrors = true;
     }
+    
+    if (emailController.text.trim().isEmpty) {
+      _fieldErrors['email'] = 'Email address is required';
+      _fieldTouched['email'] = true;
+      hasErrors = true;
+    } else {
+      // Email validation
+      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+      if (!emailRegex.hasMatch(emailController.text.trim())) {
+        _fieldErrors['email'] = 'Please enter a valid email address';
+        _fieldTouched['email'] = true;
+        hasErrors = true;
+      }
+    }
+    
+    if (messageController.text.trim().isEmpty) {
+      _fieldErrors['message'] = 'Message is required';
+      _fieldTouched['message'] = true;
+      hasErrors = true;
+    }
+    
+    if (hasErrors) {
+      setState(() {});
+      return false;
+    }
+    
+    return true;
+  }
+  
+  void _validateFieldRealTime(String fieldKey, String value) {
+    setState(() {
+      _fieldTouched[fieldKey] = true;
+      
+      if (fieldKey == 'name' && value.trim().isEmpty) {
+        _fieldErrors[fieldKey] = 'Full name is required';
+      } else if (fieldKey == 'email') {
+        if (value.trim().isEmpty) {
+          _fieldErrors[fieldKey] = 'Email address is required';
+        } else {
+          final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+          if (!emailRegex.hasMatch(value.trim())) {
+            _fieldErrors[fieldKey] = 'Please enter a valid email address';
+          } else {
+            _fieldErrors.remove(fieldKey);
+          }
+        }
+      } else if (fieldKey == 'message' && value.trim().isEmpty) {
+        _fieldErrors[fieldKey] = 'Message is required';
+      } else {
+        _fieldErrors.remove(fieldKey);
+      }
+    });
+  }
 
-    // Email validation
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(emailController.text.trim())) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please enter a valid email address'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
+  Future<void> handleSubmit() async {
+    if (!_validateForm()) return;
 
     setState(() {
       _isSubmitting = true;
@@ -298,6 +347,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                                   focusNode: nameFocusNode,
                                   textInputAction: TextInputAction.next,
                                   delay: 100,
+                                  fieldKey: 'name',
                                   onSubmitted: (value) {
                                     FocusScope.of(context).requestFocus(emailFocusNode);
                                   },
@@ -312,6 +362,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                                   focusNode: emailFocusNode,
                                   textInputAction: TextInputAction.next,
                                   delay: 200,
+                                  fieldKey: 'email',
                                   onSubmitted: (value) {
                                     FocusScope.of(context).requestFocus(mobileFocusNode);
                                   },
@@ -326,6 +377,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                                   focusNode: mobileFocusNode,
                                   textInputAction: TextInputAction.next,
                                   delay: 300,
+                                  fieldKey: 'mobile',
                                   onSubmitted: (value) {
                                     FocusScope.of(context).requestFocus(companyFocusNode);
                                   },
@@ -340,6 +392,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                                   focusNode: companyFocusNode,
                                   textInputAction: TextInputAction.next,
                                   delay: 400,
+                                  fieldKey: 'company',
                                   onSubmitted: (value) {
                                     // Move focus to message field since subject is now a dropdown
                                     FocusScope.of(context).requestFocus(messageFocusNode);
@@ -360,6 +413,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                                   controller: messageController,
                                   focusNode: messageFocusNode,
                                   delay: 600,
+                                  fieldKey: 'message',
                                 ),
                                 SizedBox(height: 40),
 
@@ -410,7 +464,12 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
     required TextEditingController controller,
     required FocusNode focusNode,
     required int delay,
+    required String fieldKey,
   }) {
+    bool hasError = _fieldTouched[fieldKey] == true && _fieldErrors[fieldKey] != null;
+    Color borderColor = hasError ? Colors.red : Constants.ftaColorLight;
+    Color focusedBorderColor = hasError ? Colors.red : Color(0xFFF5A623);
+    
     return TweenAnimationBuilder<double>(
       duration: Duration(milliseconds: 800 + delay),
       tween: Tween(begin: 0.0, end: 1.0),
@@ -419,65 +478,93 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
           opacity: value,
           child: Transform.translate(
             offset: Offset(30 * (1 - value), 0),
-            child: Container(
-              height: 120, // Bigger height for message field
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-
-
-              ),
-              child: TextField(
-                controller: controller,
-                focusNode: focusNode,
-                maxLines: null, // Allow unlimited lines
-                expands: true, // Expand to fill container height
-                textAlignVertical: TextAlignVertical.top, // Start text at top
-                style: GoogleFonts.manrope(
-                  fontSize: Breakpoints.isTablet(context) 
-                      ? ResponsiveTypography.getTypography(context).normal 
-                      : 14,
-                  color: Colors.black87,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 120, // Bigger height for message field
+                  decoration: BoxDecoration(
+                    color: hasError ? Colors.red.withOpacity(0.05) : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TextField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    maxLines: null, // Allow unlimited lines
+                    expands: true, // Expand to fill container height
+                    textAlignVertical: TextAlignVertical.top, // Start text at top
+                    style: GoogleFonts.manrope(
+                      fontSize: Breakpoints.isTablet(context) 
+                          ? ResponsiveTypography.getTypography(context).normal 
+                          : 14,
+                      color: Colors.black87,
+                    ),
+                    onChanged: (value) {
+                      _validateFieldRealTime(fieldKey, value);
+                    },
+                    decoration: InputDecoration(
+                      hintText: hintText.replaceAll('*', ''),
+                      hintStyle: GoogleFonts.manrope(
+                        fontSize: Breakpoints.isTablet(context) 
+                            ? ResponsiveTypography.getTypography(context).normal 
+                            : 14,
+                        color: Colors.grey[500],
+                      ),
+                      labelText: label.replaceAll('*', ''),
+                      labelStyle: TextStyle(
+                        color: hasError ? Colors.red : Constants.ftaColorLight,
+                        fontSize: Breakpoints.isTablet(context) 
+                            ? ResponsiveTypography.getTypography(context).normal 
+                            : 14,
+                      ),
+                      floatingLabelStyle: TextStyle(
+                        color: hasError ? Colors.red : Constants.ftaColorLight,
+                        fontSize: Breakpoints.isTablet(context) 
+                            ? ResponsiveTypography.getTypography(context).normal 
+                            : 14,
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide(color: borderColor),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide(color: borderColor, width: hasError ? 2 : 1),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide(color: focusedBorderColor, width: 2),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide(color: Colors.red, width: 2),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide(color: Colors.red, width: 2),
+                      ),
+                      contentPadding: Breakpoints.isTablet(context) 
+                          ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium) 
+                          : EdgeInsets.all(16), // More padding for bigger field
+                      fillColor: hasError ? Colors.red.withOpacity(0.05) : Colors.white,
+                      filled: true,
+                    ),
+                  ),
                 ),
-
-                decoration: InputDecoration(
-                  hintText: hintText.replaceAll('*', ''),
-                  hintStyle: GoogleFonts.manrope(
-                    fontSize: Breakpoints.isTablet(context) 
-                        ? ResponsiveTypography.getTypography(context).normal 
-                        : 14,
-                    color: Colors.grey[500],
+                if (hasError && _fieldErrors[fieldKey] != null)
+                  Padding(
+                    padding: EdgeInsets.only(left: 18, top: 4),
+                    child: Text(
+                      _fieldErrors[fieldKey]!,
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ),
-                  labelText: label.replaceAll('*', ''),
-                  labelStyle: TextStyle(
-                    color: Constants.ftaColorLight,
-                    fontSize: Breakpoints.isTablet(context) 
-                        ? ResponsiveTypography.getTypography(context).normal 
-                        : 14,
-                  ),
-                  floatingLabelStyle: TextStyle(
-                    color: Constants.ftaColorLight,
-                    fontSize: Breakpoints.isTablet(context) 
-                        ? ResponsiveTypography.getTypography(context).normal 
-                        : 14,
-
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: Constants.ftaColorLight),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: Color(0xFFF5A623), width: 2),
-                  ),
-                  contentPadding: Breakpoints.isTablet(context) 
-                      ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingMedium) 
-                      : EdgeInsets.all(16), // More padding for bigger field
-                  fillColor: Colors.white,
-                  filled: true,
-                ),
-              ),
+              ],
             ),
           ),
         );
@@ -492,9 +579,12 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
     required FocusNode focusNode,
     required TextInputAction textInputAction,
     required int delay,
+    required String fieldKey,
     int maxLines = 1,
     Function(String)? onSubmitted,
   }) {
+    bool hasError = _fieldTouched[fieldKey] == true && _fieldErrors[fieldKey] != null;
+    
     return TweenAnimationBuilder<double>(
       duration: Duration(milliseconds: 800 + delay),
       tween: Tween(begin: 0.0, end: 1.0),
@@ -514,8 +604,14 @@ class _ContactFormScreenState extends State<ContactFormScreen> with TickerProvid
                     ? TextInputAction.next
                     : TextInputAction.done,
                 isPasswordField: false,
-                onChanged: (value) {},
-                onSubmitted:onSubmitted??(value){},
+                hasError: hasError,
+                errorText: _fieldErrors[fieldKey],
+                onChanged: (value) {
+                  _validateFieldRealTime(fieldKey, value);
+                },
+                onSubmitted: onSubmitted ?? (value) {
+                  _validateFieldRealTime(fieldKey, value);
+                },
               ),
             ),
           ),

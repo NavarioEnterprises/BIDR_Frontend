@@ -69,8 +69,12 @@ class _HeaderSectionState extends State<HeaderSection> {
           _buildResponsiveLogo(context),
 
           // Navigation - show drawer icon on mobile, nav buttons on tablet+
-          if (!isMobile) ...[Spacer(), _buildDesktopNavigation()],
-          Spacer(),
+          if (!isMobile) ...[
+            SizedBox(width: 32),
+            _buildDesktopNavigation(),
+            SizedBox(width: 32),
+          ] else
+            Spacer(),
 
           // Authentication buttons - always show but responsive
           _buildAuthenticationButtons(),
@@ -111,64 +115,66 @@ class _HeaderSectionState extends State<HeaderSection> {
   Widget _buildDesktopNavigation() {
     final spacing = ResponsiveSpacing.getSpacing(context);
 
-    return Wrap(
-      runSpacing: spacing.spacingMedium,
-      children: [
-        _navButton(
-          'Home',
-          0,
-          () => setState(() {
-            Constants.buyerAppBarValue = 0;
-            appBarValueNotifier.value++;
-            buyerHomeValueNotifier.value++;
-          }),
-        ),
-        _navButton(
-          'Support',
-          1,
-          () => setState(() {
-            Constants.buyerAppBarValue = 1;
-            appBarValueNotifier.value++;
-            buyerHomeValueNotifier.value++;
-          }),
-        ),
-        _navButton(
-          'FAQs',
-          2,
-          () => setState(() {
-            Constants.buyerAppBarValue = 2;
-            appBarValueNotifier.value++;
-            buyerHomeValueNotifier.value++;
-          }),
-        ),
-        _navButton(
-          'Policies',
-          3,
-          () => setState(() {
-            Constants.buyerAppBarValue = 3;
-            appBarValueNotifier.value++;
-            buyerHomeValueNotifier.value++;
-          }),
-        ),
-        _navButton(
-          'Blogs',
-          4,
-          () => setState(() {
-            Constants.buyerAppBarValue = 4;
-            appBarValueNotifier.value++;
-            buyerHomeValueNotifier.value++;
-          }),
-        ),
-        _navButton(
-          'Contact Us',
-          5,
-          () => setState(() {
-            Constants.buyerAppBarValue = 5;
-            appBarValueNotifier.value++;
-            buyerHomeValueNotifier.value++;
-          }),
-        ),
-      ],
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _navButton(
+            'Home',
+            0,
+            () => setState(() {
+              Constants.buyerAppBarValue = 0;
+              appBarValueNotifier.value++;
+              buyerHomeValueNotifier.value++;
+            }),
+          ),
+          _navButton(
+            'Support',
+            1,
+            () => setState(() {
+              Constants.buyerAppBarValue = 1;
+              appBarValueNotifier.value++;
+              buyerHomeValueNotifier.value++;
+            }),
+          ),
+          _navButton(
+            'FAQs',
+            2,
+            () => setState(() {
+              Constants.buyerAppBarValue = 2;
+              appBarValueNotifier.value++;
+              buyerHomeValueNotifier.value++;
+            }),
+          ),
+          _navButton(
+            'Policies',
+            3,
+            () => setState(() {
+              Constants.buyerAppBarValue = 3;
+              appBarValueNotifier.value++;
+              buyerHomeValueNotifier.value++;
+            }),
+          ),
+          _navButton(
+            'Blogs',
+            4,
+            () => setState(() {
+              Constants.buyerAppBarValue = 4;
+              appBarValueNotifier.value++;
+              buyerHomeValueNotifier.value++;
+            }),
+          ),
+          _navButton(
+            'Contact Us',
+            5,
+            () => setState(() {
+              Constants.buyerAppBarValue = 5;
+              appBarValueNotifier.value++;
+              buyerHomeValueNotifier.value++;
+            }),
+          ),
+        ],
+      ),
     );
   }
 
@@ -589,48 +595,40 @@ class _HeaderSectionState extends State<HeaderSection> {
 
   Widget _navButton(String text, int index, VoidCallback onPressed) {
     final typography = ResponsiveTypography.getTypography(context);
-    final spacing = ResponsiveSpacing.getSpacing(context);
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: spacing.paddingSmall),
-      child: Row(
-        children: [
-          IntrinsicWidth(
-            child: Container(
-              constraints: BoxConstraints(minWidth: 85),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: onPressed,
-                    child: Text(
-                      text,
-                      style: GoogleFonts.manrope(
-                        color: index == Constants.buyerAppBarValue
-                            ? Constants.ftaColorLight
-                            : Colors.black45,
-                        fontSize: 15,
-                        fontWeight: index == Constants.buyerAppBarValue
-                            ? FontWeight.bold
-                            : FontWeight.w600,
-                      ),
-                    ),
-                  ),
-
-                  index == Constants.buyerAppBarValue
-                      ? Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8),
-                          child: Container(
-                            height: 2,
-                            color: Constants.ctaColorLight,
-                          ),
-                        )
-                      : SizedBox.shrink(),
-                ],
+    return Flexible(
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                text,
+                style: GoogleFonts.manrope(
+                  color: index == Constants.buyerAppBarValue
+                      ? Constants.ftaColorLight
+                      : Colors.black45,
+                  fontSize: 15,
+                  fontWeight: index == Constants.buyerAppBarValue
+                      ? FontWeight.bold
+                      : FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
+              SizedBox(height: 4),
+              AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                height: 2,
+                width: index == Constants.buyerAppBarValue ? 40 : 0,
+                color: Constants.ctaColorLight,
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
