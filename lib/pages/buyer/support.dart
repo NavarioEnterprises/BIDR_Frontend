@@ -239,10 +239,7 @@ class _SupportState extends State<Support> with TickerProviderStateMixin {
                 opacity: value,
                 child: Transform.translate(
                   offset: Offset(0, 20 * (1 - value)),
-                  child: BuyerDashboardHeader(
-                    headerName: 'Buyer Dashboard',
-                    totalAlert: GlobalVariables.alertList.length,
-                  ),
+                  child: BuyerDashboardHeader(headerName: 'Buyer Dashboard'),
                 ),
               );
             },
@@ -2151,12 +2148,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
 class BuyerDashboardHeader extends StatefulWidget {
   final String headerName;
-  final int totalAlert;
-  const BuyerDashboardHeader({
-    super.key,
-    required this.headerName,
-    required this.totalAlert,
-  });
+
+  const BuyerDashboardHeader({super.key, required this.headerName});
 
   @override
   State<BuyerDashboardHeader> createState() => _BuyerDashboardHeaderState();
@@ -2171,6 +2164,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
   OverlayEntry? _overlayEntry;
   bool _isOverlayShown = false;
   bool _isLoadingNotifications = false;
+  int _unreadCount = 0;
   final NotificationApiService _notificationApiService =
       NotificationApiService();
 
@@ -2185,7 +2179,46 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
       parent: _animationController,
       curve: Curves.easeInOut,
     );
-    _loadNotificationsFromApi();
+    _initializeNotifications();
+  }
+
+  Future<void> _initializeNotifications() async {
+    if (!mounted) return;
+
+    try {
+      // Simple initial load without complex refresh logic
+      final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
+      print('Initializing notifications for user UUID: $userUuid');
+
+      if (userUuid.isNotEmpty) {
+        setState(() {
+          _isLoadingNotifications = true;
+        });
+
+        // Load notifications first
+        final fetchedNotifications = await _notificationApiService
+            .getUserNotifications(userUuid)
+            .timeout(const Duration(seconds: 10));
+
+        if (mounted) {
+          setState(() {
+            notifications = fetchedNotifications;
+            // Calculate unread count from loaded notifications
+            _unreadCount = fetchedNotifications.where((n) => !n.read).length;
+            _isLoadingNotifications = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error initializing notifications: $e');
+      if (mounted) {
+        setState(() {
+          notifications = [];
+          _unreadCount = 0;
+          _isLoadingNotifications = false;
+        });
+      }
+    }
   }
 
   @override
@@ -2197,16 +2230,12 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
 
   Future<void> _loadNotificationsFromApi() async {
     if (!mounted) return;
-    
-    setState(() {
-      _isLoadingNotifications = true;
-    });
 
     try {
       // Use the user's UUID from Constants
       final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
       print('Loading notifications for user UUID: $userUuid');
-      
+
       if (userUuid.isNotEmpty) {
         final fetchedNotifications = await _notificationApiService
             .getUserNotifications(userUuid);
@@ -2214,7 +2243,6 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
         if (mounted) {
           setState(() {
             notifications = fetchedNotifications;
-            _isLoadingNotifications = false;
           });
         }
       } else {
@@ -2222,22 +2250,99 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
         if (mounted) {
           setState(() {
             notifications = [];
-            _isLoadingNotifications = false;
           });
         }
       }
     } catch (e) {
       print('Error loading notifications from API: $e');
-      // On error, just set empty notifications and stop loading
+      // On error, just set empty notifications
       if (mounted) {
         setState(() {
           notifications = [];
+        });
+      }
+    }
+  }
+
+  Future<void> _loadUnreadCount() async {
+    if (!mounted) return;
+
+    try {
+      final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
+      print('Loading unread count for user UUID: $userUuid');
+
+      if (userUuid.isNotEmpty) {
+        final unreadCount = await _notificationApiService
+            .getUnreadNotificationCount(userUuid);
+
+        if (mounted) {
+          setState(() {
+            _unreadCount = unreadCount;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading unread notification count: $e');
+      if (mounted) {
+        setState(() {
+          _unreadCount = 0;
+        });
+      }
+    }
+  }
+
+  Future<void> _refreshNotifications() async {
+    if (!mounted) return;
+
+    setState(() {
+      _isLoadingNotifications = true;
+    });
+
+    try {
+      // Add timeout to prevent infinite loading
+      await Future.wait([
+        _loadNotificationsFromApi(),
+        _loadUnreadCount(),
+      ]).timeout(const Duration(seconds: 15));
+    } catch (e) {
+      print('Error refreshing notifications: $e');
+      // Set empty state on error
+      if (mounted) {
+        setState(() {
+          notifications = [];
+          _unreadCount = 0;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
           _isLoadingNotifications = false;
         });
       }
     }
   }
 
+  Future<void> _markNotificationAsRead(String notificationId) async {
+    try {
+      final success = await _notificationApiService.markAsRead(notificationId);
+      if (success && mounted) {
+        // Update local notification state immediately
+        setState(() {
+          final index = notifications.indexWhere((n) => n.id == notificationId);
+          if (index != -1) {
+            notifications[index].read = true;
+          }
+          // Recalculate unread count from notifications
+          _unreadCount = notifications.where((n) => !n.read).length;
+        });
+        print('Notification marked as read: $notificationId');
+      } else {
+        print('Failed to mark notification as read: $notificationId');
+      }
+    } catch (e) {
+      print('Error marking notification as read: $e');
+    }
+  }
 
   void _showNotificationOverlay() {
     if (_isOverlayShown) {
@@ -2245,9 +2350,9 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
       return;
     }
 
-    // Only refresh notifications if we don't have any yet
+    // Only refresh if we have no notifications or it's been a while
     if (notifications.isEmpty && !_isLoadingNotifications) {
-      _loadNotificationsFromApi();
+      _initializeNotifications();
     }
 
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
@@ -2320,52 +2425,55 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
                             const SizedBox(height: 20),
                             _buildRecentNotifications(),
                             const SizedBox(height: 16),
-                            Center(
-                              child: TextButton(
-                                onPressed: () {
-                                  _removeOverlay();
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: true,
-                                    barrierColor: Colors.black.withOpacity(0.5),
-                                    builder: (BuildContext context) {
-                                      return Dialog(
-                                        backgroundColor: Colors.transparent,
-                                        insetPadding: EdgeInsets.all(20),
-                                        child: Container(
-                                          width: 280,
-                                          height: 500,
-                                          constraints: BoxConstraints(
-                                            maxWidth: 280,
-                                            maxHeight: 500,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            child: NotificationPage(
-                                              notifications: notifications,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                                child: Text(
-                                  'View all',
-                                  style: TextStyle(
-                                    color: Constants.ctaColorLight,
-                                    fontWeight: FontWeight.w600,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextButton(
+                                  onPressed: _unreadCount > 0
+                                      ? () async {
+                                          // Mark all as read
+                                          final userUuid =
+                                              Constants.currentUser?.uid ??
+                                              Constants.myUid;
+                                          if (userUuid.isNotEmpty) {
+                                            final success =
+                                                await _notificationApiService
+                                                    .markAllAsRead(userUuid);
+                                            if (success && mounted) {
+                                              setState(() {
+                                                // Mark all notifications as read locally
+                                                for (var notification
+                                                    in notifications) {
+                                                  notification.read = true;
+                                                }
+                                                _unreadCount = 0;
+                                              });
+                                            }
+                                          }
+                                        }
+                                      : null,
+                                  child: Text(
+                                    'Mark All Read',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: _unreadCount > 0
+                                          ? Constants.ctaColorLight
+                                          : Colors.grey,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
-                              ),
+                                TextButton(
+                                  onPressed: () => _showFilteredNotifications('all'),
+                                  child: Text(
+                                    'View all',
+                                    style: TextStyle(
+                                      color: Constants.ctaColorLight,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -2403,43 +2511,186 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
 
     return Column(
       children: [
-        _buildStatItem('Total Notifications', totalNotifications.toString()),
+        _buildStatItem(
+          'Total Notifications',
+          totalNotifications.toString(),
+          onTap: () => _showFilteredNotifications('all'),
+        ),
         const SizedBox(height: 8),
-        _buildStatItem('Read Notifications', readNotifications.toString()),
+        _buildStatItem(
+          'Read Notifications',
+          readNotifications.toString(),
+          onTap: () => _showFilteredNotifications('read'),
+        ),
         const SizedBox(height: 8),
-        _buildStatItem('Unread Notifications', unreadNotifications.toString()),
+        _buildStatItem(
+          'Unread Notifications',
+          unreadNotifications.toString(),
+          onTap: () => _showFilteredNotifications('unread'),
+        ),
       ],
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Constants.ctaColorLight,
-        borderRadius: BorderRadius.circular(8),
+  Widget _buildStatItem(String label, String value, {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Constants.ctaColorLight,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Row(
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (onTap != null) ...[
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: 14,
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
+    );
+  }
+
+  void _showFilteredNotifications(String filter) {
+    _removeOverlay();
+    
+    List<WebNotification> filteredNotifications;
+    String title;
+    
+    switch (filter) {
+      case 'all':
+        filteredNotifications = notifications;
+        title = 'All Notifications';
+        break;
+      case 'read':
+        filteredNotifications = notifications.where((n) => n.read).toList();
+        title = 'Read Notifications';
+        break;
+      case 'unread':
+        filteredNotifications = notifications.where((n) => !n.read).toList();
+        title = 'Unread Notifications';
+        break;
+      default:
+        filteredNotifications = notifications;
+        title = 'All Notifications';
+    }
+    
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(20),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            height: MediaQuery.of(context).size.height * 0.8,
+            constraints: const BoxConstraints(
+              maxWidth: 600,
+              maxHeight: 700,
+            ),
+            decoration: BoxDecoration(
               color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Constants.ctaColorLight,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                ),
+                // Content
+                Expanded(
+                  child: filteredNotifications.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.notifications_none,
+                                size: 64,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No notifications to show',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(20),
+                          itemCount: filteredNotifications.length,
+                          itemBuilder: (context, index) {
+                            return _buildNotificationItem(
+                              filteredNotifications[index],
+                              isCompact: false,
+                            );
+                          },
+                        ),
+                ),
+              ],
             ),
           ),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -2538,51 +2789,116 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
     WebNotification notification, {
     bool isCompact = false,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Constants.ctaColorLight.withOpacity(0.1),
-              shape: BoxShape.circle,
+    return InkWell(
+      onTap: () {
+        // Mark as read if it's unread
+        if (!notification.read) {
+          _markNotificationAsRead(notification.id);
+        }
+        // You can add additional logic here like navigating to a detailed view
+        print('Notification tapped: ${notification.title}');
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: notification.read
+              ? Colors.transparent
+              : Constants.ctaColorLight.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(8),
+          border: notification.read
+              ? null
+              : Border.all(
+                  color: Constants.ctaColorLight.withOpacity(0.2),
+                  width: 1,
+                ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Constants.ctaColorLight.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _getIconForType(notification.type),
+                color: Constants.ctaColorLight,
+                size: 20,
+              ),
             ),
-            child: Icon(
-              _getIconForType(notification.type),
-              color: Constants.ctaColorLight,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  notification.title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: notification.read
-                        ? FontWeight.normal
-                        : FontWeight.bold,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          notification.title,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: notification.read
+                                ? FontWeight.normal
+                                : FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      if (!notification.read)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: Constants.ctaColorLight,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  notification.body,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  maxLines: isCompact ? 1 : 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  Text(
+                    notification.body,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    maxLines: isCompact ? 1 : 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (!isCompact) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatDateTime(notification.createdAt),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey[500],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
+    } else {
+      return 'Just now';
+    }
   }
 
   IconData _getIconForType(String type) {
@@ -2619,11 +2935,11 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
           badges.Badge(
             position: badges.BadgePosition.topEnd(top: -6, end: -6),
 
-            showBadge: true,
+            showBadge: _unreadCount > 0,
             ignorePointer: false,
             onTap: _showNotificationOverlay,
             badgeContent: Text(
-              widget.totalAlert.toString(),
+              _unreadCount.toString(),
               style: TextStyle(
                 fontSize: 10,
                 color: Constants.ftaColorLight,

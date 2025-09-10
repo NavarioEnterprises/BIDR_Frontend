@@ -1,23 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
+    <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="chore: add log file for product management service Azure deployment debugging">
+    <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="feat: enhance notification system with improved loading and filtering functionality">
+      <change beforePath="$PROJECT_DIR$/.idea/BIDR_Backend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BIDR_Backend.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/authentication_service/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat_service/logs/chat_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/chat_service/logs/chat_service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notifications_service/logs/notification_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/notifications_service/logs/notification_service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/logs/product_management_service.log" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/logs/product_management_service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flutter_config_example.dart" beforeDir="false" afterPath="$PROJECT_DIR$/flutter_config_example.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/https_environment_config.dart" beforeDir="false" afterPath="$PROJECT_DIR$/https_environment_config.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/https_gateway_environment_config.dart" beforeDir="false" afterPath="$PROJECT_DIR$/https_gateway_environment_config.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/customWdget/appbar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customWdget/appbar.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/alert.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/alert.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/pages/buyer/blog.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer/blog.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/pages/buyer/support.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer/support.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/pages/buyer_dashboard.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer_dashboard.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/pages/buyer_home.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer_home.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/pages/seller/seller_home_dashboard.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/seller/seller_home_dashboard.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/notification_api_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/notification_api_service.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
   </component>
   <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
     <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
@@ -50,22 +60,31 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Django Server.Unnamed.executor": "Run",
+    "Flutter.main.dart.executor": "Run",
     "Python.settings.executor": "Run",
     "Python.urls.executor": "Run",
     "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "SHELLCHECK.PATH": "/Users/thulanimoyo/Library/Application Support/JetBrains/PyCharm2025.2/plugins/Shell Script/shellcheck",
-    "git-widget-placeholder": "main",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "dev",
+    "io.flutter.reload.alreadyRun": "true",
     "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/thulanimoyo/MEGA downloads/new downloads/BIDR_Backend",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "show.migrate.to.gradle.popup": "false",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
@@ -78,7 +97,13 @@
       <recent name="$PROJECT_DIR$/product_management_service/categories/management/commands" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Flutter.main.dart">
+    <configuration default="true" type="AppleRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" IS_LOCATION_SIMULATION_SUPPORTED="false" IS_LOCATION_SIMULATION_ALLOWED="true" APPLICATION_LANGUAGE="IDELaunchSchemeLanguageUseSystemLanguage" APPLICATION_REGION="" MAKE_ACTIVE="TRUE" SHOULD_DEBUG_EXTENSIONS="false">
+      <embedded_app_extension_list />
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Unnamed" type="Python.DjangoServer" factoryName="Django server" nameIsGenerated="true">
       <module name="BIDR_Backend" />
       <option name="ENV_FILES" value="" />
@@ -287,18 +312,8 @@
     <MESSAGE value="chore: remove unused migrations and add image upload handling&#10;&#10;- Delete obsolete migrations from quotes, analytics, and product_requests apps&#10;- Implement serializers for product and VIN image uploads in product_requests&#10;- Add server-side validation and saving logic for uploaded files&#10;- Improve serializers' `to_internal_value` for handling mutable data structures&#10;- Adjust logic to support image processing in category-specific data&#10;- Add new test cases for payment transactions and update payment model tests&#10;- Conditional inclusion of Prometheus metrics endpoint in chat service&#10;- Introduce seller earnings endpoint tests in payment_transactions" />
     <MESSAGE value="chore: add private keys and deployment logs for debugging&#10;&#10;- Add `chat-service-privkey.pem` and `notifications-privkey.pem` for service configuration&#10;- Include product management service deployment logs for investigation" />
     <MESSAGE value="chore: add log file for product management service Azure deployment debugging" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: add log file for product management service Azure deployment debugging" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/deploy_to_k8s.py</url>
-          <line>41</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="feat: enhance notification system with improved loading and filtering functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance notification system with improved loading and filtering functionality" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/BIDR_Backend$urls.coverage" NAME="urls Coverage Results" MODIFIED="1756578822990" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/reviews_and_ratings/rewards" />

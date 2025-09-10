@@ -51,6 +51,7 @@ double _maxDistance = 1.0;
 class _BuyerHomePageState extends State<BuyerHomePage>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  final ScrollController _scrollController = ScrollController();
 
   int selectedIndex = -1;
   int index = 0;
@@ -153,6 +154,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
     _slideController.dispose();
     _scaleController.dispose();
     _categoryController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -216,6 +218,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                       ? Expanded(
                           child: Container(
                             child: SingleChildScrollView(
+                              controller: _scrollController,
                               child: Column(
                                 children: [
                                   Container(
@@ -234,11 +237,11 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                               left:
                                                   Breakpoints.isTablet(context)
                                                   ? 24
-                                                  : 64,
+                                                  : 32,
                                               right:
                                                   Breakpoints.isTablet(context)
                                                   ? 24
-                                                  : 64,
+                                                  : 32,
                                             ),
                                             child: Center(
                                               child: _buildAnimatedBannerSection(
@@ -490,6 +493,22 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                       : const SizedBox.shrink(),
                 ],
               ),
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                _scrollController.animateTo(
+                  0,
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                );
+              },
+              backgroundColor: Constants.ctaColorLight,
+              child: Icon(
+                Icons.keyboard_arrow_up,
+                color: Colors.white,
+                size: 28,
+              ),
+              tooltip: 'Scroll to top',
             ),
           );
   }
@@ -802,7 +821,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
             opacity: value,
             child: Container(
               width: MediaQuery.of(context).size.width,
-              height: 400,
+              height: 150,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
@@ -1234,7 +1253,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     super.initState();
     // Set initial values
     _maxDistanceController.text = _maxDistance.round().toString();
-    
+
     // Add listener to manufacturer controller to update makes/models
     _manufacturerController.addListener(() {
       setState(() {
@@ -1408,10 +1427,12 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             return const Iterable<String>.empty();
           }
           final String query = textEditingValue.text.toLowerCase();
-          return options.where((String option) {
-            return option.toLowerCase().contains(query) &&
-                   option.toLowerCase() != query;
-          }).take(5); // Limit to 5 suggestions
+          return options
+              .where((String option) {
+                return option.toLowerCase().contains(query) &&
+                    option.toLowerCase() != query;
+              })
+              .take(5); // Limit to 5 suggestions
         },
         onSelected: onSelected,
         fieldViewBuilder:
@@ -1431,7 +1452,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   controller.text = fieldController.text;
                 }
               });
-              
+
               return TextField(
                 controller: fieldController,
                 focusNode: fieldFocusNode,
@@ -1484,16 +1505,15 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   elevation: 4.0,
                   borderRadius: BorderRadius.circular(16),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: 200,
-                      maxWidth: 400,
-                    ),
+                    constraints: BoxConstraints(maxHeight: 200, maxWidth: 400),
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Constants.ftaColorLight.withOpacity(0.3)),
+                        border: Border.all(
+                          color: Constants.ftaColorLight.withOpacity(0.3),
+                        ),
                       ),
                       child: ListView.builder(
                         padding: EdgeInsets.all(8.0),
@@ -2009,7 +2029,9 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   _makeModelController,
                   _makeModelFocus,
                   _getModelsForManufacturer(
-                    _manufacturerController.text.isNotEmpty ? _manufacturerController.text : _selectedManufacturer,
+                    _manufacturerController.text.isNotEmpty
+                        ? _manufacturerController.text
+                        : _selectedManufacturer,
                   ).where((model) => model != 'Select Makes & Models').toList(),
                   (value) => setState(() {
                     _selectedMakeModel = value;
@@ -2217,7 +2239,9 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 ),
               ),
               SizedBox(width: 16),
-              const Expanded(child: SizedBox.shrink()), // Empty space for alignment
+              const Expanded(
+                child: SizedBox.shrink(),
+              ), // Empty space for alignment
             ],
           ),
         ]),
@@ -3325,11 +3349,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.check_circle,
-                          color: Colors.green,
-                          size: 16,
-                        ),
+                        Icon(Icons.check_circle, color: Colors.green, size: 16),
                         SizedBox(width: 4),
                         Text(
                           '${_vinImages.length} image${_vinImages.length > 1 ? 's' : ''}',

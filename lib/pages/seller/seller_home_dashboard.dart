@@ -1153,7 +1153,7 @@ class _SellerDashboardState extends State<SellerDashboard>
 
     return Column(
       children: [
-        _buildStatItem('Total Notifications', totalNotifications.toString()),
+        _buildStatItem('Total Notifications1', totalNotifications.toString()),
         const SizedBox(height: 8),
         _buildStatItem('Read Notifications', readNotifications.toString()),
         const SizedBox(height: 8),

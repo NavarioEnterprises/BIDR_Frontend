@@ -1,12 +1,10 @@
-
-
 class WebNotification {
-  final String id;  // Changed from int to String to handle UUID
+  final String id; // Changed from int to String to handle UUID
   final String title;
   final String body;
   final String description;
   final String type;
-  final bool read;
+  bool read;
   final DateTime createdAt;
 
   WebNotification({
@@ -21,13 +19,13 @@ class WebNotification {
 
   factory WebNotification.fromJson(Map<String, dynamic> json) {
     return WebNotification(
-      id: json['id']?.toString() ?? '0',  // Convert to string
+      id: json['id']?.toString() ?? '0', // Convert to string
       title: json['title'] ?? "",
       body: json['body'] ?? "",
       description: json['description'] ?? '',
       type: json['type'] ?? "",
       read: json['read'] ?? false,
-      createdAt: json['created_at'] != null 
+      createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at']) ?? DateTime.now()
           : DateTime.now(),
     );

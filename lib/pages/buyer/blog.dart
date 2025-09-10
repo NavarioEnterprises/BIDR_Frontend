@@ -1,4 +1,3 @@
-
 import 'package:bidr/pages/buyer/support.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,10 +24,11 @@ class BlogCardsScreen extends StatefulWidget {
   _BlogCardsScreenState createState() => _BlogCardsScreenState();
 }
 
-class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderStateMixin {
+class _BlogCardsScreenState extends State<BlogCardsScreen>
+    with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
-  
+
   final BlogApiService _blogApiService = BlogApiService();
   List<BlogItem> blogItems = [];
   bool _isLoading = true;
@@ -45,10 +45,7 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     _loadBlogs();
     _controller.forward();
@@ -89,8 +86,8 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
             Text(
               'Loading blog posts...',
               style: GoogleFonts.manrope(
-                fontSize: Breakpoints.isTablet(context) 
-                    ? ResponsiveTypography.getTypography(context).normal 
+                fontSize: Breakpoints.isTablet(context)
+                    ? ResponsiveTypography.getTypography(context).normal
                     : 16,
                 color: Colors.grey[600],
               ),
@@ -105,17 +102,13 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red[400],
-            ),
+            Icon(Icons.error_outline, size: 64, color: Colors.red[400]),
             SizedBox(height: 16),
             Text(
               'Failed to load blog posts',
               style: GoogleFonts.manrope(
-                fontSize: Breakpoints.isTablet(context) 
-                    ? ResponsiveTypography.getTypography(context).medium 
+                fontSize: Breakpoints.isTablet(context)
+                    ? ResponsiveTypography.getTypography(context).medium
                     : 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
@@ -125,8 +118,8 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
             Text(
               _error!.replaceAll('Exception: ', ''),
               style: GoogleFonts.manrope(
-                fontSize: Breakpoints.isTablet(context) 
-                    ? ResponsiveTypography.getTypography(context).normal 
+                fontSize: Breakpoints.isTablet(context)
+                    ? ResponsiveTypography.getTypography(context).normal
                     : 14,
                 color: Colors.grey[600],
               ),
@@ -149,8 +142,8 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
               child: Text(
                 'Retry',
                 style: GoogleFonts.manrope(
-                  fontSize: Breakpoints.isTablet(context) 
-                      ? ResponsiveTypography.getTypography(context).normal 
+                  fontSize: Breakpoints.isTablet(context)
+                      ? ResponsiveTypography.getTypography(context).normal
                       : 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -175,8 +168,8 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
             Text(
               'No blog posts available',
               style: GoogleFonts.manrope(
-                fontSize: Breakpoints.isTablet(context) 
-                    ? ResponsiveTypography.getTypography(context).medium 
+                fontSize: Breakpoints.isTablet(context)
+                    ? ResponsiveTypography.getTypography(context).medium
                     : 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
@@ -186,8 +179,8 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
             Text(
               'Check back later for new content!',
               style: GoogleFonts.manrope(
-                fontSize: Breakpoints.isTablet(context) 
-                    ? ResponsiveTypography.getTypography(context).normal 
+                fontSize: Breakpoints.isTablet(context)
+                    ? ResponsiveTypography.getTypography(context).normal
                     : 14,
                 color: Colors.grey[600],
               ),
@@ -205,7 +198,7 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
         //childAspectRatio: 0.4,
       ),
       itemCount: blogItems.length,
-      padding: Breakpoints.isTablet(context) 
+      padding: Breakpoints.isTablet(context)
           ? EdgeInsets.all(ResponsiveSpacing.getSpacing(context).paddingLarge)
           : EdgeInsets.all(24),
       physics: NeverScrollableScrollPhysics(),
@@ -225,26 +218,36 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
                     onTap: () {
                       // Increment view count when opening blog
                       _blogApiService.incrementBlogViews(blogItems[index].id);
-                      
+
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) => BlogDetailScreen(
-                            blogItem: blogItems[index],
-                            relatedItems: blogItems.where((item) => item != blogItems[index]).toList(),
-                          ),
-                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                            return SlideTransition(
-                              position: Tween<Offset>(
-                                begin: Offset(1.0, 0.0),
-                                end: Offset.zero,
-                              ).animate(CurvedAnimation(
-                                parent: animation,
-                                curve: Curves.easeInOut,
-                              )),
-                              child: child,
-                            );
-                          },
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  BlogDetailScreen(
+                                    blogItem: blogItems[index],
+                                    relatedItems: blogItems
+                                        .where(
+                                          (item) => item != blogItems[index],
+                                        )
+                                        .toList(),
+                                  ),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                                return SlideTransition(
+                                  position:
+                                      Tween<Offset>(
+                                        begin: Offset(1.0, 0.0),
+                                        end: Offset.zero,
+                                      ).animate(
+                                        CurvedAnimation(
+                                          parent: animation,
+                                          curve: Curves.easeInOut,
+                                        ),
+                                      ),
+                                  child: child,
+                                );
+                              },
                           transitionDuration: Duration(milliseconds: 400),
                         ),
                       );
@@ -274,10 +277,7 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
                 opacity: value,
                 child: Transform.translate(
                   offset: Offset(0, 20 * (1 - value)),
-                  child: BuyerDashboardHeader(
-                    headerName: 'Buyer Dashboard',
-                    totalAlert: GlobalVariables.alertList.length,
-                  ),
+                  child: BuyerDashboardHeader(headerName: 'Buyer Dashboard'),
                 ),
               );
             },
@@ -288,12 +288,16 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
               child: Column(
                 children: [
                   Padding(
-                    padding: Breakpoints.isTablet(context) 
-                      ? EdgeInsets.only(
-                          left: ResponsiveSpacing.getSpacing(context).paddingLarge, 
-                          right: ResponsiveSpacing.getSpacing(context).paddingLarge,
-                        )
-                      : const EdgeInsets.only(left: 45, right: 45),
+                    padding: Breakpoints.isTablet(context)
+                        ? EdgeInsets.only(
+                            left: ResponsiveSpacing.getSpacing(
+                              context,
+                            ).paddingLarge,
+                            right: ResponsiveSpacing.getSpacing(
+                              context,
+                            ).paddingLarge,
+                          )
+                        : const EdgeInsets.only(left: 45, right: 45),
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       height: 400,
@@ -310,11 +314,13 @@ class _BlogCardsScreenState extends State<BlogCardsScreen> with TickerProviderSt
                         opacity: value,
                         child: Transform.translate(
                           offset: Offset(0, 20 * (1 - value)),
-                          child: FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
+                          child: FooterSection(
+                            logo: "lib/assets/images/bidr_logo2.png",
+                          ),
                         ),
                       );
                     },
-                  )
+                  ),
                 ],
               ),
             ),
@@ -329,17 +335,15 @@ class BlogCard extends StatefulWidget {
   final BlogItem blogItem;
   final VoidCallback onTap;
 
-  const BlogCard({
-    Key? key,
-    required this.blogItem,
-    required this.onTap,
-  }) : super(key: key);
+  const BlogCard({Key? key, required this.blogItem, required this.onTap})
+    : super(key: key);
 
   @override
   _BlogCardState createState() => _BlogCardState();
 }
 
-class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin {
+class _BlogCardState extends State<BlogCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _hoverController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _elevationAnimation;
@@ -353,21 +357,13 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.05,
-    ).animate(CurvedAnimation(
-      parent: _hoverController,
-      curve: Curves.easeInOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(parent: _hoverController, curve: Curves.easeInOut),
+    );
 
-    _elevationAnimation = Tween<double>(
-      begin: 3.0,
-      end: 8.0,
-    ).animate(CurvedAnimation(
-      parent: _hoverController,
-      curve: Curves.easeInOut,
-    ));
+    _elevationAnimation = Tween<double>(begin: 3.0, end: 8.0).animate(
+      CurvedAnimation(parent: _hoverController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -422,12 +418,18 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                           duration: Duration(milliseconds: 300),
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(topLeft: Radius.circular(12),topRight: Radius.circular(12)),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                            ),
 
                             color: Colors.grey[300],
                           ),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.only(topLeft: Radius.circular(12),topRight: Radius.circular(12)),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                            ),
                             child: Stack(
                               children: [
                                 CachedNetworkImage(
@@ -437,7 +439,10 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                                   height: double.infinity,
                                   placeholder: (context, url) => Container(
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(12),topRight: Radius.circular(12)),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(12),
+                                        topRight: Radius.circular(12),
+                                      ),
                                       color: Colors.grey.shade100,
                                     ),
                                     child: const Center(
@@ -451,25 +456,28 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                                       ),
                                     ),
                                   ),
-                                  errorWidget: (context, url, error) => Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(12),topRight: Radius.circular(12)),
-                                      color: Colors.grey.shade100,
-                                    ),
-                                    child: const Icon(
-                                      HugeIcons.strokeRoundedShoppingBasket01,
-                                      color: Colors.grey,
-                                      size: 32,
-                                    ),
-                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(12),
+                                            topRight: Radius.circular(12),
+                                          ),
+                                          color: Colors.grey.shade100,
+                                        ),
+                                        child: const Icon(
+                                          HugeIcons
+                                              .strokeRoundedShoppingBasket01,
+                                          color: Colors.grey,
+                                          size: 32,
+                                        ),
+                                      ),
                                 ),
                                 // Hover overlay
                                 AnimatedOpacity(
                                   duration: Duration(milliseconds: 200),
                                   opacity: _isHovered ? 0.1 : 0.0,
-                                  child: Container(
-                                    color: Colors.black,
-                                  ),
+                                  child: Container(color: Colors.black),
                                 ),
                               ],
                             ),
@@ -493,8 +501,10 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                                     child: Text(
                                       widget.blogItem.title,
                                       style: GoogleFonts.manrope(
-                                        fontSize: Breakpoints.isTablet(context) 
-                                            ? ResponsiveTypography.getTypography(context).normal 
+                                        fontSize: Breakpoints.isTablet(context)
+                                            ? ResponsiveTypography.getTypography(
+                                                context,
+                                              ).normal
                                             : 14,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
@@ -515,8 +525,12 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                                         widget.blogItem.description,
                                         textAlign: TextAlign.justify,
                                         style: GoogleFonts.manrope(
-                                          fontSize: Breakpoints.isTablet(context) 
-                                              ? ResponsiveTypography.getTypography(context).normal - 4 
+                                          fontSize:
+                                              Breakpoints.isTablet(context)
+                                              ? ResponsiveTypography.getTypography(
+                                                      context,
+                                                    ).normal -
+                                                    4
                                               : 12,
                                           color: Colors.grey[600],
                                           height: 1.3,
@@ -537,13 +551,25 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                                     opacity: value,
                                     child: Row(
                                       children: [
-                                        Icon(Icons.calendar_today, size: 12, color: Colors.grey[600]),
+                                        Icon(
+                                          Icons.calendar_today,
+                                          size: 12,
+                                          color: Colors.grey[600],
+                                        ),
                                         SizedBox(width: 4),
                                         Text(
-                                          DateFormat("yyyy-MM-dd HH:mm").format(DateTime.parse(widget.blogItem.date)),
+                                          DateFormat("yyyy-MM-dd HH:mm").format(
+                                            DateTime.parse(
+                                              widget.blogItem.date,
+                                            ),
+                                          ),
                                           style: GoogleFonts.manrope(
-                                            fontSize: Breakpoints.isTablet(context) 
-                                                ? ResponsiveTypography.getTypography(context).normal - 5 
+                                            fontSize:
+                                                Breakpoints.isTablet(context)
+                                                ? ResponsiveTypography.getTypography(
+                                                        context,
+                                                      ).normal -
+                                                      5
                                                 : 11,
                                             color: Colors.grey[600],
                                           ),
@@ -563,17 +589,17 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
                                     child: Row(
                                       children: [
                                         _buildAnimatedStatItem(
-                                            Icons.favorite,
-                                            widget.blogItem.likes,
-                                            Colors.orange,
-                                            value
+                                          Icons.favorite,
+                                          widget.blogItem.likes,
+                                          Colors.orange,
+                                          value,
                                         ),
                                         SizedBox(width: 12),
                                         _buildAnimatedStatItem(
-                                            Icons.chat_bubble_outline,
-                                            widget.blogItem.commentsCount,
-                                            Colors.orange,
-                                            value
+                                          Icons.chat_bubble_outline,
+                                          widget.blogItem.commentsCount,
+                                          Colors.orange,
+                                          value,
                                         ),
                                       ],
                                     ),
@@ -595,7 +621,12 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildAnimatedStatItem(IconData icon, int count, Color color, double animationValue) {
+  Widget _buildAnimatedStatItem(
+    IconData icon,
+    int count,
+    Color color,
+    double animationValue,
+  ) {
     return Transform.scale(
       scale: animationValue,
       child: Row(
@@ -609,10 +640,10 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
               return Text(
                 '$value',
                 style: GoogleFonts.manrope(
-                  fontSize: Breakpoints.isTablet(context) 
-                      ? ResponsiveTypography.getTypography(context).normal - 5 
+                  fontSize: Breakpoints.isTablet(context)
+                      ? ResponsiveTypography.getTypography(context).normal - 5
                       : 11,
-                  color: Colors.grey[600]
+                  color: Colors.grey[600],
                 ),
               );
             },
@@ -624,9 +655,7 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
 
   Widget _getImageWidget() {
     return Container(
-      decoration: BoxDecoration(
-        color: _getBackgroundColor(),
-      ),
+      decoration: BoxDecoration(color: _getBackgroundColor()),
       child: Center(
         child: TweenAnimationBuilder<double>(
           duration: Duration(milliseconds: 600),
@@ -669,7 +698,6 @@ class _BlogCardState extends State<BlogCard> with SingleTickerProviderStateMixin
   }
 }
 
-
 class BlogDetailScreen extends StatefulWidget {
   final BlogItem blogItem;
   final List<BlogItem> relatedItems;
@@ -684,7 +712,8 @@ class BlogDetailScreen extends StatefulWidget {
   State<BlogDetailScreen> createState() => _BlogDetailScreenState();
 }
 
-class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProviderStateMixin {
+class _BlogDetailScreenState extends State<BlogDetailScreen>
+    with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
@@ -694,21 +723,28 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
     BlogComment(
       id: 1,
       user: {'username': 'user1', 'first_name': 'John', 'last_name': 'Smith'},
-      content: "Great article! Very informative about auto spares. This really helped me understand the importance of quality parts.",
+      content:
+          "Great article! Very informative about auto spares. This really helped me understand the importance of quality parts.",
       isApproved: true,
       createdAt: DateTime.now().subtract(Duration(hours: 2)),
     ),
     BlogComment(
       id: 2,
-      user: {'username': 'user2', 'first_name': 'Sarah', 'last_name': 'Johnson'},
-      content: "I've been looking for reliable auto spares for months. This guide is exactly what I needed. Thanks for sharing!",
+      user: {
+        'username': 'user2',
+        'first_name': 'Sarah',
+        'last_name': 'Johnson',
+      },
+      content:
+          "I've been looking for reliable auto spares for months. This guide is exactly what I needed. Thanks for sharing!",
       isApproved: true,
       createdAt: DateTime.now().subtract(Duration(hours: 5)),
     ),
     BlogComment(
       id: 3,
       user: {'username': 'user3', 'first_name': 'Mike', 'last_name': 'Wilson'},
-      content: "The section about brake pads was particularly helpful. Keep up the good work with these detailed posts.",
+      content:
+          "The section about brake pads was particularly helpful. Keep up the good work with these detailed posts.",
       isApproved: true,
       createdAt: DateTime.now().subtract(Duration(days: 1)),
     ),
@@ -726,21 +762,14 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation = Tween<Offset>(begin: Offset(0, 0.3), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     // Start animations
     _fadeController.forward();
@@ -778,14 +807,27 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                     height: 60,
                     width: MediaQuery.of(context).size.width,
                     color: Constants.ctaColorLight,
-                    padding: Breakpoints.isTablet(context) 
+                    padding: Breakpoints.isTablet(context)
                         ? EdgeInsets.only(
-                            left: ResponsiveSpacing.getSpacing(context).paddingLarge, 
-                            right: ResponsiveSpacing.getSpacing(context).paddingLarge, 
-                            top: ResponsiveSpacing.getSpacing(context).paddingSmall, 
-                            bottom: ResponsiveSpacing.getSpacing(context).paddingSmall,
+                            left: ResponsiveSpacing.getSpacing(
+                              context,
+                            ).paddingLarge,
+                            right: ResponsiveSpacing.getSpacing(
+                              context,
+                            ).paddingLarge,
+                            top: ResponsiveSpacing.getSpacing(
+                              context,
+                            ).paddingSmall,
+                            bottom: ResponsiveSpacing.getSpacing(
+                              context,
+                            ).paddingSmall,
                           )
-                        : EdgeInsets.only(left: 40, right: 24, top: 8, bottom: 8),
+                        : EdgeInsets.only(
+                            left: 40,
+                            right: 24,
+                            top: 8,
+                            bottom: 8,
+                          ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -795,7 +837,9 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                           child: IconButton(
                             onPressed: () {
                               // Navigate back to the first page (remove all routes until first)
-                              Navigator.of(context).popUntil((route) => route.isFirst);
+                              Navigator.of(
+                                context,
+                              ).popUntil((route) => route.isFirst);
                             },
                             icon: Icon(CupertinoIcons.back),
                             splashRadius: 20,
@@ -805,20 +849,24 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                         Text(
                           'Buyer',
                           style: TextStyle(
-                            color: Colors.white, 
-                            fontSize: Breakpoints.isTablet(context) 
-                                ? ResponsiveTypography.getTypography(context).normal 
-                                : 16, 
+                            color: Colors.white,
+                            fontSize: Breakpoints.isTablet(context)
+                                ? ResponsiveTypography.getTypography(
+                                    context,
+                                  ).normal
+                                : 16,
                             fontFamily: 'YuGothic',
                           ),
                         ),
                         Text(
                           ' Dashboard',
                           style: TextStyle(
-                            color: Constants.ftaColorLight, 
-                            fontSize: Breakpoints.isTablet(context) 
-                                ? ResponsiveTypography.getTypography(context).normal 
-                                : 16, 
+                            color: Constants.ftaColorLight,
+                            fontSize: Breakpoints.isTablet(context)
+                                ? ResponsiveTypography.getTypography(
+                                    context,
+                                  ).normal
+                                : 16,
                             fontFamily: 'YuGothic',
                           ),
                         ),
@@ -828,10 +876,14 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                   SizedBox(height: 24),
                   Center(
                     child: Padding(
-                      padding: Breakpoints.isTablet(context) 
+                      padding: Breakpoints.isTablet(context)
                           ? EdgeInsets.only(
-                              left: ResponsiveSpacing.getSpacing(context).paddingLarge, 
-                              right: ResponsiveSpacing.getSpacing(context).paddingLarge,
+                              left: ResponsiveSpacing.getSpacing(
+                                context,
+                              ).paddingLarge,
+                              right: ResponsiveSpacing.getSpacing(
+                                context,
+                              ).paddingLarge,
                             )
                           : const EdgeInsets.only(left: 55, right: 55),
                       child: Container(
@@ -849,7 +901,8 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                 child: Padding(
                                   padding: const EdgeInsets.all(0.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       // Hero Image with animation
                                       AnimatedContainer(
@@ -857,14 +910,20 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                         width: double.infinity,
                                         height: 300,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                           image: DecorationImage(
-                                            image: NetworkImage(widget.blogItem.imageUrl),
+                                            image: NetworkImage(
+                                              widget.blogItem.imageUrl,
+                                            ),
                                             fit: BoxFit.cover,
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(0.1),
+                                              color: Colors.black.withOpacity(
+                                                0.1,
+                                              ),
                                               blurRadius: 10,
                                               offset: Offset(0, 4),
                                             ),
@@ -881,15 +940,24 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                           return Opacity(
                                             opacity: value,
                                             child: Transform.translate(
-                                              offset: Offset(0, 20 * (1 - value)),
+                                              offset: Offset(
+                                                0,
+                                                20 * (1 - value),
+                                              ),
                                               child: Text(
                                                 widget.blogItem.title,
                                                 style: GoogleFonts.manrope(
-                                                  fontSize: Breakpoints.isTablet(context) 
-                                                      ? ResponsiveTypography.getTypography(context).heading 
+                                                  fontSize:
+                                                      Breakpoints.isTablet(
+                                                        context,
+                                                      )
+                                                      ? ResponsiveTypography.getTypography(
+                                                          context,
+                                                        ).heading
                                                       : 32,
                                                   fontWeight: FontWeight.bold,
-                                                  color: Constants.ftaColorLight,
+                                                  color:
+                                                      Constants.ftaColorLight,
                                                   height: 1.2,
                                                 ),
                                               ),
@@ -907,12 +975,20 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                           return Opacity(
                                             opacity: value,
                                             child: Transform.translate(
-                                              offset: Offset(0, 15 * (1 - value)),
+                                              offset: Offset(
+                                                0,
+                                                15 * (1 - value),
+                                              ),
                                               child: Text(
                                                 widget.blogItem.description,
                                                 style: GoogleFonts.manrope(
-                                                  fontSize: Breakpoints.isTablet(context) 
-                                                      ? ResponsiveTypography.getTypography(context).normal 
+                                                  fontSize:
+                                                      Breakpoints.isTablet(
+                                                        context,
+                                                      )
+                                                      ? ResponsiveTypography.getTypography(
+                                                          context,
+                                                        ).normal
                                                       : 14,
                                                   color: Colors.black,
                                                   height: 1.5,
@@ -935,15 +1011,27 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                               children: [
                                                 Row(
                                                   children: [
-                                                    Icon(HugeIcons.strokeRoundedCalendar01, size: 24, color: Constants.ftaColorLight),
+                                                    Icon(
+                                                      HugeIcons
+                                                          .strokeRoundedCalendar01,
+                                                      size: 24,
+                                                      color: Constants
+                                                          .ftaColorLight,
+                                                    ),
                                                     SizedBox(width: 6),
                                                     Text(
                                                       widget.blogItem.date,
                                                       style: GoogleFonts.manrope(
-                                                        fontSize: Breakpoints.isTablet(context) 
-                                                            ? ResponsiveTypography.getTypography(context).normal 
+                                                        fontSize:
+                                                            Breakpoints.isTablet(
+                                                              context,
+                                                            )
+                                                            ? ResponsiveTypography.getTypography(
+                                                                context,
+                                                              ).normal
                                                             : 14,
-                                                        color: Constants.ftaColorLight,
+                                                        color: Constants
+                                                            .ftaColorLight,
                                                       ),
                                                     ),
                                                   ],
@@ -951,9 +1039,20 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                                 SizedBox(height: 16),
                                                 Row(
                                                   children: [
-                                                    _buildAnimatedStatItem(CupertinoIcons.heart_fill, widget.blogItem.likes, Colors.red),
+                                                    _buildAnimatedStatItem(
+                                                      CupertinoIcons.heart_fill,
+                                                      widget.blogItem.likes,
+                                                      Colors.red,
+                                                    ),
                                                     SizedBox(width: 16),
-                                    _buildAnimatedStatItem(HugeIcons.strokeRoundedMessage01, widget.blogItem.commentsCount, Colors.orange),
+                                                    _buildAnimatedStatItem(
+                                                      HugeIcons
+                                                          .strokeRoundedMessage01,
+                                                      widget
+                                                          .blogItem
+                                                          .commentsCount,
+                                                      Colors.orange,
+                                                    ),
                                                   ],
                                                 ),
                                               ],
@@ -975,8 +1074,13 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                             child: Text(
                                               widget.blogItem.detailContent,
                                               style: GoogleFonts.manrope(
-                                                fontSize: Breakpoints.isTablet(context) 
-                                                    ? ResponsiveTypography.getTypography(context).normal 
+                                                fontSize:
+                                                    Breakpoints.isTablet(
+                                                      context,
+                                                    )
+                                                    ? ResponsiveTypography.getTypography(
+                                                        context,
+                                                      ).normal
                                                     : 14,
                                                 height: 1.6,
                                                 color: Colors.black,
@@ -992,8 +1096,11 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                       Text(
                                         'Comments (${blogComments.length})',
                                         style: GoogleFonts.manrope(
-                                          fontSize: Breakpoints.isTablet(context) 
-                                              ? ResponsiveTypography.getTypography(context).large 
+                                          fontSize:
+                                              Breakpoints.isTablet(context)
+                                              ? ResponsiveTypography.getTypography(
+                                                  context,
+                                                ).large
                                               : 20,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black87,
@@ -1006,18 +1113,35 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                         child: SingleChildScrollView(
                                           child: Column(
                                             children: [
-                                              ...blogComments.asMap().entries.map((entry) {
+                                              ...blogComments.asMap().entries.map((
+                                                entry,
+                                              ) {
                                                 int index = entry.key;
-                                                BlogComment comment = entry.value;
-                                                return TweenAnimationBuilder<double>(
-                                                  duration: Duration(milliseconds: 600 + (index * 200)),
-                                                  tween: Tween(begin: 0.0, end: 1.0),
+                                                BlogComment comment =
+                                                    entry.value;
+                                                return TweenAnimationBuilder<
+                                                  double
+                                                >(
+                                                  duration: Duration(
+                                                    milliseconds:
+                                                        600 + (index * 200),
+                                                  ),
+                                                  tween: Tween(
+                                                    begin: 0.0,
+                                                    end: 1.0,
+                                                  ),
                                                   builder: (context, value, child) {
                                                     return Opacity(
                                                       opacity: value,
                                                       child: Transform.translate(
-                                                        offset: Offset(30 * (1 - value), 0),
-                                                        child: _buildCommentItem(comment),
+                                                        offset: Offset(
+                                                          30 * (1 - value),
+                                                          0,
+                                                        ),
+                                                        child:
+                                                            _buildCommentItem(
+                                                              comment,
+                                                            ),
                                                       ),
                                                     );
                                                   },
@@ -1026,23 +1150,26 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                             ],
                                           ),
                                         ),
-                                      )
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
                             ),
-                            SizedBox(width: 24,),
+                            SizedBox(width: 24),
 
                             // Related Articles (Right Side) with slide animation
                             SlideTransition(
-                              position: Tween<Offset>(
-                                begin: Offset(1, 0),
-                                end: Offset.zero,
-                              ).animate(CurvedAnimation(
-                                parent: _slideController,
-                                curve: Curves.easeOutCubic,
-                              )),
+                              position:
+                                  Tween<Offset>(
+                                    begin: Offset(1, 0),
+                                    end: Offset.zero,
+                                  ).animate(
+                                    CurvedAnimation(
+                                      parent: _slideController,
+                                      curve: Curves.easeOutCubic,
+                                    ),
+                                  ),
                               child: Container(
                                 width: 350,
                                 height: MediaQuery.of(context).size.height,
@@ -1054,8 +1181,10 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                     Text(
                                       'Related Articles',
                                       style: GoogleFonts.manrope(
-                                        fontSize: Breakpoints.isTablet(context) 
-                                            ? ResponsiveTypography.getTypography(context).medium 
+                                        fontSize: Breakpoints.isTablet(context)
+                                            ? ResponsiveTypography.getTypography(
+                                                context,
+                                              ).medium
                                             : 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
@@ -1067,14 +1196,24 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                                         itemCount: widget.relatedItems.length,
                                         itemBuilder: (context, index) {
                                           return TweenAnimationBuilder<double>(
-                                            duration: Duration(milliseconds: 800 + (index * 150)),
+                                            duration: Duration(
+                                              milliseconds: 800 + (index * 150),
+                                            ),
                                             tween: Tween(begin: 0.0, end: 1.0),
                                             builder: (context, value, child) {
                                               return Opacity(
                                                 opacity: value,
                                                 child: Transform.translate(
-                                                  offset: Offset(20 * (1 - value), 0),
-                                                  child: _buildAnimatedRelatedItem(context, widget.relatedItems[index]),
+                                                  offset: Offset(
+                                                    20 * (1 - value),
+                                                    0,
+                                                  ),
+                                                  child:
+                                                      _buildAnimatedRelatedItem(
+                                                        context,
+                                                        widget
+                                                            .relatedItems[index],
+                                                      ),
                                                 ),
                                               );
                                             },
@@ -1116,8 +1255,8 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
               Text(
                 '$count',
                 style: GoogleFonts.manrope(
-                  fontSize: Breakpoints.isTablet(context) 
-                      ? ResponsiveTypography.getTypography(context).normal 
+                  fontSize: Breakpoints.isTablet(context)
+                      ? ResponsiveTypography.getTypography(context).normal
                       : 14,
                   color: color,
                   fontWeight: FontWeight.w600,
@@ -1200,25 +1339,32 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
         Navigator.pushAndRemoveUntil(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => BlogDetailScreen(
-              blogItem: item,
-              relatedItems: widget.relatedItems.where((i) => i != item).toList(),
-            ),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: Offset(1.0, 0.0),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(
-                  parent: animation,
-                  curve: Curves.easeInOut,
-                )),
-                child: child,
-              );
-            },
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                BlogDetailScreen(
+                  blogItem: item,
+                  relatedItems: widget.relatedItems
+                      .where((i) => i != item)
+                      .toList(),
+                ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return SlideTransition(
+                    position:
+                        Tween<Offset>(
+                          begin: Offset(1.0, 0.0),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeInOut,
+                          ),
+                        ),
+                    child: child,
+                  );
+                },
             transitionDuration: Duration(milliseconds: 300),
           ),
-              (route) => route.settings.name == '/articles' || route.isFirst,
+          (route) => route.settings.name == '/articles' || route.isFirst,
         );
       },
       child: AnimatedContainer(
@@ -1243,25 +1389,32 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
               Navigator.pushAndRemoveUntil(
                 context,
                 PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) => BlogDetailScreen(
-                    blogItem: item,
-                    relatedItems: widget.relatedItems.where((i) => i != item).toList(),
-                  ),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: Offset(1.0, 0.0),
-                        end: Offset.zero,
-                      ).animate(CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeInOut,
-                      )),
-                      child: child,
-                    );
-                  },
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      BlogDetailScreen(
+                        blogItem: item,
+                        relatedItems: widget.relatedItems
+                            .where((i) => i != item)
+                            .toList(),
+                      ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return SlideTransition(
+                          position:
+                              Tween<Offset>(
+                                begin: Offset(1.0, 0.0),
+                                end: Offset.zero,
+                              ).animate(
+                                CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.easeInOut,
+                                ),
+                              ),
+                          child: child,
+                        );
+                      },
                   transitionDuration: Duration(milliseconds: 300),
                 ),
-                    (route) => route.settings.name == '/articles' || route.isFirst,
+                (route) => route.settings.name == '/articles' || route.isFirst,
               );
             },
             child: Column(
@@ -1313,7 +1466,11 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                       SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(Icons.calendar_today, size: 12, color: Colors.grey[500]),
+                          Icon(
+                            Icons.calendar_today,
+                            size: 12,
+                            color: Colors.grey[500],
+                          ),
                           SizedBox(width: 4),
                           Text(
                             item.date,
@@ -1333,7 +1490,11 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> with TickerProvider
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(Icons.chat_bubble_outline, size: 12, color: Colors.orange),
+                          Icon(
+                            Icons.chat_bubble_outline,
+                            size: 12,
+                            color: Colors.orange,
+                          ),
                           SizedBox(width: 2),
                           Text(
                             '${item.commentsCount}',

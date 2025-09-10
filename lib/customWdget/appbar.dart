@@ -63,7 +63,7 @@ class _HeaderSectionState extends State<HeaderSection> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-         // if (isMobile) ...[_buildMobileMenuIcon(), SizedBox(width: 16)],
+          // if (isMobile) ...[_buildMobileMenuIcon(), SizedBox(width: 16)],
 
           // Logo - responsive sizing
           _buildResponsiveLogo(context),
@@ -82,11 +82,18 @@ class _HeaderSectionState extends State<HeaderSection> {
   Widget _buildResponsiveLogo(BuildContext context) {
     final bool isMobile = Breakpoints.isMobile(context);
 
-    return Image.asset(
-      "lib/assets/images/bidr_logo1.png",
-      fit: BoxFit.contain,
-      height: isMobile ? 40 : 50,
-      width: isMobile ? 64 : 80,
+    return GestureDetector(
+      onTap: () {
+        Constants.buyerAppBarValue = 0;
+        appBarValueNotifier.value++;
+        buyerHomeValueNotifier.value++;
+      },
+      child: Image.asset(
+        "lib/assets/images/bidr_logo1.png",
+        fit: BoxFit.contain,
+        height: isMobile ? 50 : 60,
+        width: isMobile ? 80 : 96,
+      ),
     );
   }
 
@@ -243,9 +250,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                         ),
                         SizedBox(height: spacing.spacingMedium),
                         Text(
-                          Constants.myEmail == ""
-                              ? "guest@gmail.com"
-                              : Constants.myEmail,
+                          Constants.myEmail == "" ? "guest" : Constants.myEmail,
                           style: GoogleFonts.manrope(
                             color: Constants.ftaColorLight,
                             fontSize: 13,
@@ -480,7 +485,7 @@ class _HeaderSectionState extends State<HeaderSection> {
           );
         case 'buyer':
           return Container(
-            constraints: BoxConstraints(maxWidth: 250, maxHeight: 55),//
+            constraints: BoxConstraints(maxWidth: 250, maxHeight: 55), //
             child: ElevatedButton(
               onPressed: () {
                 if (mounted) {
@@ -488,7 +493,6 @@ class _HeaderSectionState extends State<HeaderSection> {
                   appBarValueNotifier.value++;
                   buyerHomeValueNotifier.value++;
                   buyerHomeMobileValueNotifier.value++;
-
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -555,7 +559,8 @@ class _HeaderSectionState extends State<HeaderSection> {
         'Login',
         style: GoogleFonts.manrope(
           color: Colors.black,
-          fontWeight: FontWeight.w600,
+
+          fontWeight: FontWeight.w700,
           fontSize: typography.normal,
         ),
       ),
@@ -592,7 +597,7 @@ class _HeaderSectionState extends State<HeaderSection> {
         children: [
           IntrinsicWidth(
             child: Container(
-              constraints: BoxConstraints(minWidth: 65),
+              constraints: BoxConstraints(minWidth: 85),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -604,7 +609,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                         color: index == Constants.buyerAppBarValue
                             ? Constants.ftaColorLight
                             : Colors.black45,
-                        fontSize: 13,
+                        fontSize: 15,
                         fontWeight: index == Constants.buyerAppBarValue
                             ? FontWeight.bold
                             : FontWeight.w600,

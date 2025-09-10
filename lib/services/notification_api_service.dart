@@ -66,30 +66,45 @@ class NotificationApiService {
   // Fetch unread notifications for a user
   Future<List<WebNotification>> getUnreadNotifications(String userId) async {
     try {
+      print('=== UNREAD NOTIFICATIONS API REQUEST START ===');
+      print('Fetching unread notifications for user: $userId');
+      
       final url = Uri.parse(
         '${GlobalVariables.notificationsServiceUrl}$apiPath/user/$userId/unread/',
       );
+      print('Unread notifications URL: $url');
+      
       final response = await http.get(
         url,
         headers: {'Content-Type': 'application/json'},
       ).timeout(const Duration(seconds: 10));
 
+      print('Unread notifications response - Status: ${response.statusCode}');
+      print('Unread notifications response body: ${response.body}');
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         List<WebNotification> notifications = [];
 
-        if (data is Map && data.containsKey('results')) {
-          // Handle paginated response
+        if (data is Map && data.containsKey('notifications')) {
+          print('Processing ${data['notifications'].length} unread notifications from API');
+          for (var notification in data['notifications']) {
+            notifications.add(_mapToWebNotification(notification));
+          }
+        } else if (data is Map && data.containsKey('results')) {
+          print('Processing ${data['results'].length} unread notifications (paginated)');
           for (var notification in data['results']) {
             notifications.add(_mapToWebNotification(notification));
           }
         } else if (data is List) {
-          // Handle array response
+          print('Processing ${data.length} unread notifications (list format)');
           for (var notification in data) {
             notifications.add(_mapToWebNotification(notification));
           }
         }
 
+        print('Successfully parsed ${notifications.length} unread notifications');
+        print('=== UNREAD NOTIFICATIONS API REQUEST END ===');
         return notifications;
       } else {
         print('Failed to fetch unread notifications: ${response.statusCode}');
@@ -97,6 +112,7 @@ class NotificationApiService {
       }
     } catch (e) {
       print('Error fetching unread notifications: $e');
+      print('=== UNREAD NOTIFICATIONS API REQUEST FAILED ===');
       return [];
     }
   }
@@ -156,6 +172,92 @@ class NotificationApiService {
     } catch (e) {
       print('Error deleting notification: $e');
       return false;
+    }
+  }
+
+  // Get notification statistics for a user
+  Future<Map<String, dynamic>?> getNotificationStats(String userId) async {
+    try {
+      print('=== NOTIFICATION STATS API REQUEST START ===');
+      print('Fetching notification stats for user: $userId');
+      
+      final url = Uri.parse(
+        '${GlobalVariables.notificationsServiceUrl}$apiPath/stats/$userId/',
+      );
+      print('Notification stats URL: $url');
+      
+      final response = await http.get(
+        url,
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(const Duration(seconds: 10));
+
+      print('Notification stats response - Status: ${response.statusCode}');
+      print('Notification stats response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print('Successfully fetched notification stats');
+        print('=== NOTIFICATION STATS API REQUEST END ===');
+        return data;
+      } else {
+        print('Failed to fetch notification stats: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching notification stats: $e');
+      print('=== NOTIFICATION STATS API REQUEST FAILED ===');
+      return null;
+    }
+  }
+
+  // Get unread notification count only
+  Future<int> getUnreadNotificationCount(String userId) async {
+    try {
+      print('=== UNREAD COUNT API REQUEST START ===');
+      print('Fetching unread count for user: $userId');
+      
+      final url = Uri.parse(
+        '${GlobalVariables.notificationsServiceUrl}$apiPath/user/$userId/unread/',
+      );
+      print('Unread count URL: $url');
+      
+      final response = await http.get(
+        url,
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(const Duration(seconds: 10));
+
+      print('Unread count response - Status: ${response.statusCode}');
+      print('Unread count response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        // Try to get unread_count from response first
+        if (data is Map && data.containsKey('unread_count')) {
+          final count = data['unread_count'] as int;
+          print('Successfully got unread count from API: $count');
+          print('=== UNREAD COUNT API REQUEST END ===');
+          return count;
+        }
+        
+        // Fallback: count unread notifications in the list
+        if (data is Map && data.containsKey('notifications')) {
+          final unreadCount = (data['notifications'] as List)
+              .where((n) => n['is_read'] == false)
+              .length;
+          print('Calculated unread count from notifications list: $unreadCount');
+          print('=== UNREAD COUNT API REQUEST END ===');
+          return unreadCount;
+        }
+      }
+      
+      print('Failed to get unread count, returning 0');
+      print('=== UNREAD COUNT API REQUEST FAILED ===');
+      return 0;
+    } catch (e) {
+      print('Error getting unread notification count: $e');
+      print('=== UNREAD COUNT API REQUEST FAILED ===');
+      return 0;
     }
   }
 

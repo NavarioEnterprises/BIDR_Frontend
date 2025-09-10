@@ -12,7 +12,8 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/authentication_service/env/bin" />
       <excludeFolder url="file://$MODULE_DIR$/authentication_service/env/include" />
@@ -21,8 +22,7 @@
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10 virtualenv at ~/MEGA downloads/new downloads/BIDR_Backend/chat_service/venv" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-  </component>
-  <component name="TemplatesService">
-    <option name="TEMPLATE_CONFIGURATION" value="Django" />
+    <orderEntry type="library" name="Dart SDK" level="project" />
+    <orderEntry type="library" name="Dart Packages" level="project" />
   </component>
 </module>

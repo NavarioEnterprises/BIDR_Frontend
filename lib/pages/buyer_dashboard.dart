@@ -18,6 +18,7 @@ import 'dart:convert';
 
 import 'buyer/account_management.dart';
 import 'buyer/share_with_friends.dart';
+import 'buyer/support.dart';
 import 'buyer/transaction_management.dart';
 import 'group_chat.dart';
 
@@ -100,6 +101,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     return Column(
       children: [
         SizedBox(height: 24),
+        BuyerDashboardHeader(headerName: "Buyer's Dashboard"),
         Padding(
           padding: const EdgeInsets.only(left: 68, right: 68),
           child: Center(
