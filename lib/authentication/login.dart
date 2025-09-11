@@ -1,7 +1,9 @@
 import 'package:bidr/authentication/splashscreen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../constants/Constants.dart';
 import '../customWdget/custom_input2.dart';
@@ -162,17 +164,42 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           // Fixed spacing at top
                           //const SizedBox(height: 60),
-                          Center(
-                            child: Container(
-                              width: 130,
-                              height: 130,
-                              child: Image.asset(
-                                "lib/assets/images/bidr_logo_with_text.png",
-                                fit: BoxFit.contain,
-                                width: 90,
-                                height: 90,
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  context.go('/');
+                                },
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Constants.ftaColorLight,
+                                  elevation: 5,
+                                  shadowColor: Colors.black54,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                icon: Icon(
+                                  Iconsax.home,
+                                  color: Constants.ftaColorLight,
+                                ),
                               ),
-                            ),
+                              Spacer(),
+                              Center(
+                                child: Container(
+                                  width: 130,
+                                  height: 130,
+                                  child: Image.asset(
+                                    "lib/assets/images/bidr_logo_with_text.png",
+                                    fit: BoxFit.contain,
+                                    width: 90,
+                                    height: 90,
+                                  ),
+                                ),
+                              ),
+                              Spacer(),
+                              SizedBox(height: 40,width: 40,)
+                            ],
                           ),
                           // Welcome back title
                           const SizedBox(height: 24),

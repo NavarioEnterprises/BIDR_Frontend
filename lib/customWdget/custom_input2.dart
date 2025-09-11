@@ -1136,11 +1136,11 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
                   fontFamily: 'YuGothic',
                 ),
               ),
-              labelStyle: TextStyle(
+              labelStyle: GoogleFonts.manrope(
                 color: widget.hasError == true ? Colors.red : Colors.black,
-                fontSize: 13.5,
-                fontWeight: FontWeight.w500,
-                fontFamily: 'YuGothic',
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+
               ),
               contentPadding: EdgeInsets.only(left: 16, top: 16),
               enabledBorder: OutlineInputBorder(

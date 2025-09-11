@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_places_flutter/model/prediction.dart';
@@ -186,8 +187,8 @@ class _BuyerHomePageState extends State<BuyerHomePage>
       "name": "Consumer \nElectronics",
     },
     {
-      "icon": "lib/assets/images/auction_icon.png",
-      "icon2": "lib/assets/images/auction_icon.png",
+      "icon": "lib/assets/images/rim_and_type.png",
+      "icon2": "lib/assets/images/rim_and_type.png",
       "name": "Vehicle\nAuctions",
     },
   ];
@@ -223,6 +224,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                   Constants.buyerAppBarValue == 0
                       ? Expanded(
                           child: Container(
+                            width: MediaQuery.of(context).size.width,
                             child: Scrollbar(
                               controller: _scrollController,
                               thumbVisibility: true,
@@ -236,8 +238,9 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                 child: Column(
                                   children: [
                                     Container(
+                                      width: MediaQuery.of(context).size.width,
                                       constraints: BoxConstraints(
-                                        maxWidth: 1600,
+                                        maxWidth: 2000,
                                       ),
                                       child: Column(
                                         crossAxisAlignment:
@@ -255,17 +258,20 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                                       context,
                                                     )
                                                     ? 24
-                                                    : 32,
+                                                    : 60,
                                                 right:
                                                     Breakpoints.isTablet(
                                                       context,
                                                     )
                                                     ? 24
-                                                    : 32,
+                                                    : 60,
                                               ),
-                                              child: Center(
-                                                child: _buildAnimatedBannerSection(
-                                                  "lib/assets/images/competitive.png",
+                                              child: SizedBox(
+                                                width:MediaQuery.of(context).size.width,
+                                                child: Center(
+                                                  child: _buildAnimatedBannerSection(
+                                                    "lib/assets/images/competitive.png",
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -594,32 +600,32 @@ class _BuyerHomePageState extends State<BuyerHomePage>
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             crossAxisCount: 3,
-            childAspectRatio: 0.8,
+            childAspectRatio: 1.1,
             crossAxisSpacing: 24,
             mainAxisSpacing: 24,
             children: [
               _buildInfoCard(
-                icon: Icons.help_outline,
+                icon: HugeIcons.strokeRoundedHelpCircle,
                 title: 'How it Works?',
                 subtitle:
                     'Simple process: Create a request, receive bids from multiple sellers, choose the best offer. No more endless searching.',
-                color: Colors.orange,
+                color: Colors.orange.shade300,
                 index: 0,
               ),
               _buildInfoCard(
-                icon: Icons.shopping_cart_outlined,
+                icon: HugeIcons.strokeRoundedShoppingCart01,
                 title: 'Why buyers should use this service?',
                 subtitle:
                     'Save time and money. Get competitive prices from verified sellers. One request, multiple offers, best deals.',
-                color: Colors.blue,
+                color: Colors.blue.shade300,
                 index: 1,
               ),
               _buildInfoCard(
-                icon: Icons.business_outlined,
+                icon: HugeIcons.strokeRoundedBuilding01,
                 title: 'Why join as a business?',
                 subtitle:
                     'Reach more customers, increase sales, compete fairly. Join our network of trusted sellers and grow your business.',
-                color: Colors.green,
+                color: Colors.green.shade300,
                 index: 2,
               ),
             ],
@@ -628,7 +634,6 @@ class _BuyerHomePageState extends State<BuyerHomePage>
       ),
     );
   }
-
   Widget _buildInfoCard({
     required IconData icon,
     required String title,
@@ -646,60 +651,102 @@ class _BuyerHomePageState extends State<BuyerHomePage>
             opacity: value,
             child: Container(
               decoration: BoxDecoration(
-                color: color.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: color, width: 1.5),
+                // Beautiful gradient background
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white,
+                    color.withOpacity(0.02),
+                    Colors.white,
+                  ],
+                  stops: [0.0, 0.5, 1.0],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                    color: color.withOpacity(0.08),
+                    width: 1.2
+                ),
                 boxShadow: [
+                  // Primary shadow
                   BoxShadow(
-                    color: color.withOpacity(0.1),
-                    blurRadius: 10,
+                    color: color.withOpacity(0.06),
+                    blurRadius: 12,
                     spreadRadius: 0,
                     offset: Offset(0, 4),
                   ),
+                  // Secondary subtle shadow
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 20,
+                    spreadRadius: 0,
+                    offset: Offset(0, 8),
+                  ),
                 ],
               ),
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Icon
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: color,
-                        borderRadius: BorderRadius.circular(20),
+              child: Container(
+                // Inner glow effect
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.white.withOpacity(0.8),
+                      Colors.white.withOpacity(0.4),
+                    ],
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(28),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Icon with subtle background
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.06),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: color.withOpacity(0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: Icon(
+                            icon,
+                            size: 32,
+                            color: color.withOpacity(0.9)
+                        ),
                       ),
-                      child: Icon(icon, size: 40, color: Colors.white),
-                    ),
-                    SizedBox(height: 20),
-
-                    // Title
-                    Text(
-                      title,
-                      style: GoogleFonts.manrope(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                      SizedBox(height: 24),
+                      // Title
+                      Text(
+                        title,
+                        style: GoogleFonts.manrope(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.grey[800],
+                          letterSpacing: -0.2,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 12),
-
-                    // Subtitle
-                    Text(
-                      subtitle,
-                      style: GoogleFonts.manrope(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black54,
-                        height: 1.4,
+                      SizedBox(height: 12),
+                      // Subtitle
+                      Text(
+                        subtitle,
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                          height: 1.5,
+                          letterSpacing: 0.1,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -708,6 +755,75 @@ class _BuyerHomePageState extends State<BuyerHomePage>
       },
     );
   }
+
+  /*Widget _buildInfoCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required int index,
+  }) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 600 + (index * 200)),
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 30 * (1 - value)),
+          child: Container(
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.01),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: color.withOpacity(0.1), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.08),
+                  blurRadius: 5,
+                  spreadRadius: 0,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Icon
+                  Icon(icon, size: 40, color: color),
+                  SizedBox(height: 20),
+
+                  // Title
+                  Text(
+                    title,
+                    style: GoogleFonts.manrope(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 12),
+
+                  // Subtitle
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black54,
+                      height: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }*/
 
   Widget _buildAnimatedVideoSection(
     String title,
@@ -954,41 +1070,29 @@ class _BuyerHomePageState extends State<BuyerHomePage>
   }
 
   Widget _buildAnimatedBannerSection(String image) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 600),
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: 0.95 + (0.05 * value),
-          child: Opacity(
-            opacity: value,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: 150,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: Image.asset(
-                  image,
-                  fit: BoxFit.cover,
-                  width: MediaQuery.of(context).size.width,
-                  height: 400,
-                ),
-              ),
-            ),
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 150,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, 5),
           ),
-        );
-      },
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Image.asset(
+          image,
+          fit: BoxFit.cover,
+          width: MediaQuery.of(context).size.width,
+          height: 150,
+        ),
+      ),
     );
   }
 
@@ -1568,15 +1672,14 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(
+          labelStyle: GoogleFonts.manrope(
             color: Colors.black,
-            fontSize: 13.5,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'YuGothic',
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Constants.ftaColorLight),
+            borderSide: BorderSide(color: Colors.black),
             borderRadius: BorderRadius.circular(36),
           ),
           focusedBorder: OutlineInputBorder(
@@ -1592,12 +1695,17 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             value: value,
             hint: Text(
               label.replaceAll('*', ''),
-              style: GoogleFonts.manrope(
-                color: Colors.grey.withOpacity(0.35),
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
+              style: GoogleFonts.inter(
+                textStyle: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey.withOpacity(0.35),
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'YuGothic',
+                ),
               ),
             ),
+
             isExpanded: true,
             icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
             items: items.map((String item) {
@@ -1667,11 +1775,10 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 focusNode: fieldFocusNode,
                 decoration: InputDecoration(
                   labelText: label,
-                  labelStyle: TextStyle(
+                  labelStyle:  GoogleFonts.manrope(
                     color: Colors.black,
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'YuGothic',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: 16,
@@ -1686,10 +1793,14 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                     borderRadius: BorderRadius.circular(36),
                   ),
                   hintText: label.replaceAll('*', ''),
-                  hintStyle: GoogleFonts.manrope(
-                    color: Colors.grey.withOpacity(0.35),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w300,
+                  hintStyle:GoogleFonts.inter(
+                    textStyle: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.withOpacity(0.35),
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'YuGothic',
+                    ),
                   ),
                 ),
                 style: GoogleFonts.manrope(
@@ -1780,10 +1891,10 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       style: GoogleFonts.manrope(color: Colors.black, fontSize: 16),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: GoogleFonts.manrope(
+        labelStyle:  GoogleFonts.manrope(
           color: Colors.black,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
         ),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         hintText: 'Enter distance (1-1500 km)',
@@ -3253,16 +3364,20 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
               decoration: InputDecoration(
                 labelText: 'Your Location*',
                 labelStyle: GoogleFonts.manrope(
-                  color: Constants.ftaColorLight,
-                  fontSize: 13.5,
+                  color: Colors.black,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 hintText: 'Start typing your address...',
-                hintStyle: GoogleFonts.manrope(
-                  color: Colors.grey.shade400,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
+                hintStyle:GoogleFonts.inter(
+                  textStyle: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.withOpacity(0.35),
+                    letterSpacing: 0,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'YuGothic',
+                  ),
                 ),
                 filled: true,
                 fillColor: Colors.white,
@@ -3272,8 +3387,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Colors.grey.shade300,
-                    width: 1.5,
+                    color: Colors.black,
+                    width: 1,
                   ),
                   borderRadius: BorderRadius.circular(36),
                 ),
@@ -3299,7 +3414,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   margin: EdgeInsets.only(left: 16, right: 8),
                   child: Icon(
                     Icons.location_on,
-                    color: Constants.ftaColorLight,
+                    color: Colors.black,
                     size: 22,
                   ),
                 ),
@@ -3525,18 +3640,21 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         ),
         decoration: InputDecoration(
           labelText: 'VIN (Vehicle Identification Number)*',
-          labelStyle: TextStyle(
+          labelStyle:  GoogleFonts.manrope(
             color: Colors.black,
-            fontSize: 13.5,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'YuGothic',
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
           ),
           floatingLabelBehavior: FloatingLabelBehavior.always,
           hintText: 'Enter VIN Number',
-          hintStyle: GoogleFonts.manrope(
-            color: Colors.grey.withOpacity(0.35),
-            fontSize: 14,
-            fontWeight: FontWeight.w300,
+          hintStyle: GoogleFonts.inter(
+            textStyle: TextStyle(
+              fontSize: 13,
+              color: Colors.grey.withOpacity(0.35),
+              letterSpacing: 0,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'YuGothic',
+            ),
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           enabledBorder: OutlineInputBorder(
@@ -4828,26 +4946,25 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
   }
 
   Widget _buildCustomDropdown(
-    String label,
-    String? value,
-    List<String> items,
-    Function(String?) onChanged,
-  ) {
+      String label,
+      String? value,
+      List<String> items,
+      Function(String?) onChanged,
+      ) {
     return Container(
       width: double.infinity,
       height: 48,
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(
+          labelStyle: GoogleFonts.manrope(
             color: Colors.black,
-            fontSize: 13.5,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'YuGothic',
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Constants.ftaColorLight),
+            borderSide: BorderSide(color: Colors.black),
             borderRadius: BorderRadius.circular(36),
           ),
           focusedBorder: OutlineInputBorder(
@@ -4863,12 +4980,17 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
             value: value,
             hint: Text(
               label.replaceAll('*', ''),
-              style: GoogleFonts.manrope(
-                color: Colors.grey.withOpacity(0.35),
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
+              style: GoogleFonts.inter(
+                textStyle: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey.withOpacity(0.35),
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'YuGothic',
+                ),
               ),
             ),
+
             isExpanded: true,
             icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
             items: items.map((String item) {
@@ -5708,26 +5830,25 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
   }
 
   Widget _buildCustomDropdown(
-    String label,
-    String? value,
-    List<String> items,
-    Function(String?) onChanged,
-  ) {
+      String label,
+      String? value,
+      List<String> items,
+      Function(String?) onChanged,
+      ) {
     return Container(
       width: double.infinity,
       height: 48,
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(
+          labelStyle: GoogleFonts.manrope(
             color: Colors.black,
-            fontSize: 13.5,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'YuGothic',
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Constants.ftaColorLight),
+            borderSide: BorderSide(color: Colors.black),
             borderRadius: BorderRadius.circular(36),
           ),
           focusedBorder: OutlineInputBorder(
@@ -5743,12 +5864,17 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
             value: value,
             hint: Text(
               label.replaceAll('*', ''),
-              style: GoogleFonts.manrope(
-                color: Colors.grey.withOpacity(0.35),
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
+              style: GoogleFonts.inter(
+                textStyle: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey.withOpacity(0.35),
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'YuGothic',
+                ),
               ),
             ),
+
             isExpanded: true,
             icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
             items: items.map((String item) {
@@ -6792,8 +6918,12 @@ class FooterSection extends StatelessWidget {
                           url: 'https://www.x.com',
                         ),
                         SocialMediaButton(
-                          imagePath: 'lib/assets/images/youTube.png',
-                          url: 'https://www.youTube.com',
+                          imagePath: 'lib/assets/images/tik.png',
+                          url: 'https://www.tiktok.com',
+                        ),
+                        SocialMediaButton(
+                          imagePath: 'lib/assets/images/linkedIn.png',
+                          url: 'https://www.linkedin.com',
                         ),
                       ],
                     ),

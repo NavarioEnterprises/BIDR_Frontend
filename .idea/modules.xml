@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/BIDR_Backend.iml" filepath="$PROJECT_DIR$/.idea/BIDR_Backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/BIDR_Frontend_final.iml" filepath="$PROJECT_DIR$/.idea/BIDR_Frontend_final.iml" />
     </modules>
   </component>
 </project>

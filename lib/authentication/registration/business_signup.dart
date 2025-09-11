@@ -1374,15 +1374,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                'Seller Sign Up',
-                style: GoogleFonts.manrope(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey,
-                ),
-              ),
-              SizedBox(height: 16),
+
               Expanded(
                 child: Container(
                   width: MediaQuery.of(context).size.width,
