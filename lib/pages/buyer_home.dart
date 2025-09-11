@@ -4198,24 +4198,28 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     try {
       // Use the updated API key
       const String apiKey = 'AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA';
-      
+
       // For web platform, use JavaScript interop to avoid CORS issues
       if (kIsWeb) {
         return await _getPlacePredictionsWeb(pattern);
       }
-      
+
       // Mobile platform - use direct API call
       final String encodedQuery = Uri.encodeComponent(pattern.trim());
-      final String baseURL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-      final String request = '$baseURL?input=$encodedQuery&key=$apiKey&components=country:za&language=en&sessiontoken=${DateTime.now().millisecondsSinceEpoch}';
+      final String baseURL =
+          'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+      final String request =
+          '$baseURL?input=$encodedQuery&key=$apiKey&components=country:za&language=en&sessiontoken=${DateTime.now().millisecondsSinceEpoch}';
 
-      final response = await http.get(
-        Uri.parse(request),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ).timeout(Duration(seconds: 8));
+      final response = await http
+          .get(
+            Uri.parse(request),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          )
+          .timeout(Duration(seconds: 8));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
@@ -4247,8 +4251,9 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   // Web-specific method using JavaScript interop (for ProductQuoteForm)
   Future<List<Prediction>> _getPlacePredictionsWeb(String query) async {
     try {
-      final Completer<List<Prediction>> completer = Completer<List<Prediction>>();
-      
+      final Completer<List<Prediction>> completer =
+          Completer<List<Prediction>>();
+
       // Wait for Google Maps API to be available with retries
       bool apiAvailable = await _waitForGoogleMapsAPI();
       if (!apiAvailable) {
@@ -4265,7 +4270,9 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             final List<dynamic> resultsList = List<dynamic>.from(jsResults);
             final List<Prediction> predictions = resultsList.map((jsResult) {
               // Convert each JavaScript object to Map safely
-              final Map<String, dynamic> result = _convertJsObjectToMap(jsResult);
+              final Map<String, dynamic> result = _convertJsObjectToMap(
+                jsResult,
+              );
               return Prediction(
                 description: result['description']?.toString() ?? '',
                 placeId: result['placeId']?.toString() ?? '',
@@ -4276,7 +4283,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 structuredFormatting: null,
               );
             }).toList();
-            
+
             if (!completer.isCompleted) {
               completer.complete(predictions);
             }
@@ -4325,14 +4332,16 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   Map<String, dynamic> _convertJsObjectToMap(dynamic jsObject) {
     try {
       if (jsObject == null) return {};
-      
+
       // If it's already a Map, return it
       if (jsObject is Map<String, dynamic>) {
         return jsObject;
       }
-      
+
       // Convert JavaScript object using JSON serialization
-      final String jsonString = js.context['JSON'].callMethod('stringify', [jsObject]);
+      final String jsonString = js.context['JSON'].callMethod('stringify', [
+        jsObject,
+      ]);
       return Map<String, dynamic>.from(json.decode(jsonString));
     } catch (e) {
       print('Error converting JavaScript object: $e');
