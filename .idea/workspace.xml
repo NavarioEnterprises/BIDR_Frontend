@@ -5,23 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="feat: enhance notification system with improved loading, filtering, and user interaction">
-      <change afterPath="$PROJECT_DIR$/lib/assets/images/auction_icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/assets/images/spares1.png.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/pages/vehicle_auctions_coming_soon.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/google_places_helper.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Info.plist" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/authentication/otp_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/otp_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/authentication/registration/buyer_signup.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/registration/buyer_signup.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/authentication/splashscreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/splashscreen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/customWdget/appbar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customWdget/appbar.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/customWdget/custom_input2.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customWdget/custom_input2.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/pages/buyer/contact_form.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer/contact_form.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/pages/buyer_dashboard.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer_dashboard.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/pages/buyer_home.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer_home.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/pages/mobileView/landingPage/landingMobileViewPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/mobileView/landingPage/landingMobileViewPage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -298,7 +282,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757494170374</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="feat: enhance notification system with improved loading, filtering, and user interaction">
+      <option name="closed" value="true" />
+      <created>1757544010837</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1757544010837</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
