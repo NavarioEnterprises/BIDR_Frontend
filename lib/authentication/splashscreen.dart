@@ -44,14 +44,7 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: Colors.white,
       body: Container(
         width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          border: MediaQuery.of(context).size.width < 800
-              ? null
-              : Border.all(
-                  color: Constants.gtaColorLight,
-                  width: (MediaQuery.of(context).size.width < 800 ? 0 : 20),
-                ),
-        ),
+        decoration: BoxDecoration(border: null),
 
         child: Row(
           children: [
@@ -102,22 +95,25 @@ class _SplashScreenState extends State<SplashScreen>
                             if (MediaQuery.of(context).size.width < 800)
                               SizedBox(width: 16),
 
-                            IconButton(
-                              onPressed: () {
-                                context.go('/login');
-                              },
-                              style: IconButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: Constants.ftaColorLight,
-                                elevation: 5,
-                                shadowColor: Colors.black54,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 32.0),
+                              child: IconButton(
+                                onPressed: () {
+                                  context.go('/login');
+                                },
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Constants.ftaColorLight,
+                                  elevation: 5,
+                                  shadowColor: Colors.black54,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
-                              ),
-                              icon: Icon(
-                                CupertinoIcons.back,
-                                color: Constants.ftaColorLight,
+                                icon: Icon(
+                                  CupertinoIcons.back,
+                                  color: Constants.ftaColorLight,
+                                ),
                               ),
                             ),
                             Spacer(),
@@ -388,14 +384,14 @@ class _SplashScreenState extends State<SplashScreen>
                 color: Colors.white,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected 
-                      ? Constants.ctaColorLight 
+                  color: isSelected
+                      ? Constants.ctaColorLight
                       : Constants.ctaColorLight.withOpacity(0.3),
                   width: isSelected ? 8 : 4,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: isSelected 
+                    color: isSelected
                         ? Constants.ctaColorLight.withOpacity(0.3)
                         : Constants.ctaColorLight.withOpacity(0.1),
                     blurRadius: isSelected ? 16 : 8,
@@ -407,7 +403,7 @@ class _SplashScreenState extends State<SplashScreen>
               child: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isSelected 
+                  color: isSelected
                       ? Constants.ctaColorLight.withOpacity(0.05)
                       : Constants.ctaColorLight.withOpacity(0.02),
                 ),
@@ -417,8 +413,8 @@ class _SplashScreenState extends State<SplashScreen>
                     child: SvgPicture.asset(
                       icon,
                       fit: BoxFit.cover,
-                      color: isSelected 
-                          ? Constants.ctaColorLight 
+                      color: isSelected
+                          ? Constants.ctaColorLight
                           : Constants.ctaColorLight.withOpacity(0.7),
                     ),
                   ),
@@ -431,8 +427,8 @@ class _SplashScreenState extends State<SplashScreen>
               style: GoogleFonts.manrope(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: isSelected 
-                    ? Constants.ctaColorLight 
+                color: isSelected
+                    ? Constants.ctaColorLight
                     : Constants.ftaColorLight.withOpacity(0.8),
                 letterSpacing: 1.2,
               ),

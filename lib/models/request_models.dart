@@ -114,9 +114,10 @@ class CombinedRequest {
       rimTyreRequest: (json['rim_tyre_request'] as List<dynamic>? ?? [])
           .map((item) => RimTyreRequest.fromJson(item))
           .toList(),
-      consumerElectronicsRequest: (json['consumer_electronics_request'] as List<dynamic>? ?? [])
-          .map((item) => ConsumerElectronicsRequest.fromJson(item))
-          .toList(),
+      consumerElectronicsRequest:
+          (json['consumer_electronics_request'] as List<dynamic>? ?? [])
+              .map((item) => ConsumerElectronicsRequest.fromJson(item))
+              .toList(),
     );
   }
 
@@ -289,6 +290,7 @@ class MoreFields {
       partNumber: json['part_number'] ?? '',
       transmissionType: json['transmission_type'] ?? '',
       mileage: json['mileage'] ?? '',
+
       fuelType: json['fuel_type'] ?? '',
       bodyType: json['body_type'] ?? '',
     );

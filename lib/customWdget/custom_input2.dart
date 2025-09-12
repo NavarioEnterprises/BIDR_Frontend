@@ -1069,7 +1069,7 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
   @override
   Widget build(BuildContext context) {
     Color borderColor = widget.hasError == true ? Colors.red : Colors.black;
-    Color focusedBorderColor = widget.hasError == true ? Colors.red : Color(0xffED7D32);
+    Color focusedBorderColor = widget.hasError == true ? Colors.red : Colors.black;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1136,11 +1136,11 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
                   fontFamily: 'YuGothic',
                 ),
               ),
-              labelStyle: GoogleFonts.manrope(
+              labelStyle: TextStyle(
                 color: widget.hasError == true ? Colors.red : Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-
+                fontSize: 14.5,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'YuGothic',
               ),
               contentPadding: EdgeInsets.only(left: 16, top: 16),
               enabledBorder: OutlineInputBorder(
@@ -1459,8 +1459,8 @@ class CustomErrorDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color borderColor = hasError ? Colors.red : Constants.ftaColorLight;
-    Color focusedBorderColor = hasError ? Colors.red : Constants.ctaColorLight;
+    Color borderColor = hasError ? Colors.red : Colors.black;
+    Color focusedBorderColor = hasError ? Colors.red : Colors.black;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1473,7 +1473,7 @@ class CustomErrorDropdown<T> extends StatelessWidget {
               labelText: labelText + (isRequired ? ' *' : ''),
               labelStyle: TextStyle(
                 color: hasError ? Colors.red : Colors.black,
-                fontSize: 13.5,
+                fontSize: 14.5,
                 fontWeight: FontWeight.w500,
                 fontFamily: 'YuGothic',
               ),

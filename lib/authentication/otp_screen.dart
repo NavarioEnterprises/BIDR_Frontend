@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import '../constants/Constants.dart';
 import '../customWdget/customCard.dart';
 import '../global_values.dart';
+import '../models/user.dart';
 import '../pages/buyer_home.dart';
 import '../services/auth_api_service.dart';
 import '../services/shared_preferences.dart';
@@ -19,12 +20,14 @@ class BidrOTPVerificationScreen extends StatefulWidget {
   final String email;
   final String phone;
   final String? testOtp;
+  final Map<String, dynamic>? loginResponse;
 
   const BidrOTPVerificationScreen({
     Key? key,
     required this.email,
     required this.phone,
     this.testOtp,
+    this.loginResponse,
   }) : super(key: key);
 
   @override
@@ -189,17 +192,24 @@ class _BidrOTPVerificationScreenState extends State<BidrOTPVerificationScreen>
 
         // Navigate after a short delay to avoid Navigator conflicts
         Future.delayed(const Duration(milliseconds: 500), () async {
-          // Store login status
-          await Sharedprefs.saveUserLoggedInSharedPreference(true);
-          await Sharedprefs.saveCompleteLoginDataSharedPreference(
-            Constants.currentUser!.toJson().toString(),
-          );
-          await Sharedprefs.saveUserRoleSharedPreference(
-            Constants.currentUser!.role,
-          );
+          // Use login response data if available
+          if (widget.loginResponse != null) {
+            // Store complete login information as JSON
+            final loginResponseJson = jsonEncode(widget.loginResponse);
+            await Sharedprefs.saveCompleteLoginDataSharedPreference(
+              loginResponseJson,
+            );
+            
+            // Store login status
+            await Sharedprefs.saveUserLoggedInSharedPreference(true);
+            
+            // Create user model and set as current user
+            final loginResponse = LoginResponse.fromJson(widget.loginResponse!);
+            Constants.currentUser = loginResponse.user;
+            
+            // Store user role for backward compatibility
+            await Sharedprefs.saveUserRoleSharedPreference(loginResponse.user.role);
 
-          // Navigate based on user role
-          if (mounted && Constants.currentUser != null) {
             // Update global constants from the user model
             Constants.myUid = Constants.currentUser!.uid;
             Constants.userId = Constants.currentUser!.id;
@@ -209,6 +219,7 @@ class _BidrOTPVerificationScreenState extends State<BidrOTPVerificationScreen>
             Constants.myUsername = Constants.currentUser!.fullName;
             Constants.myEmail = Constants.currentUser!.email;
           }
+          
           if (mounted) {
             Navigator.pushReplacement(
               context,

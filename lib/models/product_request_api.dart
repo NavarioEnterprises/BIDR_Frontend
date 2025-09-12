@@ -1,3 +1,5 @@
+import 'request_models.dart';
+
 /// Model for Product Request API responses
 class ProductRequestApiResponse {
   final int count;
@@ -54,6 +56,8 @@ class ProductRequestItem {
   final List<QuoteItem> quotes;
   final List<String>? productImages;
   final List<String>? images;
+  final String? vinPhotoUrl;
+  final Map<String, dynamic>? productSpecifications;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -78,6 +82,8 @@ class ProductRequestItem {
     required this.quotes,
     this.productImages,
     this.images,
+    this.vinPhotoUrl,
+    this.productSpecifications,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -115,6 +121,8 @@ class ProductRequestItem {
       images: (json['images'] as List<dynamic>?)
           ?.map((image) => image.toString())
           .toList(),
+      vinPhotoUrl: json['vin_photo_url'],
+      productSpecifications: json['product_specifications'] as Map<String, dynamic>?,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );
@@ -142,9 +150,272 @@ class ProductRequestItem {
       'quotes': quotes.map((quote) => quote.toJson()).toList(),
       'product_images': productImages,
       'images': images,
+      'vin_photo_url': vinPhotoUrl,
+      'product_specifications': productSpecifications,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
+  }
+
+  // Helper method to convert urgency timeline from API format to display format
+  String getUrgencyDisplay() {
+    switch (urgencyTimeline) {
+      case '1_WEEK':
+        return '7 days';
+      case '2_WEEKS':
+        return '14 days';
+      case '1_MONTH':
+        return '1 month';
+      case '24_HOURS':
+        return '24 hours';
+      case '12_HOURS':
+        return '12 hours';
+      default:
+        return urgencyTimeline;
+    }
+  }
+
+  // Helper method to extract mileage from product specifications
+  String getMileage() {
+    if (productSpecifications != null) {
+      // Try to get mileage from various possible fields
+      final mileage = productSpecifications!['mileage']?.toString() ?? 
+                     productSpecifications!['vehicle_mileage']?.toString() ??
+                     '0';
+      return mileage;
+    }
+    return '0';
+  }
+
+  // Convert ProductRequestItem to AutoSparesRequest format for compatibility with detail screens
+  AutoSparesRequest toAutoSparesRequest() {
+    // Extract vehicle and part information from product_specifications
+    final specs = productSpecifications ?? {};
+    
+    // Create VehicleDetails from available data
+    final vehicleDetails = VehicleDetails(
+      vin: specs['vin_number']?.toString() ?? getVinNumber(),
+      manufacturer: specs['vehicle_make']?.toString() ?? '',
+      makeModel: specs['vehicle_model']?.toString() ?? '',
+      type: _mapVehicleType(specs['vehicle_type']?.toString()),
+      condition: specs['condition_preference']?.toString() ?? conditionPreference ?? '',
+      year: specs['vehicle_year']?.toString() ?? '',
+    );
+
+    // Extract location info if available
+    final locationInfo = specs['location_info'] as Map<String, dynamic>?;
+    final locationAddress = locationInfo?['address']?.toString() ?? 'Unknown';
+
+    // Create PartDetails from available data
+    final partDetails = PartDetails(
+      partName: specs['part_name']?.toString() ?? title,
+      quantity: specs['quantity'] ?? quantity ?? 1,
+      location: locationAddress,
+      maxDistanceKm: 50.0, // Default value as seen in debug output
+      urgency: getCountdownDisplay(),
+      productDescription: specs['description']?.toString() ?? description,
+      imageUrls: specs['product_images']?.cast<String>() ?? productImages ?? [],
+    );
+
+    // Create MoreFields from available data  
+    final moreFields = MoreFields(
+      partNumber: specs['part_number']?.toString() ?? '',
+      transmissionType: specs['transmission_type']?.toString() ?? 'Unknown',
+      mileage: specs['mileage']?.toString() ?? getMileage(),
+      fuelType: specs['fuel_type']?.toString() ?? 'Unknown',  
+      bodyType: specs['body_type']?.toString() ?? 'Unknown',
+    );
+
+    // Create AutoSpares object
+    final autoSpares = AutoSpares(
+      vehicleDetails: vehicleDetails,
+      partDetails: partDetails,
+      moreFields: moreFields,
+    );
+
+    // Return AutoSparesRequest
+    return AutoSparesRequest(
+      id: requestId,
+      status: status,
+      category: category,
+      createdAt: createdAt,
+      autoSpares: autoSpares,
+      sellerOffers: quotes,
+      productImages: productImages,
+      images: images,
+    );
+  }
+
+  // Helper method to map vehicle type from API to display format
+  String _mapVehicleType(String? vehicleType) {
+    switch (vehicleType) {
+      case 'PASSENGER_CAR':
+        return 'Passenger Car';
+      case 'SUV':
+        return 'SUV';
+      case 'TRUCK':
+        return 'Truck';
+      case 'MOTORCYCLE':
+        return 'Motorcycle';
+      default:
+        return vehicleType ?? 'Unknown';
+    }
+  }
+
+  // Helper method to map urgency from specs format
+  String? _mapUrgencyFromSpecs(String? urgency) {
+    switch (urgency) {
+      case '1_WEEK':
+        return '1 Week';
+      case '1_MONTH':
+        return '1 Month';
+      case '24_HOURS':
+        return '24 Hours';
+      case '12_HOURS':
+        return '12 Hours';
+      default:
+        return urgency;
+    }
+  }
+
+  // Get the duration in hours for countdown calculation
+  int getUrgencyDurationInHours() {
+    switch (urgencyTimeline) {
+      case '1_WEEK':
+        return 7 * 24; // 7 days * 24 hours
+      case '2_WEEKS':
+        return 14 * 24; // 14 days * 24 hours
+      case '1_MONTH':
+        return 30 * 24; // 30 days * 24 hours (approximate)
+      case '24_HOURS':
+        return 24;
+      case '12_HOURS':
+        return 12;
+      case '6_HOURS':
+        return 6;
+      default:
+        return 7 * 24; // Default to 1 week
+    }
+  }
+
+  // Calculate remaining time from creation date
+  Duration getRemainingTime() {
+    final totalDuration = Duration(hours: getUrgencyDurationInHours());
+    final deadline = createdAt.add(totalDuration);
+    final now = DateTime.now();
+    
+    if (deadline.isBefore(now)) {
+      return Duration.zero; // Expired
+    }
+    
+    return deadline.difference(now);
+  }
+
+  // Get countdown display string
+  String getCountdownDisplay() {
+    final remaining = getRemainingTime();
+    
+    if (remaining == Duration.zero) {
+      return "Expired";
+    }
+    
+    final days = remaining.inDays;
+    final hours = remaining.inHours % 24;
+    final minutes = remaining.inMinutes % 60;
+    
+    if (days > 0) {
+      return "${days}d ${hours}h ${minutes}m";
+    } else if (hours > 0) {
+      return "${hours}h ${minutes}m";
+    } else {
+      return "${minutes}m";
+    }
+  }
+
+  // Get countdown percentage (0.0 to 1.0) for circular progress
+  double getCountdownPercentage() {
+    final totalDuration = Duration(hours: getUrgencyDurationInHours());
+    final remaining = getRemainingTime();
+    
+    if (remaining == Duration.zero) {
+      return 0.0; // Expired
+    }
+    
+    return remaining.inMilliseconds / totalDuration.inMilliseconds;
+  }
+
+  // Helper methods to extract additional details from product specifications
+  String getEngineSize() {
+    if (productSpecifications != null) {
+      return productSpecifications!['engine_size']?.toString() ?? '';
+    }
+    return '';
+  }
+
+  String getVinNumber() {
+    if (productSpecifications != null) {
+      return productSpecifications!['vin_number']?.toString() ?? '';
+    }
+    return '';
+  }
+
+  String getPartCategory() {
+    if (productSpecifications != null) {
+      return productSpecifications!['part_category']?.toString() ?? '';
+    }
+    return '';
+  }
+
+  String getCompatibleModels() {
+    if (productSpecifications != null) {
+      return productSpecifications!['compatible_models']?.toString() ?? '';
+    }
+    return '';
+  }
+
+  String getPreferredBrand() {
+    if (productSpecifications != null) {
+      return productSpecifications!['preferred_brand']?.toString() ?? '';
+    }
+    return '';
+  }
+
+  String getAvoidBrands() {
+    if (productSpecifications != null) {
+      return productSpecifications!['avoid_brands']?.toString() ?? '';
+    }
+    return '';
+  }
+
+  String getInstallationRequired() {
+    if (productSpecifications != null) {
+      final value = productSpecifications!['installation_required']?.toString() ?? 'NO';
+      return value == 'YES' ? 'Yes' : 'No';
+    }
+    return 'No';
+  }
+
+  String getWarrantyRequired() {
+    if (productSpecifications != null) {
+      final value = productSpecifications!['warranty_required']?.toString() ?? 'NO';
+      return value == 'YES' ? 'Yes' : 'No';
+    }
+    return 'No';
+  }
+
+  String getWarrantyDuration() {
+    if (productSpecifications != null) {
+      return productSpecifications!['warranty_duration']?.toString() ?? '';
+    }
+    return '';
+  }
+
+  String getEnergyEfficiencyRequired() {
+    if (productSpecifications != null) {
+      final value = productSpecifications!['energy_efficiency_required']?.toString() ?? 'NO';
+      return value == 'YES' ? 'Yes' : 'No';
+    }
+    return 'No';
   }
 }
 

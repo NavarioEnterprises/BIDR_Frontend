@@ -58,6 +58,7 @@ class AuthApiService {
       'confirm_password': confirmPassword,
       'delivery_method': deliveryMethod,
     });
+
     print('Making request to: $url');
     print('Headers: $headers');
     print('Body: $body');
@@ -88,11 +89,11 @@ class AuthApiService {
         try {
           final jsonResponse =
               jsonDecode(response.body) as Map<String, dynamic>;
-          return {
-            'success': false,
-            'statusCode': response.statusCode,
-            'errors': jsonResponse,
-          };
+
+          // For registration errors, preserve the backend response structure
+          // while adding statusCode for compatibility
+          jsonResponse['statusCode'] = response.statusCode;
+          return jsonResponse;
         } catch (e) {
           // If response body is not valid JSON
           return {
@@ -641,7 +642,9 @@ class AuthApiService {
   Future<Map<String, dynamic>?> getUserProfile({
     required String accessToken,
   }) async {
-    var url = Uri.parse('${GlobalVariables.authServiceUrl}profile/comprehensive/');
+    var url = Uri.parse(
+      '${GlobalVariables.authServiceUrl}profile/comprehensive/',
+    );
     var request = http.Request('GET', url);
     request.headers['Content-Type'] = 'application/json';
     request.headers['Authorization'] = 'Bearer $accessToken';
@@ -678,10 +681,7 @@ class AuthApiService {
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
     request.headers['Authorization'] = 'Bearer $accessToken';
-    request.body = jsonEncode({
-      'subject': subject,
-      'message': message,
-    });
+    request.body = jsonEncode({'subject': subject, 'message': message});
 
     try {
       http.StreamedResponse response = await request.send();
@@ -753,16 +753,15 @@ class AuthApiService {
     int page = 1,
   }) async {
     // Build query parameters
-    Map<String, String> queryParams = {
-      'page': page.toString(),
-    };
+    Map<String, String> queryParams = {'page': page.toString()};
     if (startDate != null) queryParams['start_date'] = startDate;
     if (endDate != null) queryParams['end_date'] = endDate;
     if (status != null) queryParams['status'] = status;
 
-    var uri = Uri.parse('${GlobalVariables.transactionsServiceUrl}api/v1/payment-transactions/seller-earnings/')
-        .replace(queryParameters: queryParams);
-    
+    var uri = Uri.parse(
+      '${GlobalVariables.transactionsServiceUrl}api/v1/payment-transactions/seller-earnings/',
+    ).replace(queryParameters: queryParams);
+
     var request = http.Request('GET', uri);
     request.headers['Content-Type'] = 'application/json';
     request.headers['Authorization'] = 'Bearer $accessToken';
@@ -787,6 +786,67 @@ class AuthApiService {
     } catch (e) {
       print('Error occurred: $e');
       return {'success': false, 'error': 'Network or parsing error: $e'};
+    }
+  }
+
+  // Check if user exists and their authentication status
+  Future<Map<String, dynamic>?> checkUserStatus(String email) async {
+    final url = Uri.parse(
+      '${GlobalVariables.authServiceUrl}check-user-status/',
+    );
+    final headers = {'Content-Type': 'application/json'};
+
+    try {
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode({'email': email}),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        print('User status check: $jsonResponse');
+        return jsonResponse;
+      } else {
+        print('User status check failed: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error checking user status: $e');
+      return null;
+    }
+  }
+
+  // Update user role to include both buyer and seller
+  Future<Map<String, dynamic>?> updateUserRole({
+    required String email,
+    required String newRole,
+  }) async {
+    final url = Uri.parse('${GlobalVariables.authServiceUrl}update-user-role/');
+    final headers = {'Content-Type': 'application/json'};
+
+    try {
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode({'email': email, 'role': newRole}),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        print('User role updated: $jsonResponse');
+        return jsonResponse;
+      } else {
+        print('User role update failed: ${response.statusCode}');
+        final errorResponse = jsonDecode(response.body);
+        return {
+          'success': false,
+          'error': errorResponse['error'] ?? 'Failed to update user role',
+        };
+      }
+    } catch (e) {
+      print('Error updating user role: $e');
+      return {'success': false, 'error': 'Network error occurred'};
     }
   }
 }

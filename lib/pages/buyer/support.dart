@@ -2464,7 +2464,8 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
                                   ),
                                 ),
                                 TextButton(
-                                  onPressed: () => _showFilteredNotifications('all'),
+                                  onPressed: () =>
+                                      _showFilteredNotifications('all'),
                                   child: Text(
                                     'View all',
                                     style: TextStyle(
@@ -2581,10 +2582,10 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
 
   void _showFilteredNotifications(String filter) {
     _removeOverlay();
-    
+
     List<WebNotification> filteredNotifications;
     String title;
-    
+
     switch (filter) {
       case 'all':
         filteredNotifications = notifications;
@@ -2602,7 +2603,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
         filteredNotifications = notifications;
         title = 'All Notifications';
     }
-    
+
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -2614,10 +2615,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
           child: Container(
             width: MediaQuery.of(context).size.width * 0.9,
             height: MediaQuery.of(context).size.height * 0.8,
-            constraints: const BoxConstraints(
-              maxWidth: 600,
-              maxHeight: 700,
-            ),
+            constraints: const BoxConstraints(maxWidth: 600, maxHeight: 700),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
@@ -2628,10 +2626,16 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Constants.ctaColorLight,
+                    color: Colors.white,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20),
+                    ),
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey.shade200,
+                        width: 1,
+                      ),
                     ),
                   ),
                   child: Row(
@@ -2639,14 +2643,14 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Colors.grey.shade800,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white),
+                        icon: Icon(Icons.close, color: Colors.grey.shade600),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                     ],
@@ -2692,6 +2696,174 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
         );
       },
     );
+  }
+
+  void _showSingleNotification(WebNotification notification) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(20),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            constraints: const BoxConstraints(maxWidth: 500),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey.shade200,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          notification.title,
+                          style: TextStyle(
+                            color: Colors.grey.shade800,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close, color: Colors.grey.shade600),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                ),
+                // Content
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Status indicator
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: notification.read
+                              ? Colors.grey.shade100
+                              : Constants.ctaColorLight.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: notification.read
+                                ? Colors.grey.shade300
+                                : Constants.ctaColorLight.withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          notification.read ? 'Read' : 'Unread',
+                          style: TextStyle(
+                            color: notification.read
+                                ? Colors.grey.shade600
+                                : Constants.ctaColorLight,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Message content
+                      Text(
+                        notification.body,
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 16,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Timestamp
+                      Text(
+                        _formatTimestamp(notification.createdAt),
+                        style: TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Mark as read/unread button
+                      if (!notification.read)
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _markNotificationAsRead(notification.id);
+                              Navigator.of(context).pop();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Constants.ctaColorLight,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text(
+                              'Mark as Read',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _formatTimestamp(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inMinutes < 1) {
+      return 'Just now';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes}m ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inDays == 1) {
+      return 'Yesterday';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays}d ago';
+    } else {
+      return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
+    }
   }
 
   Widget _buildRecentNotifications() {
@@ -2791,12 +2963,16 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
   }) {
     return InkWell(
       onTap: () {
+        // Close the overlay first
+        _removeOverlay();
+        
+        // Show single notification dialog
+        _showSingleNotification(notification);
+        
         // Mark as read if it's unread
         if (!notification.read) {
           _markNotificationAsRead(notification.id);
         }
-        // You can add additional logic here like navigating to a detailed view
-        print('Notification tapped: ${notification.title}');
       },
       borderRadius: BorderRadius.circular(8),
       child: Container(
@@ -2916,28 +3092,29 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 60,
-      width: MediaQuery.of(context).size.width,
-      color: Constants.ctaColorLight,
-      padding: EdgeInsets.only(left: 68, right: 68, top: 8, bottom: 8),
-      child: Row(
-        children: [
-          Text(
-            widget.headerName,
-            style: TextStyle(
-              color: Constants.ftaColorLight,
-              fontSize: 16,
-              fontFamily: 'YuGothic',
+    return GestureDetector(
+      onTap: _showNotificationOverlay,
+      child: Container(
+        height: 60,
+        width: MediaQuery.of(context).size.width,
+        color: Constants.ctaColorLight,
+        padding: EdgeInsets.only(left: 68, right: 68, top: 8, bottom: 8),
+        child: Row(
+          children: [
+            Text(
+              widget.headerName,
+              style: TextStyle(
+                color: Constants.ftaColorLight,
+                fontSize: 16,
+                fontFamily: 'YuGothic',
+              ),
             ),
-          ),
-          Spacer(),
-          badges.Badge(
-            position: badges.BadgePosition.topEnd(top: -6, end: -6),
+            Spacer(),
+            badges.Badge(
+              position: badges.BadgePosition.topEnd(top: -6, end: -6),
 
-            showBadge: _unreadCount > 0,
-            ignorePointer: false,
-            onTap: _showNotificationOverlay,
+              showBadge: _unreadCount > 0,
+              ignorePointer: true,
             badgeContent: Text(
               _unreadCount.toString(),
               style: TextStyle(
@@ -2975,6 +3152,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
           ),
         ],
       ),
+    ),
     );
   }
 }

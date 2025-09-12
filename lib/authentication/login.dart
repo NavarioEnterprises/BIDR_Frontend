@@ -13,6 +13,7 @@ import '../pages/seller/seller_home_dashboard.dart';
 import '../models/user.dart';
 import '../services/auth_api_service.dart';
 import 'forgot_password.dart';
+import 'otp_screen.dart';
 import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
@@ -65,6 +66,26 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     if (response != null) {
+      // Check if OTP is verified
+      final bool isOtpVerified =
+          response['otp_verified'] ??
+          true; // Default to true for backward compatibility
+
+      if (!isOtpVerified) {
+        // User needs to verify OTP, navigate to OTP screen
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (context) => BidrOTPVerificationScreen(
+              email: _emailController.text.trim(),
+              phone: response['user']?['phone_number'] ?? '',
+              loginResponse: response,
+            ),
+          ),
+        );
+        return;
+      }
+
       // Store complete login information as JSON
       final loginResponseJson = jsonEncode(response);
       await Sharedprefs.saveCompleteLoginDataSharedPreference(
@@ -92,8 +113,15 @@ class _LoginPageState extends State<LoginPage> {
         Constants.myUsername = Constants.currentUser!.fullName;
         Constants.myEmail = Constants.currentUser!.email;
 
-        // Navigate to dashboard
-        context.go('/dashboard');
+        // Check if user has dual roles (buyer,seller)
+        final userRole = Constants.currentUser!.role;
+        if (userRole.contains(',')) {
+          // User has multiple roles, show selection dialog
+          _showRoleSelectionDialog(userRole);
+        } else {
+          // Single role, navigate directly
+          _navigateToRoleDashboard(userRole);
+        }
       }
     } else {
       // Show error message
@@ -116,6 +144,75 @@ class _LoginPageState extends State<LoginPage> {
   void _handleSignUp() {
     // Navigate to sign up page
     print('Sign up clicked');
+  }
+
+  void _showRoleSelectionDialog(String userRole) {
+    final roles = userRole.split(',');
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Select Role',
+            style: GoogleFonts.manrope(
+              fontWeight: FontWeight.bold,
+              color: Constants.ftaColorLight,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'You have access to multiple roles. Please select how you would like to login:',
+                style: GoogleFonts.manrope(fontSize: 14),
+              ),
+              const SizedBox(height: 20),
+              ...roles.map(
+                (role) => Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _navigateToRoleDashboard(role.trim());
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Constants.ctaColorLight,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      role.trim() == 'buyer'
+                          ? 'Login as Buyer'
+                          : 'Login as Seller',
+                      style: GoogleFonts.manrope(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _navigateToRoleDashboard(String role) {
+    if (role.trim() == 'buyer') {
+      context.go('/dashboard');
+    } else if (role.trim() == 'seller') {
+      context.go('/seller-dashboard');
+    } else {
+      // Fallback to generic dashboard route
+      context.go('/dashboard');
+    }
   }
 
   @override
@@ -500,6 +597,26 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
     });
 
     if (response != null) {
+      // Check if OTP is verified
+      final bool isOtpVerified =
+          response['otp_verified'] ??
+          true; // Default to true for backward compatibility
+
+      if (!isOtpVerified) {
+        // User needs to verify OTP, navigate to OTP screen
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (context) => BidrOTPVerificationScreen(
+              email: _emailController.text.trim(),
+              phone: response['user']?['phone_number'] ?? '',
+              loginResponse: response,
+            ),
+          ),
+        );
+        return;
+      }
+
       // Store complete login information as JSON
       final loginResponseJson = jsonEncode(response);
       await Sharedprefs.saveCompleteLoginDataSharedPreference(
@@ -527,8 +644,15 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
         Constants.myUsername = Constants.currentUser!.fullName;
         Constants.myEmail = Constants.currentUser!.email;
 
-        // Navigate to dashboard
-        context.go('/dashboard');
+        // Check if user has dual roles (buyer,seller)
+        final userRole = Constants.currentUser!.role;
+        if (userRole.contains(',')) {
+          // User has multiple roles, show selection dialog
+          _showRoleSelectionDialog(userRole);
+        } else {
+          // Single role, navigate directly
+          _navigateToRoleDashboard(userRole);
+        }
       }
     } else {
       // Show error message
@@ -540,6 +664,75 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
           ),
         );
       }
+    }
+  }
+
+  void _showRoleSelectionDialog(String userRole) {
+    final roles = userRole.split(',');
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Select Role',
+            style: GoogleFonts.manrope(
+              fontWeight: FontWeight.bold,
+              color: Constants.ftaColorLight,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'You have access to multiple roles. Please select how you would like to login:',
+                style: GoogleFonts.manrope(fontSize: 14),
+              ),
+              const SizedBox(height: 20),
+              ...roles.map(
+                (role) => Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _navigateToRoleDashboard(role.trim());
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Constants.ctaColorLight,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      role.trim() == 'buyer'
+                          ? 'Login as Buyer'
+                          : 'Login as Seller',
+                      style: GoogleFonts.manrope(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _navigateToRoleDashboard(String role) {
+    if (role.trim() == 'buyer') {
+      context.go('/buyer-home');
+    } else if (role.trim() == 'seller') {
+      context.go('/seller-dashboard');
+    } else {
+      // Fallback to generic dashboard route
+      context.go('/dashboard');
     }
   }
 
