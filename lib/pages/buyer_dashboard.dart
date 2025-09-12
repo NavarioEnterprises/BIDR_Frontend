@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 import '../config/environment_config.dart';
+import '../customWdget/appbar.dart';
 import '../customWdget/dropdownMenu.dart';
 import '../models/request_models.dart';
 import '../models/product_request_api.dart';
@@ -102,6 +103,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       children: [
         SizedBox(height: 24),
         BuyerDashboardHeader(headerName: "Buyer's Dashboard"),
+        SizedBox(height: 24),
         Padding(
           padding: const EdgeInsets.only(left: 68, right: 68),
           child: Center(
@@ -1340,13 +1342,13 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
   Widget _buildEmptyStateCard() {
     return Container(
-      width: 350,
-      height: 400,
+      width: double.infinity,
+      height: 500,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: Colors.grey.shade50),
       ),
       child: Center(
         child: Column(
@@ -1381,13 +1383,16 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    _fetchProductRequests();
+                    // Navigate to landing page
+                    Constants.buyerAppBarValue = 0;
+                    appBarValueNotifier.value++;
+                    buyerHomeValueNotifier.value++;
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Constants.ftaColorLight,
                     foregroundColor: Colors.white,
                   ),
-                  child: Text('Refresh'),
+                  child: Text('Add a Request'),
                 ),
                 /*SizedBox(width: 12),
                 ElevatedButton(
@@ -1401,6 +1406,16 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                   child: Text('Test API'),
                 ),*/
               ],
+            ),
+            SizedBox(height: 12),
+            Text(
+              'Refresh',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: Constants.ftaColorLight,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -1574,12 +1589,20 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       switch (request.category) {
         case "VEHICLE_SPARES":
         case "Vehicle Spares":
+          // Convert ProductRequestItem to AutoSparesRequest if needed
+          dynamic autoSpareData;
+          if (request.runtimeType.toString().contains('ProductRequestItem')) {
+            autoSpareData = request.toAutoSparesRequest().autoSpares;
+          } else {
+            autoSpareData = request.autoSpares ?? request.autoSpare;
+          }
+
           SparesDetailScreen.showAsDialog(
             context,
             index: index,
             request: request,
-            autoSpare: request.autoSpares ?? request.autoSpare,
-            bids: request.sellerOffers ?? [],
+            autoSpare: autoSpareData,
+            bids: request.sellerOffers ?? request.quotes ?? [],
           );
           break;
 
@@ -4804,6 +4827,170 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
 
   SortOption? _currentSort;
   final Set<String> _cancelledRequests = {};
+  int _currentProductImageIndex = 0;
+  Map<String, dynamic>? _getProductSpecifications() {
+    try {
+      if (widget.request.runtimeType.toString().contains(
+        'ProductRequestItem',
+      )) {
+        final productRequest = widget.request as dynamic;
+        return productRequest.productSpecifications as Map<String, dynamic>?;
+      }
+      return null;
+    } catch (e) {
+      print('Error getting product specifications: $e');
+      return null;
+    }
+  }
+
+  // Helper method to get part number
+  String _getPartNumber() {
+    try {
+      final specs = _getProductSpecifications();
+      if (specs != null && specs['part_number'] != null) {
+        final partNumber = specs['part_number'].toString();
+        return partNumber.isEmpty ? "Not specified" : partNumber;
+      }
+
+      return "Not specified";
+    } catch (e) {
+      print('Error getting part number: $e');
+      return "Not specified";
+    }
+  }
+
+  // Helper method to get transmission type
+  String _getTransmissionType() {
+    try {
+      final specs = _getProductSpecifications();
+      if (specs != null && specs['transmission_type'] != null) {
+        final transmissionType = specs['transmission_type'].toString();
+        return transmissionType.isEmpty ? "Not specified" : transmissionType;
+      }
+
+      // Check if there's a vehicle_type field that might indicate transmission
+      if (specs != null && specs['vehicle_type'] != null) {
+        final vehicleType = specs['vehicle_type'].toString();
+        return "Vehicle Type: $vehicleType";
+      }
+
+      return "Not specified";
+    } catch (e) {
+      print('Error getting transmission type: $e');
+      return "Not specified";
+    }
+  }
+
+  // Helper method to get mileage
+  String _getMileage() {
+    try {
+      final specs = _getProductSpecifications();
+      if (specs != null && specs['mileage'] != null) {
+        final mileage = specs['mileage'].toString();
+        return mileage.isEmpty || mileage == "0"
+            ? "Not specified"
+            : "$mileage km";
+      }
+
+      // If mileage is not available, show vehicle year as an alternative
+      if (specs != null && specs['vehicle_year'] != null) {
+        final year = specs['vehicle_year'].toString();
+        return "Year: $year";
+      }
+
+      return "Not specified";
+    } catch (e) {
+      print('Error getting mileage: $e');
+      return "Not specified";
+    }
+  }
+
+  // Helper method to get fuel type
+  String _getFuelType() {
+    try {
+      final specs = _getProductSpecifications();
+      if (specs != null && specs['fuel_type'] != null) {
+        final fuelType = specs['fuel_type'].toString();
+        return fuelType.isEmpty ? "Not specified" : fuelType;
+      }
+
+      // If fuel type is not available, show vehicle make as an alternative
+      if (specs != null && specs['vehicle_make'] != null) {
+        final make = specs['vehicle_make'].toString();
+        return "Make: $make";
+      }
+
+      return "Not specified";
+    } catch (e) {
+      print('Error getting fuel type: $e');
+      return "Not specified";
+    }
+  }
+
+  // Helper method to get body type
+  String _getBodyType() {
+    try {
+      final specs = _getProductSpecifications();
+      if (specs != null && specs['body_type'] != null) {
+        final bodyType = specs['body_type'].toString();
+        return bodyType.isEmpty ? "Not specified" : bodyType;
+      }
+
+      // If body type is not available, show vehicle model as an alternative
+      if (specs != null && specs['vehicle_model'] != null) {
+        final model = specs['vehicle_model'].toString();
+        return "Model: $model";
+      }
+
+      return "Not specified";
+    } catch (e) {
+      print('Error getting body type: $e');
+      return "Not specified";
+    }
+  }
+
+  // Helper method to get engine size
+  String _getEngineSize() {
+    try {
+      final specs = _getProductSpecifications();
+      if (specs != null && specs['engine_size'] != null) {
+        final engineSize = specs['engine_size'].toString();
+        return engineSize.isEmpty ? "Not specified" : engineSize;
+      }
+
+      return "Not specified";
+    } catch (e) {
+      print('Error getting engine size: $e');
+      return "Not specified";
+    }
+  }
+
+  // Helper method to get vehicle type display name
+  String _getVehicleTypeDisplay() {
+    try {
+      final specs = _getProductSpecifications();
+      if (specs != null && specs['vehicle_type'] != null) {
+        final vehicleType = specs['vehicle_type'].toString();
+        switch (vehicleType) {
+          case 'PASSENGER_CAR':
+            return 'Passenger Car';
+          case 'COMMERCIAL_VEHICLE':
+            return 'Commercial Vehicle';
+          case 'MOTORCYCLE':
+            return 'Motorcycle';
+          case 'TRUCK':
+            return 'Truck';
+          default:
+            return vehicleType.isEmpty ? "Not specified" : vehicleType;
+        }
+      }
+
+      return "Not specified";
+    } catch (e) {
+      print('Error getting vehicle type: $e');
+      return "Not specified";
+    }
+  }
 
   String _getCategoryDisplayName(String category) {
     switch (category) {
@@ -4816,6 +5003,73 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
       default:
         return category;
     }
+  }
+
+  // Helper method to get product images from request
+  List<String> _getProductImages() {
+    try {
+      if (widget.request.productImages?.isNotEmpty == true) {
+        return widget.request.productImages!;
+      }
+      if (widget.request.images?.isNotEmpty == true) {
+        return widget.request.images!;
+      }
+      return [];
+    } catch (e) {
+      print('Error getting product images: $e');
+      return [];
+    }
+  }
+
+  // Helper method to get VIN image URL
+  String? _getVinImageUrl() {
+    try {
+      // Check if request is ProductRequestItem and has vinPhotoUrl
+      if (widget.request != null &&
+          widget.request.runtimeType.toString().contains(
+            'ProductRequestItem',
+          )) {
+        final productRequest = widget.request as dynamic;
+
+        // First try vinPhotoUrl field
+        if (productRequest.vinPhotoUrl != null &&
+            productRequest.vinPhotoUrl.isNotEmpty) {
+          return productRequest.vinPhotoUrl;
+        }
+
+        // Then try vin_photo from product_specifications
+        if (productRequest.productSpecifications != null) {
+          final specs =
+              productRequest.productSpecifications as Map<String, dynamic>;
+          final vinPhoto = specs['vin_photo'];
+          if (vinPhoto != null && vinPhoto.toString().isNotEmpty) {
+            return vinPhoto.toString();
+          }
+        }
+      }
+
+      return null;
+    } catch (e) {
+      print('Error getting VIN image: $e');
+      return null;
+    }
+  }
+
+  // Helper method to get full image URL (using the existing method from parent)
+  String _getFullImageUrl(String imagePath) {
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+
+    // Remove leading slash if present
+    final cleanPath = imagePath.startsWith('/')
+        ? imagePath.substring(1)
+        : imagePath;
+
+    // Build full URL using the products service URL
+    String baseUrl = GlobalVariables.productsServiceUrl;
+    return '$baseUrl$cleanPath';
   }
 
   Widget _buildTimerCircle(String value, String label) {
@@ -5361,28 +5615,34 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                 [
                                   _buildDetailItem(
                                     "Part Number",
-                                    widget.autoSpare.moreFields.partNumber,
+                                    _getPartNumber(), // Use helper method
+                                  ),
+                                  _buildDetailItem(
+                                    "Engine Size",
+                                    _getEngineSize(), // Add engine size
                                   ),
                                   _buildDetailItem(
                                     "Transmission Type",
-                                    widget
-                                        .autoSpare
-                                        .moreFields
-                                        .transmissionType,
+                                    _getTransmissionType(), // Use helper method
                                   ),
                                   _buildDetailItem(
                                     "Mileage of Vehicle",
-                                    widget.autoSpare.moreFields.mileage,
+                                    _getMileage(), // Use helper method
                                   ),
                                   _buildDetailItem(
                                     "Fuel Type",
-                                    widget.autoSpare.moreFields.fuelType,
+                                    _getFuelType(), // Use helper method
                                   ),
                                   _buildDetailItem(
                                     "Body Type",
-                                    widget.autoSpare.moreFields.bodyType,
+                                    _getBodyType(), // Use helper method
                                   ),
-                                  _buildDetailItem("Enquiry Time", "24 Hours"),
+                                  _buildDetailItem(
+                                    "Enquiry Time",
+                                    _getUrgencyDisplayName(
+                                      widget.request,
+                                    ), // Use helper for urgency
+                                  ),
                                 ],
                               ),
                             ),
@@ -5521,7 +5781,7 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
           ),
           SizedBox(height: 6),
           if (showImage) ...[
-            // Show placeholder image for VIN
+            // Show actual VIN image
             Container(
               height: 80,
               width: double.infinity,
@@ -5532,113 +5792,302 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  'assets/images/mechanic_working.jpg', // You would replace this with actual image
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[200],
-                      child: Center(
-                        child: Icon(
-                          Icons.image,
-                          color: Colors.grey[400],
-                          size: 24,
+                child: _getVinImageUrl() != null
+                    ? Image.network(
+                        _getFullImageUrl(_getVinImageUrl()!),
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: Colors.grey[200],
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value:
+                                    loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                          (loadingProgress.expectedTotalBytes ??
+                                              1)
+                                    : null,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[200],
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.image_not_supported,
+                                    color: Colors.grey[400],
+                                    size: 24,
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'VIN Image\nNot Available',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.grey[500],
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        color: Colors.grey[200],
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image_not_supported,
+                                color: Colors.grey[400],
+                                size: 24,
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'No VIN Image\nProvided',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    );
-                  },
-                ),
               ),
             ),
             SizedBox(height: 6),
           ],
           if (isProductImages) ...[
-            Container(
-              height: 80,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Color(0xFFE0E0E0)),
-              ),
-              child: Stack(
-                children: [
-                  ClipRRect(
+            Builder(
+              builder: (context) {
+                final productImages = _getProductImages();
+
+                if (productImages.isEmpty) {
+                  return Container(
+                    height: 80,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Color(0xFFE0E0E0)),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.image_not_supported,
+                            color: Colors.grey[400],
+                            size: 30,
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'No Product Images\nProvided',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                // Ensure current index is within bounds
+                if (_currentProductImageIndex >= productImages.length) {
+                  _currentProductImageIndex = 0;
+                }
+
+                return Container(
+                  height: 80,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(10),
-                    child: Image.asset(
-                      'assets/images/mechanic_working.jpg', // You would replace this with actual image
-                      width: double.infinity,
-                      height: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[200],
-                          child: Center(
-                            child: Icon(
-                              Icons.image,
-                              color: Colors.grey[400],
-                              size: 30,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    border: Border.all(color: Color(0xFFE0E0E0)),
                   ),
-                  // Navigation arrows
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: IconButton(
-                            onPressed: () {
-                              setState(() {});
-                            },
-                            icon: Icon(
-                              Icons.arrow_back_ios,
-                              color: Constants.ftaColorLight,
-                              size: 12,
-                            ),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          _getFullImageUrl(
+                            productImages[_currentProductImageIndex],
                           ),
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              color: Colors.grey[200],
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  value:
+                                      loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                            (loadingProgress
+                                                    .expectedTotalBytes ??
+                                                1)
+                                      : null,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey[200],
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.image_not_supported,
+                                      color: Colors.grey[400],
+                                      size: 24,
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      'Image Failed\nto Load',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.grey[500],
+                                        fontSize: 9,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: IconButton(
-                            onPressed: () {
-                              setState(() {});
-                            },
-                            icon: Icon(
-                              Icons.arrow_forward_ios,
-                              color: Constants.ftaColorLight,
-                              size: 12,
+                      // Image counter
+                      if (productImages.length > 1) ...[
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '${_currentProductImageIndex + 1}/${productImages.length}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
+                      ],
+                      // Navigation arrows (only show if multiple images)
+                      if (productImages.length > 1) ...[
+                        // Left arrow
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.9),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _currentProductImageIndex =
+                                          (_currentProductImageIndex -
+                                              1 +
+                                              productImages.length) %
+                                          productImages.length;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.arrow_back_ios,
+                                    color: Constants.ftaColorLight,
+                                    size: 12,
+                                  ),
+                                  padding: EdgeInsets.zero,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Right arrow
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.9),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _currentProductImageIndex =
+                                          (_currentProductImageIndex + 1) %
+                                          productImages.length;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Constants.ftaColorLight,
+                                    size: 12,
+                                  ),
+                                  padding: EdgeInsets.zero,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ] else if (!showImage) ...[
             Text(
@@ -5790,6 +6239,45 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
         ),
       ],
     );
+  }
+
+  String _getUrgencyDisplayName(dynamic request) {
+    try {
+      String urgencyTimeline = "";
+
+      // Try to get from ProductRequestItem
+      if (request.runtimeType.toString().contains('ProductRequestItem')) {
+        urgencyTimeline = request.urgencyTimeline ?? "";
+      }
+
+      // If empty, try to get from autoSpare
+      if (urgencyTimeline.isEmpty &&
+          widget.autoSpare?.partDetails?.urgency != null) {
+        urgencyTimeline = widget.autoSpare.partDetails.urgency;
+      }
+
+      switch (urgencyTimeline) {
+        case 'ASAP':
+          return 'ASAP (12 hours)';
+        case '12_HOURS':
+          return '12 Hours';
+        case '24_HOURS':
+          return '24 Hours';
+        case '2-3_DAYS':
+          return '2-3 Days';
+        case '1_WEEK':
+          return '1 Week';
+        case '2_WEEKS':
+          return '2 Weeks';
+        case '1_MONTH':
+          return '1 Month';
+        default:
+          return urgencyTimeline.isEmpty ? "Not specified" : urgencyTimeline;
+      }
+    } catch (e) {
+      print('Error getting urgency display name: $e');
+      return "Not specified";
+    }
   }
 }
 

@@ -178,6 +178,7 @@ flutter:
     - lib/assets/images/star_eyes_emoji_1.png
     - lib/assets/images/bidr23.png
     - lib/assets/images/like.png
+    - lib/assets/images/auction.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

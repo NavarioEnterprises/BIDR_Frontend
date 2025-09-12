@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -9,8 +10,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_places_flutter/model/prediction.dart';
+import 'package:http/http.dart' as http;
 import 'dart:io' if (dart.library.html) 'dart:html' as html;
+import 'dart:js' if (dart.library.html) 'dart:js' as js;
 import 'dart:typed_data';
 import 'package:path/path.dart' as path;
 
@@ -26,7 +31,14 @@ import 'business_signup_mobile.dart';
 import '../../services/shared_preferences.dart';
 
 class BusinessSignUpPage extends StatefulWidget {
-  const BusinessSignUpPage({super.key});
+  final bool isProceedingFromBuyer;
+  final Map<String, String>? existingUserData;
+
+  const BusinessSignUpPage({
+    super.key,
+    this.isProceedingFromBuyer = false,
+    this.existingUserData,
+  });
 
   @override
   State<BusinessSignUpPage> createState() => _BusinessSignUpPageState();
@@ -117,14 +129,35 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     'Postbank': '460005',
   };
 
+  final List<Map<String, String>> categories = [
+    {
+      "icon": "lib/assets/images/spares1.png",
+      "icon2": "lib/assets/images/vehicle_light.png",
+      "name": "Vehicle\nSpares",
+    },
+    {
+      "icon": "lib/assets/images/rim_and_type.png",
+      "icon2": "lib/assets/images/rims.png",
+      "name": "Vehicle Tyres\nand Rims",
+    },
+    {
+      "icon": "lib/assets/images/consumer.png",
+      "icon2": "lib/assets/images/ele_light.png",
+      "name": "Consumer \nElectronics",
+    },
+    {
+      "icon": "lib/assets/images/auction.png",
+      "icon2": "lib/assets/images/auction.png",
+      "name": "Vehicle\nAuctions",
+    },
+  ];
   // Step 4 - Product Categories 'Oil & Fluids'
   List<String> selectedCategories = [];
   final List<String> availableCategories = [
-    'Engines Parts',
-    'Batteries',
-    'Transmission Parts',
-    'Body Parts',
-    'Suspension Parts',
+    'Vehicle Spares',
+    'Vehicle Tyres and Rims',
+    'Consumer Electronics',
+    'Vehicle Auctions',
   ];
 
   // Step 5 - Display on Platform
@@ -181,11 +214,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       subtitle: 'Select Your Product Categories',
       isCompleted: false,
     ),
-    StepInfo(
-      title: 'Display On Platform',
-      subtitle: 'Enter Name of Trading Name',
-      isCompleted: false,
-    ),
   ];
   Timer? _addressValidationTimer;
 
@@ -239,8 +267,31 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       _debounceAddressValidation();
     });
 
+    // Handle proceeding from buyer registration
+    if (widget.isProceedingFromBuyer && widget.existingUserData != null) {
+      _prefillExistingUserData();
+      // Skip to step 2 (Company Details) since personal info and OTP verification are already completed
+      currentStep = 2;
+      // Mark previous steps as completed
+      if (steps.length > 2) {
+        steps[0].isCompleted = true; // User Information
+        steps[1].isCompleted = true; // OTP Verification
+      }
+    }
+
     // Load saved form progress
     _loadFormProgress();
+  }
+
+  void _prefillExistingUserData() {
+    if (widget.existingUserData != null) {
+      final userData = widget.existingUserData!;
+      _firstNameController.text = userData['firstName'] ?? '';
+      _lastNameController.text = userData['lastName'] ?? '';
+      // _emailController.text = userData['email'] ?? '';
+      // _phoneController.text = userData['phone'] ?? '';
+      // Don't prefill password as it's already set
+    }
   }
 
   void _initializeFocusNodes() {
@@ -632,18 +683,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     return true;
   }
 
-  // Display On Platform Form Validation
-  bool _validateDisplayOnPlatformForm() {
-    if (!_isRegisteredNameSelected &&
-        _tradingNameController.text.trim().isEmpty) {
-      _showFieldValidationError(
-        'Please select registered name or enter trading name',
-        focusNodes['tradingName']!,
-      );
-      return false;
-    }
-    return true;
-  }
 
   // Show field validation error with focus
   void _showFieldValidationError(String message, FocusNode focusNode) {
@@ -834,6 +873,22 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         await _saveFormDataForSuggestions();
         // Clear form progress on successful submission
         await FormProgressService.clearBusinessFormProgress();
+
+        // If this is a buyer adding seller role, update the user role
+        if (widget.isProceedingFromBuyer && widget.existingUserData != null) {
+          try {
+            final roleUpdateResult = await authApiService.updateUserRole(
+              email: widget.existingUserData!['email']!,
+              newRole: 'seller',
+            );
+            if (roleUpdateResult != null &&
+                roleUpdateResult['success'] == true) {
+              print('Successfully updated user role to include seller');
+            }
+          } catch (e) {
+            print('Failed to update user role: $e');
+          }
+        }
       }
 
       return result;
@@ -977,8 +1032,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         return _validateBankAccountForm();
       case 5: // Product Categories
         return _validateProductCategoriesForm();
-      case 6: // Display On Platform
-        return _validateDisplayOnPlatformForm();
       default:
         return true;
     }
@@ -2665,10 +2718,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                     return Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 2,
-                        ),
+                        border: Border.all(color: Colors.black, width: 2),
                         color: Colors.white,
                       ),
                       child: TextFormField(
@@ -2823,10 +2873,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                 return Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(
-                      color: Colors.black,
-                      width: 2,
-                    ),
+                    border: Border.all(color: Colors.black, width: 2),
                     color: Colors.white,
                   ),
                   child: TextFormField(
@@ -3343,8 +3390,6 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _physicalAddressController =
       TextEditingController();
-  List<Map<String, dynamic>> _searchSuggestions = [];
-  bool _isSearching = false;
 
   @override
   void initState() {
@@ -3421,80 +3466,324 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
     _updateMarker();
   }
 
-  void _searchPlaces(String query) async {
-    if (query.isEmpty) {
-      setState(() {
-        _searchSuggestions.clear();
-        _isSearching = false;
-      });
-      return;
-    }
-
-    setState(() {
-      _isSearching = true;
-    });
+  // Autocomplete method for TypeAhead field
+  Future<List<Prediction>> _searchPlacesAutocomplete(String pattern) async {
+    if (pattern.length < 3) return [];
 
     try {
-      List<Location> locations = await locationFromAddress(query);
-      List<Map<String, dynamic>> suggestions = [];
+      // Use the updated API key
+      const String apiKey = 'AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA';
 
-      for (Location location in locations) {
-        try {
-          List<Placemark> placemarks = await placemarkFromCoordinates(
-            location.latitude,
-            location.longitude,
-          );
-
-          if (placemarks.isNotEmpty) {
-            final placemark = placemarks.first;
-            suggestions.add({
-              'address': [
-                placemark.street,
-                placemark.locality,
-                placemark.administrativeArea,
-                placemark.country,
-              ].where((s) => s != null && s.isNotEmpty).join(', '),
-              'location': LatLng(location.latitude, location.longitude),
-            });
-          }
-        } catch (e) {
-          // Skip if reverse geocoding fails
-        }
+      // For web platform, use JavaScript interop to avoid CORS issues
+      if (kIsWeb) {
+        return await _getPlacePredictionsWeb(pattern);
       }
 
-      setState(() {
-        _searchSuggestions = suggestions
-            .take(5)
-            .toList(); // Limit to 5 suggestions
-        _isSearching = false;
-      });
+      // Mobile platform - use direct API call
+      final String encodedQuery = Uri.encodeComponent(pattern.trim());
+      final String baseURL =
+          'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+      final String request =
+          '$baseURL?input=$encodedQuery&key=$apiKey&components=country:za&language=en&sessiontoken=${DateTime.now().millisecondsSinceEpoch}';
+
+      final response = await http.get(
+        Uri.parse(request),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 'OK') {
+          final predictions = (data['predictions'] as List).map((prediction) {
+            return Prediction(
+              description: prediction['description'] ?? '',
+              placeId: prediction['place_id'] ?? '',
+              reference: prediction['reference'] ?? '',
+              matchedSubstrings: [],
+              terms: [],
+              types: List<String>.from(prediction['types'] ?? []),
+              structuredFormatting: null,
+            );
+          }).toList();
+          return predictions.take(8).toList();
+        }
+      }
+      return [];
     } catch (e) {
+      print('Error in _searchPlacesAutocomplete: $e');
+      return [];
+    }
+  }
+
+  // Web-specific method using JavaScript interop
+  Future<List<Prediction>> _getPlacePredictionsWeb(String query) async {
+    try {
+      final Completer<List<Prediction>> completer =
+          Completer<List<Prediction>>();
+
+      // Wait for Google Maps API to be available with retries
+      bool apiAvailable = await _waitForGoogleMapsAPI();
+      if (!apiAvailable) {
+        print('Google Places JavaScript API not available after waiting');
+        return [];
+      }
+
+      // Call JavaScript function
+      js.context.callMethod('getPlacePredictions', [
+        query,
+        js.allowInterop((dynamic jsResults) {
+          try {
+            // Convert JavaScript array to Dart list
+            final List<dynamic> resultsList = List<dynamic>.from(jsResults);
+            final List<Prediction> predictions = resultsList.map((jsResult) {
+              // Convert each JavaScript object to Map safely
+              final Map<String, dynamic> result = _convertJsObjectToMap(
+                jsResult,
+              );
+              return Prediction(
+                description: result['description']?.toString() ?? '',
+                placeId: result['placeId']?.toString() ?? '',
+                reference: result['reference']?.toString() ?? '',
+                matchedSubstrings: [],
+                terms: [],
+                types: _convertToStringList(result['types']),
+                structuredFormatting: null,
+              );
+            }).toList();
+
+            if (!completer.isCompleted) {
+              completer.complete(predictions);
+            }
+          } catch (e) {
+            print('Error processing JavaScript results: $e');
+            if (!completer.isCompleted) {
+              completer.complete([]);
+            }
+          }
+        }),
+      ]);
+
+      return await completer.future.timeout(
+        Duration(seconds: 10),
+        onTimeout: () => [],
+      );
+    } catch (e) {
+      print('Error in _getPlacePredictionsWeb: $e');
+      return [];
+    }
+  }
+
+  // Helper methods for JavaScript object conversion
+  Future<bool> _waitForGoogleMapsAPI() async {
+    // Check if already available
+    if (js.context.hasProperty('getPlacePredictions')) {
+      return true;
+    }
+
+    // Manual check with retries
+    for (int i = 0; i < 20; i++) {
+      await Future.delayed(Duration(milliseconds: 500));
+      if (js.context.hasProperty('getPlacePredictions')) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  Map<String, dynamic> _convertJsObjectToMap(dynamic jsObject) {
+    try {
+      if (jsObject == null) return {};
+
+      // If it's already a Map, return it
+      if (jsObject is Map<String, dynamic>) {
+        return jsObject;
+      }
+
+      // Convert JavaScript object using JSON serialization
+      final String jsonString = js.context['JSON'].callMethod('stringify', [
+        jsObject,
+      ]);
+      return Map<String, dynamic>.from(json.decode(jsonString));
+    } catch (e) {
+      print('Error converting JavaScript object: $e');
+      return {};
+    }
+  }
+
+  List<String> _convertToStringList(dynamic value) {
+    try {
+      if (value == null) return [];
+      if (value is List) {
+        return value.map((e) => e?.toString() ?? '').toList();
+      }
+      return [];
+    } catch (e) {
+      print('Error converting to string list: $e');
+      return [];
+    }
+  }
+
+  // Handle location selection from TypeAhead
+  Future<void> _onLocationSelected(Prediction suggestion) async {
+    try {
+      if (suggestion.placeId?.startsWith('geocoding_') == true) {
+        // Handle old geocoding format (fallback)
+        final coords = suggestion.placeId!
+            .substring('geocoding_'.length)
+            .split('_');
+        if (coords.length == 2) {
+          final lat = double.tryParse(coords[0]);
+          final lng = double.tryParse(coords[1]);
+
+          if (lat != null && lng != null) {
+            final newLatLng = LatLng(lat, lng);
+            setState(() {
+              _currentLocation = newLatLng;
+              _currentAddress = suggestion.description ?? '';
+              _searchController.text = _currentAddress;
+            });
+            _updateMarker();
+            _mapController.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(target: newLatLng, zoom: 16),
+              ),
+            );
+          }
+        }
+        return;
+      }
+
+      if (suggestion.placeId?.isNotEmpty == true) {
+        // Use Place Details API if we have a place ID
+        if (kIsWeb) {
+          // Web implementation using JavaScript
+          await _getPlaceDetailsWeb(
+            suggestion.placeId!,
+            suggestion.description ?? '',
+          );
+        } else {
+          // Mobile implementation using HTTP
+          await _getPlaceDetailsMobile(
+            suggestion.placeId!,
+            suggestion.description ?? '',
+          );
+        }
+      } else {
+        // Use description directly
+        setState(() {
+          _currentAddress = suggestion.description ?? '';
+          _searchController.text = _currentAddress;
+        });
+      }
+    } catch (e) {
+      print('Error in _onLocationSelected: $e');
       setState(() {
-        _searchSuggestions.clear();
-        _isSearching = false;
+        _currentAddress = suggestion.description ?? '';
+        _searchController.text = _currentAddress;
       });
     }
   }
 
-  void _selectSuggestion(Map<String, dynamic> suggestion) {
-    final location = suggestion['location'] as LatLng;
-    final address = suggestion['address'] as String;
+  Future<void> _getPlaceDetailsWeb(
+    String placeId,
+    String fallbackDescription,
+  ) async {
+    try {
+      final Completer<void> completer = Completer<void>();
 
-    setState(() {
-      _currentLocation = location;
-      _currentAddress = address;
-      _searchController.text = address;
-      _searchSuggestions.clear();
-    });
+      js.context.callMethod('getPlaceDetails', [
+        placeId,
+        js.allowInterop((dynamic jsResult) {
+          try {
+            if (jsResult != null) {
+              final Map<String, dynamic> result = _convertJsObjectToMap(
+                jsResult,
+              );
+              final double lat = result['latitude']?.toDouble() ?? 0.0;
+              final double lng = result['longitude']?.toDouble() ?? 0.0;
+              final String address =
+                  result['formattedAddress']?.toString() ?? fallbackDescription;
 
-    _updateMarker();
+              if (lat != 0.0 && lng != 0.0) {
+                final newLatLng = LatLng(lat, lng);
+                setState(() {
+                  _currentLocation = newLatLng;
+                  _currentAddress = address;
+                  _searchController.text = address;
+                });
+                _updateMarker();
+                _mapController.animateCamera(
+                  CameraUpdate.newCameraPosition(
+                    CameraPosition(target: newLatLng, zoom: 16),
+                  ),
+                );
+              }
+            }
+          } catch (e) {
+            print('Error processing place details: $e');
+          }
+          if (!completer.isCompleted) {
+            completer.complete();
+          }
+        }),
+      ]);
 
-    // Move camera to selected location
-    _mapController.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: location, zoom: 16),
-      ),
-    );
+      await completer.future.timeout(Duration(seconds: 5));
+    } catch (e) {
+      print('Error getting place details: $e');
+    }
+  }
+
+  Future<void> _getPlaceDetailsMobile(
+    String placeId,
+    String fallbackDescription,
+  ) async {
+    try {
+      const String apiKey = 'AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA';
+      final String detailsURL =
+          'https://maps.googleapis.com/maps/api/place/details/json';
+      final String request =
+          '$detailsURL?place_id=$placeId&key=$apiKey&fields=geometry,formatted_address';
+
+      final response = await http.get(Uri.parse(request));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 'OK' && data['result'] != null) {
+          final result = data['result'];
+          final geometry = result['geometry'];
+          final location = geometry?['location'];
+
+          if (location != null) {
+            final double lat = location['lat']?.toDouble() ?? 0.0;
+            final double lng = location['lng']?.toDouble() ?? 0.0;
+            final String address =
+                result['formatted_address'] ?? fallbackDescription;
+
+            if (lat != 0.0 && lng != 0.0) {
+              final newLatLng = LatLng(lat, lng);
+              setState(() {
+                _currentLocation = newLatLng;
+                _currentAddress = address;
+                _searchController.text = address;
+              });
+              _updateMarker();
+              _mapController.animateCamera(
+                CameraUpdate.newCameraPosition(
+                  CameraPosition(target: newLatLng, zoom: 16),
+                ),
+              );
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('Error getting place details mobile: $e');
+    }
   }
 
   @override
@@ -3563,19 +3852,20 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
                 ],
               ),
             ),
-            // Compact Search Section
+            // TypeAhead Search Section
             Container(
               margin: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Container(
+              child: TypeAheadField<Prediction>(
+                builder: (context, controller, focusNode) {
+                  return Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       color: Colors.white,
                       border: Border.all(color: Colors.black),
                     ),
                     child: TextField(
-                      controller: _searchController,
+                      controller: controller,
+                      focusNode: focusNode,
                       style: GoogleFonts.manrope(fontSize: 16),
                       decoration: InputDecoration(
                         hintText: 'Search location...',
@@ -3588,116 +3878,72 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
                           color: Constants.ctaColorLight,
                           size: 22,
                         ),
-                        suffixIcon: _isSearching
-                            ? Container(
-                                padding: const EdgeInsets.all(12),
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Constants.ctaColorLight,
-                                  ),
-                                ),
-                              )
-                            : _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear_rounded, size: 20),
-                                color: const Color(0xFF666666),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  setState(() {
-                                    _searchSuggestions.clear();
-                                  });
-                                },
-                              )
-                            : null,
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
                         ),
                       ),
-                      onChanged: (value) {
-                        // Debounce search
-                        Future.delayed(const Duration(milliseconds: 500), () {
-                          if (_searchController.text == value &&
-                              value.isNotEmpty) {
-                            _searchPlaces(value);
-                          }
-                        });
-                      },
                     ),
-                  ),
-                  // Compact Search Suggestions
-                  if (_searchSuggestions.isNotEmpty)
-                    Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      constraints: const BoxConstraints(maxHeight: 160),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.black),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
+                  );
+                },
+                suggestionsCallback: (pattern) async {
+                  if (pattern.length < 3) return [];
+                  return await _searchPlacesAutocomplete(pattern);
+                },
+                itemBuilder: (context, suggestion) {
+                  return Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.grey.shade200,
+                          width: 0.5,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Constants.ctaColorLight.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
                           ),
-                        ],
-                      ),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        itemCount: _searchSuggestions.length,
-                        itemBuilder: (context, index) {
-                          final suggestion = _searchSuggestions[index];
-                          return Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () => _selectSuggestion(suggestion),
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(6),
-                                      decoration: BoxDecoration(
-                                        color: Constants.ctaColorLight
-                                            .withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Icon(
-                                        Icons.location_on_rounded,
-                                        color: Constants.ctaColorLight,
-                                        size: 16,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Text(
-                                        suggestion['address'],
-                                        style: GoogleFonts.manrope(
-                                          fontSize: 14,
-                                          color: const Color(0xFF333333),
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                          child: Icon(
+                            Icons.location_on_rounded,
+                            color: Constants.ctaColorLight,
+                            size: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            suggestion.description ?? '',
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              color: const Color(0xFF333333),
                             ),
-                          );
-                        },
-                      ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                ],
+                  );
+                },
+                onSelected: (suggestion) {
+                  _onLocationSelected(suggestion);
+                },
+                decorationBuilder: (context, child) {
+                  return Material(
+                    type: MaterialType.card,
+                    elevation: 4,
+                    borderRadius: BorderRadius.circular(12),
+                    child: child,
+                  );
+                },
+                offset: const Offset(0, 8),
               ),
             ),
             // Map
@@ -3718,9 +3964,7 @@ class _LocationPickerDialogState extends State<_LocationPickerDialog> {
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border(
-                  top: BorderSide(color: Colors.black, width: 1),
-                ),
+                border: Border(top: BorderSide(color: Colors.black, width: 1)),
               ),
               padding: const EdgeInsets.all(20),
               child: Column(

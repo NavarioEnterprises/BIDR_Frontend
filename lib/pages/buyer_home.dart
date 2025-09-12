@@ -186,8 +186,8 @@ class _BuyerHomePageState extends State<BuyerHomePage>
       "name": "Consumer \nElectronics",
     },
     {
-      "icon": "lib/assets/images/auction_icon.png",
-      "icon2": "lib/assets/images/auction_icon.png",
+      "icon": "lib/assets/images/auction.png",
+      "icon2": "lib/assets/images/auction.png",
       "name": "Vehicle\nAuctions",
     },
   ];
@@ -271,7 +271,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                             ),
                                           ),
 
-                                          SizedBox(height: 24),
+                                          SizedBox(height: 36),
 
                                           // Animated Category Section
                                           Center(
@@ -594,7 +594,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             crossAxisCount: 3,
-            childAspectRatio: 0.8,
+            childAspectRatio: 0.9,
             crossAxisSpacing: 24,
             mainAxisSpacing: 24,
             children: [
@@ -646,12 +646,12 @@ class _BuyerHomePageState extends State<BuyerHomePage>
             opacity: value,
             child: Container(
               decoration: BoxDecoration(
-                color: color.withOpacity(0.05),
+                color: color.withOpacity(0.01),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: color, width: 1.5),
+                border: Border.all(color: color.withOpacity(0.15), width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withOpacity(0.1),
+                    color: color.withOpacity(0.01),
                     blurRadius: 10,
                     spreadRadius: 0,
                     offset: Offset(0, 4),
@@ -1029,7 +1029,6 @@ class _BuyerHomePageState extends State<BuyerHomePage>
               );
             },
           ),
-          SizedBox(height: 6),
           TweenAnimationBuilder<double>(
             tween: Tween<double>(begin: 0.0, end: 1.0),
             duration: Duration(milliseconds: 800),
@@ -1047,7 +1046,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
               );
             },
           ),
-          SizedBox(height: 24),
+          SizedBox(height: 36),
           Wrap(
             spacing: 16,
             runSpacing: 24,
@@ -1667,9 +1666,10 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 focusNode: fieldFocusNode,
                 decoration: InputDecoration(
                   labelText: label,
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
                   labelStyle: TextStyle(
                     color: Colors.black,
-                    fontSize: 13.5,
+                    fontSize: 14.5,
                     fontWeight: FontWeight.w500,
                     fontFamily: 'YuGothic',
                   ),
@@ -1678,11 +1678,11 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                     vertical: 8,
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Constants.ftaColorLight),
+                    borderSide: BorderSide(color: Colors.black),
                     borderRadius: BorderRadius.circular(36),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Constants.ctaColorLight),
+                    borderSide: BorderSide(color: Colors.black),
                     borderRadius: BorderRadius.circular(36),
                   ),
                   hintText: label.replaceAll('*', ''),
@@ -1692,6 +1692,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                     fontWeight: FontWeight.w300,
                   ),
                 ),
+
                 style: GoogleFonts.manrope(
                   color: Colors.black,
                   fontSize: 14,
@@ -3253,7 +3254,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
               decoration: InputDecoration(
                 labelText: 'Your Location*',
                 labelStyle: GoogleFonts.manrope(
-                  color: Constants.ftaColorLight,
+                  color: Colors.black,
                   fontSize: 13.5,
                   fontWeight: FontWeight.w600,
                 ),
@@ -3271,10 +3272,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   vertical: 16,
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.grey.shade300,
-                    width: 1.5,
-                  ),
+                  borderSide: BorderSide(color: Colors.black, width: 1),
                   borderRadius: BorderRadius.circular(36),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -4388,7 +4386,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         final String baseURL =
             'https://maps.googleapis.com/maps/api/place/details/json';
         final String request =
-            '$baseURL?place_id=${suggestion.placeId}&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&fields=geometry';
+            '$baseURL?place_id=${suggestion.placeId}&key=AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA&fields=geometry';
 
         final response = await http.get(Uri.parse(request));
 
@@ -5545,7 +5543,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
             labelText: 'Your Location*',
             labelStyle: TextStyle(
               color: Colors.black,
-              fontSize: 13.5,
+              fontSize: 14.5,
               fontWeight: FontWeight.w500,
               fontFamily: 'YuGothic',
             ),
@@ -6678,7 +6676,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
             labelText: 'Your Location*',
             labelStyle: TextStyle(
               color: Colors.black,
-              fontSize: 13.5,
+              fontSize: 14.5,
               fontWeight: FontWeight.w500,
               fontFamily: 'YuGothic',
             ),
@@ -7478,7 +7476,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
         final String baseURL =
             'https://maps.googleapis.com/maps/api/place/details/json';
         final String request =
-            '$baseURL?place_id=${prediction.placeId}&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&fields=geometry';
+            '$baseURL?place_id=${prediction.placeId}&key=AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA&fields=geometry';
 
         final response = await http.get(Uri.parse(request));
 

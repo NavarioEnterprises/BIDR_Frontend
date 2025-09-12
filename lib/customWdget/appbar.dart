@@ -41,6 +41,7 @@ class _HeaderSectionState extends State<HeaderSection> {
   @override
   void dispose() {
     appBarValueNotifier.removeListener(_onValueChanged);
+    myNotifier1?.dispose();
     super.dispose();
   }
 
@@ -52,7 +53,6 @@ class _HeaderSectionState extends State<HeaderSection> {
     return Container(
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.symmetric(
-        horizontal: spacing.paddingLarge,
         vertical: spacing.paddingSmall,
       ),
       decoration: BoxDecoration(
@@ -63,7 +63,8 @@ class _HeaderSectionState extends State<HeaderSection> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // if (isMobile) ...[_buildMobileMenuIcon(), SizedBox(width: 16)],
+          // Equal spacing before logo
+          SizedBox(width: spacing.paddingLarge),
 
           // Logo - responsive sizing
           _buildResponsiveLogo(context),
@@ -78,6 +79,9 @@ class _HeaderSectionState extends State<HeaderSection> {
 
           // Authentication buttons - always show but responsive
           _buildAuthenticationButtons(),
+
+          // Equal spacing after authentication buttons
+          SizedBox(width: spacing.paddingLarge),
         ],
       ),
     );

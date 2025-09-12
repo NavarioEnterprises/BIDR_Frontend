@@ -14,6 +14,7 @@ import '../../pages/buyer_home.dart';
 import '../login.dart';
 import '../otp_screen.dart';
 import '../../services/shared_preferences.dart';
+import 'business_signup.dart';
 
 class BuyerSignUpPage extends StatefulWidget {
   final String userRole;
@@ -79,14 +80,13 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
   final FocusNode _confirmPasswordFocusNode = FocusNode();
 
   bool _isLoading = false;
-  String _deliveryMethod = 'sms'; // Default to SMS
+  String _deliveryMethod = 'email'; // Default to email
   String message = "";
   AuthApiService apiService = AuthApiService();
-  
+
   // Validation error states
   Map<String, String?> _fieldErrors = {};
   Map<String, bool> _fieldTouched = {};
-  
 
   @override
   void dispose() {
@@ -101,9 +101,9 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
     _confirmPasswordFocusNode.dispose();
+
     super.dispose();
   }
-
 
   void _handleSignUp() async {
     if (!_validateForm()) return;
@@ -113,6 +113,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     });
 
     try {
+      // Proceed with registration - backend will handle existing user logic
       final result = await apiService.registerUser(
         email: _emailController.text,
         firstName: _fullNameController.text,
@@ -155,73 +156,46 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
             );
           }
         } else {
-          // Handle errors - extract specific error message
-          String errorMessage = 'Registration failed';
+          // Handle errors - backend now returns structured error responses
+          final bool isOtpVerified = result['otp_verified'] ?? true;
+          final bool canAddSeller = result['can_add_seller'] ?? false;
+          final String userRole = result['user_role'] ?? '';
 
-          if (result['errors'] != null) {
-            final errorResponse = result['errors'] as Map<String, dynamic>;
+          if (!isOtpVerified) {
+            // User exists but OTP not verified, go to OTP screen
+            _navigateToOtpVerification();
+            return;
+          } else if (canAddSeller) {
+            // Existing buyer wants to add seller account
+            _showAddSellerAccountDialog();
+            return;
+          } else if (result['error'] != null) {
+            final String errorMessage = result['error'].toString();
 
-            // Check if the errors field contains nested errors (from API response)
-            if (errorResponse['errors'] != null) {
-              final errors = errorResponse['errors'] as Map<String, dynamic>;
-
-              // Check for email error first
-              if (errors['email'] != null) {
-                final emailErrors = errors['email'] as List;
-                if (emailErrors.isNotEmpty) {
-                  errorMessage = emailErrors.first.toString();
-                  // Check if the error is about email already existing
-                  if (errorMessage.toLowerCase().contains('already exists') ||
-                      errorMessage.toLowerCase().contains('already registered') ||
-                      errorMessage.toLowerCase().contains('user with this email')) {
-                    // Show option to navigate to OTP screen directly
-                    if (!mounted) return;
-                    _showEmailExistsDialog();
-                    return;
-                  }
-                }
-              }
-              // Check for other field errors
-              else {
-                List<String> errorMessages = [];
-                errors.forEach((field, messages) {
-                  if (messages is List && messages.isNotEmpty) {
-                    errorMessages.add(messages.first.toString());
-                  } else if (messages is String) {
-                    errorMessages.add(messages);
-                  }
-                });
-                if (errorMessages.isNotEmpty) {
-                  errorMessage = errorMessages.first;
-                }
-              }
+            // Check for specific error patterns
+            if (errorMessage.toLowerCase().contains('already exists') ||
+                errorMessage.toLowerCase().contains('already registered')) {
+              _showEmailExistsDialog();
+              return;
             }
-            // Handle direct field errors (fallback)
-            else if (errorResponse['email'] != null) {
-              final emailErrors = errorResponse['email'] as List;
-              if (emailErrors.isNotEmpty) {
-                errorMessage = emailErrors.first.toString();
-                // Check if the error is about email already existing
-                if (errorMessage.toLowerCase().contains('already exists') ||
-                    errorMessage.toLowerCase().contains('already registered') ||
-                    errorMessage.toLowerCase().contains('user with this email')) {
-                  // Show option to navigate to OTP screen directly
-                  if (!mounted) return;
-                  _showEmailExistsDialog();
-                  return;
-                }
-              }
-            }
-          } else if (result['message'] != null) {
-            errorMessage = result['message'].toString();
           }
 
-          // Show clean error message directly
-          CustomDialogs.showErrorDialog(
-            context,
-            errorMessage,
-            onRetry: () => _handleSignUp(),
-          );
+          // Handle other error cases
+          if (result['errors'] != null) {
+            handleRegistrationErrors(context, result);
+          } else if (result['message'] != null) {
+            CustomDialogs.showErrorDialog(
+              context,
+              result['message'].toString(),
+              onRetry: () => _handleSignUp(),
+            );
+          } else {
+            CustomDialogs.showErrorDialog(
+              context,
+              'Registration failed. Please try again.',
+              onRetry: () => _handleSignUp(),
+            );
+          }
         }
       } else {
         // Handle null response
@@ -250,7 +224,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
       _fieldErrors.clear();
       _fieldTouched.clear();
     });
-    
+
     // Validate each field and collect errors
     final fields = [
       {
@@ -312,7 +286,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
 
     return true;
   }
-  
+
   void _validateFieldRealTime(String fieldKey, String fieldName, String value) {
     String? error = _validateField(fieldName, value);
     setState(() {
@@ -360,12 +334,12 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     if (fieldKey == 'buyer_full_name') validationKey = 'fullName';
     if (fieldKey == 'buyer_mobile_number') validationKey = 'mobile';
     if (fieldKey == 'buyer_email') validationKey = 'email';
-    
+
     return FutureBuilder<List<String>>(
       future: FormDataService.getFieldSuggestions(fieldKey),
       builder: (context, snapshot) {
         final suggestions = snapshot.data ?? [];
-        
+
         if (suggestions.isEmpty || isPasswordField == true) {
           // If no suggestions or password field, use regular field
           return _buildCustomTextField(
@@ -380,50 +354,65 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
             isName: isName,
           );
         }
-        
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Autocomplete<String>(
               optionsBuilder: (TextEditingValue textEditingValue) {
                 if (textEditingValue.text.isEmpty) {
-                  return suggestions.take(3); // Show recent suggestions when empty
+                  return suggestions.take(
+                    3,
+                  ); // Show recent suggestions when empty
                 }
-                return suggestions.where((String suggestion) {
-                  return suggestion.toLowerCase().contains(textEditingValue.text.toLowerCase());
-                }).take(3);
+                return suggestions
+                    .where((String suggestion) {
+                      return suggestion.toLowerCase().contains(
+                        textEditingValue.text.toLowerCase(),
+                      );
+                    })
+                    .take(3);
               },
-              fieldViewBuilder: (context, fieldController, fieldFocusNode, onEditingComplete) {
-                // Sync with our main controller
-                if (controller.text != fieldController.text) {
-                  fieldController.text = controller.text;
-                }
-                
-                fieldController.addListener(() {
-                  if (controller.text != fieldController.text) {
-                    controller.text = fieldController.text;
-                    // Save suggestion when user types
-                    if (fieldController.text.trim().isNotEmpty) {
-                      FormDataService.saveFieldSuggestion(fieldKey, fieldController.text.trim());
+              fieldViewBuilder:
+                  (
+                    context,
+                    fieldController,
+                    fieldFocusNode,
+                    onEditingComplete,
+                  ) {
+                    // Sync with our main controller
+                    if (controller.text != fieldController.text) {
+                      fieldController.text = controller.text;
                     }
-                  }
-                });
 
-                return _buildCustomTextField(
-                  hintText,
-                  fieldController,
-                  focusNode,
-                  nextFocusNode,
-                  validationKey,
-                  suffixIcon: suffixIcon,
-                  isPasswordField: isPasswordField,
-                  integersOnly: integersOnly,
-                  isName: isName,
-                );
-              },
+                    fieldController.addListener(() {
+                      if (controller.text != fieldController.text) {
+                        controller.text = fieldController.text;
+                        // Save suggestion when user types
+                        if (fieldController.text.trim().isNotEmpty) {
+                          FormDataService.saveFieldSuggestion(
+                            fieldKey,
+                            fieldController.text.trim(),
+                          );
+                        }
+                      }
+                    });
+
+                    return _buildCustomTextField(
+                      hintText,
+                      fieldController,
+                      focusNode,
+                      nextFocusNode,
+                      validationKey,
+                      suffixIcon: suffixIcon,
+                      isPasswordField: isPasswordField,
+                      integersOnly: integersOnly,
+                      isName: isName,
+                    );
+                  },
               optionsViewBuilder: (context, onSelected, options) {
                 if (options.isEmpty) return Container();
-                
+
                 return Align(
                   alignment: Alignment.topLeft,
                   child: Material(
@@ -501,15 +490,16 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     String hintText,
     TextEditingController controller,
     FocusNode focusNode,
-    FocusNode? nextFocusNode, 
+    FocusNode? nextFocusNode,
     String fieldKey, {
     Widget? suffixIcon,
     bool? isPasswordField,
     bool? integersOnly,
     bool? isName,
   }) {
-    bool hasError = _fieldTouched[fieldKey] == true && _fieldErrors[fieldKey] != null;
-    
+    bool hasError =
+        _fieldTouched[fieldKey] == true && _fieldErrors[fieldKey] != null;
+
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
       labelText: hintText,
@@ -533,7 +523,8 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
           String formattedValue = cleanedValue;
           if (cleanedValue.contains('+')) {
             final plusCount = '+'.allMatches(cleanedValue).length;
-            if (plusCount > 1 || (plusCount == 1 && !cleanedValue.startsWith('+'))) {
+            if (plusCount > 1 ||
+                (plusCount == 1 && !cleanedValue.startsWith('+'))) {
               formattedValue = cleanedValue.replaceAll('+', '');
               if (value.startsWith('+')) {
                 formattedValue = '+' + formattedValue;
@@ -556,14 +547,14 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
             );
           }
         }
-        
+
         // Real-time validation
         _validateFieldRealTime(fieldKey, hintText, controller.text);
       },
       onSubmitted: (value) {
         // Validate before moving to next field
         _validateFieldRealTime(fieldKey, hintText, value);
-        
+
         if (_fieldErrors[fieldKey] != null) {
           return; // Don't proceed if there's an error
         }
@@ -682,17 +673,17 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
                 setState(() {
                   _isLoading = true;
                 });
-                
+
                 final result = await apiService.resendOtp(
                   _emailController.text,
                   _mobileController.text,
                   deliveryMethod: _deliveryMethod,
                 );
-                
+
                 setState(() {
                   _isLoading = false;
                 });
-                
+
                 if (result != null && result['success'] == true) {
                   if (!mounted) return;
                   CustomDialogs.showSuccessDialog(
@@ -754,6 +745,255 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     );
   }
 
+  void _showAddSellerAccountDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 500),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Icon
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Constants.ctaColorLight.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.store_outlined,
+                      size: 40,
+                      color: Constants.ctaColorLight,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Title
+                  Text(
+                    'Expand Your Account',
+                    style: GoogleFonts.manrope(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1A1A1A),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Subtitle
+                  Text(
+                    'You already have a buyer account. Would you like to add selling capabilities to start earning on our platform?',
+                    style: GoogleFonts.manrope(
+                      fontSize: 16,
+                      color: const Color(0xFF6B7280),
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Benefits
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFFE2E8F0),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildBenefitRow(
+                          Icons.trending_up,
+                          'Start selling your products',
+                        ),
+                        const SizedBox(height: 12),
+                        _buildBenefitRow(
+                          Icons.dashboard_outlined,
+                          'Access seller dashboard',
+                        ),
+                        const SizedBox(height: 12),
+                        _buildBenefitRow(
+                          Icons.analytics_outlined,
+                          'Track your earnings',
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Action buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            side: BorderSide(
+                              color: const Color(0xFFE2E8F0),
+                              width: 1.5,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                          ),
+                          child: Text(
+                            'Not Now',
+                            style: GoogleFonts.manrope(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF6B7280),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            await _addSellerAccount();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Constants.ctaColorLight,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                          ),
+                          child: Text(
+                            'Add Seller Account',
+                            style: GoogleFonts.manrope(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBenefitRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Constants.ctaColorLight),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: GoogleFonts.manrope(
+              fontSize: 14,
+              color: const Color(0xFF374151),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showUserAlreadyHasRoleDialog(String role) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Account Already Exists',
+            style: GoogleFonts.manrope(
+              fontWeight: FontWeight.bold,
+              color: Constants.ftaColorLight,
+            ),
+          ),
+          content: Text(
+            'You already have an account with $role privileges. Please use the login page to access your account.',
+            style: GoogleFonts.manrope(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'OK',
+                style: GoogleFonts.manrope(
+                  color: Constants.ctaColorLight,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _navigateToOtpVerification() {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) => BidrOTPVerificationScreen(
+          email: _emailController.text,
+          phone: _mobileController.text,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _addSellerAccount() async {
+    try {
+      // Navigate directly to business registration with existing user data
+      // The business registration process will handle adding the seller role
+      Navigator.push(
+        context,
+        MaterialPageRoute<void>(
+          builder: (context) => BusinessSignUpPage(
+            isProceedingFromBuyer: true,
+            existingUserData: {
+              'firstName': _fullNameController.text,
+              'lastName': '',
+              'email': _emailController.text,
+              'phone': _mobileController.text,
+            },
+          ),
+        ),
+      );
+    } catch (e) {
+      CustomDialogs.showErrorDialog(
+        context,
+        'An error occurred while navigating to seller registration',
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -762,14 +1002,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
         padding: const EdgeInsets.all(0.0),
         child: Container(
           width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            border: MediaQuery.of(context).size.width < 800
-                ? null
-                : Border.all(
-                    color: Constants.gtaColorLight,
-                    width: (MediaQuery.of(context).size.width > 800) ? 20 : 0,
-                  ),
-          ),
+          decoration: BoxDecoration(border: null),
           child: Row(
             children: [
               if (MediaQuery.of(context).size.width > 800)
