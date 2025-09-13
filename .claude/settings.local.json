@@ -57,7 +57,8 @@
       "Bash(dart run:*)",
       "Bash(sed:*)",
       "Bash(flutter run:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(awk:*)"
     ],
     "deny": [],
     "ask": []

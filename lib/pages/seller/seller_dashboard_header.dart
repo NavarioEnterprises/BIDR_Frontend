@@ -4,11 +4,19 @@ import 'package:bidr/models/alert.dart';
 import 'package:bidr/services/notification_api_service.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:hugeicons/hugeicons.dart';
+import '../../customWdget/dropdownMenu.dart';
 
 class SellerDashboardHeader extends StatefulWidget {
   final String headerName;
+  final SortOption? initialSort;
+  final Function(SortOption?)? onSortChanged;
 
-  const SellerDashboardHeader({super.key, required this.headerName});
+  const SellerDashboardHeader({
+    super.key, 
+    required this.headerName,
+    this.initialSort,
+    this.onSortChanged,
+  });
 
   @override
   State<SellerDashboardHeader> createState() => _SellerDashboardHeaderState();
@@ -1012,6 +1020,13 @@ class _SellerDashboardHeaderState extends State<SellerDashboardHeader>
                 ),
               ),
             ),
+            if (widget.onSortChanged != null) ...[
+              SizedBox(width: 15),
+              SellerSortDropdownMenu(
+                initialValue: widget.initialSort,
+                onSortChanged: widget.onSortChanged!,
+              ),
+            ],
           ],
         ),
       ),

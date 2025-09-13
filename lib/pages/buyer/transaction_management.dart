@@ -4027,16 +4027,18 @@ class _TransactionDashboardState extends State<TransactionDashboard>
       );
 
       if (findOrderResponse.statusCode != 200) {
-        throw Exception('Failed to find order');
+        throw Exception(
+          'Failed to find order: ${findOrderResponse.statusCode} - ${findOrderResponse.body}',
+        );
       }
 
       final findOrderData = json.decode(findOrderResponse.body);
       if (findOrderData['results'] == null ||
           findOrderData['results'].isEmpty) {
-        throw Exception('Order not found');
+        throw Exception('Order not found in results');
       }
 
-      final String orderId = findOrderData['results'][0]['id'].toString();
+      final String orderId = findOrderData['results'][0]['order_id'].toString();
 
       // Now make API call to update order status using the correct endpoint
       final response = await http.post(
@@ -4054,7 +4056,6 @@ class _TransactionDashboardState extends State<TransactionDashboard>
           'return_description': _returnDescriptionController.text,
         }),
       );
-
       if (response.statusCode == 200 || response.statusCode == 204) {
         // Success - update local order list
         setState(() {
@@ -4139,7 +4140,444 @@ class _TransactionDashboardState extends State<TransactionDashboard>
           style: GoogleFonts.manrope(fontSize: 16, fontWeight: FontWeight.w700),
         ),
         description: Text(
-          'An error occurred. Please try again.',
+          'Failed to submit return request. Please try again.',
+          style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+        width: 350,
+        height: 80,
+        toastDuration: const Duration(seconds: 3),
+      ).show(context);
+    }
+  }
+
+  void _showCancelOrderDialog(dynamic order) {
+    bool _acceptedTerms = false;
+    final TextEditingController _cancelReasonController =
+        TextEditingController();
+    String _selectedCancelReason = '';
+
+    final List<String> _cancelReasons = [
+      'Changed my mind',
+      'Found a better deal elsewhere',
+      'No longer need the item',
+      'Order was placed by mistake',
+      'Seller not responsive',
+      'Delivery taking too long',
+      'Personal financial reasons',
+      'Other',
+    ];
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Container(
+                width: 500,
+                constraints: BoxConstraints(maxHeight: 700),
+                padding: EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Cancel Order',
+                          style: GoogleFonts.manrope(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Constants.ftaColorLight,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: Icon(
+                            Icons.close,
+                            size: 24,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+
+                    // Order details
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Order #${order.orderNumber}',
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Constants.ftaColorLight,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            '${order.product} - ${order.vehicle}',
+                            style: GoogleFonts.manrope(
+                              fontSize: 13,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20),
+
+                    // Cancellation reason dropdown
+                    Text(
+                      'Reason for Cancellation *',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Constants.ftaColorLight,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _selectedCancelReason.isEmpty
+                              ? null
+                              : _selectedCancelReason,
+                          hint: Text(
+                            'Select a reason',
+                            style: GoogleFonts.manrope(color: Colors.grey[500]),
+                          ),
+                          isExpanded: true,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                          items: _cancelReasons.map((reason) {
+                            return DropdownMenuItem(
+                              value: reason,
+                              child: Text(
+                                reason,
+                                style: GoogleFonts.manrope(fontSize: 14),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedCancelReason = value ?? '';
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+
+                    // Additional details
+                    Text(
+                      'Additional Details (Optional)',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Constants.ftaColorLight,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    TextFormField(
+                      controller: _cancelReasonController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintText:
+                            'Please provide additional details about your cancellation...',
+                        hintStyle: GoogleFonts.manrope(color: Colors.grey[500]),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: Constants.ctaColorLight,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+
+                    // Terms and conditions
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red[200]!),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Cancellation Terms & Conditions',
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.red[700],
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            '• A cancellation fee of 10% of the order value may apply\n'
+                            '• Refund will be processed within 3-5 business days\n'
+                            '• Seller will be notified of the cancellation\n'
+                            '• This action cannot be undone once confirmed',
+                            style: GoogleFonts.manrope(
+                              fontSize: 12,
+                              color: Colors.red[600],
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 16),
+
+                    // Acceptance checkbox
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _acceptedTerms,
+                          onChanged: (value) {
+                            setState(() {
+                              _acceptedTerms = value ?? false;
+                            });
+                          },
+                          activeColor: Constants.ctaColorLight,
+                        ),
+                        Expanded(
+                          child: Text(
+                            'I understand and accept the cancellation terms and conditions',
+                            style: GoogleFonts.manrope(
+                              fontSize: 13,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+
+                    // Action buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              side: BorderSide(color: Colors.grey[400]!),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'Keep Order',
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed:
+                                (_selectedCancelReason.isNotEmpty &&
+                                    _acceptedTerms)
+                                ? () {
+                                    _submitCancelRequest(
+                                      order,
+                                      _selectedCancelReason,
+                                      _cancelReasonController.text.trim(),
+                                    );
+                                    Navigator.of(context).pop();
+                                  }
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  (_selectedCancelReason.isNotEmpty &&
+                                      _acceptedTerms)
+                                  ? Colors.red[600]
+                                  : Colors.grey[400],
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Text(
+                              'Cancel Order',
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _submitCancelRequest(
+    dynamic order,
+    String reason,
+    String description,
+  ) async {
+    try {
+      // First, find the order by order_number to get its ID
+      final findOrderResponse = await http.get(
+        Uri.parse(
+          '${AppConfig.productsServiceUrl}api/v1/product-requests/orders/?order_number=${order.orderNumber}',
+        ),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (findOrderResponse.statusCode != 200) {
+        throw Exception(
+          'Failed to find order: ${findOrderResponse.statusCode}',
+        );
+      }
+
+      final findOrderData = json.decode(findOrderResponse.body);
+      if (findOrderData['results'] == null ||
+          findOrderData['results'].isEmpty) {
+        throw Exception('Order not found');
+      }
+
+      final String orderId = findOrderData['results'][0]['order_id'].toString();
+
+      // Now make API call to update order status to CANCELLED
+      final response = await http.post(
+        Uri.parse(
+          '${AppConfig.productsServiceUrl}api/v1/product-requests/orders/$orderId/update_status/',
+        ),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'status': 'CANCELLED',
+          'user_id': Constants.myUid,
+          'reason': reason,
+          'description': description,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Success - update local order list
+        setState(() {
+          // Find and remove the order from ongoing orders
+          final index = onGoingOrders.indexWhere(
+            (o) => o.orderNumber == order.orderNumber,
+          );
+          if (index != -1) {
+            onGoingOrders.removeAt(index);
+            // Create updated order with CANCELLED status
+            final cancelledOrder = Order(
+              vendorName: order.vendorName,
+              product: order.product,
+              productId: order.productId,
+              sellerId: order.sellerId,
+              requestId: order.requestId,
+              vehicle: order.vehicle,
+              orderNumber: order.orderNumber,
+              status: 'CANCELLED',
+              dateTime: order.dateTime,
+              price: order.price,
+              rating: order.rating,
+              distanceInKm: order.distanceInKm,
+              location: order.location,
+              comments: order.comments,
+            );
+            cancelledOrders.add(cancelledOrder);
+          }
+        });
+
+        // Show success message
+        MotionToast.success(
+          title: Text(
+            'Order Cancelled',
+            style: GoogleFonts.manrope(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          description: Text(
+            'Your order has been successfully cancelled. Refund will be processed within 3-5 business days.',
+            style: GoogleFonts.manrope(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          width: 350,
+          height: 80,
+          toastDuration: const Duration(seconds: 3),
+        ).show(context);
+      } else {
+        // Show error message
+        MotionToast.error(
+          title: Text(
+            'Error',
+            style: GoogleFonts.manrope(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          description: Text(
+            'Failed to cancel order. Please try again.',
+            style: GoogleFonts.manrope(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          width: 350,
+          height: 80,
+          toastDuration: const Duration(seconds: 3),
+        ).show(context);
+      }
+    } catch (e) {
+      print('Error cancelling order: $e');
+      // Show error message
+      MotionToast.error(
+        title: Text(
+          'Error',
+          style: GoogleFonts.manrope(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+        description: Text(
+          'Failed to cancel order. Please try again.',
           style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         width: 350,
@@ -4502,15 +4940,12 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color:
-                                  order.status.toLowerCase() ==
-                                      "refunded"
+                              color: order.status.toLowerCase() == "refunded"
                                   ? Color(0XFF0045BD)
                                   : order.status.toLowerCase() ==
                                         "refund_requested"
                                   ? Colors.orange.shade600
-                                  : order.status.toLowerCase() ==
-                                        "cancelled"
+                                  : order.status.toLowerCase() == "cancelled"
                                   ? Color(0XFFD62828)
                                   : Constants.ctaColorLight.withOpacity(0.25),
                               borderRadius: BorderRadius.circular(8),
@@ -4521,8 +4956,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                                 color:
-                                    order.status.toLowerCase() ==
-                                            "refunded" ||
+                                    order.status.toLowerCase() == "refunded" ||
                                         order.status.toLowerCase() ==
                                             "refund_requested"
                                     ? Colors.white
@@ -4881,6 +5315,33 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                           ),
                         ),
                         SizedBox(width: 12),
+                        // Add Cancel button for PAID orders
+                        if (order.status.toLowerCase().contains('paid') ||
+                            order.status.toLowerCase().contains(
+                              'payment confirmed',
+                            )) ...[
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => _showCancelOrderDialog(order),
+                              style: OutlinedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                side: BorderSide(color: Colors.red, width: 1.5),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(360),
+                                ),
+                              ),
+                              child: Text(
+                                "Cancel Order",
+                                style: GoogleFonts.manrope(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                        ],
                         Container(
                           decoration: BoxDecoration(
                             color: Constants.ctaColorLight,
@@ -4988,8 +5449,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                       ],
                     ),
                   ),
-                ] else if (order.status.toLowerCase() ==
-                        "refunded" ||
+                ] else if (order.status.toLowerCase() == "refunded" ||
                     order.status.toLowerCase() == "refund_requested") ...[
                   // Show rating for refunded/refund requested orders
                   Padding(

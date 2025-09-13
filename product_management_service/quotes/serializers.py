@@ -138,11 +138,78 @@ class QuoteDetailSerializer(serializers.ModelSerializer):
         ]
     
     def get_request_details(self, obj):
-        """Get basic request details."""
+        """Get comprehensive request details."""
         if obj.request_id:
+            request = obj.request_id
             return {
-                'id': obj.request_id.request_id,
-                'title': getattr(obj.request_id, 'title', 'Product Request')
+                'id': request.request_id,
+                'title': getattr(request, 'title', 'Product Request'),
+                'description': getattr(request, 'description', ''),
+                'category': getattr(request, 'category', ''),
+                'quantity': getattr(request, 'quantity', None),
+                'condition_preference': getattr(request, 'condition_preference', ''),
+                'max_budget': getattr(request, 'max_budget', None),
+                'currency': getattr(request, 'currency', 'ZAR'),
+                'buyer_location': getattr(request, 'buyer_location', {}),
+                'urgency_timeline': getattr(request, 'urgency_timeline', ''),
+                'product_specifications': getattr(request, 'product_specifications', {}),
+                'product_images': getattr(request, 'product_images', []),
+                'vin_photo_url': getattr(request, 'vin_photo_url', ''),
+                'status': getattr(request, 'status', ''),
+                'created_at': request.created_at.isoformat() if hasattr(request, 'created_at') else None,
+                'updated_at': request.updated_at.isoformat() if hasattr(request, 'updated_at') else None,
+                # Category-specific summaries
+                'vehicle_spares_summary': getattr(request, 'vehicle_spares_summary', ''),
+                'tyres_rims_summary': getattr(request, 'tyres_rims_summary', ''),
+                'consumer_electronics_summary': getattr(request, 'consumer_electronics_summary', ''),
+                # Related category models data
+                'vehicle_spares_data': self._get_vehicle_spares_data(request),
+                'vehicle_tyres_rims_data': self._get_vehicle_tyres_rims_data(request),
+                'consumer_electronics_data': self._get_consumer_electronics_data(request),
+            }
+        return None
+    
+    def _get_vehicle_spares_data(self, request):
+        """Get vehicle spares specific data if available."""
+        if hasattr(request, 'vehicle_spares') and request.vehicle_spares:
+            vs = request.vehicle_spares
+            return {
+                'vehicle_make': getattr(vs, 'vehicle_make', ''),
+                'vehicle_model': getattr(vs, 'vehicle_model', ''),
+                'vehicle_year': getattr(vs, 'vehicle_year', None),
+                'vehicle_type': getattr(vs, 'vehicle_type', ''),
+                'engine_size': getattr(vs, 'engine_size', ''),
+                'vin_number': getattr(vs, 'vin_number', ''),
+                'part_name': getattr(vs, 'part_name', ''),
+                'part_category': getattr(vs, 'part_category', ''),
+                'part_number': getattr(vs, 'part_number', ''),
+            }
+        return None
+    
+    def _get_vehicle_tyres_rims_data(self, request):
+        """Get tyres/rims specific data if available."""
+        if hasattr(request, 'vehicle_tyres_rims') and request.vehicle_tyres_rims:
+            tr = request.vehicle_tyres_rims
+            return {
+                'tyre_width': getattr(tr, 'tyre_width', ''),
+                'sidewall_profile': getattr(tr, 'sidewall_profile', ''),
+                'wheel_rim_diameter': getattr(tr, 'wheel_rim_diameter', ''),
+                'select_tyres_rims': getattr(tr, 'select_tyres_rims', ''),
+                'vehicle_type': getattr(tr, 'vehicle_type', ''),
+                'preferred_brand': getattr(tr, 'preferred_brand', ''),
+            }
+        return None
+    
+    def _get_consumer_electronics_data(self, request):
+        """Get consumer electronics specific data if available."""
+        if hasattr(request, 'consumer_electronics') and request.consumer_electronics:
+            ce = request.consumer_electronics
+            return {
+                'electronics_type': getattr(ce, 'electronics_type', ''),
+                'brand_preference': getattr(ce, 'brand_preference', ''),
+                'model_series': getattr(ce, 'model_series', ''),
+                'screen_size': getattr(ce, 'screen_size', ''),
+                'connectivity_options': getattr(ce, 'connectivity_options', []),
             }
         return None
     

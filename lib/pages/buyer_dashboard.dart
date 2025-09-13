@@ -6595,6 +6595,7 @@ class _ConsumerElectronicsDetailScreenState
                                           ),
                                         ),
                                       ),
+                                    //SizedBox(width: 12),
                                   ],
                                 ),
                               ],
@@ -6634,19 +6635,66 @@ class _ConsumerElectronicsDetailScreenState
                                               ),
                                             ),
                                             Spacer(),
-                                            GestureDetector(
-                                              onTap: () {},
-                                              child: Text(
-                                                "View Details",
-                                                style: GoogleFonts.manrope(
-                                                  color:
-                                                      Constants.ftaColorLight,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  decoration:
-                                                      TextDecoration.underline,
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                _buildTimerCircle(
+                                                  _getRemainingTime(
+                                                    widget.request.createdAt,
+                                                    _mapTimeframeToUrgency(
+                                                      widget
+                                                          .consumerElectronics
+                                                          .budgetTimeline
+                                                          .urgency,
+                                                    ),
+                                                    'days',
+                                                  ),
+                                                  "D",
                                                 ),
-                                              ),
+                                                SizedBox(width: 12),
+                                                _buildTimerCircle(
+                                                  _getRemainingTime(
+                                                    widget.request.createdAt,
+                                                    _mapTimeframeToUrgency(
+                                                      widget
+                                                          .consumerElectronics
+                                                          .budgetTimeline
+                                                          .urgency,
+                                                    ),
+                                                    'hours',
+                                                  ),
+                                                  "H",
+                                                ),
+                                                SizedBox(width: 12),
+                                                _buildTimerCircle(
+                                                  _getRemainingTime(
+                                                    widget.request.createdAt,
+                                                    _mapTimeframeToUrgency(
+                                                      widget
+                                                          .consumerElectronics
+                                                          .budgetTimeline
+                                                          .urgency,
+                                                    ),
+                                                    'minutes',
+                                                  ),
+                                                  "M",
+                                                ),
+                                                SizedBox(width: 12),
+                                                _buildTimerCircle(
+                                                  _getRemainingTime(
+                                                    widget.request.createdAt,
+                                                    _mapTimeframeToUrgency(
+                                                      widget
+                                                          .consumerElectronics
+                                                          .budgetTimeline
+                                                          .urgency,
+                                                    ),
+                                                    'seconds',
+                                                  ),
+                                                  "S",
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
@@ -6683,67 +6731,8 @@ class _ConsumerElectronicsDetailScreenState
                               ),
                             ),
                             SizedBox(height: 16),
+
                             // Status dots - showing remaining time
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _buildTimerCircle(
-                                  _getRemainingTime(
-                                    widget.request.createdAt,
-                                    _mapTimeframeToUrgency(
-                                      widget
-                                          .consumerElectronics
-                                          .budgetTimeline
-                                          .urgency,
-                                    ),
-                                    'days',
-                                  ),
-                                  "D",
-                                ),
-                                SizedBox(width: 12),
-                                _buildTimerCircle(
-                                  _getRemainingTime(
-                                    widget.request.createdAt,
-                                    _mapTimeframeToUrgency(
-                                      widget
-                                          .consumerElectronics
-                                          .budgetTimeline
-                                          .urgency,
-                                    ),
-                                    'hours',
-                                  ),
-                                  "H",
-                                ),
-                                SizedBox(width: 12),
-                                _buildTimerCircle(
-                                  _getRemainingTime(
-                                    widget.request.createdAt,
-                                    _mapTimeframeToUrgency(
-                                      widget
-                                          .consumerElectronics
-                                          .budgetTimeline
-                                          .urgency,
-                                    ),
-                                    'minutes',
-                                  ),
-                                  "M",
-                                ),
-                                SizedBox(width: 12),
-                                _buildTimerCircle(
-                                  _getRemainingTime(
-                                    widget.request.createdAt,
-                                    _mapTimeframeToUrgency(
-                                      widget
-                                          .consumerElectronics
-                                          .budgetTimeline
-                                          .urgency,
-                                    ),
-                                    'seconds',
-                                  ),
-                                  "S",
-                                ),
-                              ],
-                            ),
                             SizedBox(height: 24),
                           ],
                         ),
@@ -7743,20 +7732,8 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                               ),
                                             ),
                                             Spacer(),
-                                            GestureDetector(
-                                              onTap: () {},
-                                              child: Text(
-                                                "View Details",
-                                                style: GoogleFonts.manrope(
-                                                  color:
-                                                      Constants.ftaColorLight,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                ),
-                                              ),
-                                            ),
+
+                                            // Status dots - showing remaining time
                                           ],
                                         ),
                                         SizedBox(height: 8),
@@ -7788,59 +7765,70 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                       ],
                                     ),
                                   ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      _buildTimerCircle(
+                                        _getRemainingTime(
+                                          widget.request.createdAt,
+                                          _mapTimeframeToUrgency(
+                                            widget
+                                                .rimTyre
+                                                .productDetails
+                                                .urgency,
+                                          ),
+                                          'days',
+                                        ),
+                                        "D",
+                                      ),
+                                      SizedBox(width: 12),
+                                      _buildTimerCircle(
+                                        _getRemainingTime(
+                                          widget.request.createdAt,
+                                          _mapTimeframeToUrgency(
+                                            widget
+                                                .rimTyre
+                                                .productDetails
+                                                .urgency,
+                                          ),
+                                          'hours',
+                                        ),
+                                        "H",
+                                      ),
+                                      SizedBox(width: 12),
+                                      _buildTimerCircle(
+                                        _getRemainingTime(
+                                          widget.request.createdAt,
+                                          _mapTimeframeToUrgency(
+                                            widget
+                                                .rimTyre
+                                                .productDetails
+                                                .urgency,
+                                          ),
+                                          'minutes',
+                                        ),
+                                        "M",
+                                      ),
+                                      SizedBox(width: 12),
+                                      _buildTimerCircle(
+                                        _getRemainingTime(
+                                          widget.request.createdAt,
+                                          _mapTimeframeToUrgency(
+                                            widget
+                                                .rimTyre
+                                                .productDetails
+                                                .urgency,
+                                          ),
+                                          'seconds',
+                                        ),
+                                        "S",
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),
-                            SizedBox(height: 16),
-                            // Status dots - showing remaining time
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _buildTimerCircle(
-                                  _getRemainingTime(
-                                    widget.request.createdAt,
-                                    _mapTimeframeToUrgency(
-                                      widget.rimTyre.productDetails.urgency,
-                                    ),
-                                    'days',
-                                  ),
-                                  "D",
-                                ),
-                                SizedBox(width: 12),
-                                _buildTimerCircle(
-                                  _getRemainingTime(
-                                    widget.request.createdAt,
-                                    _mapTimeframeToUrgency(
-                                      widget.rimTyre.productDetails.urgency,
-                                    ),
-                                    'hours',
-                                  ),
-                                  "H",
-                                ),
-                                SizedBox(width: 12),
-                                _buildTimerCircle(
-                                  _getRemainingTime(
-                                    widget.request.createdAt,
-                                    _mapTimeframeToUrgency(
-                                      widget.rimTyre.productDetails.urgency,
-                                    ),
-                                    'minutes',
-                                  ),
-                                  "M",
-                                ),
-                                SizedBox(width: 12),
-                                _buildTimerCircle(
-                                  _getRemainingTime(
-                                    widget.request.createdAt,
-                                    _mapTimeframeToUrgency(
-                                      widget.rimTyre.productDetails.urgency,
-                                    ),
-                                    'seconds',
-                                  ),
-                                  "S",
-                                ),
-                              ],
-                            ),
+
                             SizedBox(height: 24),
                           ],
                         ),
@@ -8727,6 +8715,7 @@ String _mapTimeframeToUrgency(String? timeframe) {
 }
 
 String _getRequestDescription(dynamic request) {
+  print("sakjsa $request ${request.runtimeType}");
   try {
     if (request?.category == null) return "No description available";
 

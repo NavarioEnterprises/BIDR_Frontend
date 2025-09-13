@@ -96,7 +96,12 @@ class QuoteViewSet(viewsets.ModelViewSet):
     
     Provides CRUD operations for quotes with different serializers for list and detail views.
     """
-    queryset = Quote.objects.all()
+    queryset = Quote.objects.all().select_related(
+        'request_id',
+        'request_id__consumer_electronics',
+        'request_id__vehicle_spares', 
+        'request_id__vehicle_tyres_rims'
+    ).prefetch_related('items', 'attachments', 'messages')
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'currency', 'estimated_delivery_days']
     search_fields = ['id']

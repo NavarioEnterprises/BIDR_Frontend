@@ -82,6 +82,12 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
   bool isLoadingDisputes = true;
   String? disputesError;
 
+  // Transaction history state variables
+  List<dynamic> paidOrders = [];
+  List<dynamic> refundedOrders = [];
+  bool isLoadingTransactions = false;
+  String? transactionsError;
+
   // Tab labels
   List<String> requestTabLabels = ['New Requests', 'My Requests'];
 
@@ -212,6 +218,7 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
     _fetchQuotesData();
     _fetchOrdersSummary();
     _fetchDisputeOrders();
+    _fetchTransactionHistory();
   }
 
   Future<void> _getCurrentLocation() async {
@@ -607,6 +614,71 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
       setState(() {
         disputesError = 'Network error: ${e.toString()}';
         isLoadingDisputes = false;
+      });
+    }
+  }
+
+  // Fetch transaction history (paid and refunded orders)
+  Future<void> _fetchTransactionHistory() async {
+    try {
+      setState(() {
+        isLoadingTransactions = true;
+        transactionsError = null;
+      });
+
+      final response = await http.get(
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/',
+        ).replace(queryParameters: {'seller_id': Constants.myUid}),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+
+        // Handle different possible response structures
+        List<dynamic> ordersData;
+        if (jsonData is List) {
+          ordersData = jsonData;
+        } else if (jsonData is Map && jsonData.containsKey('results')) {
+          ordersData = jsonData['results'];
+        } else if (jsonData is Map && jsonData.containsKey('orders')) {
+          ordersData = jsonData['orders'];
+        } else {
+          ordersData = [];
+        }
+
+        // Separate paid orders (earning history) and refunded orders (withdraw history)
+        final List<dynamic> paid = ordersData.where((order) {
+          final status = order['status']?.toString().toUpperCase() ?? '';
+          return status == 'PAID' || status == 'COMPLETED' || status == 'DELIVERED';
+        }).toList();
+
+        final List<dynamic> refunded = ordersData.where((order) {
+          final status = order['status']?.toString().toUpperCase() ?? '';
+          return status == 'REFUNDED' || status == 'REFUND_REQUESTED' || status == 'RETURNED';
+        }).toList();
+
+        setState(() {
+          paidOrders = paid;
+          refundedOrders = refunded;
+          isLoadingTransactions = false;
+        });
+
+        print('Paid orders: ${paidOrders.length}, Refunded orders: ${refundedOrders.length}');
+      } else {
+        setState(() {
+          transactionsError = 'Failed to load transaction history: ${response.statusCode}';
+          isLoadingTransactions = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        transactionsError = 'Network error: ${e.toString()}';
+        isLoadingTransactions = false;
       });
     }
   }
@@ -4390,32 +4462,92 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
           ],
         ),
         SizedBox(height: 20),
-        // Transaction List
-        Row(
+        // Transaction Content
+        _buildTransactionContent(),
+      ],
+    );
+  }
+
+  Widget _buildTransactionContent() {
+    if (isLoadingTransactions) {
+      return Center(
+        child: CircularProgressIndicator(color: Constants.ctaColorLight),
+      );
+    }
+
+    if (transactionsError != null) {
+      return Center(
+        child: Column(
           children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.5,
-              child: Column(
-                children: List.generate(
-                  3,
-                  (index) => TweenAnimationBuilder<double>(
-                    tween: Tween<double>(begin: 0, end: 1),
-                    duration: Duration(milliseconds: 300 + (index * 100)),
-                    curve: Curves.easeOutBack,
-                    builder: (context, value, child) {
-                      return Transform.scale(
-                        scale: value,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 24),
-                          child: _buildTransactionItem(),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+            Text(
+              'Error loading transactions',
+              style: GoogleFonts.manrope(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
               ),
             ),
+            SizedBox(height: 8),
+            Text(
+              transactionsError!,
+              style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _fetchTransactionHistory,
+              child: Text('Retry'),
+            ),
           ],
+        ),
+      );
+    }
+
+    final List<dynamic> currentTransactions = selectedSubIndex == 0 ? paidOrders : refundedOrders;
+    
+    if (currentTransactions.isEmpty) {
+      return Center(
+        child: Column(
+          children: [
+            Icon(
+              selectedSubIndex == 0 ? Icons.monetization_on_outlined : Icons.money_off_outlined,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            SizedBox(height: 16),
+            Text(
+              selectedSubIndex == 0 
+                ? 'No earnings yet'
+                : 'No refunds yet',
+              style: GoogleFonts.manrope(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              selectedSubIndex == 0
+                ? 'Paid orders will appear here'
+                : 'Refunded orders will appear here',
+              style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[500]),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            children: currentTransactions.take(10).map((transaction) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: _buildTransactionItem(transaction),
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
@@ -4459,7 +4591,30 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
     );
   }
 
-  Widget _buildTransactionItem() {
+  Widget _buildTransactionItem(Map<String, dynamic> transaction) {
+    final String title = transaction['product_name'] ?? 
+                        transaction['title'] ?? 
+                        transaction['description'] ?? 
+                        'Order';
+    
+    final String amount = 'R${transaction['amount'] ?? transaction['total_amount'] ?? transaction['price'] ?? '0'}';
+    
+    final String status = transaction['status']?.toString().toUpperCase() ?? 'UNKNOWN';
+    
+    // Format date
+    String dateStr = 'Unknown date';
+    try {
+      if (transaction['created_at'] != null) {
+        final DateTime date = DateTime.parse(transaction['created_at']);
+        dateStr = '${date.day}/${date.month}/${date.year}';
+      } else if (transaction['date'] != null) {
+        final DateTime date = DateTime.parse(transaction['date']);
+        dateStr = '${date.day}/${date.month}/${date.year}';
+      }
+    } catch (e) {
+      dateStr = 'Unknown date';
+    }
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.only(bottom: 6, top: 6, right: 16, left: 8),
@@ -4473,15 +4628,18 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.transparent,
-
-              border: Border.all(color: Color(0xFF04AD01)),
+              border: Border.all(
+                color: selectedSubIndex == 0 
+                    ? Color(0xFF04AD01) 
+                    : Color(0xFFE74C3C)
+              ),
               shape: BoxShape.circle,
             ),
             child: Icon(
               selectedSubIndex == 0 ? Icons.add : Icons.remove,
               color: selectedSubIndex == 0
                   ? Color(0xFF04AD01)
-                  : Constants.ftaColorLight,
+                  : Color(0xFFE74C3C),
               size: 16,
             ),
           ),
@@ -4491,26 +4649,52 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Vehicle Service',
+                  title,
                   style: GoogleFonts.manrope(
                     fontWeight: FontWeight.w700,
                     fontSize: 14,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 4),
-                Text(
-                  'Sep 5, 2023',
-                  style: GoogleFonts.manrope(
-                    color: Color(0xFF7F8C8D),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      dateStr,
+                      style: GoogleFonts.manrope(
+                        color: Color(0xFF7F8C8D),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: selectedSubIndex == 0 
+                            ? Color(0xFF04AD01).withOpacity(0.1)
+                            : Color(0xFFE74C3C).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        status,
+                        style: GoogleFonts.manrope(
+                          color: selectedSubIndex == 0 
+                              ? Color(0xFF04AD01)
+                              : Color(0xFFE74C3C),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
           Text(
-            'R500',
+            amount,
             style: GoogleFonts.manrope(
               color: selectedSubIndex == 0
                   ? Constants.ctaColorLight
