@@ -1506,31 +1506,34 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                       child: Row(
                                         children: [
                                           currentStep > 0
-                                              ? IconButton(
-                                                  onPressed: currentStep > 0
-                                                      ? _previousStep
-                                                      : null,
-                                                  style: IconButton.styleFrom(
-                                                    backgroundColor:
-                                                        Constants.ftaColorLight,
-                                                    foregroundColor:
-                                                        Constants.ctaColorLight,
-                                                    elevation: 5,
-                                                    shadowColor: Colors.black54,
-                                                  ),
-                                                  icon: Icon(
-                                                    CupertinoIcons.back,
-                                                    color: Colors.white,
-                                                  ),
-                                                )
+                                              ?IconButton(
+                                            onPressed: currentStep > 0
+                                          ? _previousStep
+                                          : null,
+                                            style: IconButton.styleFrom(
+                                              backgroundColor: Colors.white,
+                                              foregroundColor: Constants.ftaColorLight,
+                                              elevation: 5,
+                                              shadowColor: Colors.black54,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                            ),
+                                            icon: Icon(
+                                              CupertinoIcons.back,
+                                              color: Constants.ftaColorLight,
+                                            ),
+                                          )
+
                                               : SizedBox.shrink(),
                                           currentStep > 0
                                               ? const SizedBox(width: 20)
                                               : SizedBox.shrink(),
-                                          Column(
+                                          Row(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
                                             children: [
+
                                               Text(
                                                 'Application to Register a Business',
                                                 style: GoogleFonts.manrope(
@@ -1540,6 +1543,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                                                       Constants.ftaColorLight,
                                                 ),
                                               ),
+
                                             ],
                                           ),
                                         ],
@@ -2140,72 +2144,58 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   }
 
   Widget _buildLocationDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Location*',
-          style: GoogleFonts.manrope(
-            color: const Color(0xFF333333),
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: Colors.black, width: 2),
-            color: Colors.white,
-          ),
-          child: InkWell(
-            onTap: _showLocationPickerDialog,
-            borderRadius: BorderRadius.circular(30),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.location_on,
-                    color:
-                        _selectedLocationText != null &&
-                            _selectedLocationText!.isNotEmpty
-                        ? Constants.ctaColorLight
-                        : const Color(0xFF666666),
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      _selectedLocationText != null &&
-                              _selectedLocationText!.isNotEmpty
-                          ? _selectedLocationText!
-                          : 'Select Location on Map',
-                      style: GoogleFonts.manrope(
-                        color:
-                            _selectedLocationText != null &&
-                                _selectedLocationText!.isNotEmpty
-                            ? const Color(0xFF333333)
-                            : const Color(0xFF999999),
-                        fontSize: 16,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.map_outlined,
-                    color: const Color(0xFF666666),
-                    size: 18,
-                  ),
-                ],
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: Colors.black, width: 2),
+        color: Colors.white,
+      ),
+      child: InkWell(
+        onTap: _showLocationPickerDialog,
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
+            children: [
+              Icon(
+                Icons.location_on,
+                color:
+                _selectedLocationText != null &&
+                    _selectedLocationText!.isNotEmpty
+                    ? Constants.ctaColorLight
+                    : const Color(0xFF666666),
+                size: 20,
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  _selectedLocationText != null &&
+                      _selectedLocationText!.isNotEmpty
+                      ? _selectedLocationText!
+                      : 'Select Location on Map',
+                  style: GoogleFonts.manrope(
+                    color:
+                    _selectedLocationText != null &&
+                        _selectedLocationText!.isNotEmpty
+                        ? const Color(0xFF333333)
+                        : const Color(0xFF999999),
+                    fontSize: 16,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.map_outlined,
+                color: const Color(0xFF666666),
+                size: 18,
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -2243,98 +2233,116 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   // Get coordinates from physical address
 
   Widget _buildBankDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Bank Name*',
-          style: GoogleFonts.manrope(
-            color: const Color(0xFF333333),
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: Colors.black, width: 2),
-            color: Colors.white,
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: _selectedBank,
-              hint: Text(
-                'Select Bank',
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: Colors.black, width: 1),
+        color: Colors.white,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Transform.translate(
+            offset: Offset(0, -8),
+            child: Container(
+              color: Colors.white,
+              child: Text(
+                'Bank Name*',
                 style: GoogleFonts.manrope(
-                  color: const Color(0xFF999999),
-                  fontSize: 16,
+                  color: const Color(0xFF333333),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              items: _southAfricanBanks.keys.map((String bank) {
-                return DropdownMenuItem<String>(
-                  value: bank,
-                  child: Text(
-                    bank,
-                    style: GoogleFonts.manrope(
-                      color: const Color(0xFF333333),
-                      fontSize: 16,
-                    ),
-                  ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedBank = newValue;
-                  _selectedBranchCode = newValue != null
-                      ? _southAfricanBanks[newValue]
-                      : null;
-                  _bankNameController.text = newValue ?? '';
-                  _branchCodeController.text = _selectedBranchCode ?? '';
-                });
-              },
             ),
           ),
-        ),
-      ],
+          Transform.translate(
+            offset: Offset(0, -10),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                isExpanded: true,
+                value: _selectedBank,
+                hint: Text(
+                  'Select Bank',
+                  style: GoogleFonts.manrope(
+                    color: const Color(0xFF999999),
+                    fontSize: 16,
+                  ),
+                ),
+                items: _southAfricanBanks.keys.map((String bank) {
+                  return DropdownMenuItem<String>(
+                    value: bank,
+                    child: Text(
+                      bank,
+                      style: GoogleFonts.manrope(
+                        color: const Color(0xFF333333),
+                        fontSize: 16,
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedBank = newValue;
+                    _selectedBranchCode = newValue != null
+                        ? _southAfricanBanks[newValue]
+                        : null;
+                    _bankNameController.text = newValue ?? '';
+                    _branchCodeController.text = _selectedBranchCode ?? '';
+                  });
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildBranchCodeField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Branch Code*',
-          style: GoogleFonts.manrope(
-            color: const Color(0xFF333333),
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: Colors.black, width: 2),
-            color: Colors.white,
-          ),
-          child: Text(
-            _selectedBranchCode ?? 'Select a bank first',
-            style: GoogleFonts.manrope(
-              color: _selectedBranchCode != null
-                  ? const Color(0xFF333333)
-                  : const Color(0xFF999999),
-              fontSize: 16,
+    return  Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: Colors.black, width: 2),
+        color: Colors.white,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Transform.translate(
+            offset: Offset(0, -24),
+            child: Container(
+              color: Colors.white,
+              child: Text(
+                'Branch Code*',
+                style: GoogleFonts.manrope(
+                  color: const Color(0xFF333333),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
-        ),
-      ],
+          Transform.translate(
+            offset: Offset(0, -10),
+            child: Text(
+              _selectedBranchCode ?? 'Select a bank first',
+              style: GoogleFonts.manrope(
+                color: _selectedBranchCode != null
+                    ? const Color(0xFF333333)
+                    : const Color(0xFF999999),
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -2596,51 +2604,58 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     FocusNode focusNode, {
     bool showPinIcon = false,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.manrope(
-            color: const Color(0xFF333333),
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+    return TextFormField(
+      controller: controller,
+      focusNode: focusNode,
+      maxLines: 4,
+      minLines: 4,
+      style: GoogleFonts.manrope(
+        color: const Color(0xFF333333),
+        fontSize: 16,
+      ),
+      decoration: InputDecoration(
+        hintText: hint,
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        floatingLabelAlignment: FloatingLabelAlignment.start,
+        hintStyle: GoogleFonts.manrope(
+          color: const Color(0xFF999999),
+          fontSize: 12,
+
         ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black, width: 2),
-            color: Colors.white,
-          ),
-          child: TextFormField(
-            controller: controller,
-            focusNode: focusNode,
-            maxLines: 4,
-            minLines: 4,
-            style: GoogleFonts.manrope(
-              color: const Color(0xFF333333),
-              fontSize: 16,
-            ),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: GoogleFonts.manrope(
-                color: const Color(0xFF999999),
-                fontSize: 16,
-              ),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-              suffixIcon: showPinIcon
-                  ? Icon(Icons.location_pin, color: const Color(0xFF666666))
-                  : null,
-            ),
-          ),
+        labelStyle: GoogleFonts.manrope(
+          color:Colors.black ,
+          fontSize: 14.5,
+          fontWeight: FontWeight.w500,
+
         ),
-      ],
+        contentPadding: EdgeInsets.only(left: 16, top: 16),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.black, width: 1),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey.withOpacity(0.55)),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        focusedBorder: OutlineInputBorder(
+
+          borderRadius: BorderRadius.circular(16),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.red, width: 2),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.red, width: 2),
+          borderRadius: BorderRadius.circular(16),
+        ),
+
+
+        suffixIcon: showPinIcon
+            ? Icon(Icons.location_pin, color: const Color(0xFF666666))
+            : null,
+      ),
     );
   }
 
@@ -2656,243 +2671,74 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     bool isPassword = false,
     Widget? suffixIcon,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.manrope(
-            color: const Color(0xFF333333),
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        FutureBuilder<List<String>>(
-          future: FormDataService.getFieldSuggestions(fieldKey),
-          builder: (context, snapshot) {
-            final suggestions = snapshot.data ?? [];
+    return FutureBuilder<List<String>>(
+      future: FormDataService.getFieldSuggestions(fieldKey),
+      builder: (context, snapshot) {
+        final suggestions = snapshot.data ?? [];
 
-            return Autocomplete<String>(
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                if (textEditingValue.text.isEmpty) {
-                  return suggestions.take(
-                    5,
-                  ); // Show recent suggestions when empty
+        return Autocomplete<String>(
+          optionsBuilder: (TextEditingValue textEditingValue) {
+            if (textEditingValue.text.isEmpty) {
+              return suggestions.take(
+                5,
+              ); // Show recent suggestions when empty
+            }
+            return suggestions
+                .where((String suggestion) {
+              return suggestion.toLowerCase().contains(
+                textEditingValue.text.toLowerCase(),
+              );
+            })
+                .take(5);
+          },
+          fieldViewBuilder:
+              (
+              context,
+              fieldController,
+              fieldFocusNode,
+              onEditingComplete,
+              ) {
+            // Sync with our main controller
+            if (controller.text != fieldController.text) {
+              fieldController.text = controller.text;
+            }
+
+            // Add listener to update main controller
+            fieldController.addListener(() {
+              if (controller.text != fieldController.text) {
+                controller.text = fieldController.text;
+              }
+            });
+
+            return CustomInputTransparent4(
+              hintText: hint,
+              labelText: label,
+              controller: fieldController,
+              focusNode: focusNode,
+              textInputAction: focusNode != null
+                  ? TextInputAction.next
+                  : TextInputAction.done,
+              isPasswordField: isPassword ?? false,
+              suffix: suffixIcon,
+              onChanged: (value) {
+                // Save suggestion when user types
+                if (value.trim().isNotEmpty) {
+                  FormDataService.saveFieldSuggestion(
+                    fieldKey,
+                    value.trim(),
+                  );
                 }
-                return suggestions
-                    .where((String suggestion) {
-                      return suggestion.toLowerCase().contains(
-                        textEditingValue.text.toLowerCase(),
-                      );
-                    })
-                    .take(5);
               },
-              fieldViewBuilder:
-                  (
-                    context,
-                    fieldController,
-                    fieldFocusNode,
-                    onEditingComplete,
-                  ) {
-                    // Sync with our main controller
-                    if (controller.text != fieldController.text) {
-                      fieldController.text = controller.text;
-                    }
-
-                    // Add listener to update main controller
-                    fieldController.addListener(() {
-                      if (controller.text != fieldController.text) {
-                        controller.text = fieldController.text;
-                      }
-                    });
-
-                    return Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: Colors.black, width: 2),
-                        color: Colors.white,
-                      ),
-                      child: TextFormField(
-                        controller: fieldController,
-                        focusNode: focusNode,
-                        keyboardType: integersOnly
-                            ? TextInputType.number
-                            : TextInputType.text,
-                        obscureText: isPassword,
-                        style: GoogleFonts.manrope(
-                          color: const Color(0xFF333333),
-                          fontSize: 16,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: hint,
-                          hintStyle: GoogleFonts.manrope(
-                            color: const Color(0xFF999999),
-                            fontSize: 16,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
-                          suffixIcon: suffixIcon,
-                        ),
-                        onEditingComplete: onEditingComplete,
-                        onChanged: (value) {
-                          // Save suggestion when user types
-                          if (value.trim().isNotEmpty) {
-                            FormDataService.saveFieldSuggestion(
-                              fieldKey,
-                              value.trim(),
-                            );
-                          }
-                        },
-                      ),
-                    );
-                  },
-              optionsViewBuilder: (context, onSelected, options) {
-                if (options.isEmpty) return Container();
-
-                return Align(
-                  alignment: Alignment.topLeft,
-                  child: Material(
-                    elevation: 4,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 300,
-                      constraints: const BoxConstraints(maxHeight: 200),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.black),
-                      ),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: options.length,
-                        itemBuilder: (context, index) {
-                          final option = options.elementAt(index);
-                          return InkWell(
-                            onTap: () => onSelected(option),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: index < options.length - 1
-                                        ? Colors.black
-                                        : Colors.transparent,
-                                    width: 1,
-                                  ),
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.history,
-                                    size: 16,
-                                    color: const Color(0xFF666666),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      option,
-                                      style: GoogleFonts.manrope(
-                                        color: const Color(0xFF333333),
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                );
-              },
-              onSelected: (String selection) {
-                controller.text = selection;
-                FormDataService.saveFieldSuggestion(fieldKey, selection);
+              onSubmitted: (value) {
+                if (focusNode != null) {
+                  focusNode.requestFocus();
+                }
               },
             );
           },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildYearAutocomplete() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Year Established*',
-          style: GoogleFonts.manrope(
-            color: const Color(0xFF333333),
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Autocomplete<String>(
-          optionsBuilder: (TextEditingValue textEditingValue) {
-            if (textEditingValue.text.isEmpty) {
-              return const Iterable<String>.empty();
-            }
-            return _getRecentYears().where((String year) {
-              return year.contains(textEditingValue.text.toLowerCase());
-            });
-          },
-          fieldViewBuilder:
-              (context, controller, focusNode, onEditingComplete) {
-                // Sync with our main controller
-                if (_yearEstablishedController.text != controller.text) {
-                  controller.text = _yearEstablishedController.text;
-                }
-
-                // Add listener to update main controller
-                controller.addListener(() {
-                  if (_yearEstablishedController.text != controller.text) {
-                    _yearEstablishedController.text = controller.text;
-                  }
-                });
-
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: Colors.black, width: 2),
-                    color: Colors.white,
-                  ),
-                  child: TextFormField(
-                    controller: controller,
-                    focusNode: focusNodes['yearEstablished']!,
-                    keyboardType: TextInputType.number,
-                    style: GoogleFonts.manrope(
-                      color: const Color(0xFF333333),
-                      fontSize: 16,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Enter Year Established',
-                      hintStyle: GoogleFonts.manrope(
-                        color: const Color(0xFF999999),
-                        fontSize: 16,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16,
-                      ),
-                    ),
-                    onEditingComplete: onEditingComplete,
-                  ),
-                );
-              },
           optionsViewBuilder: (context, onSelected, options) {
+            if (options.isEmpty) return Container();
+
             return Align(
               alignment: Alignment.topLeft,
               child: Material(
@@ -2928,12 +2774,24 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                               ),
                             ),
                           ),
-                          child: Text(
-                            option,
-                            style: GoogleFonts.manrope(
-                              color: const Color(0xFF333333),
-                              fontSize: 16,
-                            ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.history,
+                                size: 16,
+                                color: const Color(0xFF666666),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  option,
+                                  style: GoogleFonts.manrope(
+                                    color: const Color(0xFF333333),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       );
@@ -2944,10 +2802,113 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
             );
           },
           onSelected: (String selection) {
-            _yearEstablishedController.text = selection;
+            controller.text = selection;
+            FormDataService.saveFieldSuggestion(fieldKey, selection);
           },
-        ),
-      ],
+        );
+      },
+    );
+  }
+
+  Widget _buildYearAutocomplete() {
+    return Autocomplete<String>(
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return const Iterable<String>.empty();
+        }
+        return _getRecentYears().where((String year) {
+          return year.contains(textEditingValue.text.toLowerCase());
+        });
+      },
+      fieldViewBuilder:
+          (context, controller, focusNode, onEditingComplete) {
+        // Sync with our main controller
+        if (_yearEstablishedController.text != controller.text) {
+          controller.text = _yearEstablishedController.text;
+        }
+
+        // Add listener to update main controller
+        controller.addListener(() {
+          if (_yearEstablishedController.text != controller.text) {
+            _yearEstablishedController.text = controller.text;
+          }
+        });
+
+        return CustomInputTransparent4(
+          hintText: "Enter Year Established",
+          labelText: 'Enter Year Established*',
+          controller: controller,
+          integersOnly: true,
+          focusNode: focusNodes['yearEstablished']!,
+          textInputAction: focusNodes['yearEstablished']! != null
+              ? TextInputAction.next
+              : TextInputAction.done,
+          isPasswordField: false,
+
+          onChanged: (value) {
+
+          },
+          onSubmitted: (value) {
+            if (focusNodes['yearEstablished']! != null) {
+              focusNodes['yearEstablished']!.requestFocus();
+            }
+          },
+        );
+      },
+      optionsViewBuilder: (context, onSelected, options) {
+        return Align(
+          alignment: Alignment.topLeft,
+          child: Material(
+            elevation: 4,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: 300,
+              constraints: const BoxConstraints(maxHeight: 200),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.black),
+              ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: options.length,
+                itemBuilder: (context, index) {
+                  final option = options.elementAt(index);
+                  return InkWell(
+                    onTap: () => onSelected(option),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: index < options.length - 1
+                                ? Colors.black
+                                : Colors.transparent,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        option,
+                        style: GoogleFonts.manrope(
+                          color: const Color(0xFF333333),
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
+      onSelected: (String selection) {
+        _yearEstablishedController.text = selection;
+      },
     );
   }
 
@@ -3015,42 +2976,32 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Upload CIPC Documents',
-          style: GoogleFonts.manrope(
-            fontSize: 14,
-            fontWeight: FontWeight.w300,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 8),
         GestureDetector(
           onTap: _pickFiles,
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: Colors.black, width: 2),
-              color: Colors.white,
+              border: Border.all(color: Colors.black),
+              borderRadius: BorderRadius.circular(36),
+              color: Colors.transparent,
             ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.cloud_upload_outlined,
-                  color: Color(0xFF999999),
-                ),
-                const SizedBox(width: 12),
-                Text(
+            child: Transform.translate(
+              offset: Offset(0, -32),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                color: Colors.white,
+                child: Text(
                   _uploadedDocuments.isNotEmpty
                       ? '${_uploadedDocuments.length} document(s) uploaded'
                       : 'Upload CIPC Documents',
                   style: GoogleFonts.manrope(
-                    color: Color(0xFF999999),
-                    fontSize: 16,
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -3086,8 +3037,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
                     final fileName = _getFileName(file);
                     final isImage =
                         fileName.toLowerCase().endsWith('.jpg') ||
-                        fileName.toLowerCase().endsWith('.jpeg') ||
-                        fileName.toLowerCase().endsWith('.png');
+                            fileName.toLowerCase().endsWith('.jpeg') ||
+                            fileName.toLowerCase().endsWith('.png');
 
                     return Container(
                       padding: const EdgeInsets.symmetric(
@@ -3169,7 +3120,8 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
               ],
             ),
           ),
-        ],
+        ]
+
       ],
     );
   }

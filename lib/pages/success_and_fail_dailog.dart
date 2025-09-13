@@ -508,37 +508,3 @@ class _FailureDialogState extends State<_FailureDialog>
     );
   }
 }
-
-// Usage Examples:
-class DialogExamples {
-  static void showExamples(BuildContext context) {
-    // Success Dialog Example
-    DialogHelper.showSuccessDialog(
-      context,
-      title: 'Payment Successful!',
-      message: 'Your transaction has been processed successfully. You will receive a confirmation email shortly.',
-      buttonText: 'Continue Shopping',
-      onPressed: () {
-        Navigator.of(context).pop();
-        // Navigate to next screen
-      },
-    );
-
-    // Failure Dialog Example
-    DialogHelper.showFailureDialog(
-      context,
-      title: 'Payment Failed',
-      message: 'We encountered an issue processing your payment. Please check your card details and try again.',
-      primaryButtonText: 'Try Again',
-      secondaryButtonText: 'Change Payment',
-      onPrimaryPressed: () {
-        Navigator.of(context).pop();
-        // Retry payment logic
-      },
-      onSecondaryPressed: () {
-        Navigator.of(context).pop();
-        // Navigate to payment method selection
-      },
-    );
-  }
-}

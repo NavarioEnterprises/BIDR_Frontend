@@ -380,13 +380,7 @@ class _LoginPageState extends State<LoginPage> {
                               alignment: Alignment.centerLeft,
                               child: TextButton(
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          BidrPasswordResetFlow(),
-                                    ),
-                                  );
+                                  context.go('/forgotpassword');
                                 },
                                 child: Text(
                                   'Forgot Password?',

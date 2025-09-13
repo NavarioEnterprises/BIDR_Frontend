@@ -1102,7 +1102,7 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
               hintText: widget.hintText,
               labelText: widget.labelText,
               errorText: widget.hasError == true ? widget.errorText : null,
-              errorStyle: TextStyle(
+              errorStyle: GoogleFonts.manrope(
                 color: Colors.red,
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
@@ -1127,7 +1127,7 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
                   : null,
               filled: true,
               fillColor: widget.hasError == true ? Colors.red.withOpacity(0.05) : Colors.transparent,
-              hintStyle: GoogleFonts.inter(
+              hintStyle: GoogleFonts.manrope(
                 textStyle: TextStyle(
                   fontSize: 13,
                   color: Colors.grey.withOpacity(0.35),
@@ -1136,11 +1136,11 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
                   fontFamily: 'YuGothic',
                 ),
               ),
-              labelStyle: TextStyle(
+              labelStyle: GoogleFonts.manrope(
                 color: widget.hasError == true ? Colors.red : Colors.black,
                 fontSize: 14.5,
                 fontWeight: FontWeight.w500,
-                fontFamily: 'YuGothic',
+
               ),
               contentPadding: EdgeInsets.only(left: 16, top: 16),
               enabledBorder: OutlineInputBorder(
@@ -1164,11 +1164,11 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
                 borderRadius: BorderRadius.circular(36),
               ),
             ),
-            style: TextStyle(
+            style: GoogleFonts.manrope(
               color: Colors.black,
               fontSize: 13.5,
               fontWeight: FontWeight.w500,
-              fontFamily: 'YuGothic',
+
             ),
           ),
         ),
@@ -1177,7 +1177,7 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
             padding: EdgeInsets.only(left: 18, top: 4),
             child: Text(
               widget.errorText!,
-              style: TextStyle(
+              style: GoogleFonts.manrope(
                 color: Colors.red,
                 fontSize: 12,
                 fontWeight: FontWeight.w400,

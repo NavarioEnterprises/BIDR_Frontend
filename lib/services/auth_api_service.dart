@@ -44,7 +44,8 @@ class AuthApiService {
     required String password,
     required String confirmPassword,
     String deliveryMethod = 'sms',
-  }) async {
+  })
+  async {
     final url = Uri.parse('${GlobalVariables.authServiceUrl}register/');
 
     final headers = {'Content-Type': 'application/json'};
@@ -146,7 +147,8 @@ class AuthApiService {
     String email,
     String cellphone, {
     String deliveryMethod = 'sms',
-  }) async {
+  }) async
+  {
     var url = Uri.parse('${GlobalVariables.authServiceUrl}resend-otp/');
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
@@ -256,7 +258,8 @@ class AuthApiService {
     required String userId,
     required String companyName,
     required String companyRegNo,
-  }) async {
+  }) async
+  {
     var url = Uri.parse(
       '${GlobalVariables.authServiceUrl}api/seller/register/',
     );
@@ -286,7 +289,8 @@ class AuthApiService {
 
   Future<Map<String, dynamic>?> submitBusinessRegistration(
     Map<String, dynamic> businessData,
-  ) async {
+  ) async
+  {
     final url = Uri.parse(
       '${GlobalVariables.authServiceUrl}api/seller/business-registration/',
     );
@@ -347,7 +351,8 @@ class AuthApiService {
     required String sellerId,
     required String filePath,
     required String documentType,
-  }) async {
+  })
+  async {
     var url = Uri.parse(
       '${GlobalVariables.authServiceUrl}api/seller/upload-document/',
     );
@@ -377,7 +382,8 @@ class AuthApiService {
     required String bankName,
     required String accountNumber,
     required String accountType,
-  }) async {
+  }) async
+  {
     var url = Uri.parse(
       '${GlobalVariables.authServiceUrl}api/seller/bank-details/',
     );
@@ -411,7 +417,8 @@ class AuthApiService {
     required String firstName,
     required String lastName,
     required String phoneNumber,
-  }) async {
+  })
+  async {
     var url = Uri.parse('${GlobalVariables.authServiceUrl}profile/');
     var request = http.Request('PATCH', url);
     request.headers['Content-Type'] = 'application/json';
@@ -447,7 +454,8 @@ class AuthApiService {
 
   Future<Map<String, dynamic>?> requestPasswordReset({
     required String email,
-  }) async {
+  }) async
+  {
     var url = Uri.parse(
       '${GlobalVariables.authServiceUrl}password-reset-request/',
     );
@@ -480,7 +488,8 @@ class AuthApiService {
 
   Future<Map<String, dynamic>?> deleteAccount({
     required String accessToken,
-  }) async {
+  }) async
+  {
     var url = Uri.parse('${GlobalVariables.authServiceUrl}profile/');
     var request = http.Request('DELETE', url);
     request.headers['Content-Type'] = 'application/json';
@@ -511,7 +520,8 @@ class AuthApiService {
   Future<Map<String, dynamic>?> signOut({
     required String accessToken,
     required String refreshToken,
-  }) async {
+  }) async
+  {
     try {
       // Call logout API
       await logout(accessToken, refreshToken);
@@ -525,7 +535,8 @@ class AuthApiService {
   /// Get seller profile by auth_user_uid
   Future<Map<String, dynamic>> getSellerProfile({
     required String authUserUid,
-  }) async {
+  }) async
+  {
     try {
       final url =
           '${GlobalVariables.authServiceUrl}api/seller/profiles/by-auth-user-uid/$authUserUid/';
@@ -563,7 +574,8 @@ class AuthApiService {
   Future<Map<String, dynamic>> updateSellerProfile({
     required String profileId,
     required Map<String, dynamic> profileData,
-  }) async {
+  }) async
+  {
     try {
       final url =
           '${GlobalVariables.authServiceUrl}api/seller/profiles/$profileId/';
@@ -602,7 +614,8 @@ class AuthApiService {
   Future<Map<String, dynamic>> updateSellerBasicInfo({
     required String authUserUid,
     required Map<String, dynamic> sellerData,
-  }) async {
+  })
+  async {
     try {
       final url =
           '${GlobalVariables.authServiceUrl}api/seller/profiles/update-by-auth-user-uid/$authUserUid/';
@@ -641,7 +654,8 @@ class AuthApiService {
 
   Future<Map<String, dynamic>?> getUserProfile({
     required String accessToken,
-  }) async {
+  }) async
+  {
     var url = Uri.parse(
       '${GlobalVariables.authServiceUrl}profile/comprehensive/',
     );
@@ -676,7 +690,8 @@ class AuthApiService {
     required String accessToken,
     required String subject,
     required String message,
-  }) async {
+  }) async
+  {
     var url = Uri.parse('${GlobalVariables.authServiceUrl}contact-support/');
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
@@ -711,7 +726,8 @@ class AuthApiService {
     required String email,
     required String company,
     String? projectDetails,
-  }) async {
+  }) async
+  {
     var url = Uri.parse('${GlobalVariables.authServiceUrl}request-quote/');
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
@@ -751,7 +767,8 @@ class AuthApiService {
     String? endDate,
     String? status,
     int page = 1,
-  }) async {
+  }) async
+  {
     // Build query parameters
     Map<String, String> queryParams = {'page': page.toString()};
     if (startDate != null) queryParams['start_date'] = startDate;
@@ -821,7 +838,8 @@ class AuthApiService {
   Future<Map<String, dynamic>?> updateUserRole({
     required String email,
     required String newRole,
-  }) async {
+  }) async
+  {
     final url = Uri.parse('${GlobalVariables.authServiceUrl}update-user-role/');
     final headers = {'Content-Type': 'application/json'};
 

@@ -5,24 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="feat: enhance notification system with improved loading, filtering, and user interaction">
-      <change afterPath="$PROJECT_DIR$/lib/assets/images/auction.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/authentication/forgot_password.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/forgot_password.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/authentication/login.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/login.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/authentication/otp_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/otp_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/authentication/registration/business_signup.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/registration/business_signup.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/authentication/registration/buyer_signup.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/registration/buyer_signup.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/authentication/splashscreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/splashscreen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/customWdget/appbar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customWdget/appbar.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customWdget/custom_input2.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customWdget/custom_input2.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/product_request_api.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/product_request_api.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/request_models.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/request_models.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/notifier/my_notifier.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/notifier/my_notifier.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/pages/buyer/support.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer/support.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/pages/buyer_dashboard.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer_dashboard.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/pages/buyer_home.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer_home.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/pages/success_and_fail_dailog.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/success_and_fail_dailog.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/services/auth_api_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/auth_api_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,6 +36,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "makaps3"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/NavarioEnterprises/BIDR_Frontend.git",
+    "accountId": "0f04ec50-c64a-4e40-bbaa-6e87c0136238"
+  }
+}]]></component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -56,6 +59,7 @@
   &quot;associatedIndex&quot;: 4
 }</component>
   <component name="ProjectId" id="30xQDYETW2HKkLwnbYF3COeRNZF" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -90,6 +94,7 @@
     &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
@@ -105,6 +110,10 @@
     </key>
   </component>
   <component name="RunManager" selected="Flutter.main.dart">
+    <configuration name="main.dart" type="FlutterRunConfigurationType" factoryName="Flutter">
+      <option name="filePath" value="$PROJECT_DIR$/lib/main.dart" />
+      <method v="2" />
+    </configuration>
     <configuration name="Unnamed" type="Python.DjangoServer" factoryName="Django server" nameIsGenerated="true">
       <module name="BIDR_Backend" />
       <option name="ENV_FILES" value="" />
@@ -150,6 +159,7 @@
       </set>
     </attachedChunks>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="" />
@@ -350,7 +360,29 @@
     <MESSAGE value="chore: add log file for product management service Azure deployment debugging" />
     <MESSAGE value="feat: enhance notification system with improved loading and filtering functionality" />
     <MESSAGE value="feat: enhance notification system with improved loading, filtering, and user interaction" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance notification system with improved loading, filtering, and user interaction" />
+    <MESSAGE value="improved card info and forms on buyer_home.dart, removed youtube and added linkedIn.png and tiktok.png. also created success_and_fail_dailog.dart" />
+    <option name="LAST_COMMIT_MESSAGE" value="improved card info and forms on buyer_home.dart, removed youtube and added linkedIn.png and tiktok.png. also created success_and_fail_dailog.dart" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/services/auth_api_service.dart</url>
+          <line>289</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/services/auth_api_service.dart</url>
+          <line>379</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/authentication/registration/business_signup.dart</url>
+          <line>2673</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/BIDR_Backend$urls.coverage" NAME="urls Coverage Results" MODIFIED="1756578822990" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/reviews_and_ratings/rewards" />

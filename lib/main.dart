@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 //import 'package:fvp/fvp.dart' as fvp;
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'authentication/forgot_password.dart';
 import 'authentication/login.dart';
 import 'authentication/registration/business_signup.dart';
 import 'authentication/registration/buyer_signup.dart';
@@ -119,6 +120,7 @@ class MyApp extends StatelessWidget {
       final publicRoutes = [
         '/',
         '/login',
+        '/forgotpassword',
         '/register',
         '/register/buyer',
         '/register/seller',
@@ -168,6 +170,12 @@ class MyApp extends StatelessWidget {
         name: 'login',
         builder: (BuildContext context, GoRouterState state) =>
             const LoginPage(),
+      ),
+      GoRoute(
+        path: '/forgotpassword',
+        name: 'forgotpassword',
+        builder: (BuildContext context, GoRouterState state) =>
+        const BidrPasswordResetFlow(),
       ),
 
       // Registration Routes

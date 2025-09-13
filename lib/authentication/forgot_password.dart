@@ -2,12 +2,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'dart:async';
 
 import '../constants/Constants.dart';
 import '../customWdget/customCard.dart';
 import '../customWdget/custom_input2.dart';
-import 'login.dart';
+import '../pages/success_and_fail_dailog.dart';
 import 'otp_screen.dart';
 
 
@@ -90,26 +92,23 @@ class _BidrPasswordResetScreenState extends State<BidrPasswordResetScreen>
   Widget build(BuildContext context) {
 
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
-          child: CustomCard(
-            color: Colors.white,
-            elevation: 5,
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          backgroundColor: Colors.white,
+          body: Center(
             child: Container(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height*0.8,
-              constraints: BoxConstraints(maxWidth: 880,maxHeight: 660),
-              padding: EdgeInsets.only(left: 16,right: 16, bottom: 16, top:16),
+              height: MediaQuery.of(context).size.height,
+              constraints: BoxConstraints(maxWidth: 2000,),
+              padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+
                   color: Colors.black.withOpacity(0.75)
               ),
               child:Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
@@ -149,19 +148,30 @@ class _BidrPasswordResetScreenState extends State<BidrPasswordResetScreen>
                             padding: EdgeInsets.only(left: 40,right: 40, bottom: 24, top:24),
                             child:  Column(
                               mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Row(
                                   children: [
                                     IconButton(
-                                      onPressed:() =>setState(() {
-                                        Navigator.pop(context);
-                                      }),
-                                      style: IconButton.styleFrom(backgroundColor: Constants.ftaColorLight,foregroundColor: Constants.ctaColorLight,elevation: 5,shadowColor: Colors.black54),
-                                      icon:  Icon(
-                                        CupertinoIcons.back,
-                                        color: Colors.white,
+                                      onPressed: () {
+                                        context.go('/login');
+                                      },
+                                      style: IconButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Constants.ftaColorLight,
+                                        elevation: 5,
+                                        shadowColor: Colors.black54,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
                                       ),
-                                    ),Spacer(),
+                                      icon: Icon(
+                                        CupertinoIcons.back,
+                                        color: Constants.ftaColorLight,
+                                      ),
+                                    ),
+                                    Spacer(),
                                     _buildBidrLogo(),
                                     Spacer(),
                                     SizedBox(width: 40,height: 40,)
@@ -195,16 +205,30 @@ class _BidrPasswordResetScreenState extends State<BidrPasswordResetScreen>
 
                                 const SizedBox(height: 24),
 
-                                _buildInputField(
-                                  'Email',
-                                  'Enter Email',
-                                  _emailController,
-                                  _emailFocusNode,
+                                Container(
+                                  constraints: BoxConstraints(maxWidth: 500),
+                                  width: (MediaQuery.of(context).size.width > 800)
+                                      ? MediaQuery.of(context).size.width * 0.5
+                                      : MediaQuery.of(context).size.width * 0.85,
+                                  child: _buildCustomTextField(
+                                    'Email',
+                                    _emailController,
+                                    _emailFocusNode,
+                                    null,
+                                    isPasswordField: false,
+
+
+                                  ),
                                 ),
 
                                 const SizedBox(height: 24),
 
-                                _buildGetOTPButton(),
+                                Container(
+                                    constraints: BoxConstraints(maxWidth: 500),
+                                    width: (MediaQuery.of(context).size.width > 800)
+                                        ? MediaQuery.of(context).size.width * 0.5
+                                        : MediaQuery.of(context).size.width * 0.85,
+                                    child: _buildGetOTPButton()),
                               ],
                             ),
                           ),
@@ -218,157 +242,49 @@ class _BidrPasswordResetScreenState extends State<BidrPasswordResetScreen>
 
             ),
           ),
-        ),
-      )
+        )
     );
   }
-  Widget _buildInputField(
-      String label,
-      String hint,
+  Widget _buildCustomTextField(
+      String hintText,
       TextEditingController controller,
-      FocusNode focusNode, {
-        bool integersOnly = false,
-        int? maxLines,
+      FocusNode focusNode,
+      FocusNode? nextFocusNode, {
+        Widget? suffixIcon,
+        bool? isPasswordField,
       }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            label,
-            style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: Colors.black,
-                fontFamily: 'YuGothic'
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomInputTransparent4(
-          hintText: hint,
-          controller: controller,
-          focusNode: focusNode,
-          textInputAction: TextInputAction.next,
-          isPasswordField: false,
-          integersOnly: integersOnly,
-          maxLines: maxLines,
-          onChanged: (value) {},
-          onSubmitted: (value) {
-            _handleGetOTP();
-          },
-        ),
-      ],
+    return CustomInputTransparent4(
+      hintText: hintText.replaceAll('*', ''),
+      labelText: hintText,
+      controller: controller,
+      focusNode: focusNode,
+      textInputAction: nextFocusNode != null
+          ? TextInputAction.next
+          : TextInputAction.done,
+      isPasswordField: isPasswordField ?? false,
+      suffix: suffixIcon,
+      onChanged: (value) {},
+      onSubmitted: (value) {
+        if (nextFocusNode != null) {
+          nextFocusNode.requestFocus();
+        }
+      },
     );
   }
 
   Widget _buildBidrLogo() {
-    return Column(
-      children: [
-        Container(
-          width: 90,
-          height: 90,
-          child: Image.asset(
-            "lib/assets/images/bidr_logo.png",
-            fit: BoxFit.contain,
-            width: 90,
-            height: 90,
-          ),
-        ),
-        const SizedBox(height: 16),
-        RichText(
-          text: const TextSpan(
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 2,
-              fontFamily: 'YuGothic',
-            ),
-            children: [
-              TextSpan(
-                text: 'BI',
-                style: TextStyle(color: Color(0xFF1A365D)),
-              ),
-              TextSpan(
-                text: 'D',
-                style: TextStyle(color: Color(0xFFFFA500)),
-              ),
-              TextSpan(
-                text: 'R',
-                style: TextStyle(color: Color(0xFF1A365D)),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return Container(
+      width: 90,
+      height: 90,
+      child: Image.asset(
+        "lib/assets/images/bidr_logo.png",
+        fit: BoxFit.contain,
+        width: 90,
+        height: 90,
+      ),
     );
   }
 
-  Widget _buildFloatingElements() {
-    return Stack(
-      children: [
-        Positioned(
-          top: -50,
-          right: -50,
-          child: TweenAnimationBuilder(
-            duration: const Duration(seconds: 6),
-            tween: Tween<double>(begin: 0, end: 1),
-            builder: (context, double value, child) {
-              return Transform.translate(
-                offset: Offset(0, -20 * (0.5 - (value - 0.5).abs()) * 2),
-                child: Transform.rotate(
-                  angle: value * 6.28,
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [
-                          Constants.ctaColorLight.withOpacity(0.1),
-                          const Color(0xFF4299E1).withOpacity(0.1),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        Positioned(
-          bottom: -50,
-          left: -50,
-          child: TweenAnimationBuilder(
-            duration: const Duration(seconds: 6),
-            tween: Tween<double>(begin: 0, end: 1),
-            builder: (context, double value, child) {
-              return Transform.translate(
-                offset: Offset(0, -20 * (0.5 - ((value + 0.5) % 1 - 0.5).abs()) * 2),
-                child: Transform.rotate(
-                  angle: (value + 0.5) * 6.28,
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [
-                          const Color(0xFF4299E1).withOpacity(0.1),
-                          Constants.ctaColorLight.withOpacity(0.1),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildGetOTPButton() {
     return MouseRegion(
@@ -421,12 +337,24 @@ class _BidrPasswordResetScreenState extends State<BidrPasswordResetScreen>
 
   void _handleGetOTP() async {
     if (_emailController.text.isEmpty) {
-      _showSnackBar('Please enter your email address');
+      DialogHelper.showFailureDialog(
+        context,
+        title: 'Missing Information',
+        message: 'Please enter your email address',
+        primaryButtonText: 'OK',
+        secondaryButtonText: 'Cancel',
+      );
       return;
     }
 
     if (!_isValidEmail(_emailController.text)) {
-      _showSnackBar('Please enter a valid email address');
+      DialogHelper.showFailureDialog(
+        context,
+        title: 'Invalid Email',
+        message: 'Please enter a valid email address',
+        primaryButtonText: 'OK',
+        secondaryButtonText: 'Cancel',
+      );
       return;
     }
 
@@ -464,18 +392,6 @@ class _BidrPasswordResetScreenState extends State<BidrPasswordResetScreen>
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 
-  void _showSnackBar(String message, {bool isSuccess = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isSuccess ? Colors.green : Colors.red,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
-  }
 }
 
 // Screen 2: OTP Verification
@@ -544,97 +460,43 @@ class _BidrResetPasswordScreenState extends State<BidrResetPasswordScreen>
     super.dispose();
   }
 
-  Widget _buildPasswordField(
-      String label,
-      String hint,
+  Widget _buildCustomTextField(
+      String hintText,
       TextEditingController controller,
       FocusNode focusNode,
-      bool obscureText,
-      VoidCallback toggleVisibility,
-      ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            label,
-            style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: Colors.black,
-                fontFamily: 'YuGothic'
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomInputTransparent4(
-          hintText: hint,
-          controller: controller,
-          focusNode: focusNode,
-          textInputAction: TextInputAction.next,
-          isPasswordField:obscureText ,
-          integersOnly: false,
-          maxLines: 2,
-          suffix: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: IconButton(
-              icon: Icon(
-                obscureText ? Icons.visibility_off : Icons.visibility,
-                color: const Color(0xFF718096),
-              ),
-              onPressed: toggleVisibility,
-            ),
-          ),
-          onChanged: (value) {
-          },
-          onSubmitted: (value) {
-
-          },
-        ),
-      ],
+      FocusNode? nextFocusNode, {
+        Widget? suffixIcon,
+        bool? isPasswordField,
+      }) {
+    return CustomInputTransparent4(
+      hintText: hintText.replaceAll('*', ''),
+      labelText: hintText,
+      controller: controller,
+      focusNode: focusNode,
+      textInputAction: nextFocusNode != null
+          ? TextInputAction.next
+          : TextInputAction.done,
+      isPasswordField: isPasswordField ?? false,
+      suffix: suffixIcon,
+      onChanged: (value) {},
+      onSubmitted: (value) {
+        if (nextFocusNode != null) {
+          nextFocusNode.requestFocus();
+        }
+      },
     );
   }
 
   Widget _buildBidrLogo() {
-    return Column(
-      children: [
-        Container(
-          width: 90,
-          height: 90,
-          child: Image.asset(
-            "lib/assets/images/bidr_logo.png",
-            fit: BoxFit.contain,
-            width: 90,
-            height: 90,
-          ),
-        ),
-        const SizedBox(height: 16),
-        RichText(
-          text: const TextSpan(
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 2,
-              fontFamily: 'YuGothic',
-            ),
-            children: [
-              TextSpan(
-                text: 'BI',
-                style: TextStyle(color: Color(0xFF1A365D)),
-              ),
-              TextSpan(
-                text: 'D',
-                style: TextStyle(color: Color(0xFFFFA500)),
-              ),
-              TextSpan(
-                text: 'R',
-                style: TextStyle(color: Color(0xFF1A365D)),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return Container(
+      width: 90,
+      height: 90,
+      child: Image.asset(
+        "lib/assets/images/bidr_logo.png",
+        fit: BoxFit.contain,
+        width: 90,
+        height: 90,
+      ),
     );
   }
 
@@ -689,28 +551,58 @@ class _BidrResetPasswordScreenState extends State<BidrResetPasswordScreen>
 
   void _handleResetPassword() async {
     if (_passwordController.text.isEmpty) {
-      _showSnackBar('Please enter your new password');
+      DialogHelper.showFailureDialog(
+        context,
+        title: 'Missing Information',
+        message: 'Please enter your new password',
+        primaryButtonText: 'OK',
+        secondaryButtonText: 'Cancel',
+      );
       return;
     }
 
     if (_confirmPasswordController.text.isEmpty) {
-      _showSnackBar('Please confirm your password');
+      DialogHelper.showFailureDialog(
+        context,
+        title: 'Missing Information',
+        message: 'Please confirm your password',
+        primaryButtonText: 'OK',
+        secondaryButtonText: 'Cancel',
+      );
       return;
     }
 
     if (_passwordController.text != _confirmPasswordController.text) {
-      _showSnackBar('Passwords do not match');
+      DialogHelper.showFailureDialog(
+        context,
+        title: 'Password Mismatch',
+        message: 'Passwords do not match',
+        primaryButtonText: 'OK',
+        secondaryButtonText: 'Cancel',
+      );
       return;
     }
 
     if (_passwordController.text.length < 8) {
-      _showSnackBar('Password must be at least 8 characters long');
+      DialogHelper.showFailureDialog(
+        context,
+        title: 'Weak Password',
+        message: 'Password must be at least 8 characters long',
+        primaryButtonText: 'OK',
+        secondaryButtonText: 'Cancel',
+      );
       return;
     }
 
     // Additional password strength validation
     if (!_isPasswordStrong(_passwordController.text)) {
-      _showSnackBar('Password must contain uppercase, lowercase, number and special character');
+      DialogHelper.showFailureDialog(
+        context,
+        title: 'Weak Password',
+        message: 'Password must contain uppercase, lowercase, number and special character',
+        primaryButtonText: 'OK',
+        secondaryButtonText: 'Cancel',
+      );
       return;
     }
 
@@ -780,12 +672,8 @@ class _BidrResetPasswordScreenState extends State<BidrResetPasswordScreen>
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Close dialog
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => LoginPage()));
-                  //Navigator.of(context).popUntil((route) => route.isFirst); // Go back to login
+                  context.go('/login');
+
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Constants.ctaColorLight,
@@ -810,22 +698,6 @@ class _BidrResetPasswordScreenState extends State<BidrResetPasswordScreen>
     );
   }
 
-  void _showSnackBar(String message, {bool isSuccess = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(fontFamily: 'YuGothic'),
-        ),
-        backgroundColor: isSuccess ? Colors.green : Colors.red,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -837,9 +709,9 @@ class _BidrResetPasswordScreenState extends State<BidrResetPasswordScreen>
           elevation: 5,
           child: Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height*0.8,
-            constraints: BoxConstraints(maxWidth: 880,maxHeight: 670),
-            padding: EdgeInsets.only(left: 16,right: 16, bottom: 16, top:16),
+            height: MediaQuery.of(context).size.height,
+            constraints: BoxConstraints(maxWidth: 2000,),
+            padding: EdgeInsets.all(24),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 color: Colors.black.withOpacity(0.75)
@@ -895,17 +767,27 @@ class _BidrResetPasswordScreenState extends State<BidrResetPasswordScreen>
                                 padding: EdgeInsets.only(left: 40,right: 40, bottom: 24, top:24),
                                 child:  Column(
                                   mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Row(
                                       children: [
                                         IconButton(
-                                          onPressed:() =>setState(() {
-                                            Navigator.pop(context);
-                                          }),
-                                          style: IconButton.styleFrom(backgroundColor: Constants.ftaColorLight,foregroundColor: Constants.ctaColorLight,elevation: 5,shadowColor: Colors.black54),
-                                          icon:  Icon(
+                                          onPressed: () {
+                                            context.go('/login');
+                                          },
+                                          style: IconButton.styleFrom(
+                                            backgroundColor: Colors.white,
+                                            foregroundColor: Constants.ftaColorLight,
+                                            elevation: 5,
+                                            shadowColor: Colors.black54,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                          icon: Icon(
                                             CupertinoIcons.back,
-                                            color: Colors.white,
+                                            color: Constants.ftaColorLight,
                                           ),
                                         ),Spacer(),
                                         _buildBidrLogo(),
@@ -915,12 +797,12 @@ class _BidrResetPasswordScreenState extends State<BidrResetPasswordScreen>
                                     ),
                                     const SizedBox(height: 24),
 
-                                    const Text(
+                                    Text(
                                       'Reset Password',
                                       style: TextStyle(
                                         fontSize: 28,
                                         fontWeight: FontWeight.w700,
-                                        color: Color(0xFF1A365D),
+                                        color: Constants.ftaColorLight,
                                         fontFamily: 'YuGothic',
                                       ),
                                     ),
@@ -940,32 +822,34 @@ class _BidrResetPasswordScreenState extends State<BidrResetPasswordScreen>
 
                                     const SizedBox(height: 32),
 
-                                    _buildPasswordField(
-                                      'Password',
-                                      'Enter Password',
-                                      _passwordController,
-                                      _passwordFocusNode,
-                                      _obscurePassword,
-                                          () {
-                                        setState(() {
-                                          _obscurePassword = !_obscurePassword;
-                                        });
-                                      },
+                                    Container(
+                                      constraints: BoxConstraints(maxWidth: 500),
+                                      width: (MediaQuery.of(context).size.width > 800)
+                                          ? MediaQuery.of(context).size.width * 0.5
+                                          : MediaQuery.of(context).size.width * 0.85,
+                                      child: _buildCustomTextField(
+                                          'Enter Password',
+                                          _passwordController,
+                                          _passwordFocusNode,
+                                          null,
+                                          isPasswordField: true
+                                      ),
                                     ),
 
                                     const SizedBox(height: 20),
 
-                                    _buildPasswordField(
-                                      'Confirm Password',
-                                      'Enter Confirm Password',
-                                      _confirmPasswordController,
-                                      _confirmPasswordFocusNode,
-                                      _obscureConfirmPassword,
-                                          () {
-                                        setState(() {
-                                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                                        });
-                                      },
+                                    Container(
+                                      constraints: BoxConstraints(maxWidth: 500),
+                                      width: (MediaQuery.of(context).size.width > 800)
+                                          ? MediaQuery.of(context).size.width * 0.5
+                                          : MediaQuery.of(context).size.width * 0.85,
+                                      child: _buildCustomTextField(
+                                          'Enter Confirm Password',
+                                          _confirmPasswordController,
+                                          _confirmPasswordFocusNode,
+                                          null,
+                                          isPasswordField: true
+                                      ),
                                     ),
 
                                     const SizedBox(height: 8),
@@ -973,6 +857,10 @@ class _BidrResetPasswordScreenState extends State<BidrResetPasswordScreen>
                                     // Password requirements
                                     Container(
                                       padding: const EdgeInsets.all(8),
+                                      constraints: BoxConstraints(maxWidth: 500),
+                                      width: (MediaQuery.of(context).size.width > 800)
+                                          ? MediaQuery.of(context).size.width * 0.5
+                                          : MediaQuery.of(context).size.width * 0.85,
                                       decoration: BoxDecoration(
                                         color:  Colors.grey.shade100,
                                         borderRadius: BorderRadius.circular(8),
@@ -984,7 +872,7 @@ class _BidrResetPasswordScreenState extends State<BidrResetPasswordScreen>
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                           Text(
+                                          Text(
                                             'Password requirements:',
                                             style: TextStyle(
                                               fontSize: 12,
@@ -1010,7 +898,12 @@ class _BidrResetPasswordScreenState extends State<BidrResetPasswordScreen>
 
                                     const SizedBox(height: 24),
 
-                                    _buildResetButton(),
+                                    Container(
+                                        constraints: BoxConstraints(maxWidth: 500),
+                                        width: (MediaQuery.of(context).size.width > 800)
+                                            ? MediaQuery.of(context).size.width * 0.5
+                                            : MediaQuery.of(context).size.width * 0.85,
+                                        child: _buildResetButton()),
                                   ],
                                 ),
                               ),
