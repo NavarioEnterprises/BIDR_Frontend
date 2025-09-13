@@ -182,7 +182,10 @@ class _AccountManagementPageState extends State<AccountManagementPage>
   @override
   void initState() {
     super.initState();
-
+    // Add a small delay to ensure login method has completed
+    Future.delayed(Duration(milliseconds: 500), () {
+      _loadUserData();
+    });
     // Initialize animation controllers
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 300),
@@ -207,23 +210,41 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     _slideController.forward();
 
     // Initialize form data (you can load from user data)
-    _loadUserData();
   }
 
   void _loadUserData() async {
     try {
-      // Get access token to fetch fresh user data from backend
-      final accessToken =
-          await Sharedprefs.getUserAccessTokenSharedPreference();
+      // Check if access token is available first
+      String? accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+      print("Access token available: ${accessToken != null && accessToken.isNotEmpty}");
+      print("Access token length: ${accessToken?.length ?? 0}");
+      
+      // Get user UID from SharedPreferences or Constants
+      String? userUid = await Sharedprefs.getUserUidSharedPreference();
+      if (userUid == null || userUid.isEmpty) {
+        userUid = Constants.myUid;
+      }
+      
+      print("User UID: $userUid");
+      
+      // If no access token, wait a bit longer and retry once
+      if (accessToken == null || accessToken.isEmpty) {
+        print("No access token found, waiting and retrying...");
+        await Future.delayed(Duration(seconds: 1));
+        accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+        print("Access token after retry: ${accessToken != null && accessToken.isNotEmpty}");
+      }
 
-      if (accessToken != null && accessToken.isNotEmpty) {
+      if (userUid != null && userUid.isNotEmpty) {
         // Try to get fresh data from backend
         final response = await _authService.getUserProfile(
-          accessToken: accessToken,
+          uid: userUid, // This parameter is not used anymore but kept for compatibility
         );
+        print("User profile response: $response");
 
-        if (response != null && response['success'] == true) {
-          final userData = response['data'] ?? response;
+        if (response != null && response['success'] != false) {
+          // The API returns the user data directly, not wrapped in a 'data' field
+          final userData = response;
 
           setState(() {
             _firstNameController.text = userData['first_name'] ?? '';
@@ -486,6 +507,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
             'Update your personal information',
             style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
           ),
+          const SizedBox(height: 8),
           Column(
             children: [
               _buildCustomInputField(
@@ -1365,77 +1387,74 @@ class _AccountManagementPageState extends State<AccountManagementPage>
   }
 
   void _changePassword() async {
-    // Show information dialog about password reset process
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 600),
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Title
-                Text(
-                  'Change Password',
-                  style: GoogleFonts.manrope(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Content
-                Text(
-                  'For security reasons, we\'ll send a password reset link to your email address. Please check your email to confirm this action.',
-                  style: GoogleFonts.manrope(fontSize: 14),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                // Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text(
-                        'Cancel',
-                        style: GoogleFonts.manrope(color: Colors.grey[600]),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        _requestPasswordReset();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4299E1),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        'Send Reset Link',
-                        style: GoogleFonts.manrope(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+    // Validate form fields
+    final currentPassword = _currentPasswordController.text.trim();
+    final newPassword = _newPasswordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+    
+    // Validation checks
+    if (currentPassword.isEmpty) {
+      _showErrorDialog('Validation Error', 'Please enter your current password.');
+      return;
+    }
+    
+    if (newPassword.isEmpty) {
+      _showErrorDialog('Validation Error', 'Please enter a new password.');
+      return;
+    }
+    
+    if (newPassword.length < 8) {
+      _showErrorDialog('Validation Error', 'New password must be at least 8 characters long.');
+      return;
+    }
+    
+    if (newPassword != confirmPassword) {
+      _showErrorDialog('Validation Error', 'New password and confirmation do not match.');
+      return;
+    }
+    
+    if (currentPassword == newPassword) {
+      _showErrorDialog('Validation Error', 'New password must be different from your current password.');
+      return;
+    }
+
+    setState(() {
+      _isPasswordLoading = true;
+    });
+
+    try {
+      // Call API to change password
+      final response = await _authService.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+
+      if (response != null && response['success'] != false) {
+        _showSuccessDialog(
+          title: 'Password Changed!',
+          message: 'Your password has been updated successfully.',
+          icon: Icons.check_circle_outline,
+          color: Colors.green,
+          additionalInfo: 'Please remember to use your new password for future logins.',
+          onContinue: () {
+            // Clear password fields
+            _currentPasswordController.clear();
+            _newPasswordController.clear();
+            _confirmPasswordController.clear();
+          },
         );
-      },
-    );
+      } else {
+        final errorMessage = response?['error']?.toString() ?? 'Failed to change password';
+        _showErrorDialog('Password Change Failed', errorMessage);
+      }
+    } catch (e) {
+      _showErrorDialog('Error', 'An unexpected error occurred. Please try again.');
+      print('Password change error: $e');
+    } finally {
+      setState(() {
+        _isPasswordLoading = false;
+      });
+    }
   }
 
   void _requestPasswordReset() async {

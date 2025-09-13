@@ -97,6 +97,21 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
     'Suspension Parts',
   ];
 
+  // Map display names to backend choice keys
+  String _mapCategoryToBackendKey(String displayCategory) {
+    const categoryMapping = {
+      'Engine Parts': 'engine_parts',
+      'Engines Parts': 'engine_parts', // Handle typo in availableCategories
+      'Body Parts': 'body_parts',
+      'Suspension Parts': 'suspension_parts',
+      'Transmission Parts': 'transmission_parts',
+      'Batteries': 'batteries',
+      'Vehicle Spares': 'vehicle_spares',
+    };
+    
+    return categoryMapping[displayCategory] ?? 'vehicle_spares'; // Default fallback
+  }
+
   // Step 5 - Display on Platform
   final TextEditingController _tradingDisplayNameController =
       TextEditingController();
@@ -796,7 +811,7 @@ class _BusinessSignUpPageMobileState extends State<BusinessSignUpPageMobile> {
           'website_url': _websiteUrlController.text,
           'product_category': selectedCategories.join(', '),
           'product_subcategory': selectedCategories.isNotEmpty
-              ? selectedCategories.first
+              ? _mapCategoryToBackendKey(selectedCategories.first)
               : null,
         },
         'company_info': {

@@ -4,6 +4,7 @@ import 'package:bidr/pages/home_router.dart';
 import 'package:bidr/pages/faq_screen.dart';
 import 'package:bidr/pages/policies_screen.dart';
 import 'package:bidr/services/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -45,10 +46,31 @@ Future<void> main() async {
         Constants.currentUser = loginResponse.user;
         print("Loaded complete user data: ${loginResponse.toJson()}");
 
+        // Extract and store tokens from the complete login data
+        final loginResponseMap = loginResponse.toJson();
+        final accessToken = loginResponseMap['access_token'];
+        final refreshToken = loginResponseMap['refresh_token'];
+
+        print(
+          "Main.dart: Extracting tokens - access: ${accessToken != null}, refresh: ${refreshToken != null}",
+        );
+
+        if (accessToken != null) {
+          await Sharedprefs.saveUserAccessTokenSharedPreference(accessToken);
+          print("Main.dart: Access token stored from complete login data");
+        }
+
+        if (refreshToken != null) {
+          await Sharedprefs.saveUserRefreshTokenSharedPreference(refreshToken);
+          print("Main.dart: Refresh token stored from complete login data");
+        }
+
         // Set individual constants from the user model
         Constants.myUid = loginResponse.user.uid;
         Constants.userId = loginResponse.user.id;
-        print("Loaded user ID: ${loginResponse.toJson()}");
+        if (kDebugMode) {
+          print("Loaded user ID: ${loginResponse.toJson()}");
+        }
         Constants.myCell = loginResponse.user.phoneNumber;
         Constants.myDisplayname = loginResponse.user.fullName;
         Constants.myCategoryRole = loginResponse.user.role;

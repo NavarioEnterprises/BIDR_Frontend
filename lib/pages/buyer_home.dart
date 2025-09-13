@@ -2694,6 +2694,33 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     });
 
     try {
+      // Geocode address if coordinates are not available
+      double? lat = _selectedLocation?.latitude;
+      double? lng = _selectedLocation?.longitude;
+
+      print('=== LOCATION COORDINATE DEBUG ===');
+      print('Initial lat from _selectedLocation: $lat');
+      print('Initial lng from _selectedLocation: $lng');
+      print('Location text from controller: "${_locationController.text}"');
+
+      if (lat == null && lng == null && _locationController.text.isNotEmpty) {
+        print(
+          'Attempting geocoding because coordinates are null but address text exists',
+        );
+        try {
+          final coordinates = await _geocodeAddress(_locationController.text);
+          lat = coordinates?.latitude;
+          lng = coordinates?.longitude;
+          print('After geocoding - lat: $lat, lng: $lng');
+        } catch (e) {
+          print('Geocoding failed: $e');
+          // Continue with null coordinates if geocoding fails
+        }
+      }
+
+      print('Final coordinates to be sent - lat: $lat, lng: $lng');
+      print('=== END COORDINATE DEBUG ===');
+
       final result = await ApiService.submitVehicleRequest(
         selectedManufacturer: _manufacturerController.text,
         selectedMakeModel: _makeModelController.text,
@@ -2714,8 +2741,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         maxDistance: _maxDistance,
         images: _selectedImages,
         vinImages: _vinImages,
-        locationLat: _selectedLocation?.latitude,
-        locationLng: _selectedLocation?.longitude,
+        locationLat: lat,
+        locationLng: lng,
       );
       print("Form submitted after login: ${result}");
 
@@ -2760,6 +2787,33 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     });
 
     try {
+      // Geocode address if coordinates are not available
+      double? lat = _selectedLocation?.latitude;
+      double? lng = _selectedLocation?.longitude;
+
+      print('=== LOCATION COORDINATE DEBUG ===');
+      print('Initial lat from _selectedLocation: $lat');
+      print('Initial lng from _selectedLocation: $lng');
+      print('Location text from controller: "${_locationController.text}"');
+
+      if (lat == null && lng == null && _locationController.text.isNotEmpty) {
+        print(
+          'Attempting geocoding because coordinates are null but address text exists',
+        );
+        try {
+          final coordinates = await _geocodeAddress(_locationController.text);
+          lat = coordinates?.latitude;
+          lng = coordinates?.longitude;
+          print('After geocoding - lat: $lat, lng: $lng');
+        } catch (e) {
+          print('Geocoding failed: $e');
+          // Continue with null coordinates if geocoding fails
+        }
+      }
+
+      print('Final coordinates to be sent - lat: $lat, lng: $lng');
+      print('=== END COORDINATE DEBUG ===');
+
       final result = await ApiService.submitVehicleRequest(
         selectedManufacturer: _manufacturerController.text,
         selectedMakeModel: _makeModelController.text,
@@ -2780,8 +2834,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         maxDistance: _maxDistance,
         images: _selectedImages,
         vinImages: _vinImages,
-        locationLat: _selectedLocation?.latitude,
-        locationLng: _selectedLocation?.longitude,
+        locationLat: lat,
+        locationLng: lng,
       );
       print("sdhdshj ${result}");
 
@@ -3426,7 +3480,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             );
           },
           onSelected: (suggestion) async {
-            await _onLocationSelected(suggestion);
+            await onLocationSelected(suggestion);
           },
           decorationBuilder: (context, child) {
             return Material(
@@ -4361,7 +4415,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   }
 
   // Handle location selection from TypeAhead - Web compatible
-  Future<void> _onLocationSelected(Prediction suggestion) async {
+  Future<void> onLocationSelected(Prediction suggestion) async {
+    print("dgfgjh ${suggestion.lat}  ${suggestion.toJson()}");
     try {
       if (suggestion.placeId?.startsWith('geocoding_') == true) {
         // Handle old geocoding format (fallback)
@@ -4382,32 +4437,124 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
           }
         }
       } else if (suggestion.placeId != null) {
-        // Handle Google Places API placeId using HTTP API
-        final String baseURL =
-            'https://maps.googleapis.com/maps/api/place/details/json';
-        final String request =
-            '$baseURL?place_id=${suggestion.placeId}&key=AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA&fields=geometry';
-
-        final response = await http.get(Uri.parse(request));
-
-        if (response.statusCode == 200) {
-          final Map<String, dynamic> data = json.decode(response.body);
-
-          if (data['status'] == 'OK' &&
-              data['result']?['geometry']?['location'] != null) {
-            final location = data['result']['geometry']['location'];
-            final lat = location['lat']?.toDouble();
-            final lng = location['lng']?.toDouble();
-
-            if (lat != null && lng != null) {
-              final newLatLng = LatLng(lat, lng);
-
+        // For web platform, prioritize direct geocoding since Places API has issues
+        if (kIsWeb) {
+          // Try direct geocoding first since we have a good description
+          try {
+            print('Trying direct geocoding for web with description: "${suggestion.description}"');
+            final coordinates = await _geocodeAddressWeb(suggestion.description ?? '');
+            if (coordinates != null) {
               setState(() {
-                _selectedLocation = newLatLng;
+                _selectedLocation = coordinates;
                 _selectedAddress = suggestion.description ?? '';
                 _locationController.text = suggestion.description ?? '';
               });
+              return;
             }
+          } catch (geocodeError) {
+            print('Direct geocoding failed: $geocodeError');
+          }
+          
+          // If geocoding failed, try JavaScript geocoding as backup
+          try {
+            print('Trying JavaScript geocoding as backup');
+            final coordinates = await _geocodeAddressJS(suggestion.description ?? '');
+            if (coordinates != null) {
+              setState(() {
+                _selectedLocation = coordinates;
+                _selectedAddress = suggestion.description ?? '';
+                _locationController.text = suggestion.description ?? '';
+              });
+              return;
+            }
+          } catch (jsError) {
+            print('JavaScript geocoding failed: $jsError');
+          }
+          
+          // If JS geocoding failed, try JavaScript Places API as final backup
+          try {
+            print('Trying JavaScript Places API as final backup');
+            final coordinates = await _getPlaceDetailsWeb(suggestion.placeId!);
+            if (coordinates != null) {
+              setState(() {
+                _selectedLocation = coordinates;
+                _selectedAddress = suggestion.description ?? '';
+                _locationController.text = suggestion.description ?? '';
+              });
+              return;
+            }
+          } catch (webError) {
+            print('All web methods failed: $webError');
+          }
+        } else {
+          // For mobile platforms, use HTTP API
+          try {
+            final String baseURL =
+                'https://maps.googleapis.com/maps/api/place/details/json';
+
+            final String apiKey = 'AIzaSyAegBp2UyWBBPk0hU-C0bjR0cKA';
+
+            final String request =
+                '$baseURL?place_id=${suggestion.placeId}&key=$apiKey&fields=geometry';
+
+            print('Making request to: $request');
+
+            final response = await http.get(Uri.parse(request));
+
+            print('Response status: ${response.statusCode}');
+            print('Response body: ${response.body}');
+
+            if (response.statusCode == 200) {
+              final Map<String, dynamic> data = json.decode(response.body);
+
+              if (data['status'] == 'OK' &&
+                  data['result']?['geometry']?['location'] != null) {
+                final location = data['result']['geometry']['location'];
+                final lat = location['lat']?.toDouble();
+                final lng = location['lng']?.toDouble();
+
+                if (lat != null && lng != null) {
+                  final newLatLng = LatLng(lat, lng);
+
+                  setState(() {
+                    _selectedLocation = newLatLng;
+                    _selectedAddress = suggestion.description ?? '';
+                    _locationController.text = suggestion.description ?? '';
+                  });
+                  return;
+                }
+              } else {
+                print('API Error - Status: ${data['status']}');
+                if (data['error_message'] != null) {
+                  print('Error message: ${data['error_message']}');
+                }
+              }
+            } else {
+              print(
+                'HTTP Error: ${response.statusCode} - ${response.reasonPhrase}',
+              );
+            }
+          } catch (httpError) {
+            print('HTTP request failed: $httpError');
+            // Continue to fallback
+          }
+        }
+
+        // Final fallback: use geocoding service (mainly for mobile now)
+        if (!kIsWeb) {
+          try {
+            print('Mobile fallback: using geocoding package');
+            final coordinates = await _geocodeAddress(suggestion.description ?? '');
+            if (coordinates != null) {
+              setState(() {
+                _selectedLocation = coordinates;
+                _selectedAddress = suggestion.description ?? '';
+                _locationController.text = suggestion.description ?? '';
+              });
+              return;
+            }
+          } catch (geocodeError) {
+            print('Mobile geocoding fallback failed: $geocodeError');
           }
         }
       } else {
@@ -4418,7 +4565,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         });
       }
     } catch (e) {
-      print('Error in _onLocationSelected: $e');
+      print('Error in onLocationSelected: $e');
       // Fallback: just set the description
       setState(() {
         _selectedAddress = suggestion.description ?? '';
@@ -4426,6 +4573,264 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       });
     }
   }
+
+  // Web-specific method to get place details using JavaScript Places API
+  Future<LatLng?> _getPlaceDetailsWeb(String placeId) async {
+    if (!kIsWeb) return null;
+
+    try {
+      // Wait for Google Maps API to be available
+      final bool apiAvailable = await _waitForGoogleMapsAPI();
+      if (!apiAvailable) {
+        print('Google Places JavaScript API not available');
+        return null;
+      }
+
+      final Completer<LatLng?> completer = Completer<LatLng?>();
+
+      // Call JavaScript function to get place details
+      js.context.callMethod('getPlaceDetails', [
+        placeId,
+        js.allowInterop((result) {
+          if (!completer.isCompleted) {
+            if (result != null) {
+              try {
+                // Convert the JS object to a Map
+                final Map<String, dynamic> resultMap = _convertJsObjectToMap(
+                  result,
+                );
+                final double lat = resultMap['latitude']?.toDouble() ?? 0.0;
+                final double lng = resultMap['longitude']?.toDouble() ?? 0.0;
+
+                if (lat != 0.0 || lng != 0.0) {
+                  completer.complete(LatLng(lat, lng));
+                } else {
+                  completer.complete(null);
+                }
+              } catch (e) {
+                print('Error processing place details result: $e');
+                completer.complete(null);
+              }
+            } else {
+              completer.complete(null);
+            }
+          }
+        }),
+      ]);
+
+      // Timeout after 10 seconds
+      Timer(Duration(seconds: 10), () {
+        if (!completer.isCompleted) {
+          print('getPlaceDetails timeout');
+          completer.complete(null);
+        }
+      });
+
+      return await completer.future;
+    } catch (e) {
+      print('Error in _getPlaceDetailsWeb: $e');
+      return null;
+    }
+  }
+
+  // Web-specific geocoding method using Google Geocoding API
+  Future<LatLng?> _geocodeAddressWeb(String address) async {
+    if (!kIsWeb || address.isEmpty) return null;
+    
+    try {
+      final String apiKey = 'AIzaSyAegBp2UyWBBPk0hU-C0bjR0cKA';
+      final String encodedAddress = Uri.encodeComponent(address);
+      final String url = 
+          'https://maps.googleapis.com/maps/api/geocode/json?address=$encodedAddress&key=$apiKey';
+      
+      print('Web geocoding request: $url');
+      
+      final response = await http.get(Uri.parse(url));
+      
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        
+        if (data['status'] == 'OK' && data['results'] != null && data['results'].isNotEmpty) {
+          final location = data['results'][0]['geometry']['location'];
+          final double lat = location['lat']?.toDouble() ?? 0.0;
+          final double lng = location['lng']?.toDouble() ?? 0.0;
+          
+          if (lat != 0.0 || lng != 0.0) {
+            print('Web geocoding successful: LatLng($lat, $lng)');
+            return LatLng(lat, lng);
+          }
+        } else {
+          print('Web geocoding API error - Status: ${data['status']}');
+          if (data['error_message'] != null) {
+            print('Error message: ${data['error_message']}');
+          }
+          if (data['status'] == 'REQUEST_DENIED') {
+            print('API Key issue - check:');
+            print('1. Geocoding API is enabled');
+            print('2. API key has proper permissions');
+            print('3. Billing is set up');
+            print('4. Domain restrictions allow this request');
+          }
+        }
+      } else {
+        print('Web geocoding HTTP error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Web geocoding error in VehicleDetailsQuoteForm: $e');
+    }
+    
+    return null;
+  }
+
+  // JavaScript-based geocoding method using Google Geocoder
+  Future<LatLng?> _geocodeAddressJS(String address) async {
+    if (!kIsWeb || address.isEmpty) return null;
+    
+    try {
+      // Wait for Google Maps API to be available
+      final bool apiAvailable = await _waitForGoogleMapsAPI();
+      if (!apiAvailable) {
+        print('Google Maps JavaScript API not available for geocoding');
+        return null;
+      }
+
+      final Completer<LatLng?> completer = Completer<LatLng?>();
+      
+      // Call JavaScript function to geocode address
+      js.context.callMethod('geocodeAddress', [
+        address,
+        js.allowInterop((results) {
+          if (!completer.isCompleted) {
+            if (results != null && results is List && results.isNotEmpty) {
+              try {
+                // Convert the JS object to a Map
+                final Map<String, dynamic> resultMap = _convertJsObjectToMap(results[0]);
+                final double lat = resultMap['latitude']?.toDouble() ?? 0.0;
+                final double lng = resultMap['longitude']?.toDouble() ?? 0.0;
+                
+                if (lat != 0.0 || lng != 0.0) {
+                  print('JavaScript geocoding successful: LatLng($lat, $lng)');
+                  completer.complete(LatLng(lat, lng));
+                } else {
+                  print('JavaScript geocoding returned 0,0 coordinates');
+                  completer.complete(null);
+                }
+              } catch (e) {
+                print('Error processing JS geocoding result: $e');
+                completer.complete(null);
+              }
+            } else {
+              print('JavaScript geocoding returned no results');
+              completer.complete(null);
+            }
+          }
+        }),
+      ]);
+
+      // Timeout after 10 seconds
+      Timer(Duration(seconds: 10), () {
+        if (!completer.isCompleted) {
+          print('JavaScript geocoding timeout');
+          completer.complete(null);
+        }
+      });
+
+      return await completer.future;
+    } catch (e) {
+      print('Error in _geocodeAddressJS: $e');
+      return null;
+    }
+  }
+}
+
+// Geocode address text to coordinates
+Future<LatLng?> _geocodeAddress(String address) async {
+  print('=== GEOCODING DEBUG ===');
+  print('Attempting to geocode address: "$address"');
+  print('Platform: ${kIsWeb ? "Web" : "Mobile"}');
+
+  if (address.isEmpty) {
+    print('Address is empty');
+    return null;
+  }
+
+  // For web platform, use Google Geocoding API via HTTP to avoid CORS issues
+  if (kIsWeb) {
+    try {
+      print('Using Google Geocoding API for web platform');
+      final String apiKey = 'AIzaSyAegBp2UyWBBPk0hU-C0bjR0cKA';
+      final String encodedAddress = Uri.encodeComponent(address);
+      final String url =
+          'https://maps.googleapis.com/maps/api/geocode/json?address=$encodedAddress&key=$apiKey';
+
+      print('Making geocoding request to: $url');
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        if (data['status'] == 'OK' &&
+            data['results'] != null &&
+            data['results'].isNotEmpty) {
+          final location = data['results'][0]['geometry']['location'];
+          final double lat = location['lat']?.toDouble() ?? 0.0;
+          final double lng = location['lng']?.toDouble() ?? 0.0;
+
+          if (lat != 0.0 || lng != 0.0) {
+            final result = LatLng(lat, lng);
+            print('Web geocoding successful: $result');
+            return result;
+          } else {
+            print('Web geocoding returned 0,0 coordinates');
+          }
+        } else {
+          print('Web geocoding API error - Status: ${data['status']}');
+          if (data['error_message'] != null) {
+            print('Error message: ${data['error_message']}');
+          }
+        }
+      } else {
+        print(
+          'Web geocoding HTTP error: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      print('Web geocoding error: $e');
+      print('Error type: ${e.runtimeType}');
+    }
+  } else {
+    // For mobile platforms, use the geocoding package
+    try {
+      print('Using geocoding package for mobile platform');
+      List<Location> locations = await locationFromAddress(address);
+      print('Geocoding service returned ${locations.length} locations');
+
+      if (locations.isNotEmpty) {
+        final location = locations.first;
+        print(
+          'First location coordinates: lat=${location.latitude}, lng=${location.longitude}',
+        );
+
+        // Verify coordinates are valid (not 0,0)
+        if (location.latitude != 0.0 || location.longitude != 0.0) {
+          LatLng result = LatLng(location.latitude, location.longitude);
+          print('Mobile geocoding successful: $result');
+          return result;
+        } else {
+          print('Mobile geocoding returned 0,0 coordinates');
+        }
+      } else {
+        print('Mobile geocoding: No locations found for address');
+      }
+    } catch (e) {
+      print('Mobile geocoding error: $e');
+      print('Error type: ${e.runtimeType}');
+    }
+  }
+
+  print('=== GEOCODING FAILED - RETURNING NULL ===');
+  return null;
 }
 
 class ProductQuoteForm extends StatefulWidget {
@@ -6988,7 +7393,27 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
 
       for (String searchQuery in searchQueries.take(3)) {
         try {
-          List<Location> locations = await locationFromAddress(searchQuery);
+          List<Location> locations;
+
+          // Use web-compatible geocoding
+          if (kIsWeb) {
+            // Use Google Geocoding API for web
+            final webResult = await _geocodeAddressWeb(searchQuery);
+            if (webResult != null) {
+              locations = [
+                Location(
+                  latitude: webResult.latitude,
+                  longitude: webResult.longitude,
+                  timestamp: DateTime.now(),
+                ),
+              ];
+            } else {
+              locations = [];
+            }
+          } else {
+            // Use geocoding package for mobile
+            locations = await locationFromAddress(searchQuery);
+          }
 
           for (final location in locations.take(3)) {
             try {
@@ -8079,6 +8504,41 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
         });
       },
     );
+  }
+
+  // Web-specific geocoding method using Google Geocoding API
+  Future<LatLng?> _geocodeAddressWeb(String address) async {
+    if (!kIsWeb || address.isEmpty) return null;
+
+    try {
+      final String apiKey = 'AIzaSyAegBp2UyWBBPk0hU-C0bjR0cKA';
+      final String encodedAddress = Uri.encodeComponent(address);
+      final String url =
+          'https://maps.googleapis.com/maps/api/geocode/json?address=$encodedAddress&key=$apiKey';
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        print("gffgfgfg ${data}");
+
+        if (data['status'] == 'OK' &&
+            data['results'] != null &&
+            data['results'].isNotEmpty) {
+          final location = data['results'][0]['geometry']['location'];
+          final double lat = location['lat']?.toDouble() ?? 0.0;
+          final double lng = location['lng']?.toDouble() ?? 0.0;
+
+          if (lat != 0.0 || lng != 0.0) {
+            return LatLng(lat, lng);
+          }
+        }
+      }
+    } catch (e) {
+      print('Web geocoding error in LocationPickerDialog: $e');
+    }
+
+    return null;
   }
 
   @override

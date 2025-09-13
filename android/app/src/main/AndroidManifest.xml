@@ -31,7 +31,7 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
-            <meta-data android:name="com.google.android.geo.API_KEY" android:value="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPJ1DR_O21IwjXbg9AA26NyPbXjBPBTXg;libraries=drawing,geometry"/>
+            <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBPJ1DR_O21IwjXbg9AA26NyPbXjBPBTXg"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
