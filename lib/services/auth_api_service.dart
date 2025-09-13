@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/user.dart';
+import '../services/shared_preferences.dart';
 
 class AuthApiService {
   Future<String?> selectRole(String role) async {
@@ -44,8 +45,7 @@ class AuthApiService {
     required String password,
     required String confirmPassword,
     String deliveryMethod = 'sms',
-  })
-  async {
+  }) async {
     final url = Uri.parse('${GlobalVariables.authServiceUrl}register/');
 
     final headers = {'Content-Type': 'application/json'};
@@ -147,8 +147,7 @@ class AuthApiService {
     String email,
     String cellphone, {
     String deliveryMethod = 'sms',
-  }) async
-  {
+  }) async {
     var url = Uri.parse('${GlobalVariables.authServiceUrl}resend-otp/');
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
@@ -198,6 +197,99 @@ class AuthApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         var jsonResponse = jsonDecode(responseBody);
         print('Login successful: $jsonResponse');
+
+        // Debug the response structure
+        print(
+          'Response contains success: ${jsonResponse.containsKey('success')}',
+        );
+        print('Success value: ${jsonResponse['success']}');
+        print(
+          'Response contains access_token: ${jsonResponse.containsKey('access_token')}',
+        );
+        print('Access token value: ${jsonResponse['access_token']}');
+
+        // Store tokens and user data locally
+        // Check for success using either 'success: true' or 'message: Login successful'
+        bool isLoginSuccessful =
+            (jsonResponse['success'] == true) ||
+            (jsonResponse['message'] == 'Login successful');
+
+        if (isLoginSuccessful) {
+          print('Entering token storage logic...');
+          // Save access token
+          final accessToken = jsonResponse['access_token'];
+          print('Access token to save: $accessToken');
+          if (accessToken != null) {
+            final result =
+                await Sharedprefs.saveUserAccessTokenSharedPreference(
+                  accessToken,
+                );
+            print('Access token saved successfully: $result');
+          } else {
+            print('Access token is null, not saving');
+          }
+
+          // Save refresh token
+          final refreshToken = jsonResponse['refresh_token'];
+          if (refreshToken != null) {
+            await Sharedprefs.saveUserRefreshTokenSharedPreference(
+              refreshToken,
+            );
+          }
+
+          // Save user data
+          final userData = jsonResponse['user'];
+          if (userData != null) {
+            // Save user ID and UID
+            await Sharedprefs.saveUserIdSharedPreference(userData['id'] ?? -1);
+            await Sharedprefs.saveUserUidSharedPreference(
+              userData['uid'] ?? '',
+            );
+
+            // Save user email
+            await Sharedprefs.saveUserEmailSharedPreference(
+              userData['email'] ?? '',
+            );
+
+            // Save user name (use full_name or combine first_name and last_name)
+            String displayName = userData['full_name'] ?? '';
+            if (displayName.isEmpty) {
+              final firstName = userData['first_name'] ?? '';
+              final lastName = userData['last_name'] ?? '';
+              displayName = '$firstName $lastName'.trim();
+            }
+            if (displayName.isEmpty) {
+              displayName = userData['email'] ?? '';
+            }
+            await Sharedprefs.saveUserNameSharedPreference(displayName);
+
+            // Save phone number
+            await Sharedprefs.saveUserCellSharedPreference(
+              userData['phone_number'] ?? '',
+            );
+
+            // Save role
+            await Sharedprefs.saveUserRoleSharedPreference(
+              userData['role'] ?? '',
+            );
+
+            // Set logged in flag
+            await Sharedprefs.saveUserLoggedInSharedPreference(true);
+
+            // Update Constants
+            Constants.myUid = userData['uid'] ?? '';
+            Constants.userId = userData['id'] ?? -1;
+            Constants.myEmail = userData['email'] ?? '';
+            Constants.myDisplayname = displayName;
+            Constants.myUsername = displayName;
+            Constants.myCell = userData['phone_number'] ?? '';
+            Constants.myCategoryRole = userData['role'] ?? '';
+
+            // Create and store User object
+            Constants.currentUser = User.fromJson(userData);
+          }
+        }
+
         return jsonResponse;
       } else {
         print('Login failed: ${response.statusCode}');
@@ -258,8 +350,7 @@ class AuthApiService {
     required String userId,
     required String companyName,
     required String companyRegNo,
-  }) async
-  {
+  }) async {
     var url = Uri.parse(
       '${GlobalVariables.authServiceUrl}api/seller/register/',
     );
@@ -289,8 +380,7 @@ class AuthApiService {
 
   Future<Map<String, dynamic>?> submitBusinessRegistration(
     Map<String, dynamic> businessData,
-  ) async
-  {
+  ) async {
     final url = Uri.parse(
       '${GlobalVariables.authServiceUrl}api/seller/business-registration/',
     );
@@ -351,8 +441,7 @@ class AuthApiService {
     required String sellerId,
     required String filePath,
     required String documentType,
-  })
-  async {
+  }) async {
     var url = Uri.parse(
       '${GlobalVariables.authServiceUrl}api/seller/upload-document/',
     );
@@ -382,8 +471,7 @@ class AuthApiService {
     required String bankName,
     required String accountNumber,
     required String accountType,
-  }) async
-  {
+  }) async {
     var url = Uri.parse(
       '${GlobalVariables.authServiceUrl}api/seller/bank-details/',
     );
@@ -417,8 +505,7 @@ class AuthApiService {
     required String firstName,
     required String lastName,
     required String phoneNumber,
-  })
-  async {
+  }) async {
     var url = Uri.parse('${GlobalVariables.authServiceUrl}profile/');
     var request = http.Request('PATCH', url);
     request.headers['Content-Type'] = 'application/json';
@@ -454,8 +541,7 @@ class AuthApiService {
 
   Future<Map<String, dynamic>?> requestPasswordReset({
     required String email,
-  }) async
-  {
+  }) async {
     var url = Uri.parse(
       '${GlobalVariables.authServiceUrl}password-reset-request/',
     );
@@ -486,10 +572,63 @@ class AuthApiService {
     }
   }
 
+  Future<Map<String, dynamic>?> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    // Get access token for authentication
+    final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+    if (accessToken == null || accessToken.isEmpty) {
+      return {'success': false, 'error': 'No access token available'};
+    }
+
+    var url = Uri.parse('${GlobalVariables.authServiceUrl}change-password/');
+    var request = http.Request('POST', url);
+    request.headers['Content-Type'] = 'application/json';
+    request.headers['Authorization'] = 'Bearer $accessToken';
+    request.body = jsonEncode({
+      'current_password': currentPassword,
+      'new_password': newPassword,
+    });
+
+    try {
+      http.StreamedResponse response = await request.send();
+      String responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(responseBody);
+        print('Password changed successfully: $jsonResponse');
+        return jsonResponse;
+      } else {
+        print('Password change failed: ${response.statusCode}');
+        print('Response: $responseBody');
+        try {
+          var errorResponse = jsonDecode(responseBody);
+          return {
+            'success': false,
+            'statusCode': response.statusCode,
+            'error':
+                errorResponse['error'] ??
+                errorResponse['message'] ??
+                'Password change failed',
+          };
+        } catch (e) {
+          return {
+            'success': false,
+            'statusCode': response.statusCode,
+            'error': responseBody,
+          };
+        }
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+      return {'success': false, 'error': 'Network or parsing error: $e'};
+    }
+  }
+
   Future<Map<String, dynamic>?> deleteAccount({
     required String accessToken,
-  }) async
-  {
+  }) async {
     var url = Uri.parse('${GlobalVariables.authServiceUrl}profile/');
     var request = http.Request('DELETE', url);
     request.headers['Content-Type'] = 'application/json';
@@ -520,8 +659,7 @@ class AuthApiService {
   Future<Map<String, dynamic>?> signOut({
     required String accessToken,
     required String refreshToken,
-  }) async
-  {
+  }) async {
     try {
       // Call logout API
       await logout(accessToken, refreshToken);
@@ -535,8 +673,7 @@ class AuthApiService {
   /// Get seller profile by auth_user_uid
   Future<Map<String, dynamic>> getSellerProfile({
     required String authUserUid,
-  }) async
-  {
+  }) async {
     try {
       final url =
           '${GlobalVariables.authServiceUrl}api/seller/profiles/by-auth-user-uid/$authUserUid/';
@@ -574,8 +711,7 @@ class AuthApiService {
   Future<Map<String, dynamic>> updateSellerProfile({
     required String profileId,
     required Map<String, dynamic> profileData,
-  }) async
-  {
+  }) async {
     try {
       final url =
           '${GlobalVariables.authServiceUrl}api/seller/profiles/$profileId/';
@@ -614,8 +750,7 @@ class AuthApiService {
   Future<Map<String, dynamic>> updateSellerBasicInfo({
     required String authUserUid,
     required Map<String, dynamic> sellerData,
-  })
-  async {
+  }) async {
     try {
       final url =
           '${GlobalVariables.authServiceUrl}api/seller/profiles/update-by-auth-user-uid/$authUserUid/';
@@ -652,10 +787,13 @@ class AuthApiService {
     }
   }
 
-  Future<Map<String, dynamic>?> getUserProfile({
-    required String accessToken,
-  }) async
-  {
+  Future<Map<String, dynamic>?> getUserProfile({required String uid}) async {
+    // Get access token for authentication
+    final accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
+    if (accessToken == null || accessToken.isEmpty) {
+      return {'success': false, 'error': 'No access token available'};
+    }
+
     var url = Uri.parse(
       '${GlobalVariables.authServiceUrl}profile/comprehensive/',
     );
@@ -690,8 +828,7 @@ class AuthApiService {
     required String accessToken,
     required String subject,
     required String message,
-  }) async
-  {
+  }) async {
     var url = Uri.parse('${GlobalVariables.authServiceUrl}contact-support/');
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
@@ -726,8 +863,7 @@ class AuthApiService {
     required String email,
     required String company,
     String? projectDetails,
-  }) async
-  {
+  }) async {
     var url = Uri.parse('${GlobalVariables.authServiceUrl}request-quote/');
     var request = http.Request('POST', url);
     request.headers['Content-Type'] = 'application/json';
@@ -767,8 +903,7 @@ class AuthApiService {
     String? endDate,
     String? status,
     int page = 1,
-  }) async
-  {
+  }) async {
     // Build query parameters
     Map<String, String> queryParams = {'page': page.toString()};
     if (startDate != null) queryParams['start_date'] = startDate;
@@ -838,8 +973,7 @@ class AuthApiService {
   Future<Map<String, dynamic>?> updateUserRole({
     required String email,
     required String newRole,
-  }) async
-  {
+  }) async {
     final url = Uri.parse('${GlobalVariables.authServiceUrl}update-user-role/');
     final headers = {'Content-Type': 'application/json'};
 

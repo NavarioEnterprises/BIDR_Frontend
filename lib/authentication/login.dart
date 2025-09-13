@@ -66,6 +66,32 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     if (response != null) {
+      print('Login.dart: Login response received: $response');
+      
+      // Ensure tokens are saved (backup to auth_api_service.dart logic)
+      // Check for success using either 'success: true' or 'message: Login successful'
+      bool isLoginSuccessful = (response['success'] == true) || 
+                               (response['message'] == 'Login successful');
+      
+      if (isLoginSuccessful) {
+        final accessToken = response['access_token'];
+        final refreshToken = response['refresh_token'];
+        
+        print('Login.dart: Saving tokens - access: ${accessToken != null}, refresh: ${refreshToken != null}');
+        print('Login.dart: Access token length: ${accessToken?.length ?? 0}');
+        print('Login.dart: Refresh token length: ${refreshToken?.length ?? 0}');
+        
+        if (accessToken != null) {
+          await Sharedprefs.saveUserAccessTokenSharedPreference(accessToken);
+          print('Login.dart: Access token saved');
+        }
+        
+        if (refreshToken != null) {
+          await Sharedprefs.saveUserRefreshTokenSharedPreference(refreshToken);
+          print('Login.dart: Refresh token saved');
+        }
+      }
+      
       // Check if OTP is verified
       final bool isOtpVerified =
           response['otp_verified'] ??
@@ -591,6 +617,32 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
     });
 
     if (response != null) {
+      print('Login.dart: Login response received: $response');
+      
+      // Ensure tokens are saved (backup to auth_api_service.dart logic)
+      // Check for success using either 'success: true' or 'message: Login successful'
+      bool isLoginSuccessful = (response['success'] == true) || 
+                               (response['message'] == 'Login successful');
+      
+      if (isLoginSuccessful) {
+        final accessToken = response['access_token'];
+        final refreshToken = response['refresh_token'];
+        
+        print('Login.dart: Saving tokens - access: ${accessToken != null}, refresh: ${refreshToken != null}');
+        print('Login.dart: Access token length: ${accessToken?.length ?? 0}');
+        print('Login.dart: Refresh token length: ${refreshToken?.length ?? 0}');
+        
+        if (accessToken != null) {
+          await Sharedprefs.saveUserAccessTokenSharedPreference(accessToken);
+          print('Login.dart: Access token saved');
+        }
+        
+        if (refreshToken != null) {
+          await Sharedprefs.saveUserRefreshTokenSharedPreference(refreshToken);
+          print('Login.dart: Refresh token saved');
+        }
+      }
+      
       // Check if OTP is verified
       final bool isOtpVerified =
           response['otp_verified'] ??

@@ -24,10 +24,7 @@ class GlobalVariables {
     fitmentRequired: true,
     balancingRequired: true,
     tyreRotationRequired: false,
-    imageUrls: [
-      'https://example.com/images/tyre1.jpg',
-      'https://example.com/images/tyre2.jpg',
-    ],
+    imageUrls: [],
   );
 
   /* ---------- 1) Auto‑Spares branch ---------- */
@@ -141,10 +138,11 @@ class GlobalVariables {
   static String get paymentServiceUrl => AppConfig.paymentServiceUrl;
   static String get resolutionServiceUrl => AppConfig.resolutionServiceUrl;
   static String get productsServiceUrl => AppConfig.productsServiceUrl;
-  static String get notificationsServiceUrl => AppConfig.notificationsServiceUrl;
+  static String get notificationsServiceUrl =>
+      AppConfig.notificationsServiceUrl;
   static String get transactionsServiceUrl => AppConfig.transactionsServiceUrl;
   static String get reviewsServiceUrl => AppConfig.reviewsServiceUrl;
-  
+
   // Admin URLs
   static String get authAdminUrl => AppConfig.authAdminUrl;
   static String get chatAdminUrl => AppConfig.chatAdminUrl;
@@ -154,9 +152,8 @@ class GlobalVariables {
   static String get notificationsAdminUrl => AppConfig.notificationsAdminUrl;
   static String get transactionsAdminUrl => AppConfig.transactionsAdminUrl;
   static String get reviewsAdminUrl => AppConfig.reviewsAdminUrl;
-  
+
   // Monitoring URLs
   static String get grafanaUrl => AppConfig.grafanaUrl;
   static String get prometheusUrl => AppConfig.prometheusUrl;
-  
 }

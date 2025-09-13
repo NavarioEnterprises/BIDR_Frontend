@@ -96,6 +96,12 @@ class ApiService {
         // Budget information (optional)
         'currency': 'ZAR',
 
+        // Missing vehicle fields that were not being sent
+        'mileage': mileage.isNotEmpty ? mileage : '0',
+        'transmission_type': _mapTransmissionType(selectedTransmissionType),
+        'fuel_type': _mapFuelType(selectedFuelType),
+        'body_type': _mapBodyType(selectedBodyType),
+
         // Location information
         'location_info': {
           'address': location.isNotEmpty
@@ -663,6 +669,74 @@ class ApiService {
         return 'BUS';
       default:
         return 'PASSENGER_CAR';
+    }
+  }
+
+  /// Map transmission type
+  static String _mapTransmissionType(String? transmissionType) {
+    switch (transmissionType?.toLowerCase()) {
+      case 'manual':
+      case 'manual transmission':
+        return 'manual';
+      case 'automatic':
+      case 'automatic transmission':
+        return 'automatic';
+      case 'cvt':
+      case 'continuously variable transmission':
+        return 'cvt';
+      case 'semi-automatic':
+      case 'tiptronic':
+        return 'semi_automatic';
+      default:
+        return 'manual'; // Default value
+    }
+  }
+
+  /// Map fuel type
+  static String _mapFuelType(String? fuelType) {
+    switch (fuelType?.toLowerCase()) {
+      case 'petrol':
+      case 'gasoline':
+        return 'petrol';
+      case 'diesel':
+        return 'diesel';
+      case 'electric':
+      case 'ev':
+        return 'electric';
+      case 'hybrid':
+        return 'hybrid';
+      case 'lpg':
+      case 'gas':
+        return 'lpg';
+      default:
+        return 'petrol'; // Default value
+    }
+  }
+
+  /// Map body type
+  static String _mapBodyType(String? bodyType) {
+    switch (bodyType?.toLowerCase()) {
+      case 'sedan':
+      case 'saloon':
+        return 'sedan';
+      case 'hatchback':
+        return 'hatchback';
+      case 'suv':
+        return 'suv';
+      case 'coupe':
+        return 'coupe';
+      case 'convertible':
+        return 'convertible';
+      case 'wagon':
+      case 'estate':
+        return 'wagon';
+      case 'pickup':
+      case 'bakkie':
+        return 'pickup';
+      case 'van':
+        return 'van';
+      default:
+        return 'sedan'; // Default value
     }
   }
 

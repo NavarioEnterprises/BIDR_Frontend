@@ -160,6 +160,26 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     'Vehicle Auctions',
   ];
 
+  // Map display names to backend choice keys
+  String _mapCategoryToBackendKey(String displayCategory) {
+    const categoryMapping = {
+      'Vehicle Spares': 'vehicle_spares',
+      'Vehicle Tyres and Rims': 'vehicle_spares', // Using closest match
+      'Consumer Electronics':
+          'vehicle_spares', // Using closest match as backend doesn't have electronics
+      'Vehicle Auctions': 'vehicle_spares', // Using closest match
+      'Engine Parts': 'engine_parts',
+      'Body Parts': 'body_parts',
+      'Suspension Parts': 'suspension_parts',
+      'Transmission Parts': 'transmission_parts',
+      'Batteries': 'batteries',
+    };
+
+    final mappedValue = categoryMapping[displayCategory] ?? 'vehicle_spares';
+    print('🔄 Mapping category: "$displayCategory" → "$mappedValue"');
+    return mappedValue; // Default fallback
+  }
+
   // Step 5 - Display on Platform
   final TextEditingController _tradingDisplayNameController =
       TextEditingController();
@@ -683,7 +703,6 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     return true;
   }
 
-
   // Show field validation error with focus
   void _showFieldValidationError(String message, FocusNode focusNode) {
     CustomDialogs.showErrorDialog(
@@ -833,7 +852,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           'year_established': _yearEstablishedController.text,
           'product_category': selectedCategories.join(', '),
           'product_subcategory': selectedCategories.isNotEmpty
-              ? selectedCategories.first
+              ? _mapCategoryToBackendKey(selectedCategories.first)
               : null,
         },
         'company_info': {
@@ -862,6 +881,14 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         },
         'product_categories': selectedCategories,
       };
+
+      // Debug: Print the data being sent
+      print('🔍 Selected categories: $selectedCategories');
+      print(
+        '🔍 First category: ${selectedCategories.isNotEmpty ? selectedCategories.first : "NONE"}',
+      );
+      print('🔍 Business registration data:');
+      print('   - product_category: ${businessRegistrationData['seller']}');
 
       // Submit to Django backend
       final result = await authApiService.submitBusinessRegistration(

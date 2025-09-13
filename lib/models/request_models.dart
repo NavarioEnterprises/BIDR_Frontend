@@ -344,6 +344,7 @@ class AutoSparesRequest {
   final List<dynamic> sellerOffers;
   final List<String>? productImages;
   final List<String>? images;
+  final String? vinImageUrl;
 
   AutoSparesRequest({
     required this.id,
@@ -354,6 +355,7 @@ class AutoSparesRequest {
     required this.category,
     this.productImages,
     this.images,
+    this.vinImageUrl,
   });
 
   factory AutoSparesRequest.fromJson(Map<String, dynamic> json) {
@@ -370,6 +372,7 @@ class AutoSparesRequest {
       images: (json['images'] as List<dynamic>?)
           ?.map((image) => image.toString())
           .toList(),
+      vinImageUrl: json['vin_image_url']?.toString(),
     );
   }
 
@@ -380,6 +383,7 @@ class AutoSparesRequest {
       'autoSpares': autoSpares.toJson(),
       'product_images': productImages,
       'images': images,
+      'vin_image_url': vinImageUrl,
     };
   }
 }

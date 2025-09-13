@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_places_flutter/model/prediction.dart';
@@ -187,8 +186,8 @@ class _BuyerHomePageState extends State<BuyerHomePage>
       "name": "Consumer \nElectronics",
     },
     {
-      "icon": "lib/assets/images/rim_and_type.png",
-      "icon2": "lib/assets/images/rim_and_type.png",
+      "icon": "lib/assets/images/auction.png",
+      "icon2": "lib/assets/images/auction.png",
       "name": "Vehicle\nAuctions",
     },
   ];
@@ -224,7 +223,6 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                   Constants.buyerAppBarValue == 0
                       ? Expanded(
                           child: Container(
-                            width: MediaQuery.of(context).size.width,
                             child: Scrollbar(
                               controller: _scrollController,
                               thumbVisibility: true,
@@ -238,9 +236,8 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                 child: Column(
                                   children: [
                                     Container(
-                                      width: MediaQuery.of(context).size.width,
                                       constraints: BoxConstraints(
-                                        maxWidth: 2000,
+                                        maxWidth: 1600,
                                       ),
                                       child: Column(
                                         crossAxisAlignment:
@@ -258,26 +255,23 @@ class _BuyerHomePageState extends State<BuyerHomePage>
                                                       context,
                                                     )
                                                     ? 24
-                                                    : 60,
+                                                    : 32,
                                                 right:
                                                     Breakpoints.isTablet(
                                                       context,
                                                     )
                                                     ? 24
-                                                    : 60,
+                                                    : 32,
                                               ),
-                                              child: SizedBox(
-                                                width:MediaQuery.of(context).size.width,
-                                                child: Center(
-                                                  child: _buildAnimatedBannerSection(
-                                                    "lib/assets/images/competitive.png",
-                                                  ),
+                                              child: Center(
+                                                child: _buildAnimatedBannerSection(
+                                                  "lib/assets/images/competitive.png",
                                                 ),
                                               ),
                                             ),
                                           ),
 
-                                          SizedBox(height: 24),
+                                          SizedBox(height: 36),
 
                                           // Animated Category Section
                                           Center(
@@ -600,32 +594,32 @@ class _BuyerHomePageState extends State<BuyerHomePage>
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             crossAxisCount: 3,
-            childAspectRatio: 1.1,
+            childAspectRatio: 0.9,
             crossAxisSpacing: 24,
             mainAxisSpacing: 24,
             children: [
               _buildInfoCard(
-                icon: HugeIcons.strokeRoundedHelpCircle,
+                icon: Icons.help_outline,
                 title: 'How it Works?',
                 subtitle:
                     'Simple process: Create a request, receive bids from multiple sellers, choose the best offer. No more endless searching.',
-                color: Colors.orange.shade300,
+                color: Colors.orange,
                 index: 0,
               ),
               _buildInfoCard(
-                icon: HugeIcons.strokeRoundedShoppingCart01,
+                icon: Icons.shopping_cart_outlined,
                 title: 'Why buyers should use this service?',
                 subtitle:
                     'Save time and money. Get competitive prices from verified sellers. One request, multiple offers, best deals.',
-                color: Colors.blue.shade300,
+                color: Colors.blue,
                 index: 1,
               ),
               _buildInfoCard(
-                icon: HugeIcons.strokeRoundedBuilding01,
+                icon: Icons.business_outlined,
                 title: 'Why join as a business?',
                 subtitle:
                     'Reach more customers, increase sales, compete fairly. Join our network of trusted sellers and grow your business.',
-                color: Colors.green.shade300,
+                color: Colors.green,
                 index: 2,
               ),
             ],
@@ -634,6 +628,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
       ),
     );
   }
+
   Widget _buildInfoCard({
     required IconData icon,
     required String title,
@@ -651,102 +646,60 @@ class _BuyerHomePageState extends State<BuyerHomePage>
             opacity: value,
             child: Container(
               decoration: BoxDecoration(
-                // Beautiful gradient background
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white,
-                    color.withOpacity(0.02),
-                    Colors.white,
-                  ],
-                  stops: [0.0, 0.5, 1.0],
-                ),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                    color: color.withOpacity(0.08),
-                    width: 1.2
-                ),
+                color: color.withOpacity(0.01),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: color.withOpacity(0.15), width: 1.5),
                 boxShadow: [
-                  // Primary shadow
                   BoxShadow(
-                    color: color.withOpacity(0.06),
-                    blurRadius: 12,
+                    color: color.withOpacity(0.01),
+                    blurRadius: 10,
                     spreadRadius: 0,
                     offset: Offset(0, 4),
                   ),
-                  // Secondary subtle shadow
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
-                    blurRadius: 20,
-                    spreadRadius: 0,
-                    offset: Offset(0, 8),
-                  ),
                 ],
               ),
-              child: Container(
-                // Inner glow effect
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.white.withOpacity(0.8),
-                      Colors.white.withOpacity(0.4),
-                    ],
-                  ),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(28),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Icon with subtle background
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: color.withOpacity(0.06),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: color.withOpacity(0.1),
-                            width: 1,
-                          ),
-                        ),
-                        child: Icon(
-                            icon,
-                            size: 32,
-                            color: color.withOpacity(0.9)
-                        ),
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Icon
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      SizedBox(height: 24),
-                      // Title
-                      Text(
-                        title,
-                        style: GoogleFonts.manrope(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.grey[800],
-                          letterSpacing: -0.2,
-                        ),
-                        textAlign: TextAlign.center,
+                      child: Icon(icon, size: 40, color: Colors.white),
+                    ),
+                    SizedBox(height: 20),
+
+                    // Title
+                    Text(
+                      title,
+                      style: GoogleFonts.manrope(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
                       ),
-                      SizedBox(height: 12),
-                      // Subtitle
-                      Text(
-                        subtitle,
-                        style: GoogleFonts.manrope(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                          height: 1.5,
-                          letterSpacing: 0.1,
-                        ),
-                        textAlign: TextAlign.center,
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 12),
+
+                    // Subtitle
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.manrope(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black54,
+                        height: 1.4,
                       ),
-                    ],
-                  ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -755,75 +708,6 @@ class _BuyerHomePageState extends State<BuyerHomePage>
       },
     );
   }
-
-  /*Widget _buildInfoCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
-    required int index,
-  }) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 600 + (index * 200)),
-      builder: (context, value, child) {
-        return Transform.translate(
-          offset: Offset(0, 30 * (1 - value)),
-          child: Container(
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.01),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: color.withOpacity(0.1), width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.08),
-                  blurRadius: 5,
-                  spreadRadius: 0,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Icon
-                  Icon(icon, size: 40, color: color),
-                  SizedBox(height: 20),
-
-                  // Title
-                  Text(
-                    title,
-                    style: GoogleFonts.manrope(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 12),
-
-                  // Subtitle
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.manrope(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black54,
-                      height: 1.4,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }*/
 
   Widget _buildAnimatedVideoSection(
     String title,
@@ -1070,29 +954,41 @@ class _BuyerHomePageState extends State<BuyerHomePage>
   }
 
   Widget _buildAnimatedBannerSection(String image) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 150,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: Offset(0, 5),
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 600),
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: 0.95 + (0.05 * value),
+          child: Opacity(
+            opacity: value,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: 150,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: Image.asset(
+                  image,
+                  fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width,
+                  height: 400,
+                ),
+              ),
+            ),
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Image.asset(
-          image,
-          fit: BoxFit.cover,
-          width: MediaQuery.of(context).size.width,
-          height: 150,
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -1133,7 +1029,6 @@ class _BuyerHomePageState extends State<BuyerHomePage>
               );
             },
           ),
-          SizedBox(height: 6),
           TweenAnimationBuilder<double>(
             tween: Tween<double>(begin: 0.0, end: 1.0),
             duration: Duration(milliseconds: 800),
@@ -1151,7 +1046,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
               );
             },
           ),
-          SizedBox(height: 24),
+          SizedBox(height: 36),
           Wrap(
             spacing: 16,
             runSpacing: 24,
@@ -1672,14 +1567,15 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: GoogleFonts.manrope(
+          labelStyle: TextStyle(
             color: Colors.black,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'YuGothic',
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black),
+            borderSide: BorderSide(color: Constants.ftaColorLight),
             borderRadius: BorderRadius.circular(36),
           ),
           focusedBorder: OutlineInputBorder(
@@ -1695,17 +1591,12 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             value: value,
             hint: Text(
               label.replaceAll('*', ''),
-              style: GoogleFonts.inter(
-                textStyle: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey.withOpacity(0.35),
-                  letterSpacing: 0,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'YuGothic',
-                ),
+              style: GoogleFonts.manrope(
+                color: Colors.grey.withOpacity(0.35),
+                fontSize: 14,
+                fontWeight: FontWeight.w300,
               ),
             ),
-
             isExpanded: true,
             icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
             items: items.map((String item) {
@@ -1775,34 +1666,33 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 focusNode: fieldFocusNode,
                 decoration: InputDecoration(
                   labelText: label,
-                  labelStyle:  GoogleFonts.manrope(
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  labelStyle: TextStyle(
                     color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'YuGothic',
                   ),
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 8,
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Constants.ftaColorLight),
+                    borderSide: BorderSide(color: Colors.black),
                     borderRadius: BorderRadius.circular(36),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Constants.ctaColorLight),
+                    borderSide: BorderSide(color: Colors.black),
                     borderRadius: BorderRadius.circular(36),
                   ),
                   hintText: label.replaceAll('*', ''),
-                  hintStyle:GoogleFonts.inter(
-                    textStyle: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey.withOpacity(0.35),
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'YuGothic',
-                    ),
+                  hintStyle: GoogleFonts.manrope(
+                    color: Colors.grey.withOpacity(0.35),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
                   ),
                 ),
+
                 style: GoogleFonts.manrope(
                   color: Colors.black,
                   fontSize: 14,
@@ -1891,10 +1781,10 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       style: GoogleFonts.manrope(color: Colors.black, fontSize: 16),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle:  GoogleFonts.manrope(
+        labelStyle: GoogleFonts.manrope(
           color: Colors.black,
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
         ),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         hintText: 'Enter distance (1-1500 km)',
@@ -2804,6 +2694,33 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     });
 
     try {
+      // Geocode address if coordinates are not available
+      double? lat = _selectedLocation?.latitude;
+      double? lng = _selectedLocation?.longitude;
+
+      print('=== LOCATION COORDINATE DEBUG ===');
+      print('Initial lat from _selectedLocation: $lat');
+      print('Initial lng from _selectedLocation: $lng');
+      print('Location text from controller: "${_locationController.text}"');
+
+      if (lat == null && lng == null && _locationController.text.isNotEmpty) {
+        print(
+          'Attempting geocoding because coordinates are null but address text exists',
+        );
+        try {
+          final coordinates = await _geocodeAddress(_locationController.text);
+          lat = coordinates?.latitude;
+          lng = coordinates?.longitude;
+          print('After geocoding - lat: $lat, lng: $lng');
+        } catch (e) {
+          print('Geocoding failed: $e');
+          // Continue with null coordinates if geocoding fails
+        }
+      }
+
+      print('Final coordinates to be sent - lat: $lat, lng: $lng');
+      print('=== END COORDINATE DEBUG ===');
+
       final result = await ApiService.submitVehicleRequest(
         selectedManufacturer: _manufacturerController.text,
         selectedMakeModel: _makeModelController.text,
@@ -2824,8 +2741,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         maxDistance: _maxDistance,
         images: _selectedImages,
         vinImages: _vinImages,
-        locationLat: _selectedLocation?.latitude,
-        locationLng: _selectedLocation?.longitude,
+        locationLat: lat,
+        locationLng: lng,
       );
       print("Form submitted after login: ${result}");
 
@@ -2870,6 +2787,33 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     });
 
     try {
+      // Geocode address if coordinates are not available
+      double? lat = _selectedLocation?.latitude;
+      double? lng = _selectedLocation?.longitude;
+
+      print('=== LOCATION COORDINATE DEBUG ===');
+      print('Initial lat from _selectedLocation: $lat');
+      print('Initial lng from _selectedLocation: $lng');
+      print('Location text from controller: "${_locationController.text}"');
+
+      if (lat == null && lng == null && _locationController.text.isNotEmpty) {
+        print(
+          'Attempting geocoding because coordinates are null but address text exists',
+        );
+        try {
+          final coordinates = await _geocodeAddress(_locationController.text);
+          lat = coordinates?.latitude;
+          lng = coordinates?.longitude;
+          print('After geocoding - lat: $lat, lng: $lng');
+        } catch (e) {
+          print('Geocoding failed: $e');
+          // Continue with null coordinates if geocoding fails
+        }
+      }
+
+      print('Final coordinates to be sent - lat: $lat, lng: $lng');
+      print('=== END COORDINATE DEBUG ===');
+
       final result = await ApiService.submitVehicleRequest(
         selectedManufacturer: _manufacturerController.text,
         selectedMakeModel: _makeModelController.text,
@@ -2890,8 +2834,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         maxDistance: _maxDistance,
         images: _selectedImages,
         vinImages: _vinImages,
-        locationLat: _selectedLocation?.latitude,
-        locationLng: _selectedLocation?.longitude,
+        locationLat: lat,
+        locationLng: lng,
       );
       print("sdhdshj ${result}");
 
@@ -3365,19 +3309,15 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                 labelText: 'Your Location*',
                 labelStyle: GoogleFonts.manrope(
                   color: Colors.black,
-                  fontSize: 16,
+                  fontSize: 13.5,
                   fontWeight: FontWeight.w600,
                 ),
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 hintText: 'Start typing your address...',
-                hintStyle:GoogleFonts.inter(
-                  textStyle: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.withOpacity(0.35),
-                    letterSpacing: 0,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'YuGothic',
-                  ),
+                hintStyle: GoogleFonts.manrope(
+                  color: Colors.grey.shade400,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
                 ),
                 filled: true,
                 fillColor: Colors.white,
@@ -3386,10 +3326,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   vertical: 16,
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.black,
-                    width: 1,
-                  ),
+                  borderSide: BorderSide(color: Colors.black, width: 1),
                   borderRadius: BorderRadius.circular(36),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -3414,7 +3351,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
                   margin: EdgeInsets.only(left: 16, right: 8),
                   child: Icon(
                     Icons.location_on,
-                    color: Colors.black,
+                    color: Constants.ftaColorLight,
                     size: 22,
                   ),
                 ),
@@ -3543,7 +3480,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             );
           },
           onSelected: (suggestion) async {
-            await _onLocationSelected(suggestion);
+            await onLocationSelected(suggestion);
           },
           decorationBuilder: (context, child) {
             return Material(
@@ -3640,21 +3577,18 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         ),
         decoration: InputDecoration(
           labelText: 'VIN (Vehicle Identification Number)*',
-          labelStyle:  GoogleFonts.manrope(
+          labelStyle: TextStyle(
             color: Colors.black,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'YuGothic',
           ),
           floatingLabelBehavior: FloatingLabelBehavior.always,
           hintText: 'Enter VIN Number',
-          hintStyle: GoogleFonts.inter(
-            textStyle: TextStyle(
-              fontSize: 13,
-              color: Colors.grey.withOpacity(0.35),
-              letterSpacing: 0,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'YuGothic',
-            ),
+          hintStyle: GoogleFonts.manrope(
+            color: Colors.grey.withOpacity(0.35),
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           enabledBorder: OutlineInputBorder(
@@ -4481,7 +4415,8 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   }
 
   // Handle location selection from TypeAhead - Web compatible
-  Future<void> _onLocationSelected(Prediction suggestion) async {
+  Future<void> onLocationSelected(Prediction suggestion) async {
+    print("dgfgjh ${suggestion.lat}  ${suggestion.toJson()}");
     try {
       if (suggestion.placeId?.startsWith('geocoding_') == true) {
         // Handle old geocoding format (fallback)
@@ -4502,32 +4437,124 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
           }
         }
       } else if (suggestion.placeId != null) {
-        // Handle Google Places API placeId using HTTP API
-        final String baseURL =
-            'https://maps.googleapis.com/maps/api/place/details/json';
-        final String request =
-            '$baseURL?place_id=${suggestion.placeId}&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&fields=geometry';
-
-        final response = await http.get(Uri.parse(request));
-
-        if (response.statusCode == 200) {
-          final Map<String, dynamic> data = json.decode(response.body);
-
-          if (data['status'] == 'OK' &&
-              data['result']?['geometry']?['location'] != null) {
-            final location = data['result']['geometry']['location'];
-            final lat = location['lat']?.toDouble();
-            final lng = location['lng']?.toDouble();
-
-            if (lat != null && lng != null) {
-              final newLatLng = LatLng(lat, lng);
-
+        // For web platform, prioritize direct geocoding since Places API has issues
+        if (kIsWeb) {
+          // Try direct geocoding first since we have a good description
+          try {
+            print('Trying direct geocoding for web with description: "${suggestion.description}"');
+            final coordinates = await _geocodeAddressWeb(suggestion.description ?? '');
+            if (coordinates != null) {
               setState(() {
-                _selectedLocation = newLatLng;
+                _selectedLocation = coordinates;
                 _selectedAddress = suggestion.description ?? '';
                 _locationController.text = suggestion.description ?? '';
               });
+              return;
             }
+          } catch (geocodeError) {
+            print('Direct geocoding failed: $geocodeError');
+          }
+          
+          // If geocoding failed, try JavaScript geocoding as backup
+          try {
+            print('Trying JavaScript geocoding as backup');
+            final coordinates = await _geocodeAddressJS(suggestion.description ?? '');
+            if (coordinates != null) {
+              setState(() {
+                _selectedLocation = coordinates;
+                _selectedAddress = suggestion.description ?? '';
+                _locationController.text = suggestion.description ?? '';
+              });
+              return;
+            }
+          } catch (jsError) {
+            print('JavaScript geocoding failed: $jsError');
+          }
+          
+          // If JS geocoding failed, try JavaScript Places API as final backup
+          try {
+            print('Trying JavaScript Places API as final backup');
+            final coordinates = await _getPlaceDetailsWeb(suggestion.placeId!);
+            if (coordinates != null) {
+              setState(() {
+                _selectedLocation = coordinates;
+                _selectedAddress = suggestion.description ?? '';
+                _locationController.text = suggestion.description ?? '';
+              });
+              return;
+            }
+          } catch (webError) {
+            print('All web methods failed: $webError');
+          }
+        } else {
+          // For mobile platforms, use HTTP API
+          try {
+            final String baseURL =
+                'https://maps.googleapis.com/maps/api/place/details/json';
+
+            final String apiKey = 'AIzaSyAegBp2UyWBBPk0hU-C0bjR0cKA';
+
+            final String request =
+                '$baseURL?place_id=${suggestion.placeId}&key=$apiKey&fields=geometry';
+
+            print('Making request to: $request');
+
+            final response = await http.get(Uri.parse(request));
+
+            print('Response status: ${response.statusCode}');
+            print('Response body: ${response.body}');
+
+            if (response.statusCode == 200) {
+              final Map<String, dynamic> data = json.decode(response.body);
+
+              if (data['status'] == 'OK' &&
+                  data['result']?['geometry']?['location'] != null) {
+                final location = data['result']['geometry']['location'];
+                final lat = location['lat']?.toDouble();
+                final lng = location['lng']?.toDouble();
+
+                if (lat != null && lng != null) {
+                  final newLatLng = LatLng(lat, lng);
+
+                  setState(() {
+                    _selectedLocation = newLatLng;
+                    _selectedAddress = suggestion.description ?? '';
+                    _locationController.text = suggestion.description ?? '';
+                  });
+                  return;
+                }
+              } else {
+                print('API Error - Status: ${data['status']}');
+                if (data['error_message'] != null) {
+                  print('Error message: ${data['error_message']}');
+                }
+              }
+            } else {
+              print(
+                'HTTP Error: ${response.statusCode} - ${response.reasonPhrase}',
+              );
+            }
+          } catch (httpError) {
+            print('HTTP request failed: $httpError');
+            // Continue to fallback
+          }
+        }
+
+        // Final fallback: use geocoding service (mainly for mobile now)
+        if (!kIsWeb) {
+          try {
+            print('Mobile fallback: using geocoding package');
+            final coordinates = await _geocodeAddress(suggestion.description ?? '');
+            if (coordinates != null) {
+              setState(() {
+                _selectedLocation = coordinates;
+                _selectedAddress = suggestion.description ?? '';
+                _locationController.text = suggestion.description ?? '';
+              });
+              return;
+            }
+          } catch (geocodeError) {
+            print('Mobile geocoding fallback failed: $geocodeError');
           }
         }
       } else {
@@ -4538,7 +4565,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         });
       }
     } catch (e) {
-      print('Error in _onLocationSelected: $e');
+      print('Error in onLocationSelected: $e');
       // Fallback: just set the description
       setState(() {
         _selectedAddress = suggestion.description ?? '';
@@ -4546,6 +4573,264 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       });
     }
   }
+
+  // Web-specific method to get place details using JavaScript Places API
+  Future<LatLng?> _getPlaceDetailsWeb(String placeId) async {
+    if (!kIsWeb) return null;
+
+    try {
+      // Wait for Google Maps API to be available
+      final bool apiAvailable = await _waitForGoogleMapsAPI();
+      if (!apiAvailable) {
+        print('Google Places JavaScript API not available');
+        return null;
+      }
+
+      final Completer<LatLng?> completer = Completer<LatLng?>();
+
+      // Call JavaScript function to get place details
+      js.context.callMethod('getPlaceDetails', [
+        placeId,
+        js.allowInterop((result) {
+          if (!completer.isCompleted) {
+            if (result != null) {
+              try {
+                // Convert the JS object to a Map
+                final Map<String, dynamic> resultMap = _convertJsObjectToMap(
+                  result,
+                );
+                final double lat = resultMap['latitude']?.toDouble() ?? 0.0;
+                final double lng = resultMap['longitude']?.toDouble() ?? 0.0;
+
+                if (lat != 0.0 || lng != 0.0) {
+                  completer.complete(LatLng(lat, lng));
+                } else {
+                  completer.complete(null);
+                }
+              } catch (e) {
+                print('Error processing place details result: $e');
+                completer.complete(null);
+              }
+            } else {
+              completer.complete(null);
+            }
+          }
+        }),
+      ]);
+
+      // Timeout after 10 seconds
+      Timer(Duration(seconds: 10), () {
+        if (!completer.isCompleted) {
+          print('getPlaceDetails timeout');
+          completer.complete(null);
+        }
+      });
+
+      return await completer.future;
+    } catch (e) {
+      print('Error in _getPlaceDetailsWeb: $e');
+      return null;
+    }
+  }
+
+  // Web-specific geocoding method using Google Geocoding API
+  Future<LatLng?> _geocodeAddressWeb(String address) async {
+    if (!kIsWeb || address.isEmpty) return null;
+    
+    try {
+      final String apiKey = 'AIzaSyAegBp2UyWBBPk0hU-C0bjR0cKA';
+      final String encodedAddress = Uri.encodeComponent(address);
+      final String url = 
+          'https://maps.googleapis.com/maps/api/geocode/json?address=$encodedAddress&key=$apiKey';
+      
+      print('Web geocoding request: $url');
+      
+      final response = await http.get(Uri.parse(url));
+      
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        
+        if (data['status'] == 'OK' && data['results'] != null && data['results'].isNotEmpty) {
+          final location = data['results'][0]['geometry']['location'];
+          final double lat = location['lat']?.toDouble() ?? 0.0;
+          final double lng = location['lng']?.toDouble() ?? 0.0;
+          
+          if (lat != 0.0 || lng != 0.0) {
+            print('Web geocoding successful: LatLng($lat, $lng)');
+            return LatLng(lat, lng);
+          }
+        } else {
+          print('Web geocoding API error - Status: ${data['status']}');
+          if (data['error_message'] != null) {
+            print('Error message: ${data['error_message']}');
+          }
+          if (data['status'] == 'REQUEST_DENIED') {
+            print('API Key issue - check:');
+            print('1. Geocoding API is enabled');
+            print('2. API key has proper permissions');
+            print('3. Billing is set up');
+            print('4. Domain restrictions allow this request');
+          }
+        }
+      } else {
+        print('Web geocoding HTTP error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Web geocoding error in VehicleDetailsQuoteForm: $e');
+    }
+    
+    return null;
+  }
+
+  // JavaScript-based geocoding method using Google Geocoder
+  Future<LatLng?> _geocodeAddressJS(String address) async {
+    if (!kIsWeb || address.isEmpty) return null;
+    
+    try {
+      // Wait for Google Maps API to be available
+      final bool apiAvailable = await _waitForGoogleMapsAPI();
+      if (!apiAvailable) {
+        print('Google Maps JavaScript API not available for geocoding');
+        return null;
+      }
+
+      final Completer<LatLng?> completer = Completer<LatLng?>();
+      
+      // Call JavaScript function to geocode address
+      js.context.callMethod('geocodeAddress', [
+        address,
+        js.allowInterop((results) {
+          if (!completer.isCompleted) {
+            if (results != null && results is List && results.isNotEmpty) {
+              try {
+                // Convert the JS object to a Map
+                final Map<String, dynamic> resultMap = _convertJsObjectToMap(results[0]);
+                final double lat = resultMap['latitude']?.toDouble() ?? 0.0;
+                final double lng = resultMap['longitude']?.toDouble() ?? 0.0;
+                
+                if (lat != 0.0 || lng != 0.0) {
+                  print('JavaScript geocoding successful: LatLng($lat, $lng)');
+                  completer.complete(LatLng(lat, lng));
+                } else {
+                  print('JavaScript geocoding returned 0,0 coordinates');
+                  completer.complete(null);
+                }
+              } catch (e) {
+                print('Error processing JS geocoding result: $e');
+                completer.complete(null);
+              }
+            } else {
+              print('JavaScript geocoding returned no results');
+              completer.complete(null);
+            }
+          }
+        }),
+      ]);
+
+      // Timeout after 10 seconds
+      Timer(Duration(seconds: 10), () {
+        if (!completer.isCompleted) {
+          print('JavaScript geocoding timeout');
+          completer.complete(null);
+        }
+      });
+
+      return await completer.future;
+    } catch (e) {
+      print('Error in _geocodeAddressJS: $e');
+      return null;
+    }
+  }
+}
+
+// Geocode address text to coordinates
+Future<LatLng?> _geocodeAddress(String address) async {
+  print('=== GEOCODING DEBUG ===');
+  print('Attempting to geocode address: "$address"');
+  print('Platform: ${kIsWeb ? "Web" : "Mobile"}');
+
+  if (address.isEmpty) {
+    print('Address is empty');
+    return null;
+  }
+
+  // For web platform, use Google Geocoding API via HTTP to avoid CORS issues
+  if (kIsWeb) {
+    try {
+      print('Using Google Geocoding API for web platform');
+      final String apiKey = 'AIzaSyAegBp2UyWBBPk0hU-C0bjR0cKA';
+      final String encodedAddress = Uri.encodeComponent(address);
+      final String url =
+          'https://maps.googleapis.com/maps/api/geocode/json?address=$encodedAddress&key=$apiKey';
+
+      print('Making geocoding request to: $url');
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        if (data['status'] == 'OK' &&
+            data['results'] != null &&
+            data['results'].isNotEmpty) {
+          final location = data['results'][0]['geometry']['location'];
+          final double lat = location['lat']?.toDouble() ?? 0.0;
+          final double lng = location['lng']?.toDouble() ?? 0.0;
+
+          if (lat != 0.0 || lng != 0.0) {
+            final result = LatLng(lat, lng);
+            print('Web geocoding successful: $result');
+            return result;
+          } else {
+            print('Web geocoding returned 0,0 coordinates');
+          }
+        } else {
+          print('Web geocoding API error - Status: ${data['status']}');
+          if (data['error_message'] != null) {
+            print('Error message: ${data['error_message']}');
+          }
+        }
+      } else {
+        print(
+          'Web geocoding HTTP error: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      print('Web geocoding error: $e');
+      print('Error type: ${e.runtimeType}');
+    }
+  } else {
+    // For mobile platforms, use the geocoding package
+    try {
+      print('Using geocoding package for mobile platform');
+      List<Location> locations = await locationFromAddress(address);
+      print('Geocoding service returned ${locations.length} locations');
+
+      if (locations.isNotEmpty) {
+        final location = locations.first;
+        print(
+          'First location coordinates: lat=${location.latitude}, lng=${location.longitude}',
+        );
+
+        // Verify coordinates are valid (not 0,0)
+        if (location.latitude != 0.0 || location.longitude != 0.0) {
+          LatLng result = LatLng(location.latitude, location.longitude);
+          print('Mobile geocoding successful: $result');
+          return result;
+        } else {
+          print('Mobile geocoding returned 0,0 coordinates');
+        }
+      } else {
+        print('Mobile geocoding: No locations found for address');
+      }
+    } catch (e) {
+      print('Mobile geocoding error: $e');
+      print('Error type: ${e.runtimeType}');
+    }
+  }
+
+  print('=== GEOCODING FAILED - RETURNING NULL ===');
+  return null;
 }
 
 class ProductQuoteForm extends StatefulWidget {
@@ -4946,25 +5231,26 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
   }
 
   Widget _buildCustomDropdown(
-      String label,
-      String? value,
-      List<String> items,
-      Function(String?) onChanged,
-      ) {
+    String label,
+    String? value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
     return Container(
       width: double.infinity,
       height: 48,
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: GoogleFonts.manrope(
+          labelStyle: TextStyle(
             color: Colors.black,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'YuGothic',
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black),
+            borderSide: BorderSide(color: Constants.ftaColorLight),
             borderRadius: BorderRadius.circular(36),
           ),
           focusedBorder: OutlineInputBorder(
@@ -4980,17 +5266,12 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
             value: value,
             hint: Text(
               label.replaceAll('*', ''),
-              style: GoogleFonts.inter(
-                textStyle: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey.withOpacity(0.35),
-                  letterSpacing: 0,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'YuGothic',
-                ),
+              style: GoogleFonts.manrope(
+                color: Colors.grey.withOpacity(0.35),
+                fontSize: 14,
+                fontWeight: FontWeight.w300,
               ),
             ),
-
             isExpanded: true,
             icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
             items: items.map((String item) {
@@ -5667,7 +5948,7 @@ class _ProductQuoteFormState extends State<ProductQuoteForm> {
             labelText: 'Your Location*',
             labelStyle: TextStyle(
               color: Colors.black,
-              fontSize: 13.5,
+              fontSize: 14.5,
               fontWeight: FontWeight.w500,
               fontFamily: 'YuGothic',
             ),
@@ -5830,25 +6111,26 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
   }
 
   Widget _buildCustomDropdown(
-      String label,
-      String? value,
-      List<String> items,
-      Function(String?) onChanged,
-      ) {
+    String label,
+    String? value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
     return Container(
       width: double.infinity,
       height: 48,
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: GoogleFonts.manrope(
+          labelStyle: TextStyle(
             color: Colors.black,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'YuGothic',
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black),
+            borderSide: BorderSide(color: Constants.ftaColorLight),
             borderRadius: BorderRadius.circular(36),
           ),
           focusedBorder: OutlineInputBorder(
@@ -5864,17 +6146,12 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
             value: value,
             hint: Text(
               label.replaceAll('*', ''),
-              style: GoogleFonts.inter(
-                textStyle: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey.withOpacity(0.35),
-                  letterSpacing: 0,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'YuGothic',
-                ),
+              style: GoogleFonts.manrope(
+                color: Colors.grey.withOpacity(0.35),
+                fontSize: 14,
+                fontWeight: FontWeight.w300,
               ),
             ),
-
             isExpanded: true,
             icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
             items: items.map((String item) {
@@ -6804,7 +7081,7 @@ class _TireProductQuoteFormState extends State<TireProductQuoteForm> {
             labelText: 'Your Location*',
             labelStyle: TextStyle(
               color: Colors.black,
-              fontSize: 13.5,
+              fontSize: 14.5,
               fontWeight: FontWeight.w500,
               fontFamily: 'YuGothic',
             ),
@@ -6918,12 +7195,8 @@ class FooterSection extends StatelessWidget {
                           url: 'https://www.x.com',
                         ),
                         SocialMediaButton(
-                          imagePath: 'lib/assets/images/tik.png',
-                          url: 'https://www.tiktok.com',
-                        ),
-                        SocialMediaButton(
-                          imagePath: 'lib/assets/images/linkedIn.png',
-                          url: 'https://www.linkedin.com',
+                          imagePath: 'lib/assets/images/youTube.png',
+                          url: 'https://www.youTube.com',
                         ),
                       ],
                     ),
@@ -7120,7 +7393,27 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
 
       for (String searchQuery in searchQueries.take(3)) {
         try {
-          List<Location> locations = await locationFromAddress(searchQuery);
+          List<Location> locations;
+
+          // Use web-compatible geocoding
+          if (kIsWeb) {
+            // Use Google Geocoding API for web
+            final webResult = await _geocodeAddressWeb(searchQuery);
+            if (webResult != null) {
+              locations = [
+                Location(
+                  latitude: webResult.latitude,
+                  longitude: webResult.longitude,
+                  timestamp: DateTime.now(),
+                ),
+              ];
+            } else {
+              locations = [];
+            }
+          } else {
+            // Use geocoding package for mobile
+            locations = await locationFromAddress(searchQuery);
+          }
 
           for (final location in locations.take(3)) {
             try {
@@ -7608,7 +7901,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
         final String baseURL =
             'https://maps.googleapis.com/maps/api/place/details/json';
         final String request =
-            '$baseURL?place_id=${prediction.placeId}&key=AIzaSyDUgpD18M7S7OM1CeYv8kCv_sW8Rpg2Aoo&fields=geometry';
+            '$baseURL?place_id=${prediction.placeId}&key=AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA&fields=geometry';
 
         final response = await http.get(Uri.parse(request));
 
@@ -8211,6 +8504,41 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
         });
       },
     );
+  }
+
+  // Web-specific geocoding method using Google Geocoding API
+  Future<LatLng?> _geocodeAddressWeb(String address) async {
+    if (!kIsWeb || address.isEmpty) return null;
+
+    try {
+      final String apiKey = 'AIzaSyAegBp2UyWBBPk0hU-C0bjR0cKA';
+      final String encodedAddress = Uri.encodeComponent(address);
+      final String url =
+          'https://maps.googleapis.com/maps/api/geocode/json?address=$encodedAddress&key=$apiKey';
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        print("gffgfgfg ${data}");
+
+        if (data['status'] == 'OK' &&
+            data['results'] != null &&
+            data['results'].isNotEmpty) {
+          final location = data['results'][0]['geometry']['location'];
+          final double lat = location['lat']?.toDouble() ?? 0.0;
+          final double lng = location['lng']?.toDouble() ?? 0.0;
+
+          if (lat != 0.0 || lng != 0.0) {
+            return LatLng(lat, lng);
+          }
+        }
+      }
+    } catch (e) {
+      print('Web geocoding error in LocationPickerDialog: $e');
+    }
+
+    return null;
   }
 
   @override
