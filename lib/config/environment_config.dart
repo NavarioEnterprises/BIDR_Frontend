@@ -84,7 +84,7 @@ class AppConfig {
       // Service URLs
       productsServiceUrl: "https://products-management.bidr.co.za/",
       authServiceUrl: "https://api.bidr.co.za/",
-      chatServiceUrl: "http://chat-service.bidr.co.za/",
+      chatServiceUrl: "https://chat-service.bidr.co.za/",
       paymentServiceUrl: "https://resolutions.bidr.co.za/",
       resolutionServiceUrl:
           "https://bidr-resolution-1756963788.westus.azurecontainer.io:8004/",
