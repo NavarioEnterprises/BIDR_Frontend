@@ -34,6 +34,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   String? _error;
   Map<String, String> _bidSortOptions = {}; // Track sort option per request ID
   Set<String> _cancelledRequests = {}; // Track cancelled request IDs
+  Map<String, bool> _expandedSellerNotes =
+      {}; // Track expanded seller notes by quote ID
 
   // Auto-refresh timer
   Timer? _refreshTimer;
@@ -1459,126 +1461,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     );
   }
 
-  String _getRequestDescription(dynamic request) {
-    try {
-      if (request?.category == null) return "No description available";
-
-      // Handle different request types - either API response models or transformed models
-      if (request is AutoSparesRequest) {
-        // Transformed model
-        if (request.autoSpares?.partDetails?.partName != null &&
-            request.autoSpares?.vehicleDetails?.makeModel != null &&
-            request.autoSpares?.vehicleDetails?.year != null) {
-          return "${request.autoSpares.partDetails.partName}, ${request.autoSpares.vehicleDetails.makeModel}, ${request.autoSpares.vehicleDetails.year}";
-        }
-        return "Vehicle Spares Request";
-      } else if (request is RimTyreRequest) {
-        // Transformed model
-        if (request.rimTyre?.productDetails != null) {
-          final tyreType = request.rimTyre.productDetails.tyreType ?? "Tyres";
-          final tyreWidth = request.rimTyre.productDetails.tyreWidthMm ?? 0;
-          final sidewall = request.rimTyre.productDetails.sidewallProfile ?? "";
-          final rimDiameter =
-              request.rimTyre.productDetails.wheelRimDiameterInches ?? "";
-          final brand =
-              request.rimTyre.moreFields?.preferredBrand ?? "Various Brands";
-          return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
-        }
-        return "Tyre/Rim Request";
-      } else if (request is ConsumerElectronicsRequest) {
-        // Transformed model
-        if (request.consumerElectronics?.productDetails != null) {
-          final typeOfElectronics =
-              request.consumerElectronics.productDetails.typeOfElectronics ??
-              "Electronics";
-          final brandPreference =
-              request.consumerElectronics.productDetails.brandPreference ??
-              "Various Brands";
-          final modelSeries =
-              request.consumerElectronics.productDetails.modelSeries;
-          return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
-        }
-        return "Electronics Request";
-      }
-
-      // Handle API response category strings
-      switch (request.category) {
-        case "VEHICLE_SPARES":
-          // Use vehicle_spares_summary from API or fallback to title/description
-          if (request.vehicleSparesSummary != null &&
-              request.vehicleSparesSummary.isNotEmpty) {
-            return request.vehicleSparesSummary;
-          } else if (request.title != null && request.title.isNotEmpty) {
-            return "${request.title} - ${request.description ?? 'Vehicle Spares Request'}";
-          }
-          return "Vehicle Spares Request";
-
-        case "TYRES_RIMS":
-          // Use tyres_rims_summary from API or fallback to title/description
-          if (request.tyresRimsSummary != null &&
-              request.tyresRimsSummary.isNotEmpty) {
-            return "${request.tyresRimsSummary} - ${request.title ?? 'Tyre/Rim Request'}";
-          } else if (request.title != null && request.title.isNotEmpty) {
-            return "${request.title} - ${request.description ?? 'Tyre/Rim Request'}";
-          }
-          return "Tyre/Rim Request";
-
-        case "ELECTRONICS":
-          // Use consumer_electronics_summary from API or fallback to title/description
-          if (request.consumerElectronicsSummary != null &&
-              request.consumerElectronicsSummary.isNotEmpty) {
-            return request.consumerElectronicsSummary;
-          } else if (request.title != null && request.title.isNotEmpty) {
-            return "${request.title} - ${request.description ?? 'Electronics Request'}";
-          }
-          return "Electronics Request";
-
-        // Legacy categories for backward compatibility
-        case "Vehicle Spares":
-          if (request?.partDetails?.partName != null &&
-              request?.vehicleDetails?.makeModel != null &&
-              request?.vehicleDetails?.year != null) {
-            return "${request.partDetails.partName}, ${request.vehicleDetails.makeModel}, ${request.vehicleDetails.year}";
-          }
-          return "Vehicle Spares Request";
-
-        case "Vehicle Tyres and Rims":
-          if (request?.productDetails != null) {
-            final typeOfElectronics =
-                request.productDetails.typeOfElectronics ?? "Electronics";
-            final brandPreference =
-                request.productDetails.brandPreference ?? "Various Brands";
-            final modelSeries = request.productDetails.modelSeries;
-            return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
-          }
-          return "Electronics Request";
-
-        case "Consumer Electronics":
-          if (request?.productDetails != null) {
-            final tyreType = request.productDetails.tyreType ?? "Tyres";
-            final tyreWidth = request.productDetails.tyreWidthMm ?? 0;
-            final sidewall = request.productDetails.sidewallProfile ?? "";
-            final rimDiameter =
-                request.productDetails.wheelRimDiameterInches ?? "";
-            final brand =
-                request.moreFields?.preferredBrand ?? "Various Brands";
-            return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
-          }
-          return "Tyre/Rim Request";
-
-        default:
-          // Fallback to title and description from API
-          if (request.title != null && request.title.isNotEmpty) {
-            return "${request.title} - ${request.description ?? 'Request'}";
-          }
-          return "Request #${_getRequestId(request)}";
-      }
-    } catch (e) {
-      print('Error getting description: $e');
-      return "Request information unavailable";
-    }
-  }
-
   void _navigateToDetailScreen(dynamic request, int index) {
     try {
       if (request?.category == null) {
@@ -2007,7 +1889,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                               onTap: () =>
                                   _navigateToDetailScreen(request, index),
                               child: Text(
-                                "View Details2",
+                                "View Details",
                                 style: GoogleFonts.manrope(
                                   color: Constants.ftaColorLight,
                                   fontSize: 11,
@@ -2259,12 +2141,15 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
   // Modern seller bid card matching screenshot
   Widget _buildModernSellerBid(dynamic bid, dynamic request, int? sellerIndex) {
-    String sellerName = sellerIndex != null
-        ? "Seller $sellerIndex"
-        : _getSellerName(bid);
+    String sellerName = sellerIndex != null ? "Seller" : _getSellerName(bid);
     double bidAmount = _getBidAmount(bid);
+    String bidNote = _getBidNote(bid);
     DateTime bidTime = _getBidTime(bid);
     double rating = _getBidRating(bid);
+    String quoteId = bid is Map
+        ? (bid['quote_id'] ?? bid['quoteId'] ?? 'unknown')
+        : 'unknown';
+    bool isExpanded = _expandedSellerNotes[quoteId] ?? false;
 
     return Container(
       margin: EdgeInsets.only(bottom: 12),
@@ -2308,14 +2193,65 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                       ),
                     ),
                     // Expand/Collapse icon
-                    Icon(
-                      Icons.keyboard_arrow_down,
-                      color: Colors.grey.shade500,
-                      size: 20,
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          _expandedSellerNotes[quoteId] = !isExpanded;
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(4),
+                        child: Icon(
+                          isExpanded
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          color: Colors.grey.shade500,
+                          size: 20,
+                        ),
+                      ),
                     ),
                   ],
                 ),
                 SizedBox(height: 12),
+                // Collapsible seller notes section
+                if (isExpanded && bidNote.isNotEmpty)
+                  Container(
+                    margin: EdgeInsets.only(bottom: 12),
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Seller Notes:',
+                                style: GoogleFonts.manrope(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          bidNote.toString(),
+                          style: GoogleFonts.manrope(
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 // Bid amount and accept button
                 Row(
                   children: [
@@ -3774,14 +3710,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                             color: Colors.grey[600],
                           ),
                         ),
-                        Text(
-                          "View Details",
-                          style: GoogleFonts.manrope(
-                            fontSize: 12,
-                            color: Colors.orange,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
                       ],
                     ),
                     ElevatedButton(
@@ -4380,6 +4308,12 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     }
   }
 
+  String _getBidNote(dynamic bid) {
+    // Handle API response format
+    final q = bid.sellerNotes;
+    return q != null ? q.toString() : '';
+  }
+
   double _getBidAmount(dynamic bid) {
     if (bid is Seller) {
       return bid.bid?.toDouble() ?? 0.0;
@@ -4901,7 +4835,8 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
         final partNumber = specs['part_number'].toString().trim();
         if (partNumber.isEmpty) return "-";
         // Capitalize first letter
-        return partNumber.substring(0, 1).toUpperCase() + partNumber.substring(1);
+        return partNumber.substring(0, 1).toUpperCase() +
+            partNumber.substring(1);
       }
 
       return "-";
@@ -4919,7 +4854,8 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
         final transmissionType = specs['transmission_type'].toString().trim();
         if (transmissionType.isEmpty) return "-";
         // Capitalize first letter
-        return transmissionType.substring(0, 1).toUpperCase() + transmissionType.substring(1);
+        return transmissionType.substring(0, 1).toUpperCase() +
+            transmissionType.substring(1);
       }
 
       // Check if there's a vehicle_type field that might indicate transmission
@@ -4927,7 +4863,8 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
         final vehicleType = specs['vehicle_type'].toString().trim();
         if (vehicleType.isEmpty) return "-";
         // Capitalize first letter
-        return vehicleType.substring(0, 1).toUpperCase() + vehicleType.substring(1);
+        return vehicleType.substring(0, 1).toUpperCase() +
+            vehicleType.substring(1);
       }
 
       return "-";
@@ -4998,7 +4935,8 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
         final engineSize = specs['engine_size'].toString().trim();
         if (engineSize.isEmpty) return "-";
         // Capitalize first letter
-        return engineSize.substring(0, 1).toUpperCase() + engineSize.substring(1);
+        return engineSize.substring(0, 1).toUpperCase() +
+            engineSize.substring(1);
       }
 
       return "-";
@@ -5025,7 +4963,8 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
             return 'Truck';
           default:
             if (vehicleType.isEmpty) return "-";
-            return vehicleType.substring(0, 1).toUpperCase() + vehicleType.substring(1);
+            return vehicleType.substring(0, 1).toUpperCase() +
+                vehicleType.substring(1);
         }
       }
 
@@ -5387,17 +5326,7 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                           ),
                                         ),
                                       ),
-                                    SizedBox(width: 12),
-
-                                    SortDropdownMenu(
-                                      initialValue: _currentSort,
-                                      onSortChanged: (option) {
-                                        setState(() {
-                                          _currentSort = option;
-                                        });
-                                        print('Sort changed to: $option');
-                                      },
-                                    ),
+                                    //SizedBox(width: 12),
                                   ],
                                 ),
                               ],
@@ -5430,34 +5359,20 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              "Description -",
+                                              "Description ",
                                               style: GoogleFonts.manrope(
                                                 color: Colors.grey.shade600,
                                                 fontSize: 14,
                                               ),
                                             ),
-                                            Spacer(),
-                                            GestureDetector(
-                                              onTap: () {},
-                                              child: Text(
-                                                "View Details",
-                                                style: GoogleFonts.manrope(
-                                                  color:
-                                                      Constants.ftaColorLight,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                ),
-                                              ),
-                                            ),
+
+                                            SizedBox(height: 12),
                                           ],
                                         ),
                                         SizedBox(height: 8),
                                         Text(
                                           _getRequestDescription(
                                             widget.request,
-                                            widget.autoSpare,
                                           ),
                                           style: GoogleFonts.manrope(
                                             fontSize: 13,
@@ -5483,60 +5398,78 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                       ],
                                     ),
                                   ),
+                                  Spacer(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 12.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        _buildTimerCircle(
+                                          _getRemainingTime(
+                                            widget.request.createdAt,
+                                            _mapTimeframeToUrgency(
+                                              widget
+                                                  .autoSpare
+                                                  .partDetails
+                                                  .urgency,
+                                            ),
+                                            'days',
+                                          ),
+                                          "D",
+                                        ),
+                                        SizedBox(width: 12),
+                                        _buildTimerCircle(
+                                          _getRemainingTime(
+                                            widget.request.createdAt,
+                                            _mapTimeframeToUrgency(
+                                              widget
+                                                  .autoSpare
+                                                  .partDetails
+                                                  .urgency,
+                                            ),
+                                            'hours',
+                                          ),
+                                          "H",
+                                        ),
+                                        SizedBox(width: 12),
+                                        _buildTimerCircle(
+                                          _getRemainingTime(
+                                            widget.request.createdAt,
+                                            _mapTimeframeToUrgency(
+                                              widget
+                                                  .autoSpare
+                                                  .partDetails
+                                                  .urgency,
+                                            ),
+                                            'minutes',
+                                          ),
+                                          "M",
+                                        ),
+                                        SizedBox(width: 12),
+
+                                        _buildTimerCircle(
+                                          _getRemainingTime(
+                                            widget.request.createdAt,
+                                            _mapTimeframeToUrgency(
+                                              widget
+                                                  .autoSpare
+                                                  .partDetails
+                                                  .urgency,
+                                            ),
+                                            'seconds',
+                                          ),
+                                          "S",
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
                             SizedBox(height: 16),
+
                             // Status dots - showing remaining time
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _buildTimerCircle(
-                                  _getRemainingTime(
-                                    widget.request.createdAt,
-                                    _mapTimeframeToUrgency(
-                                      widget.autoSpare.partDetails.urgency,
-                                    ),
-                                    'days',
-                                  ),
-                                  "D",
-                                ),
-                                SizedBox(width: 12),
-                                _buildTimerCircle(
-                                  _getRemainingTime(
-                                    widget.request.createdAt,
-                                    _mapTimeframeToUrgency(
-                                      widget.autoSpare.partDetails.urgency,
-                                    ),
-                                    'hours',
-                                  ),
-                                  "H",
-                                ),
-                                SizedBox(width: 12),
-                                _buildTimerCircle(
-                                  _getRemainingTime(
-                                    widget.request.createdAt,
-                                    _mapTimeframeToUrgency(
-                                      widget.autoSpare.partDetails.urgency,
-                                    ),
-                                    'minutes',
-                                  ),
-                                  "M",
-                                ),
-                                SizedBox(width: 12),
-                                _buildTimerCircle(
-                                  _getRemainingTime(
-                                    widget.request.createdAt,
-                                    _mapTimeframeToUrgency(
-                                      widget.autoSpare.partDetails.urgency,
-                                    ),
-                                    'seconds',
-                                  ),
-                                  "S",
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 24),
                           ],
                         ),
                       ),
@@ -5693,51 +5626,6 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
         ],
       ),
     );
-  }
-
-  String _getRequestDescription(dynamic request, dynamic item) {
-    try {
-      if (request?.category == null) return "No description available";
-
-      switch (request.category) {
-        case "Vehicle Spares":
-          if (item?.partDetails?.partName != null &&
-              item?.vehicleDetails?.makeModel != null &&
-              item?.vehicleDetails?.year != null) {
-            return "${item.partDetails.partName}, ${item.vehicleDetails.makeModel}, ${item.vehicleDetails.year}";
-          }
-          return "Vehicle Spares Request";
-
-        case "Vehicle Tyres and Rims":
-          if (item?.productDetails != null) {
-            final typeOfElectronics =
-                item.productDetails.typeOfElectronics ?? "Electronics";
-            final brandPreference =
-                item.productDetails.brandPreference ?? "Various Brands";
-            final modelSeries = item.productDetails.modelSeries;
-            return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
-          }
-          return "Electronics Request";
-
-        case "Consumer Electronics":
-          if (item?.productDetails != null) {
-            final tyreType = item.productDetails.tyreType ?? "Tyres";
-            final tyreWidth = item.productDetails.tyreWidthMm ?? 0;
-            final sidewall = item.productDetails.sidewallProfile ?? "";
-            final rimDiameter =
-                item.productDetails.wheelRimDiameterInches ?? "";
-            final brand = item.moreFields?.preferredBrand ?? "Various Brands";
-            return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
-          }
-          return "Tyre/Rim Request";
-
-        default:
-          return "Request #${_getRequestId(request)}";
-      }
-    } catch (e) {
-      print('Error getting description: $e');
-      return "Request information unavailable2";
-    }
   }
 
   String _formatDate(DateTime? date) {
@@ -6320,11 +6208,13 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
         case '1_MONTH':
           return '1 Month';
         default:
-          return urgencyTimeline.isEmpty ? "Not specified" : urgencyTimeline;
+          if (urgencyTimeline.isEmpty) return "-";
+          return urgencyTimeline.substring(0, 1).toUpperCase() +
+              urgencyTimeline.substring(1);
       }
     } catch (e) {
       print('Error getting urgency display name: $e');
-      return "Not specified";
+      return "-";
     }
   }
 }
@@ -6406,19 +6296,6 @@ class ConsumerElectronicsDetailScreen extends StatefulWidget {
 
 class _ConsumerElectronicsDetailScreenState
     extends State<ConsumerElectronicsDetailScreen> {
-  String _getRequestId(dynamic request) {
-    // Handle ProductRequestItem from API
-    if (request is ProductRequestItem) {
-      return request.requestId.isNotEmpty ? request.requestId : 'Unknown';
-    }
-    // Handle other request types that have 'id' property
-    try {
-      return request.id?.toString() ?? 'Unknown';
-    } catch (e) {
-      return 'Unknown';
-    }
-  }
-
   SortOption? _currentSort;
   Set<String> _cancelledRequests = {};
 
@@ -6718,17 +6595,6 @@ class _ConsumerElectronicsDetailScreenState
                                           ),
                                         ),
                                       ),
-                                    SizedBox(width: 12),
-
-                                    SortDropdownMenu(
-                                      initialValue: _currentSort,
-                                      onSortChanged: (option) {
-                                        setState(() {
-                                          _currentSort = option;
-                                        });
-                                        print('Sort changed to: $option');
-                                      },
-                                    ),
                                   ],
                                 ),
                               ],
@@ -6788,7 +6654,6 @@ class _ConsumerElectronicsDetailScreenState
                                         Text(
                                           _getRequestDescription(
                                             widget.request,
-                                            widget.consumerElectronics,
                                           ),
                                           style: GoogleFonts.manrope(
                                             fontSize: 13,
@@ -7042,51 +6907,6 @@ class _ConsumerElectronicsDetailScreenState
         ],
       ),
     );
-  }
-
-  String _getRequestDescription(dynamic request, dynamic item) {
-    try {
-      if (request?.category == null) return "No description available";
-
-      switch (request.category) {
-        case "Vehicle Spares":
-          if (item?.partDetails?.partName != null &&
-              item?.vehicleDetails?.makeModel != null &&
-              item?.vehicleDetails?.year != null) {
-            return "${item.partDetails.partName}, ${item.vehicleDetails.makeModel}, ${item.vehicleDetails.year}";
-          }
-          return "Vehicle Spares Request";
-
-        case "Vehicle Tyres and Rims":
-          if (item?.productDetails != null) {
-            final typeOfElectronics =
-                item.productDetails.typeOfElectronics ?? "Electronics";
-            final brandPreference =
-                item.productDetails.brandPreference ?? "Various Brands";
-            final modelSeries = item.productDetails.modelSeries;
-            return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
-          }
-          return "Electronics Request";
-
-        case "Consumer Electronics":
-          if (item?.productDetails != null) {
-            final tyreType = item.productDetails.tyreType ?? "Tyres";
-            final tyreWidth = item.productDetails.tyreWidthMm ?? 0;
-            final sidewall = item.productDetails.sidewallProfile ?? "";
-            final rimDiameter =
-                item.productDetails.wheelRimDiameterInches ?? "";
-            final brand = item.moreFields?.preferredBrand ?? "Various Brands";
-            return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
-          }
-          return "Tyre/Rim Request";
-
-        default:
-          return "Request #${_getRequestId(request)}";
-      }
-    } catch (e) {
-      print('Error getting description: $e');
-      return "Request information unavailable3";
-    }
   }
 
   String _formatDate(DateTime? date) {
@@ -7884,17 +7704,6 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                           ),
                                         ),
                                       ),
-                                    SizedBox(width: 12),
-
-                                    SortDropdownMenu(
-                                      initialValue: _currentSort,
-                                      onSortChanged: (option) {
-                                        setState(() {
-                                          _currentSort = option;
-                                        });
-                                        print('Sort changed to: $option');
-                                      },
-                                    ),
                                   ],
                                 ),
                               ],
@@ -7954,7 +7763,6 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                         Text(
                                           _getRequestDescription(
                                             widget.request,
-                                            widget.rimTyre,
                                           ),
                                           style: GoogleFonts.manrope(
                                             fontSize: 13,
@@ -8180,51 +7988,6 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
         ],
       ),
     );
-  }
-
-  String _getRequestDescription(dynamic request, dynamic item) {
-    try {
-      if (request?.category == null) return "No description available";
-
-      switch (request.category) {
-        case "Vehicle Spares":
-          if (item?.partDetails?.partName != null &&
-              item?.vehicleDetails?.makeModel != null &&
-              item?.vehicleDetails?.year != null) {
-            return "${item.partDetails.partName}, ${item.vehicleDetails.makeModel}, ${item.vehicleDetails.year}";
-          }
-          return "Vehicle Spares Request";
-
-        case "Vehicle Tyres and Rims":
-          if (item?.productDetails != null) {
-            final typeOfElectronics =
-                item.productDetails.typeOfElectronics ?? "Electronics";
-            final brandPreference =
-                item.productDetails.brandPreference ?? "Various Brands";
-            final modelSeries = item.productDetails.modelSeries;
-            return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
-          }
-          return "Electronics Request";
-
-        case "Consumer Electronics":
-          if (item?.productDetails != null) {
-            final tyreType = item.productDetails.tyreType ?? "Tyres";
-            final tyreWidth = item.productDetails.tyreWidthMm ?? 0;
-            final sidewall = item.productDetails.sidewallProfile ?? "";
-            final rimDiameter =
-                item.productDetails.wheelRimDiameterInches ?? "";
-            final brand = item.moreFields?.preferredBrand ?? "Various Brands";
-            return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
-          }
-          return "Tyre/Rim Request";
-
-        default:
-          return "Request #${_getRequestId(request)}";
-      }
-    } catch (e) {
-      print('Error getting description: $e');
-      return "Request information unavailable3";
-    }
   }
 
   String _formatDate(DateTime? date) {
@@ -8960,5 +8723,137 @@ String _mapTimeframeToUrgency(String? timeframe) {
       return '1_MONTH';
     default:
       return '1_WEEK'; // Default to 1_WEEK
+  }
+}
+
+String _getRequestDescription(dynamic request) {
+  try {
+    if (request?.category == null) return "No description available";
+
+    // Handle different request types - either API response models or transformed models
+    if (request is AutoSparesRequest) {
+      // Transformed model
+      if (request.autoSpares?.partDetails?.partName != null &&
+          request.autoSpares?.vehicleDetails?.makeModel != null &&
+          request.autoSpares?.vehicleDetails?.year != null) {
+        return "${request.autoSpares.partDetails.partName}, ${request.autoSpares.vehicleDetails.makeModel}, ${request.autoSpares.vehicleDetails.year}";
+      }
+      return "Vehicle Spares Request";
+    } else if (request is RimTyreRequest) {
+      // Transformed model
+      if (request.rimTyre?.productDetails != null) {
+        final tyreType = request.rimTyre.productDetails.tyreType ?? "Tyres";
+        final tyreWidth = request.rimTyre.productDetails.tyreWidthMm ?? 0;
+        final sidewall = request.rimTyre.productDetails.sidewallProfile ?? "";
+        final rimDiameter =
+            request.rimTyre.productDetails.wheelRimDiameterInches ?? "";
+        final brand =
+            request.rimTyre.moreFields?.preferredBrand ?? "Various Brands";
+        return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
+      }
+      return "Tyre/Rim Request";
+    } else if (request is ConsumerElectronicsRequest) {
+      // Transformed model
+      if (request.consumerElectronics?.productDetails != null) {
+        final typeOfElectronics =
+            request.consumerElectronics.productDetails.typeOfElectronics ??
+            "Electronics";
+        final brandPreference =
+            request.consumerElectronics.productDetails.brandPreference ??
+            "Various Brands";
+        final modelSeries =
+            request.consumerElectronics.productDetails.modelSeries;
+        return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
+      }
+      return "Electronics Request";
+    }
+
+    // Handle API response category strings
+    switch (request.category) {
+      case "VEHICLE_SPARES":
+        // Use vehicle_spares_summary from API or fallback to title/description
+        if (request.vehicleSparesSummary != null &&
+            request.vehicleSparesSummary.isNotEmpty) {
+          return request.vehicleSparesSummary;
+        } else if (request.title != null && request.title.isNotEmpty) {
+          return "${request.title} - ${request.description ?? 'Vehicle Spares Request'}";
+        }
+        return "Vehicle Spares Request";
+
+      case "TYRES_RIMS":
+        // Use tyres_rims_summary from API or fallback to title/description
+        if (request.tyresRimsSummary != null &&
+            request.tyresRimsSummary.isNotEmpty) {
+          return "${request.tyresRimsSummary} - ${request.title ?? 'Tyre/Rim Request'}";
+        } else if (request.title != null && request.title.isNotEmpty) {
+          return "${request.title} - ${request.description ?? 'Tyre/Rim Request'}";
+        }
+        return "Tyre/Rim Request";
+
+      case "ELECTRONICS":
+        // Use consumer_electronics_summary from API or fallback to title/description
+        if (request.consumerElectronicsSummary != null &&
+            request.consumerElectronicsSummary.isNotEmpty) {
+          return request.consumerElectronicsSummary;
+        } else if (request.title != null && request.title.isNotEmpty) {
+          return "${request.title} - ${request.description ?? 'Electronics Request'}";
+        }
+        return "Electronics Request";
+
+      // Legacy categories for backward compatibility
+      case "Vehicle Spares":
+        if (request?.partDetails?.partName != null &&
+            request?.vehicleDetails?.makeModel != null &&
+            request?.vehicleDetails?.year != null) {
+          return "${request.partDetails.partName}, ${request.vehicleDetails.makeModel}, ${request.vehicleDetails.year}";
+        }
+        return "Vehicle Spares Request";
+
+      case "Vehicle Tyres and Rims":
+        if (request?.productDetails != null) {
+          final typeOfElectronics =
+              request.productDetails.typeOfElectronics ?? "Electronics";
+          final brandPreference =
+              request.productDetails.brandPreference ?? "Various Brands";
+          final modelSeries = request.productDetails.modelSeries;
+          return "$typeOfElectronics, $brandPreference${modelSeries != null ? ', $modelSeries' : ''}";
+        }
+        return "Electronics Request";
+
+      case "Consumer Electronics":
+        if (request?.productDetails != null) {
+          final tyreType = request.productDetails.tyreType ?? "Tyres";
+          final tyreWidth = request.productDetails.tyreWidthMm ?? 0;
+          final sidewall = request.productDetails.sidewallProfile ?? "";
+          final rimDiameter =
+              request.productDetails.wheelRimDiameterInches ?? "";
+          final brand = request.moreFields?.preferredBrand ?? "Various Brands";
+          return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
+        }
+        return "Tyre/Rim Request";
+
+      default:
+        // Fallback to title and description from API
+        if (request.title != null && request.title.isNotEmpty) {
+          return "${request.title} - ${request.description ?? 'Request'}";
+        }
+        return "Request #${_getRequestId(request)}";
+    }
+  } catch (e) {
+    print('Error getting description: $e');
+    return "Request information unavailable";
+  }
+}
+
+String _getRequestId(dynamic request) {
+  // Handle ProductRequestItem from API
+  if (request is ProductRequestItem) {
+    return request.requestId.isNotEmpty ? request.requestId : 'Unknown';
+  }
+  // Handle other request types that have 'id' property
+  try {
+    return request.id?.toString() ?? 'Unknown';
+  } catch (e) {
+    return 'Unknown';
   }
 }

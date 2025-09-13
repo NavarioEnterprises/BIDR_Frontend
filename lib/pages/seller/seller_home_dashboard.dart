@@ -6,6 +6,7 @@ import 'package:bidr/global_values.dart';
 import 'package:bidr/pages/notification.dart';
 import 'package:bidr/pages/seller/profile_management.dart';
 import 'package:bidr/pages/seller/rating_and_review.dart';
+import 'package:bidr/pages/seller/seller_dashboard_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,7 +16,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import "package:universal_html/html.dart" as html;
 import 'package:motion_toast/motion_toast.dart';
-
+import 'package:badges/badges.dart' as badges;
 import '../../customWdget/appbar.dart';
 import '../../customWdget/dropdownMenu.dart';
 import '../../models/alert.dart';
@@ -49,6 +50,12 @@ class _SellerDashboardState extends State<SellerDashboard>
   int selectedSubIndex = 0; // For transaction history tabs
   bool isPinVerifiedSuccessful = false;
   bool _isLoadingNotifications = false;
+  bool _isOverlayShown = false;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  OverlayEntry? _overlayEntry;
+
+  int _unreadCount = 0;
   final NotificationApiService _notificationApiService =
       NotificationApiService();
   final TextEditingController _priceController = TextEditingController();
@@ -117,8 +124,6 @@ class _SellerDashboardState extends State<SellerDashboard>
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
 
   final List<String> menuItems = [
     'Revenue Tracker',
@@ -594,69 +599,7 @@ class _SellerDashboardState extends State<SellerDashboard>
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 66, vertical: 8),
-            decoration: BoxDecoration(color: Constants.ftaColorLight),
-            child: Row(
-              children: [
-                Text(
-                  'Seller Dashboard',
-                  style: GoogleFonts.manrope(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Spacer(),
-                Stack(
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        HugeIcons.strokeRoundedNotification01,
-                        color: Colors.white,
-                      ),
-                      onPressed: _showNotificationDialog,
-                    ),
-                    if (unreadCount > 0)
-                      Positioned(
-                        right: 2,
-                        top: 2,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Constants.ctaColorLight,
-                            shape: BoxShape.circle,
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 16,
-                            minHeight: 16,
-                          ),
-                          child: Text(
-                            unreadCount.toString(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                SizedBox(width: 15),
-                SellerSortDropdownMenu(
-                  initialValue: _currentSort,
-                  onSortChanged: (option) {
-                    setState(() {
-                      _currentSort = option;
-                    });
-                    print('Sort changed to: $option');
-                  },
-                ),
-              ],
-            ),
-          ),
+          SellerDashboardHeader(headerName: 'Seller Dashboard'),
           // Orange Navigation Bar
           SizedBox(height: 24),
           // Main Content Area
@@ -1038,111 +981,388 @@ class _SellerDashboardState extends State<SellerDashboard>
     }
   }
 
-  void _showNotificationDialog() {
-    // Always refresh notifications when dialog is opened for the latest data
-    _loadNotificationsFromApi();
+  Future<void> _loadUnreadCount() async {
+    if (!mounted) return;
 
-    _animationController.forward();
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(0.3),
-      builder: (BuildContext context) {
-        return ScaleTransition(
-          scale: _scaleAnimation,
-          child: StatefulBuilder(
-            builder: (BuildContext context, StateSetter setDialogState) {
-              return Dialog(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+    try {
+      final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
+      print('Loading unread count for user UUID: $userUuid');
+
+      if (userUuid.isNotEmpty) {
+        final unreadCount = await _notificationApiService
+            .getUnreadNotificationCount(userUuid);
+
+        if (mounted) {
+          setState(() {
+            _unreadCount = unreadCount;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading unread notification count: $e');
+      if (mounted) {
+        setState(() {
+          _unreadCount = 0;
+        });
+      }
+    }
+  }
+
+  Future<void> _refreshNotifications() async {
+    if (!mounted) return;
+
+    setState(() {
+      _isLoadingNotifications = true;
+    });
+
+    try {
+      // Add timeout to prevent infinite loading
+      await Future.wait([
+        _loadNotificationsFromApi(),
+        _loadUnreadCount(),
+      ]).timeout(const Duration(seconds: 15));
+    } catch (e) {
+      print('Error refreshing notifications: $e');
+      // Set empty state on error
+      if (mounted) {
+        setState(() {
+          notifications = [];
+          _unreadCount = 0;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingNotifications = false;
+        });
+      }
+    }
+  }
+
+  Widget _buildNotificationItem(
+    WebNotification notification, {
+    bool isCompact = false,
+  }) {
+    return InkWell(
+      onTap: () {
+        // Close the overlay first
+        _removeOverlay();
+
+        // Show single notification dialog
+        _showSingleNotification(notification);
+
+        // Mark as read if it's unread
+        if (!notification.read) {
+          _markNotificationAsRead(notification.id);
+        }
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: notification.read
+              ? Colors.transparent
+              : Constants.ctaColorLight.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(8),
+          border: notification.read
+              ? null
+              : Border.all(
+                  color: Constants.ctaColorLight.withOpacity(0.2),
+                  width: 1,
                 ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Constants.ctaColorLight.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _getIconForType(notification.type),
+                color: Constants.ctaColorLight,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          notification.title,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: notification.read
+                                ? FontWeight.normal
+                                : FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      if (!notification.read)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: Constants.ctaColorLight,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    notification.body,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    maxLines: isCompact ? 1 : 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (!isCompact) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatDateTime(notification.createdAt),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey[500],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _markNotificationAsRead(String notificationId) async {
+    try {
+      final success = await _notificationApiService.markAsRead(notificationId);
+      if (success && mounted) {
+        // Update local notification state immediately
+        setState(() {
+          final index = notifications.indexWhere((n) => n.id == notificationId);
+          if (index != -1) {
+            notifications[index].read = true;
+          }
+          // Recalculate unread count from notifications
+          _unreadCount = notifications.where((n) => !n.read).length;
+        });
+        print('Notification marked as read: $notificationId');
+      } else {
+        print('Failed to mark notification as read: $notificationId');
+      }
+    } catch (e) {
+      print('Error marking notification as read: $e');
+    }
+  }
+
+  Future<void> _initializeNotifications() async {
+    if (!mounted) return;
+
+    try {
+      // Simple initial load without complex refresh logic
+      final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
+      print('Initializing notifications for user UUID: $userUuid');
+
+      if (userUuid.isNotEmpty) {
+        setState(() {
+          _isLoadingNotifications = true;
+        });
+
+        // Load notifications first
+        final fetchedNotifications = await _notificationApiService
+            .getUserNotifications(userUuid)
+            .timeout(const Duration(seconds: 10));
+
+        if (mounted) {
+          setState(() {
+            notifications = fetchedNotifications;
+            // Calculate unread count from loaded notifications
+            _unreadCount = fetchedNotifications.where((n) => !n.read).length;
+            _isLoadingNotifications = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error initializing notifications: $e');
+      if (mounted) {
+        setState(() {
+          notifications = [];
+          _unreadCount = 0;
+          _isLoadingNotifications = false;
+        });
+      }
+    }
+  }
+
+  void _showNotificationOverlay() {
+    if (_isOverlayShown) {
+      _removeOverlay();
+      return;
+    }
+
+    // Only refresh if we have no notifications or it's been a while
+    if (notifications.isEmpty && !_isLoadingNotifications) {
+      _initializeNotifications();
+    }
+
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final Offset offset = renderBox.localToGlobal(Offset.zero);
+    final Size buttonSize = renderBox.size;
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Stack(
+        children: [
+          // Transparent barrier to catch taps outside
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: _removeOverlay,
+              behavior: HitTestBehavior.opaque,
+              child: Container(color: Colors.transparent),
+            ),
+          ),
+          // The actual notification overlay
+          Positioned(
+            top: offset.dy + buttonSize.height + 5,
+            right: 68, // Match the padding of the header
+            child: Material(
+              color: Colors.transparent,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                alignment: Alignment.topRight,
                 child: Container(
-                  width: 320,
-                  padding: const EdgeInsets.all(16),
+                  width: 310,
+                  constraints: BoxConstraints(maxWidth: 310, maxHeight: 6500),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'ALERT',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.refresh,
-                                  size: 20,
-                                  color: _isLoadingNotifications
-                                      ? Colors.grey
-                                      : Constants.ctaColorLight,
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'ALERT',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.5,
+                                  ),
                                 ),
-                                onPressed: _isLoadingNotifications
-                                    ? null
-                                    : () {
-                                        _loadNotificationsFromApi();
-                                        // Update dialog state to show refresh immediately
-                                        setDialogState(() {});
-                                      },
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                tooltip: 'Refresh notifications',
-                              ),
-                              const SizedBox(width: 8),
-                              IconButton(
-                                icon: const Icon(Icons.close, size: 20),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _buildAlertStats(),
-                      const SizedBox(height: 20),
-                      _buildRecentNotifications(),
-                      const SizedBox(height: 16),
-                      Center(
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            tabActiveIndex = 6;
-                            sellerHomeValueNotifier.value++;
-                            setState(() {});
-                          },
-                          child: Text(
-                            'More Notifications',
-                            style: TextStyle(
-                              color: Constants.ctaColorLight,
-                              fontWeight: FontWeight.w600,
+                                IconButton(
+                                  icon: const Icon(Icons.close, size: 20),
+                                  onPressed: _removeOverlay,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ],
                             ),
-                          ),
+                            const SizedBox(height: 16),
+                            _buildAlertStats(),
+                            const SizedBox(height: 20),
+                            _buildRecentNotifications(),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextButton(
+                                  onPressed: _unreadCount > 0
+                                      ? () async {
+                                          // Mark all as read
+                                          final userUuid =
+                                              Constants.currentUser?.uid ??
+                                              Constants.myUid;
+                                          if (userUuid.isNotEmpty) {
+                                            final success =
+                                                await _notificationApiService
+                                                    .markAllAsRead(userUuid);
+                                            if (success && mounted) {
+                                              setState(() {
+                                                // Mark all notifications as read locally
+                                                for (var notification
+                                                    in notifications) {
+                                                  notification.read = true;
+                                                }
+                                                _unreadCount = 0;
+                                              });
+                                            }
+                                          }
+                                        }
+                                      : null,
+                                  child: Text(
+                                    'Mark All Read',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: _unreadCount > 0
+                                          ? Constants.ctaColorLight
+                                          : Colors.grey,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      _showFilteredNotifications('all'),
+                                  child: Text(
+                                    'View all',
+                                    style: TextStyle(
+                                      color: Constants.ctaColorLight,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              );
-            },
+              ),
+            ),
           ),
-        );
-      },
-    ).then((_) {
-      _animationController.reset();
-    });
+        ],
+      ),
+    );
+
+    _isOverlayShown = true;
+    _animationController.forward();
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _removeOverlay() {
+    if (_overlayEntry != null) {
+      _animationController.reverse().then((_) {
+        _overlayEntry?.remove();
+        _overlayEntry = null;
+        _isOverlayShown = false;
+      });
+    }
   }
 
   Widget _buildAlertStats() {
@@ -1153,44 +1373,352 @@ class _SellerDashboardState extends State<SellerDashboard>
 
     return Column(
       children: [
-        _buildStatItem('Total Notifications1', totalNotifications.toString()),
+        _buildStatItem(
+          'Total Notifications',
+          totalNotifications.toString(),
+          onTap: () => _showFilteredNotifications('all'),
+        ),
         const SizedBox(height: 8),
-        _buildStatItem('Read Notifications', readNotifications.toString()),
+        _buildStatItem(
+          'Read Notifications',
+          readNotifications.toString(),
+          onTap: () => _showFilteredNotifications('read'),
+        ),
         const SizedBox(height: 8),
-        _buildStatItem('Unread Notifications', unreadNotifications.toString()),
+        _buildStatItem(
+          'Unread Notifications',
+          unreadNotifications.toString(),
+          onTap: () => _showFilteredNotifications('unread'),
+        ),
       ],
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Constants.ctaColorLight,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+  Widget _buildStatItem(String label, String value, {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Constants.ctaColorLight,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+            Row(
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (onTap != null) ...[
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: 14,
+                  ),
+                ],
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  void _showFilteredNotifications(String filter) {
+    _removeOverlay();
+
+    List<WebNotification> filteredNotifications;
+    String title;
+
+    switch (filter) {
+      case 'all':
+        filteredNotifications = notifications;
+        title = 'All Notifications';
+        break;
+      case 'read':
+        filteredNotifications = notifications.where((n) => n.read).toList();
+        title = 'Read Notifications';
+        break;
+      case 'unread':
+        filteredNotifications = notifications.where((n) => !n.read).toList();
+        title = 'Unread Notifications';
+        break;
+      default:
+        filteredNotifications = notifications;
+        title = 'All Notifications';
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(20),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            height: MediaQuery.of(context).size.height * 0.8,
+            constraints: const BoxConstraints(maxWidth: 600, maxHeight: 700),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          color: Colors.grey.shade800,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close, color: Colors.grey.shade600),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                ),
+                // Content
+                Expanded(
+                  child: filteredNotifications.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.notifications_none,
+                                size: 64,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No notifications to show',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(20),
+                          itemCount: filteredNotifications.length,
+                          itemBuilder: (context, index) {
+                            return _buildNotificationItem(
+                              filteredNotifications[index],
+                              isCompact: false,
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSingleNotification(WebNotification notification) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(20),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            constraints: const BoxConstraints(maxWidth: 500),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          notification.title,
+                          style: TextStyle(
+                            color: Colors.grey.shade800,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close, color: Colors.grey.shade600),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                ),
+                // Content
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Status indicator
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: notification.read
+                              ? Colors.grey.shade100
+                              : Constants.ctaColorLight.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: notification.read
+                                ? Colors.grey.shade300
+                                : Constants.ctaColorLight.withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          notification.read ? 'Read' : 'Unread',
+                          style: TextStyle(
+                            color: notification.read
+                                ? Colors.grey.shade600
+                                : Constants.ctaColorLight,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Message content
+                      Text(
+                        notification.body,
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 16,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Timestamp
+                      Text(
+                        _formatTimestamp(notification.createdAt),
+                        style: TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Mark as read/unread button
+                      if (!notification.read)
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _markNotificationAsRead(notification.id);
+                              Navigator.of(context).pop();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Constants.ctaColorLight,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text(
+                              'Mark as Read',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _formatTimestamp(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inMinutes < 1) {
+      return 'Just now';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes}m ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inDays == 1) {
+      return 'Yesterday';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays}d ago';
+    } else {
+      return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
+    }
   }
 
   Widget _buildRecentNotifications() {
@@ -1284,112 +1812,19 @@ class _SellerDashboardState extends State<SellerDashboard>
     return '${difference} days ago';
   }
 
-  Widget _buildNotificationItem(
-    WebNotification notification, {
-    bool isCompact = false,
-  }) {
-    return GestureDetector(
-      onTap: () async {
-        // Mark as read if it's unread
-        if (!notification.read) {
-          final success = await _notificationApiService.markAsRead(
-            notification.id,
-          );
-          if (success) {
-            // Update the notification in the list
-            setState(() {
-              final index = notifications.indexWhere(
-                (n) => n.id == notification.id,
-              );
-              if (index != -1) {
-                notifications[index] = WebNotification(
-                  id: notification.id,
-                  title: notification.title,
-                  body: notification.body,
-                  description: notification.description,
-                  type: notification.type,
-                  read: true, // Mark as read
-                  createdAt: notification.createdAt,
-                );
-              }
-            });
-          }
-        }
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: notification.read
-              ? Colors.transparent
-              : Colors.blue.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(8),
-          border: notification.read
-              ? null
-              : Border.all(color: Colors.blue.withOpacity(0.2)),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Constants.ctaColorLight.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    _getIconForType(notification.type),
-                    color: Constants.ctaColorLight,
-                    size: 20,
-                  ),
-                ),
-                if (!notification.read)
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    notification.title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: notification.read
-                          ? FontWeight.normal
-                          : FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    notification.body,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    maxLines: isCompact ? 1 : 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  String _formatDateTime(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
+    } else {
+      return 'Just now';
+    }
   }
 
   IconData _getIconForType(String type) {
@@ -1654,7 +2089,7 @@ class _SellerDashboardState extends State<SellerDashboard>
             ),
             SizedBox(height: 8),
             Text(
-              'Additional Notes:',
+              'Additional Notes2:',
               style: GoogleFonts.manrope(
                 fontSize: 12,
                 color: Constants.ftaColorLight,
@@ -2202,7 +2637,7 @@ class _SellerDashboardState extends State<SellerDashboard>
   }) {
     final requestId = request['request_id'] ?? '';
     final title = request['title'] ?? "";
-    final description = request['description'] ?? '';
+    final description = request['seller_notes'] ?? request['description'] ?? '';
     final createdAt = request['created_at'] ?? '';
     final status = request['status'] ?? 'ACTIVE';
     final urgencyTimeline = request['urgency_timeline'] ?? '';
@@ -2311,7 +2746,7 @@ class _SellerDashboardState extends State<SellerDashboard>
 
               // Additional notes
               Text(
-                'Additional Notes - ${description.isNotEmpty ? description : "No additional notes"}',
+                'Additional Notes3 - ${description.isNotEmpty ? description : "No additional notes"}',
                 style: GoogleFonts.manrope(
                   fontSize: 14,
                   color: Colors.grey[600],
@@ -2685,37 +3120,6 @@ class _SellerDashboardState extends State<SellerDashboard>
       'minutes': minutes,
       'seconds': seconds,
     };
-  }
-
-  // Format date to display as "04/03/2025 - 10:34 PM"
-  String _formatDateTime(String dateTimeString) {
-    if (dateTimeString.isEmpty) {
-      return '04/03/2025 - 10:34 PM'; // Default fallback
-    }
-
-    try {
-      // Try to parse the API date string (assuming ISO format)
-      DateTime dateTime;
-      if (dateTimeString.contains('T')) {
-        // ISO format like "2025-03-04T22:34:00Z"
-        dateTime = DateTime.parse(dateTimeString);
-      } else if (dateTimeString.contains('/')) {
-        // Already in the desired format
-        return dateTimeString;
-      } else {
-        // Fallback for other formats
-        dateTime = DateTime.parse(dateTimeString);
-      }
-
-      // Format to "04/03/2025 - 10:34 PM"
-      final dateFormatter = DateFormat('dd/MM/yyyy');
-      final timeFormatter = DateFormat('h:mm a');
-
-      return '${dateFormatter.format(dateTime)} - ${timeFormatter.format(dateTime)}';
-    } catch (e) {
-      // If parsing fails, return default
-      return '04/03/2025 - 10:34 PM';
-    }
   }
 
   // Convert API status to LeadStatus enum
@@ -6158,7 +6562,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                           if (description.isNotEmpty) ...[
                             SizedBox(height: 24),
                             Text(
-                              'Additional Notes',
+                              'Additional Notes1',
                               style: GoogleFonts.manrope(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -6383,7 +6787,7 @@ class _SellerDashboardState extends State<SellerDashboard>
             'request_id': order['order_id']?.toString() ?? 'N/A',
             'title': order['product_name'] ?? order['productName'] ?? 'Order',
             'description':
-                order['buyer_notes'] ?? 'No additional notes provided',
+                order['seller_notes'] ?? 'No additional notes provided',
             'created_at':
                 order['created_at'] ??
                 order['orderDate'] ??

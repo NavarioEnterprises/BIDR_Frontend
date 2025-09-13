@@ -182,6 +182,7 @@ class _AccountManagementPageState extends State<AccountManagementPage>
   @override
   void initState() {
     super.initState();
+    getDefultLoadingData();
     // Add a small delay to ensure login method has completed
     Future.delayed(Duration(milliseconds: 500), () {
       _loadUserData();
@@ -212,33 +213,58 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     // Initialize form data (you can load from user data)
   }
 
+  getDefultLoadingData() async {
+    // Fallback to SharedPreferences if backend call fails
+    final firstName = await Sharedprefs.getUserNameSharedPreference() ?? '';
+    final email = await Sharedprefs.getUserEmailSharedPreference() ?? '';
+    final phone = await Sharedprefs.getUserCellSharedPreference() ?? '';
+
+    // Split full name into first and last name
+    final nameParts = firstName.split(' ');
+
+    setState(() {
+      _firstNameController.text = nameParts.isNotEmpty ? nameParts[0] : '';
+      _lastNameController.text = nameParts.length > 1
+          ? nameParts.sublist(1).join(' ')
+          : '';
+      _mobileController.text = phone;
+      _emailController.text = email;
+    });
+  }
+
   void _loadUserData() async {
     try {
       // Check if access token is available first
-      String? accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
-      print("Access token available: ${accessToken != null && accessToken.isNotEmpty}");
+      String? accessToken =
+          await Sharedprefs.getUserAccessTokenSharedPreference();
+      print(
+        "Access token available: ${accessToken != null && accessToken.isNotEmpty}",
+      );
       print("Access token length: ${accessToken?.length ?? 0}");
-      
+
       // Get user UID from SharedPreferences or Constants
       String? userUid = await Sharedprefs.getUserUidSharedPreference();
       if (userUid == null || userUid.isEmpty) {
         userUid = Constants.myUid;
       }
-      
+
       print("User UID: $userUid");
-      
+
       // If no access token, wait a bit longer and retry once
       if (accessToken == null || accessToken.isEmpty) {
         print("No access token found, waiting and retrying...");
         await Future.delayed(Duration(seconds: 1));
         accessToken = await Sharedprefs.getUserAccessTokenSharedPreference();
-        print("Access token after retry: ${accessToken != null && accessToken.isNotEmpty}");
+        print(
+          "Access token after retry: ${accessToken != null && accessToken.isNotEmpty}",
+        );
       }
 
       if (userUid != null && userUid.isNotEmpty) {
         // Try to get fresh data from backend
         final response = await _authService.getUserProfile(
-          uid: userUid, // This parameter is not used anymore but kept for compatibility
+          uid:
+              userUid, // This parameter is not used anymore but kept for compatibility
         );
         print("User profile response: $response");
 
@@ -255,23 +281,6 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           return;
         }
       }
-
-      // Fallback to SharedPreferences if backend call fails
-      final firstName = await Sharedprefs.getUserNameSharedPreference() ?? '';
-      final email = await Sharedprefs.getUserEmailSharedPreference() ?? '';
-      final phone = await Sharedprefs.getUserCellSharedPreference() ?? '';
-
-      // Split full name into first and last name
-      final nameParts = firstName.split(' ');
-
-      setState(() {
-        _firstNameController.text = nameParts.isNotEmpty ? nameParts[0] : '';
-        _lastNameController.text = nameParts.length > 1
-            ? nameParts.sublist(1).join(' ')
-            : '';
-        _mobileController.text = phone;
-        _emailController.text = email;
-      });
     } catch (e) {
       print('Error loading user data: $e');
       // Continue with SharedPreferences fallback
@@ -1391,30 +1400,42 @@ class _AccountManagementPageState extends State<AccountManagementPage>
     final currentPassword = _currentPasswordController.text.trim();
     final newPassword = _newPasswordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
-    
+
     // Validation checks
     if (currentPassword.isEmpty) {
-      _showErrorDialog('Validation Error', 'Please enter your current password.');
+      _showErrorDialog(
+        'Validation Error',
+        'Please enter your current password.',
+      );
       return;
     }
-    
+
     if (newPassword.isEmpty) {
       _showErrorDialog('Validation Error', 'Please enter a new password.');
       return;
     }
-    
+
     if (newPassword.length < 8) {
-      _showErrorDialog('Validation Error', 'New password must be at least 8 characters long.');
+      _showErrorDialog(
+        'Validation Error',
+        'New password must be at least 8 characters long.',
+      );
       return;
     }
-    
+
     if (newPassword != confirmPassword) {
-      _showErrorDialog('Validation Error', 'New password and confirmation do not match.');
+      _showErrorDialog(
+        'Validation Error',
+        'New password and confirmation do not match.',
+      );
       return;
     }
-    
+
     if (currentPassword == newPassword) {
-      _showErrorDialog('Validation Error', 'New password must be different from your current password.');
+      _showErrorDialog(
+        'Validation Error',
+        'New password must be different from your current password.',
+      );
       return;
     }
 
@@ -1435,7 +1456,8 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           message: 'Your password has been updated successfully.',
           icon: Icons.check_circle_outline,
           color: Colors.green,
-          additionalInfo: 'Please remember to use your new password for future logins.',
+          additionalInfo:
+              'Please remember to use your new password for future logins.',
           onContinue: () {
             // Clear password fields
             _currentPasswordController.clear();
@@ -1444,11 +1466,15 @@ class _AccountManagementPageState extends State<AccountManagementPage>
           },
         );
       } else {
-        final errorMessage = response?['error']?.toString() ?? 'Failed to change password';
+        final errorMessage =
+            response?['error']?.toString() ?? 'Failed to change password';
         _showErrorDialog('Password Change Failed', errorMessage);
       }
     } catch (e) {
-      _showErrorDialog('Error', 'An unexpected error occurred. Please try again.');
+      _showErrorDialog(
+        'Error',
+        'An unexpected error occurred. Please try again.',
+      );
       print('Password change error: $e');
     } finally {
       setState(() {

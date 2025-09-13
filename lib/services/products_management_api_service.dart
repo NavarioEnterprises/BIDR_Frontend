@@ -1010,7 +1010,9 @@ class ApiService {
         body: json.encode(requestBody),
       );
 
-      print('Update order status response status: ${response.statusCode}');
+      if (kDebugMode) {
+        print('Update order status response status: ${response.statusCode}');
+      }
       print('Update order status response body: ${response.body}');
 
       if (response.statusCode == 200) {

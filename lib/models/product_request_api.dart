@@ -87,22 +87,25 @@ class ProductRequestItem {
     required this.createdAt,
     required this.updatedAt,
   });
-  
+
   // Backward compatibility getter - maps quotes to sellerOffers
   List<QuoteItem> get sellerOffers => quotes;
 
   factory ProductRequestItem.fromJson(Map<String, dynamic> json) {
     return ProductRequestItem(
       requestId: json['request_id'] ?? '',
-      buyerId: json['buyer_id'] != null && json['buyer_id'] is Map<String, dynamic> 
-          ? ApiUser.fromJson(json['buyer_id']) 
+      buyerId:
+          json['buyer_id'] != null && json['buyer_id'] is Map<String, dynamic>
+          ? ApiUser.fromJson(json['buyer_id'])
           : null,
       category: json['category'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
       quantity: json['quantity'],
       conditionPreference: json['condition_preference'],
-      maxBudget: json['max_budget'] != null ? double.tryParse(json['max_budget'].toString()) : null,
+      maxBudget: json['max_budget'] != null
+          ? double.tryParse(json['max_budget'].toString())
+          : null,
       currency: json['currency'] ?? 'ZAR',
       urgencyTimeline: json['urgency_timeline'] ?? '',
       status: json['status'] ?? '',
@@ -122,7 +125,8 @@ class ProductRequestItem {
           ?.map((image) => image.toString())
           .toList(),
       vinPhotoUrl: json['vin_photo_url'],
-      productSpecifications: json['product_specifications'] as Map<String, dynamic>?,
+      productSpecifications:
+          json['product_specifications'] as Map<String, dynamic>?,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );
@@ -179,9 +183,10 @@ class ProductRequestItem {
   String getMileage() {
     if (productSpecifications != null) {
       // Try to get mileage from various possible fields
-      final mileage = productSpecifications!['mileage']?.toString() ?? 
-                     productSpecifications!['vehicle_mileage']?.toString() ??
-                     '0';
+      final mileage =
+          productSpecifications!['mileage']?.toString() ??
+          productSpecifications!['vehicle_mileage']?.toString() ??
+          '0';
       return mileage;
     }
     return '0';
@@ -191,14 +196,17 @@ class ProductRequestItem {
   AutoSparesRequest toAutoSparesRequest() {
     // Extract vehicle and part information from product_specifications
     final specs = productSpecifications ?? {};
-    
+
     // Create VehicleDetails from available data
     final vehicleDetails = VehicleDetails(
       vin: specs['vin_number']?.toString() ?? getVinNumber(),
       manufacturer: specs['vehicle_make']?.toString() ?? '',
       makeModel: specs['vehicle_model']?.toString() ?? '',
       type: _mapVehicleType(specs['vehicle_type']?.toString()),
-      condition: specs['condition_preference']?.toString() ?? conditionPreference ?? '',
+      condition:
+          specs['condition_preference']?.toString() ??
+          conditionPreference ??
+          '',
       year: specs['vehicle_year']?.toString() ?? '',
     );
 
@@ -217,12 +225,12 @@ class ProductRequestItem {
       imageUrls: specs['product_images']?.cast<String>() ?? productImages ?? [],
     );
 
-    // Create MoreFields from available data  
+    // Create MoreFields from available data
     final moreFields = MoreFields(
       partNumber: specs['part_number']?.toString() ?? '',
       transmissionType: specs['transmission_type']?.toString() ?? 'Unknown',
       mileage: specs['mileage']?.toString() ?? getMileage(),
-      fuelType: specs['fuel_type']?.toString() ?? 'Unknown',  
+      fuelType: specs['fuel_type']?.toString() ?? 'Unknown',
       bodyType: specs['body_type']?.toString() ?? 'Unknown',
     );
 
@@ -303,26 +311,26 @@ class ProductRequestItem {
     final totalDuration = Duration(hours: getUrgencyDurationInHours());
     final deadline = createdAt.add(totalDuration);
     final now = DateTime.now();
-    
+
     if (deadline.isBefore(now)) {
       return Duration.zero; // Expired
     }
-    
+
     return deadline.difference(now);
   }
 
   // Get countdown display string
   String getCountdownDisplay() {
     final remaining = getRemainingTime();
-    
+
     if (remaining == Duration.zero) {
       return "Expired";
     }
-    
+
     final days = remaining.inDays;
     final hours = remaining.inHours % 24;
     final minutes = remaining.inMinutes % 60;
-    
+
     if (days > 0) {
       return "${days}d ${hours}h ${minutes}m";
     } else if (hours > 0) {
@@ -336,11 +344,11 @@ class ProductRequestItem {
   double getCountdownPercentage() {
     final totalDuration = Duration(hours: getUrgencyDurationInHours());
     final remaining = getRemainingTime();
-    
+
     if (remaining == Duration.zero) {
       return 0.0; // Expired
     }
-    
+
     return remaining.inMilliseconds / totalDuration.inMilliseconds;
   }
 
@@ -389,7 +397,8 @@ class ProductRequestItem {
 
   String getInstallationRequired() {
     if (productSpecifications != null) {
-      final value = productSpecifications!['installation_required']?.toString() ?? 'NO';
+      final value =
+          productSpecifications!['installation_required']?.toString() ?? 'NO';
       return value == 'YES' ? 'Yes' : 'No';
     }
     return 'No';
@@ -397,7 +406,8 @@ class ProductRequestItem {
 
   String getWarrantyRequired() {
     if (productSpecifications != null) {
-      final value = productSpecifications!['warranty_required']?.toString() ?? 'NO';
+      final value =
+          productSpecifications!['warranty_required']?.toString() ?? 'NO';
       return value == 'YES' ? 'Yes' : 'No';
     }
     return 'No';
@@ -412,7 +422,9 @@ class ProductRequestItem {
 
   String getEnergyEfficiencyRequired() {
     if (productSpecifications != null) {
-      final value = productSpecifications!['energy_efficiency_required']?.toString() ?? 'NO';
+      final value =
+          productSpecifications!['energy_efficiency_required']?.toString() ??
+          'NO';
       return value == 'YES' ? 'Yes' : 'No';
     }
     return 'No';
@@ -458,6 +470,7 @@ class ApiUser {
 class QuoteItem {
   final String quoteId;
   final ApiUser sellerId;
+  final String sellerNotes;
   final double totalAmount;
   final String currency;
   final double? deliveryCost;
@@ -473,6 +486,7 @@ class QuoteItem {
   QuoteItem({
     required this.quoteId,
     required this.sellerId,
+    required this.sellerNotes,
     required this.totalAmount,
     required this.currency,
     this.deliveryCost,
@@ -492,11 +506,12 @@ class QuoteItem {
       sellerId: ApiUser.fromJson(json['seller_id']),
       totalAmount: double.tryParse(json['total_amount'].toString()) ?? 0.0,
       currency: json['currency'] ?? 'ZAR',
-      deliveryCost: json['delivery_cost'] != null 
-          ? double.tryParse(json['delivery_cost'].toString()) 
+      sellerNotes: json['seller_notes'] ?? '',
+      deliveryCost: json['delivery_cost'] != null
+          ? double.tryParse(json['delivery_cost'].toString())
           : null,
-      installationCost: json['installation_cost'] != null 
-          ? double.tryParse(json['installation_cost'].toString()) 
+      installationCost: json['installation_cost'] != null
+          ? double.tryParse(json['installation_cost'].toString())
           : null,
       estimatedDeliveryDays: json['estimated_delivery_days'],
       status: json['status'] ?? 'PENDING',

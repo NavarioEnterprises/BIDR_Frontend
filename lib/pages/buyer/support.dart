@@ -2632,10 +2632,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
                       topRight: Radius.circular(20),
                     ),
                     border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey.shade200,
-                        width: 1,
-                      ),
+                      bottom: BorderSide(color: Colors.grey.shade200, width: 1),
                     ),
                   ),
                   child: Row(
@@ -2727,10 +2724,7 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
                       topRight: Radius.circular(20),
                     ),
                     border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey.shade200,
-                        width: 1,
-                      ),
+                      bottom: BorderSide(color: Colors.grey.shade200, width: 1),
                     ),
                   ),
                   child: Row(
@@ -2965,10 +2959,10 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
       onTap: () {
         // Close the overlay first
         _removeOverlay();
-        
+
         // Show single notification dialog
         _showSingleNotification(notification);
-        
+
         // Mark as read if it's unread
         if (!notification.read) {
           _markNotificationAsRead(notification.id);
@@ -3115,44 +3109,44 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
 
               showBadge: _unreadCount > 0,
               ignorePointer: true,
-            badgeContent: Text(
-              _unreadCount.toString(),
-              style: TextStyle(
-                fontSize: 10,
-                color: Constants.ftaColorLight,
-                fontWeight: FontWeight.bold,
+              badgeContent: Text(
+                _unreadCount.toString(),
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Constants.ftaColorLight,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              badgeAnimation: badges.BadgeAnimation.rotation(
+                animationDuration: const Duration(seconds: 1),
+                colorChangeAnimationDuration: const Duration(seconds: 1),
+                loopAnimation: false,
+                curve: Curves.fastOutSlowIn,
+                colorChangeAnimationCurve: Curves.easeInCubic,
+              ),
+              badgeStyle: badges.BadgeStyle(
+                shape: badges.BadgeShape.circle,
+                badgeColor: Colors.white,
+                padding: const EdgeInsets.all(5),
+                borderRadius: BorderRadius.circular(10),
+                elevation: 3,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Constants.ftaColorLight,
+                ),
+                child: Icon(
+                  HugeIcons.strokeRoundedNotification01,
+                  size: 18,
+                  color: Colors.white,
+                ),
               ),
             ),
-            badgeAnimation: badges.BadgeAnimation.rotation(
-              animationDuration: const Duration(seconds: 1),
-              colorChangeAnimationDuration: const Duration(seconds: 1),
-              loopAnimation: false,
-              curve: Curves.fastOutSlowIn,
-              colorChangeAnimationCurve: Curves.easeInCubic,
-            ),
-            badgeStyle: badges.BadgeStyle(
-              shape: badges.BadgeShape.circle,
-              badgeColor: Colors.white,
-              padding: const EdgeInsets.all(5),
-              borderRadius: BorderRadius.circular(10),
-              elevation: 3,
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Constants.ftaColorLight,
-              ),
-              child: Icon(
-                HugeIcons.strokeRoundedNotification01,
-                size: 18,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
     );
   }
 }

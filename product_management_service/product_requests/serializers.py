@@ -118,7 +118,7 @@ class QuoteListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quote
         fields = [
-            'quote_id', 'seller_id', 'total_amount', 'currency',
+            'quote_id', 'seller_id', 'seller_notes', 'total_amount', 'currency',
             'delivery_cost', 'installation_cost', 'estimated_delivery_days',
             'status', 'valid_until', 'is_expired', 'is_valid',
             'created_at', 'updated_at'

@@ -4023,22 +4023,21 @@ class _TransactionDashboardState extends State<TransactionDashboard>
         Uri.parse(
           '${AppConfig.productsServiceUrl}api/v1/product-requests/orders/?order_number=${order.orderNumber}',
         ),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
       );
-      
+
       if (findOrderResponse.statusCode != 200) {
         throw Exception('Failed to find order');
       }
-      
+
       final findOrderData = json.decode(findOrderResponse.body);
-      if (findOrderData['results'] == null || findOrderData['results'].isEmpty) {
+      if (findOrderData['results'] == null ||
+          findOrderData['results'].isEmpty) {
         throw Exception('Order not found');
       }
-      
+
       final String orderId = findOrderData['results'][0]['id'].toString();
-      
+
       // Now make API call to update order status using the correct endpoint
       final response = await http.post(
         Uri.parse(
@@ -4049,7 +4048,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
           // Add authentication headers if needed
         },
         body: json.encode({
-          'status': 'REFUNDED',
+          'status': 'REFUND_REQUESTED',
           'user_id': Constants.myUid,
           'return_reason': _selectedReturnReason,
           'return_description': _returnDescriptionController.text,
@@ -4075,7 +4074,7 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                 requestId: order.requestId,
                 vehicle: order.vehicle,
                 orderNumber: order.orderNumber,
-                status: 'REFUNDED',
+                status: 'REFUND_REQUESTED',
                 dateTime: order.dateTime,
                 price: order.price,
                 rating: order.rating,
@@ -4505,10 +4504,13 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                             decoration: BoxDecoration(
                               color:
                                   order.status.toLowerCase() ==
-                                      "Refunded".toLowerCase()
+                                      "refunded"
                                   ? Color(0XFF0045BD)
                                   : order.status.toLowerCase() ==
-                                        "Cancelled".toLowerCase()
+                                        "refund_requested"
+                                  ? Colors.orange.shade600
+                                  : order.status.toLowerCase() ==
+                                        "cancelled"
                                   ? Color(0XFFD62828)
                                   : Constants.ctaColorLight.withOpacity(0.25),
                               borderRadius: BorderRadius.circular(8),
@@ -4520,7 +4522,9 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                                 fontWeight: FontWeight.w500,
                                 color:
                                     order.status.toLowerCase() ==
-                                        "Refunded".toLowerCase()
+                                            "refunded" ||
+                                        order.status.toLowerCase() ==
+                                            "refund_requested"
                                     ? Colors.white
                                     : Constants.ftaColorLight,
                               ),
@@ -4985,35 +4989,74 @@ class _TransactionDashboardState extends State<TransactionDashboard>
                     ),
                   ),
                 ] else if (order.status.toLowerCase() ==
-                    "Refunded".toLowerCase()) ...[
-                  // Show rating for refunded orders
+                        "refunded" ||
+                    order.status.toLowerCase() == "refund_requested") ...[
+                  // Show rating for refunded/refund requested orders
                   Padding(
                     padding: const EdgeInsets.only(left: 16, right: 16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.start,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.star,
-                          color: Constants.ctaColorLight,
-                          size: 16,
-                        ),
-                        Text(
-                          "${_getAverageRating().toStringAsFixed(1)}",
-                          style: GoogleFonts.manrope(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Constants.ftaColorLight,
+                        if (order.status.toLowerCase() == "refund_requested")
+                          Container(
+                            margin: EdgeInsets.only(bottom: 12),
+                            padding: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: Colors.orange.shade200,
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time,
+                                  color: Colors.orange.shade700,
+                                  size: 20,
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    "Refund request is being reviewed. We'll update you within 24-48 hours.",
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.orange.shade700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 12),
-                        Text(
-                          "$totalReviews Reviews",
-                          style: GoogleFonts.manrope(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w300,
-                            color: Colors.black54,
-                          ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.star,
+                              color: Constants.ctaColorLight,
+                              size: 16,
+                            ),
+                            Text(
+                              "${_getAverageRating().toStringAsFixed(1)}",
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Constants.ftaColorLight,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Text(
+                              "$totalReviews Reviews",
+                              style: GoogleFonts.manrope(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

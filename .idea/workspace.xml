@@ -5,21 +5,494 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9fd3c5ee-decf-4fcb-8b4d-97c16d2d0217" name="Changes" comment="feat: enhance notification system with improved loading, filtering, and user interaction">
-      <change beforePath="$PROJECT_DIR$/.idea/BIDR_Backend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BIDR_Backend.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/authentication/login.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/login.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/authentication/registration/business_signup.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/registration/business_signup.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/authentication/registration/business_signup_mobile.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/authentication/registration/business_signup_mobile.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/global_values.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/global_values.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/models/request_models.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/request_models.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/.env" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/API_DOCUMENTATION.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/API_DOCUMENTATION.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/API_TESTING_SUMMARY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/Dockerfile.amd64" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/Dockerfile.fixed" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/Dockerfile.minimal" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/Dockerfile.production" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/Dockerfile.simple" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/FINAL_TEST_RESULTS.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/IMPORT_README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/SECURITY_IMPLEMENTATION.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/SECURITY_INTEGRATION.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/TEST_DOCUMENTATION.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/TEST_RESULTS_SUMMARY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/admin/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/admin/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/admin/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/admin/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/admin/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/admin/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/admin/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/admin/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/admin/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/analytics/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/analytics/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/analytics/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/analytics/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/analytics/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/analytics/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/analytics/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/analytics/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/analytics/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/analytics/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/api_management/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/api_management/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/api_management/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/api_management/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/api_management/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/api_management/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/api_management/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/api_management/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/api_management/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/api_management/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/auth_logs/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/auth_logs/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/auth_logs/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/auth_logs/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/auth_logs/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/auth_logs/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/auth_logs/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/auth_logs/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/auth_logs/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/auth_logs/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/authentication_service/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/authentication_service/asgi.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/authentication_service/settings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/authentication_service/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/authentication_service/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/authentication_service/wsgi.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/azure-deployment-backup/DEPLOYMENT_SUMMARY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/azure-deployment-backup/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/azure-deployment-backup/auth-service-config.env" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/azure-deployment-backup/deploy-auth-service.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/azure-deployment-backup/deploy-with-config.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/azure-deployment-backup/manage-auth-service.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/azure-deployment/DEPLOYMENT_SUMMARY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/azure-deployment/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/azure-deployment/auth-service-config.env" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/azure-deployment/deploy-auth-service.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/azure-deployment/deploy-with-config.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/azure-deployment/manage-auth-service.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/buyer/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/buyer/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/buyer/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/buyer/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/buyer/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/buyer/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/buyer/serializer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/buyer/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/buyer/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/buyer/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/cookies.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/custom_admin/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/custom_admin/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/custom_admin/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/custom_admin/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/custom_admin/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/custom_admin/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/custom_admin/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/db.sqlite3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/import_helper.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/logs/authentication_service.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/manage.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/migrate_user_encryption.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/multi_channel_views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/services.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/otp/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/PERMISSIONS_USAGE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/decorators.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/management/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/management/commands/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/management/commands/seed_permissions.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/middleware.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/permissions/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/middleware.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/migrations/0002_apikey_is_hidden_apikey_last_updated_by_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/security/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/seller/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/services-requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/static/admin/custom.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/test_admin/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/test_admin/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/test_admin/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/test_admin/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/test_admin/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/test_admin/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/test_admin/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/backends.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/managers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/middleware.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/migrations/0002_appuser_alternative_email_appuser_alternative_phone_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/signals.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/test_security_features.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user_sessions/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user_sessions/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user_sessions/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user_sessions/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user_sessions/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user_sessions/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user_sessions/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user_sessions/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user_sessions/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentication_service/user_sessions/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backups/deployment-20250902_050423/reviews-deployment.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backups/deployment-20250902_054348/chat-deployment.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/.coverage" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/AUTHENTICATION_REMOVAL_SUMMARY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/BIDR_Chat_Service_API_Testing.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/CHAT_SERVICE_IMPLEMENTATION_SUMMARY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/CHAT_SERVICE_OVERVIEW.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/FLUTTER_TROUBLESHOOTING_GUIDE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/QUICK_START.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/TRANSLATION_AND_MODERATION_GUIDE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/activity_logs/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/activity_logs/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/activity_logs/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/activity_logs/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/activity_logs/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/activity_logs/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/activity_logs/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/api_tests.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/azure-deployment/chat-service-config.env" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/azure-deployment/deploy-chat-service.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/bidding_engine/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/bidding_engine/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/bidding_engine/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/bidding_engine/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/bidding_engine/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/bidding_engine/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/bidding_engine/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/migrations/0002_conversation_is_active_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/migrations/0003_conversation_request_id_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/migrations/0004_allow_null_buyer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_conversations/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_core/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_core/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_core/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_core/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_core/migrations/0002_auditlog_is_active_contentfilterrule_is_active_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_core/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_core/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_core/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_core/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_core/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_core/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/migrations/0002_message_is_active_messageattachment_is_active_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/migrations/0003_allow_null_sender.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/migrations/0004_message_sender_name_message_sender_role.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/serializers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/test_models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_messaging/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_moderation/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_moderation/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_moderation/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_moderation/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_moderation/migrations/0002_automoderationsettings_is_active_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_moderation/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_moderation/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_moderation/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_moderation/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_notifications/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_notifications/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_notifications/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_notifications/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_notifications/migrations/0002_notification_is_active_notificationbatch_is_active_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_notifications/migrations/0003_rename_notifications_service_notificationbatch_notifications.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_notifications/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_notifications/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_notifications/test_models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_notifications/test_models_simple.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_notifications/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_notifications/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/asgi.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/comprehensive_settings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/consumers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/routing.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/settings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/settings.py.bak" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/settings_basic.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/settings_production.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/settings_simple.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/chat_service/wsgi.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/credentials.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/db.sqlite3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/dispute_handler/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/dispute_handler/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/dispute_handler/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/dispute_handler/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/dispute_handler/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/dispute_handler/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/dispute_handler/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/file_handler/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/file_handler/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/file_handler/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/file_handler/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/file_handler/migrations/0002_filebackup_is_active_fileprocessingjob_is_active_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/file_handler/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/file_handler/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/file_handler/test_models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/file_handler/test_models_simple.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/file_handler/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/file_handler/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/integration_test.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/logs/chat_activity.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/logs/chat_service.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/logs/moderation.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/manage.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/chat_attachments/2025/08/10/test.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/chat_attachments/2025/08/10/test_8VKx4lr.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/chat_attachments/2025/08/10/test_eczYvTG.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/chat_attachments/2025/08/10/test_jSKyDeY.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/chat_attachments/2025/08/10/test_mbXT7FK.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/chat_attachments/2025/08/10/test_rpT9egv.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/uploads/2025/08/10/image.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/uploads/2025/08/10/important_file.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/uploads/2025/08/10/processing_file.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/uploads/2025/08/10/shared_file.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/uploads/2025/08/10/test.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/uploads/2025/08/10/test_document.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/media/uploads/2025/08/10/versioned_file.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/privacy_guard/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/privacy_guard/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/privacy_guard/apps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/privacy_guard/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/privacy_guard/migrations/0002_datadeletionrequest_is_active_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/privacy_guard/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/privacy_guard/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/privacy_guard/test_basic.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/privacy_guard/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/privacy_guard/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/server.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/services-requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_service/services/translation_service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/auth-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/deploy_all_services.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/admin-nodeports.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/all-services.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/auth-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/auth-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/chat-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/configmap.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/ingress.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/kustomization.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/load-balancer.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/namespace-and-serviceaccount.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/namespace-rbac.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/namespace.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/network-policy.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/nginx-proxy.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/notifications-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/payment-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/postgres.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/product-management-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/resolution-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/reviews-app-configmap.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/reviews-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/secret.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/base/transactions-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/bidr-app.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/chat-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/configmap.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/dev-services.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/enhanced-nginx-config-uat.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/hpa.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/ingress.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/init-job.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/kustomization.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/namespace-and-serviceaccount.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/namespace-rbac.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/namespace.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/network-policy.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/nginx-loadbalancer.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/nginx-proxy-config-fixed.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/nginx-proxy.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/notifications-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/development/configmap-patch.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/development/kustomization.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/production/configmap-patch.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/production/deployment-patch.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/production/kustomization.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/auth-migration-job.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/auth-service-fixed.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/auth-service-postgres-patch.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/auth-service-proper.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/auth-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/chat-postgres-patch.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/chat-service-real.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/chat-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/configmap-patch.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/configmap.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/database-secrets.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/grafana-external.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/grafana.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/kustomization.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/load-balancer-patch.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/monitoring-external.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/namespace-and-serviceaccount.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/namespace-rbac.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/nginx-proxy-loadbalancer.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/nginx-proxy-patch.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/nginx-proxy.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/notifications-postgres-patch.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/notifications-service-real.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/notifications-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/payment-postgres-patch.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/payment-service-real.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/payment-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/postgres.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/product-django-real.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/product-management-service-clean.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/product-management-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/product-service-simple.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/product-service-working.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/prometheus-auth.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/prometheus-external.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/prometheus.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/resolution-postgres-patch.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/resolution-service-real.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/resolution-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/reviews-postgres-patch.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/reviews-service-real.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/reviews-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/secret.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/overlays/uat/transactions-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/payment-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/postgres.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/product-management-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/resolution-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/reviews-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/secret-keyvault.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/secret.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/secrets-template.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/secrets.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/transactions-service.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/product_request_api.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/product_request_api.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/pages/buyer/account_management.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer/account_management.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/pages/buyer/support.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer/support.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/pages/buyer/transaction_management.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer/transaction_management.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/pages/buyer_dashboard.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer_dashboard.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/pages/buyer_home.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/buyer_home.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/auth_api_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/auth_api_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/pages/seller/seller_home_dashboard.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pages/seller/seller_home_dashboard.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/services/products_management_api_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/products_management_api_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/load_tests/advanced_load_test.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/load_tests/curl_load_test.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/load_tests/python_load_test.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_integration_security_test.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_all_endpoints.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_api.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_api_endpoints.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_application_logs.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_category_specifications.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_choices.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_dispute.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_escrow_api.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_escrow_categories.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_logging_middleware.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_model_choices.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_payment_transaction.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_payment_transaction_api.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_product_request.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_product_return.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manual_tests/manual_test_security.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring/dashboards/bidr-advanced-metrics.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring/dashboards/bidr-infrastructure.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring/dashboards/bidr-prometheus-queries.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring/dashboards/bidr-services-overview.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring/grafana-dashboards.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring/grafana-datasources.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring/prometheus.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nginx/DJANGO_URL_PREFIX_SUMMARY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nginx/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nginx/apply-django-url-prefixes.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nginx/backup-nginx-config.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nginx/backups/deployments-20250902_042225/product-deployment.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nginx/backups/deployments-20250902_042225/reviews-deployment.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nginx/nginx-k8s.conf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nginx/nginx.conf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nginx/update-nginx-config.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/product_management_service/product_requests/serializers.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +533,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Django Server.Unnamed.executor": "Run",
-    "Flutter.main.dart.executor": "Debug",
+    "Flutter.main.dart.executor": "Run",
     "Python.settings.executor": "Run",
     "Python.urls.executor": "Run",
     "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
@@ -331,7 +804,23 @@
       <option name="project" value="LOCAL" />
       <updated>1757676985874</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="feat: enhance notification system with improved loading, filtering, and user interaction">
+      <option name="closed" value="true" />
+      <created>1757737025834</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1757737025835</updated>
+    </task>
+    <task id="LOCAL-00020" summary="feat: enhance notification system with improved loading, filtering, and user interaction">
+      <option name="closed" value="true" />
+      <created>1757738234588</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1757738234589</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -367,11 +856,6 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/pages/buyer/account_management.dart</url>
-          <line>222</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/lib/pages/buyer_home.dart</url>
           <line>7372</line>
           <option name="timeStamp" value="3" />
@@ -380,41 +864,6 @@
           <url>file://$PROJECT_DIR$/lib/pages/buyer_home.dart</url>
           <line>4419</line>
           <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/pages/buyer_dashboard.dart</url>
-          <line>286</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/pages/buyer_dashboard.dart</url>
-          <line>4924</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/pages/buyer_dashboard.dart</url>
-          <line>5667</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/pages/buyer_dashboard.dart</url>
-          <line>4872</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/pages/buyer_dashboard.dart</url>
-          <line>4887</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/pages/buyer_dashboard.dart</url>
-          <line>5655</line>
-          <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="Dart">
-          <url>file://$PROJECT_DIR$/lib/pages/buyer_dashboard.dart</url>
-          <line>5620</line>
-          <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
