@@ -4040,7 +4040,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     // Extract location information from specifications
     final locationInfo = specs['location_info'] as Map<String, dynamic>? ?? {};
     final locationAddress = locationInfo['address']?.toString() ?? 'Unknown';
-    
+
     // Extract and build full image URLs
     final productImageUrls = (item.productImages ?? [])
         .map((imagePath) => _buildFullImageUrl(imagePath))
@@ -4073,9 +4073,10 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     // Build VIN image URL if available
     final vinImageUrl = item.vinPhotoUrl != null && item.vinPhotoUrl!.isNotEmpty
         ? _buildFullImageUrl(item.vinPhotoUrl!)
-        : (specs['vin_photo'] != null && specs['vin_photo'].toString().isNotEmpty
-            ? _buildFullImageUrl(specs['vin_photo'].toString())
-            : null);
+        : (specs['vin_photo'] != null &&
+                  specs['vin_photo'].toString().isNotEmpty
+              ? _buildFullImageUrl(specs['vin_photo'].toString())
+              : null);
 
     return AutoSparesRequest(
       id: item.requestId, // Keep as string UUID
@@ -4897,14 +4898,16 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
     try {
       final specs = _getProductSpecifications();
       if (specs != null && specs['part_number'] != null) {
-        final partNumber = specs['part_number'].toString();
-        return partNumber.isEmpty ? "Not specified" : partNumber;
+        final partNumber = specs['part_number'].toString().trim();
+        if (partNumber.isEmpty) return "-";
+        // Capitalize first letter
+        return partNumber.substring(0, 1).toUpperCase() + partNumber.substring(1);
       }
 
-      return "Not specified";
+      return "-";
     } catch (e) {
       print('Error getting part number: $e');
-      return "Not specified";
+      return "-";
     }
   }
 
@@ -4913,20 +4916,24 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
     try {
       final specs = _getProductSpecifications();
       if (specs != null && specs['transmission_type'] != null) {
-        final transmissionType = specs['transmission_type'].toString();
-        return transmissionType.isEmpty ? "Not specified" : transmissionType;
+        final transmissionType = specs['transmission_type'].toString().trim();
+        if (transmissionType.isEmpty) return "-";
+        // Capitalize first letter
+        return transmissionType.substring(0, 1).toUpperCase() + transmissionType.substring(1);
       }
 
       // Check if there's a vehicle_type field that might indicate transmission
       if (specs != null && specs['vehicle_type'] != null) {
-        final vehicleType = specs['vehicle_type'].toString();
-        return "Vehicle Type: $vehicleType";
+        final vehicleType = specs['vehicle_type'].toString().trim();
+        if (vehicleType.isEmpty) return "-";
+        // Capitalize first letter
+        return vehicleType.substring(0, 1).toUpperCase() + vehicleType.substring(1);
       }
 
-      return "Not specified";
+      return "-";
     } catch (e) {
       print('Error getting transmission type: $e');
-      return "Not specified";
+      return "-";
     }
   }
 
@@ -4935,22 +4942,15 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
     try {
       final specs = _getProductSpecifications();
       if (specs != null && specs['mileage'] != null) {
-        final mileage = specs['mileage'].toString();
-        return mileage.isEmpty || mileage == "0"
-            ? "Not specified2"
-            : "$mileage km";
+        final mileage = specs['mileage'].toString().trim();
+        if (mileage.isEmpty || mileage == "0") return "-";
+        return "$mileage km";
       }
 
-      // If mileage is not available, show vehicle year as an alternative
-      if (specs != null && specs['vehicle_year'] != null) {
-        final year = specs['vehicle_year'].toString();
-        return "Year: $year";
-      }
-
-      return "Not specified";
+      return "-";
     } catch (e) {
       print('Error getting mileage: $e');
-      return "Not specified";
+      return "-";
     }
   }
 
@@ -4959,20 +4959,16 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
     try {
       final specs = _getProductSpecifications();
       if (specs != null && specs['fuel_type'] != null) {
-        final fuelType = specs['fuel_type'].toString();
-        return fuelType.isEmpty ? "Not specified" : fuelType;
+        final fuelType = specs['fuel_type'].toString().trim();
+        if (fuelType.isEmpty) return "-";
+        // Capitalize first letter
+        return fuelType.substring(0, 1).toUpperCase() + fuelType.substring(1);
       }
 
-      // If fuel type is not available, show vehicle make as an alternative
-      if (specs != null && specs['vehicle_make'] != null) {
-        final make = specs['vehicle_make'].toString();
-        return "Make: $make";
-      }
-
-      return "Not specified";
+      return "-";
     } catch (e) {
       print('Error getting fuel type: $e');
-      return "Not specified";
+      return "-";
     }
   }
 
@@ -4981,20 +4977,16 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
     try {
       final specs = _getProductSpecifications();
       if (specs != null && specs['body_type'] != null) {
-        final bodyType = specs['body_type'].toString();
-        return bodyType.isEmpty ? "Not specified" : bodyType;
+        final bodyType = specs['body_type'].toString().trim();
+        if (bodyType.isEmpty) return "-";
+        // Capitalize first letter
+        return bodyType.substring(0, 1).toUpperCase() + bodyType.substring(1);
       }
 
-      // If body type is not available, show vehicle model as an alternative
-      if (specs != null && specs['vehicle_model'] != null) {
-        final model = specs['vehicle_model'].toString();
-        return "Model: $model";
-      }
-
-      return "Not specified";
+      return "-";
     } catch (e) {
       print('Error getting body type: $e');
-      return "Not specified";
+      return "-";
     }
   }
 
@@ -5003,14 +4995,16 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
     try {
       final specs = _getProductSpecifications();
       if (specs != null && specs['engine_size'] != null) {
-        final engineSize = specs['engine_size'].toString();
-        return engineSize.isEmpty ? "Not specified" : engineSize;
+        final engineSize = specs['engine_size'].toString().trim();
+        if (engineSize.isEmpty) return "-";
+        // Capitalize first letter
+        return engineSize.substring(0, 1).toUpperCase() + engineSize.substring(1);
       }
 
-      return "Not specified";
+      return "-";
     } catch (e) {
       print('Error getting engine size: $e');
-      return "Not specified";
+      return "-";
     }
   }
 
@@ -5030,14 +5024,15 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
           case 'TRUCK':
             return 'Truck';
           default:
-            return vehicleType.isEmpty ? "Not specified" : vehicleType;
+            if (vehicleType.isEmpty) return "-";
+            return vehicleType.substring(0, 1).toUpperCase() + vehicleType.substring(1);
         }
       }
 
-      return "Not specified";
+      return "-";
     } catch (e) {
       print('Error getting vehicle type: $e');
-      return "Not specified";
+      return "-";
     }
   }
 
@@ -5075,25 +5070,13 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
     try {
       // Check if request is ProductRequestItem and has vinPhotoUrl
       if (widget.request != null &&
-          widget.request.runtimeType.toString().contains(
-            'ProductRequestItem',
-          )) {
-        final productRequest = widget.request as dynamic;
+          widget.request.runtimeType.toString().contains('AutoSparesRequest')) {
+        AutoSparesRequest productRequest = widget.request;
 
         // First try vinPhotoUrl field
-        if (productRequest.vinPhotoUrl != null &&
-            productRequest.vinPhotoUrl.isNotEmpty) {
-          return productRequest.vinPhotoUrl;
-        }
-
-        // Then try vin_photo from product_specifications
-        if (productRequest.productSpecifications != null) {
-          final specs =
-              productRequest.productSpecifications as Map<String, dynamic>;
-          final vinPhoto = specs['vin_photo_url'];
-          if (vinPhoto != null && vinPhoto.toString().isNotEmpty) {
-            return vinPhoto.toString();
-          }
+        if (productRequest.vinImageUrl != null &&
+            productRequest.vinImageUrl!.isNotEmpty) {
+          return productRequest.vinImageUrl;
         }
       }
 
@@ -5675,7 +5658,7 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                     _getTransmissionType(), // Use helper method
                                   ),
                                   _buildDetailItem(
-                                    "Mileage of Vehicle1",
+                                    "Mileage of Vehicle",
                                     _getMileage(), // Use helper method
                                   ),
                                   _buildDetailItem(
@@ -5688,9 +5671,11 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                   ),
                                   _buildDetailItem(
                                     "Enquiry Time",
-                                    _getUrgencyDisplayName(
-                                      widget.request,
-                                    ), // Use helper for urgency
+
+                                    _formatDateAndTime(
+                                      widget.request.createdAt,
+                                    ),
+                                    // Use helper for urgency
                                   ),
                                 ],
                               ),
@@ -5758,6 +5743,20 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
   String _formatDate(DateTime? date) {
     if (date == null) return "Date unavailable";
     return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+  }
+
+  String _formatDateAndTime(DateTime? date) {
+    if (date == null) return "Date unavailable";
+
+    // Format date as DD/MM/YYYY
+    String formattedDate =
+        "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+
+    // Format time as HH:MM
+    String formattedTime =
+        "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
+
+    return "$formattedDate at $formattedTime";
   }
 
   Widget _buildDetailCard(
