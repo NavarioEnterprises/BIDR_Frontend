@@ -1,8 +1,0 @@
-Access Method,Service,URL,Status,Credentials,Notes
-Direct Azure IP,All Services,http://108.141.192.60/,Working,Various (see other CSVs),Direct access to load balancer
-Combined LoadBalancer,Grafana,http://48.222.241.55:3000/,Working,admin:BidrMonitor123!,Enhanced security + BIDR-specific Prometheus datasource
-Combined LoadBalancer,Prometheus,http://48.222.241.55:4000/,Working,admin:PrometheusMonitor123!,Basic auth enabled + BIDR services monitoring
-Port Forward,Grafana,kubectl port-forward -n bidr-uat service/grafana-service 3000:3000,Available,admin:bidr-admin123,Alternative direct pod access
-Port Forward,Prometheus,kubectl port-forward -n bidr-uat service/prometheus-service 9090:9090,Available,No auth required,Alternative direct pod access
-Kubernetes Service,Grafana,grafana-service.bidr-uat.svc.cluster.local:3000,Internal Only,admin:bidr-admin123,Internal cluster access
-Kubernetes Service,Prometheus,prometheus-service.bidr-uat.svc.cluster.local:9090,Internal Only,No auth required,Internal cluster access

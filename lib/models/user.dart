@@ -8,7 +8,7 @@ class User {
   final String lastName;
   final String fullName;
   final String phoneNumber;
-  final String role;
+  String role;
   final String? profilePicture;
   final bool emailVerified;
   final bool phoneVerified;
@@ -56,7 +56,8 @@ class User {
       isActive: json['is_active'] ?? true,
       isVerified: json['is_verified'] ?? false,
       primaryAddress: json['primary_address'],
-      profileCompletionPercentage: (json['profile_completion_percentage'] ?? 0.0).toDouble(),
+      profileCompletionPercentage:
+          (json['profile_completion_percentage'] ?? 0.0).toDouble(),
       createdAt: DateTime.parse(json['created_at']),
     );
   }

@@ -8,6 +8,12 @@ enum SortOption {
   highToLow,
   lowToHigh,
   rating,
+  // Seller filter options
+  allRequests,
+  newRequests,
+  myBids,
+  paidBids,
+  completedBids,
 }
 
 class SortDropdownMenu extends StatefulWidget {
@@ -385,7 +391,7 @@ class _SellerSortDropdownMenuState extends State<SellerSortDropdownMenu> {
           ),
           // The actual dropdown
           Positioned(
-            left: offset.dx + size.width + 8,
+            left: offset.dx + size.width + 8 - 230,
             top: offset.dy + size.height + 8,
             width: 200,
             child: Material(

@@ -135,6 +135,7 @@ class CustomDialogs {
   static void showErrorDialog(
     BuildContext context,
     String message, {
+    String? heading,
     VoidCallback? onRetry,
   }) {
     showGeneralDialog(
@@ -218,7 +219,7 @@ class CustomDialogs {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          'Oops!',
+                          heading ?? 'Error',
                           style: GoogleFonts.manrope(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -447,6 +448,165 @@ class CustomDialogs {
     );
   }
 
+  static void showRoleSelectionDialog(
+    BuildContext context,
+    List<String> roles, {
+    required Function(String) onRoleSelected,
+  }) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: 'Role Selection Dialog',
+      barrierColor: Colors.black.withOpacity(0.5),
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 40),
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Material(
+              color: Colors.transparent,
+              child: SlideTransition(
+                position:
+                    Tween<Offset>(
+                      begin: const Offset(0, -0.3),
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOutBack,
+                      ),
+                    ),
+                child: ScaleTransition(
+                  scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                    CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOutBack,
+                    ),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Constants.ctaColorLight.withOpacity(0.2),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TweenAnimationBuilder<double>(
+                          duration: const Duration(milliseconds: 600),
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          curve: Curves.elasticOut,
+                          builder: (context, value, child) {
+                            return Transform.scale(
+                              scale: value,
+                              child: Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Constants.ctaColorLight,
+                                      Constants.ctaColorLight.withOpacity(0.8),
+                                    ],
+                                  ),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.person_outline,
+                                  color: Colors.white,
+                                  size: 45,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Select Your Role',
+                          style: GoogleFonts.manrope(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'You have access to multiple roles. Please select how you would like to proceed:',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.manrope(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        ...roles.map(
+                          (role) => Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(bottom: 12),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                onRoleSelected(role.trim());
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Constants.ctaColorLight,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    role.trim() == 'buyer' 
+                                        ? Icons.shopping_cart_outlined 
+                                        : Icons.store_outlined,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    role.trim() == 'buyer'
+                                        ? 'Continue as Buyer'
+                                        : 'Continue as Seller',
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+    );
+  }
+
   static void showWarningDialog(
     BuildContext context,
     String message, {
@@ -612,5 +772,138 @@ class CustomDialogs {
         return FadeTransition(opacity: animation, child: child);
       },
     );
+  }
+}
+
+/// Utility class for normalizing error messages from the backend
+class ErrorMessageUtils {
+  /// Normalizes backend error messages to user-friendly messages
+  static String normalizeErrorMessage(String backendMessage) {
+    final message = backendMessage.toLowerCase().trim();
+    
+    // Login errors
+    if (message.contains('invalid credentials') || 
+        message.contains('invalid email or password') ||
+        message.contains('authentication failed') ||
+        message.contains('incorrect') ||
+        message.contains('email or password')) {
+      return 'The email or password you entered is incorrect. Please check your credentials and try again.';
+    }
+    
+    if (message.contains('user does not exist') || 
+        message.contains('user not found') ||
+        message.contains('no account found')) {
+      return 'No account found with this email address. Please check your email or create a new account.';
+    }
+    
+    if (message.contains('account not verified') ||
+        message.contains('email not verified') ||
+        message.contains('verification required') ||
+        message.contains('verify your email') ||
+        message.contains('verification code')) {
+      return 'Your account has not been verified yet. Please check your email for the verification code and complete the verification process.';
+    }
+    
+    if (message.contains('account locked') || 
+        message.contains('account disabled') ||
+        message.contains('temporarily disabled') ||
+        message.contains('user account is disabled')) {
+      return 'Your account has been temporarily disabled. Please contact support for assistance.';
+    }
+    
+    // Registration errors
+    if (message.contains('email already exists') || 
+        message.contains('user already exists')) {
+      return 'An account with this email address already exists. Please use a different email or try logging in.';
+    }
+    
+    if (message.contains('password too weak') || 
+        message.contains('password does not meet requirements')) {
+      return 'Your password does not meet the security requirements. Please choose a stronger password.';
+    }
+    
+    if (message.contains('invalid email format') || 
+        message.contains('invalid email')) {
+      return 'Please enter a valid email address.';
+    }
+    
+    // Network errors
+    if (message.contains('network error') || 
+        message.contains('connection failed') ||
+        message.contains('timeout')) {
+      return 'Unable to connect to our servers. Please check your internet connection and try again.';
+    }
+    
+    if (message.contains('server error') || 
+        message.contains('internal server error')) {
+      return 'We\'re experiencing technical difficulties. Please try again in a few moments.';
+    }
+    
+    // Default fallback - clean up the message
+    String cleanMessage = backendMessage
+        .replaceFirst(RegExp(r'^error:\s*', caseSensitive: false), '')
+        .replaceFirst(RegExp(r'^oops[!\.]*\s*', caseSensitive: false), '')
+        .trim();
+    
+    // Capitalize first letter
+    if (cleanMessage.isNotEmpty) {
+      cleanMessage = cleanMessage[0].toUpperCase() + cleanMessage.substring(1);
+    }
+    
+    // Ensure it ends with a period
+    if (cleanMessage.isNotEmpty && !cleanMessage.endsWith('.')) {
+      cleanMessage += '.';
+    }
+    
+    return cleanMessage.isNotEmpty ? cleanMessage : 'An unexpected error occurred. Please try again.';
+  }
+  
+  /// Gets appropriate heading for different types of errors
+  static String getErrorHeading(String backendMessage) {
+    final message = backendMessage.toLowerCase().trim();
+    
+    if (message.contains('login') || 
+        message.contains('invalid credentials') ||
+        message.contains('authentication failed') ||
+        message.contains('incorrect') ||
+        message.contains('email or password')) {
+      return 'Login Failed';
+    }
+    
+    if (message.contains('account not verified') ||
+        message.contains('email not verified') ||
+        message.contains('verification required') ||
+        message.contains('verify your email') ||
+        message.contains('verification code')) {
+      return 'Account Verification Required';
+    }
+    
+    if (message.contains('account disabled') ||
+        message.contains('account locked') ||
+        message.contains('temporarily disabled')) {
+      return 'Account Access Restricted';
+    }
+    
+    if (message.contains('registration') || 
+        message.contains('signup') ||
+        message.contains('already exists')) {
+      return 'Registration Failed';
+    }
+    
+    if (message.contains('verification') || 
+        message.contains('otp')) {
+      return 'Verification Failed';
+    }
+    
+    if (message.contains('network') || 
+        message.contains('connection')) {
+      return 'Connection Error';
+    }
+    
+    if (message.contains('server')) {
+      return 'Server Error';
+    }
+    
+    return 'Error';
   }
 }

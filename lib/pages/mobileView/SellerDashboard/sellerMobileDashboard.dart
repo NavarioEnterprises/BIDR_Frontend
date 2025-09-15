@@ -654,12 +654,16 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
         // Separate paid orders (earning history) and refunded orders (withdraw history)
         final List<dynamic> paid = ordersData.where((order) {
           final status = order['status']?.toString().toUpperCase() ?? '';
-          return status == 'PAID' || status == 'COMPLETED' || status == 'DELIVERED';
+          return status == 'PAID' ||
+              status == 'COMPLETED' ||
+              status == 'DELIVERED';
         }).toList();
 
         final List<dynamic> refunded = ordersData.where((order) {
           final status = order['status']?.toString().toUpperCase() ?? '';
-          return status == 'REFUNDED' || status == 'REFUND_REQUESTED' || status == 'RETURNED';
+          return status == 'REFUNDED' ||
+              status == 'REFUND_REQUESTED' ||
+              status == 'RETURNED';
         }).toList();
 
         setState(() {
@@ -668,10 +672,13 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
           isLoadingTransactions = false;
         });
 
-        print('Paid orders: ${paidOrders.length}, Refunded orders: ${refundedOrders.length}');
+        print(
+          'Paid orders: ${paidOrders.length}, Refunded orders: ${refundedOrders.length}',
+        );
       } else {
         setState(() {
-          transactionsError = 'Failed to load transaction history: ${response.statusCode}';
+          transactionsError =
+              'Failed to load transaction history: ${response.statusCode}';
           isLoadingTransactions = false;
         });
       }
@@ -680,6 +687,215 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
         transactionsError = 'Network error: ${e.toString()}';
         isLoadingTransactions = false;
       });
+    }
+  }
+
+  // Missing API methods from desktop version
+  Future<void> _loadEarningHistory({int page = 1}) async {
+    if (page == 1) {
+      setState(() {
+        isLoadingTransactions = true;
+        transactionsError = null;
+      });
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/?seller_id=${Constants.myUid}&status=PAID&page=$page',
+        ),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> newEarnings = data['results'] ?? [];
+
+        setState(() {
+          if (page == 1) {
+            paidOrders = newEarnings;
+          } else {
+            paidOrders.addAll(newEarnings);
+          }
+          isLoadingTransactions = false;
+        });
+
+        print('Loaded ${newEarnings.length} earning records (PAID orders)');
+      } else {
+        setState(() {
+          transactionsError =
+              'Failed to load earning history: ${response.statusCode}';
+          isLoadingTransactions = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        transactionsError = 'Network error: ${e.toString()}';
+        isLoadingTransactions = false;
+      });
+    }
+  }
+
+  Future<void> _loadWithdrawHistory({int page = 1}) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/?seller_id=${Constants.myUid}&status=REFUNDED&page=$page',
+        ),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> newWithdraws = data['results'] ?? [];
+
+        setState(() {
+          if (page == 1) {
+            refundedOrders = newWithdraws;
+          } else {
+            refundedOrders.addAll(newWithdraws);
+          }
+        });
+
+        print(
+          'Loaded ${newWithdraws.length} withdraw records (REFUNDED orders)',
+        );
+      }
+    } catch (e) {
+      print('Error loading withdraw history: $e');
+    }
+  }
+
+  // Order action methods
+  Future<void> _updateOrderStatus(
+    String orderId,
+    String status,
+    String notes,
+  ) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/orders/$orderId/update_status/',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({'status': status, 'notes': notes}),
+      );
+
+      if (response.statusCode == 200) {
+        print('Order status updated successfully');
+        // Refresh the relevant data
+        _fetchOrdersSummary();
+        _loadEarningHistory();
+      } else {
+        print('Failed to update order status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error updating order status: $e');
+    }
+  }
+
+  Future<void> _confirmDeliveryWithPin(String orderId, String pin) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+          '${GlobalVariables.productsServiceUrl}api/v1/product-requests/collection-codes/confirm/',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({'order_id': orderId, 'collection_code': pin}),
+      );
+
+      if (response.statusCode == 200) {
+        print('Delivery confirmed successfully');
+        // Refresh the relevant data
+        _fetchOrdersSummary();
+        _loadEarningHistory();
+      } else {
+        print('Failed to confirm delivery: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error confirming delivery: $e');
+    }
+  }
+
+  Future<void> _loadNotifications() async {
+    try {
+      final userUuid = Constants.myUid;
+      if (userUuid != null && userUuid.isNotEmpty) {
+        final fetchedNotifications = await _notificationApiService
+            .getUserNotifications(userUuid);
+        final unreadCount = await _notificationApiService
+            .getUnreadNotificationCount(userUuid);
+
+        setState(() {
+          notifications = fetchedNotifications;
+          // You can add unreadNotificationCount to your state variables
+          print(
+            'Loaded ${notifications.length} notifications, $unreadCount unread',
+          );
+        });
+      }
+    } catch (e) {
+      print('Error loading notifications: $e');
+    }
+  }
+
+  Future<void> _markNotificationAsRead(String notificationId) async {
+    try {
+      await _notificationApiService.markAsRead(notificationId);
+      // Update local state
+      setState(() {
+        notifications = notifications.map((notification) {
+          if (notification.id == notificationId) {
+            return notification.copyWith(read: true);
+          }
+          return notification;
+        }).toList();
+      });
+      print('Marked notification as read: $notificationId');
+    } catch (e) {
+      print('Error marking notification as read: $e');
+    }
+  }
+
+  Future<void> _markAllNotificationsAsRead() async {
+    try {
+      final userUuid = Constants.myUid;
+      if (userUuid != null && userUuid.isNotEmpty) {
+        await _notificationApiService.markAllAsRead(userUuid);
+        // Update local state
+        setState(() {
+          notifications = notifications
+              .map((notification) => notification.copyWith(read: true))
+              .toList();
+        });
+        print('Marked all notifications as read');
+      }
+    } catch (e) {
+      print('Error marking all notifications as read: $e');
+    }
+  }
+
+  Future<void> _getProductRequestDetails(String requestId) async {
+    try {
+      final details = await ApiService.getProductRequestDetails(requestId);
+      print('Product request details for $requestId: $details');
+    } catch (e) {
+      print('Error getting product request details: $e');
+    }
+  }
+
+  Future<void> _getQuotesForRequest(String requestId) async {
+    try {
+      final quotes = await ApiService.getQuotesForRequest(requestId);
+      print('Quotes for request $requestId: ${quotes.length}');
+    } catch (e) {
+      print('Error getting quotes for request: $e');
     }
   }
 
@@ -693,7 +909,7 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading:Padding(
+        leading: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Image.asset(
             "lib/assets/images/bidr_logo1.png",
@@ -701,54 +917,54 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
             width: 55,
           ),
         ),
-       actions: [
-         Stack(
-           children: [
-             IconButton(
-               icon: Icon(
-                 HugeIcons.strokeRoundedNotification01,
-                 color: Constants.ftaColorLight,
-               ),
-               onPressed: _showNotificationDialog,
-             ),
-             if (unreadCount > 0)
-               Positioned(
-                 right: 2,
-                 top: 2,
-                 child: Container(
-                   padding: const EdgeInsets.all(4),
-                   decoration: BoxDecoration(
-                     color: Constants.ctaColorLight,
-                     shape: BoxShape.circle,
-                   ),
-                   constraints: const BoxConstraints(
-                     minWidth: 16,
-                     minHeight: 16,
-                   ),
-                   child: Text(
-                     unreadCount.toString(),
-                     style: const TextStyle(
-                       color: Colors.white,
-                       fontSize: 9,
-                       fontWeight: FontWeight.bold,
-                     ),
-                     textAlign: TextAlign.center,
-                   ),
-                 ),
-               ),
-           ],
-         ),
-         SizedBox(width: 15),
-         SellerSortDropdownMenu(
-           initialValue: _currentSort,
-           onSortChanged: (option) {
-             setState(() {
-               _currentSort = option;
-             });
-             print('Sort changed to: $option');
-           },
-         ),
-       ],
+        actions: [
+          Stack(
+            children: [
+              IconButton(
+                icon: Icon(
+                  HugeIcons.strokeRoundedNotification01,
+                  color: Constants.ftaColorLight,
+                ),
+                onPressed: _showNotificationDialog,
+              ),
+              if (unreadCount > 0)
+                Positioned(
+                  right: 2,
+                  top: 2,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Constants.ctaColorLight,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      unreadCount.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(width: 15),
+          SellerSortDropdownMenu(
+            initialValue: _currentSort,
+            onSortChanged: (option) {
+              setState(() {
+                _currentSort = option;
+              });
+              print('Sort changed to: $option');
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -760,32 +976,22 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 OutlinedButton(
-
                   onPressed: () {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        pageBuilder:
-                            (
-                            context,
-                            animation,
-                            secondaryAnimation,
-                            ) => ProfileManagementMobile(),
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            ProfileManagementMobile(),
                         transitionsBuilder:
-                            (
-                            context,
-                            animation,
-                            secondaryAnimation,
-                            child,
-                            ) {
-                          return SlideTransition(
-                            position: Tween<Offset>(
-                              begin: Offset(1.0, 0.0),
-                              end: Offset.zero,
-                            ).animate(animation),
-                            child: child,
-                          );
-                        },
+                            (context, animation, secondaryAnimation, child) {
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: Offset(1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              );
+                            },
                       ),
                     );
                   },
@@ -803,7 +1009,6 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
                     ),
                   ),
                 ),
-
               ],
             ),
           ),
@@ -815,21 +1020,49 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"My BookKeeper" ,onTap: (){},backgroundColor: Constants.ctaColorLight,)),
-                SizedBox(width: 16,),
-                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"Support" ,onTap: (){},backgroundColor: Constants.ctaColorLight,))
+                Expanded(
+                  child: HelperWidget(
+                    icon: HugeIcons.strokeRoundedBook02,
+                    title: "My BookKeeper",
+                    onTap: () {},
+                    backgroundColor: Constants.ctaColorLight,
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: HelperWidget(
+                    icon: HugeIcons.strokeRoundedBook02,
+                    title: "Support",
+                    onTap: () {},
+                    backgroundColor: Constants.ctaColorLight,
+                  ),
+                ),
               ],
             ),
           ),
-          SizedBox(height: 16,),
+          SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"Refer a Friend/Business" ,onTap: (){},backgroundColor: Constants.ctaColorLight,)),
-                SizedBox(width: 16,),
-                Expanded(child: HelperWidget(icon:HugeIcons.strokeRoundedBook02 ,title:"Reviews & Rating Manager" ,onTap: (){},backgroundColor: Constants.ctaColorLight,))
+                Expanded(
+                  child: HelperWidget(
+                    icon: HugeIcons.strokeRoundedBook02,
+                    title: "Refer a Friend/Business",
+                    onTap: () {},
+                    backgroundColor: Constants.ctaColorLight,
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: HelperWidget(
+                    icon: HugeIcons.strokeRoundedBook02,
+                    title: "Reviews & Rating Manager",
+                    onTap: () {},
+                    backgroundColor: Constants.ctaColorLight,
+                  ),
+                ),
               ],
             ),
           ),
@@ -837,14 +1070,13 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
             child: SingleChildScrollView(
               child: Column(
                 children: [
-
                   Padding(
                     padding: const EdgeInsets.only(left: 16, right: 16),
                     child: buildLeadsRequestsWidget(),
                   ),
-                  if (tabActiveIndex == 0) ...[
-
-                  ] else if (tabActiveIndex == 1) ...[
+                  if (tabActiveIndex == 0)
+                    ...[]
+                  else if (tabActiveIndex == 1) ...[
                     Padding(
                       padding: const EdgeInsets.only(left: 64, right: 64),
                       child: Container(
@@ -980,64 +1212,6 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
         });
       }
     }
-  }
-
-  void _loadSampleNotifications() {
-    setState(() {
-      notifications = [
-        WebNotification(
-          id: '1',
-          title: 'Request Accept',
-          body: 'John Doe has accepted the concern. He help...',
-          description:
-              'John Doe has accepted the concern. He will help you with your request.',
-          type: 'accept',
-          read: false,
-          createdAt: DateTime.now(),
-        ),
-        WebNotification(
-          id: '2',
-          title: 'Bank Details Update Succesfully',
-          body: 'Lorem ipsum is a placeholder text commonly',
-          description:
-              'Lorem ipsum is a placeholder text commonly used in the printing industry.',
-          type: 'update',
-          read: false,
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        ),
-        WebNotification(
-          id: '3',
-          title: 'Your Profile Is Update Succesfully',
-          body: 'Lorem ipsum is a placeholder text commonly',
-          description:
-              'Lorem ipsum is a placeholder text commonly used in the printing industry.',
-          type: 'update',
-          read: true,
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        ),
-        WebNotification(
-          id: '4',
-          title: 'Seller Profile Update Succesfully',
-          body: 'Lorem ipsum is a placeholder text commonly',
-          description:
-              'Lorem ipsum is a placeholder text commonly used in the printing industry.',
-          type: 'update',
-          read: true,
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        ),
-        WebNotification(
-          id: '5',
-          title: 'New Order Received',
-          body: 'You have received a new order from customer',
-          description:
-              'You have received a new order from customer. Please check your dashboard.',
-          type: 'order',
-          read: false,
-          createdAt: DateTime.now().subtract(const Duration(days: 3)),
-        ),
-      ];
-      _isLoadingNotifications = false;
-    });
   }
 
   void _showNotificationDialog() {
@@ -1361,15 +1535,15 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
             ),
             Spacer(),
             OutlinedButton(
-                onPressed: (){
-
-                }, child:Text(
-              "view all",
-              style: GoogleFonts.manrope(
-                color: Colors.grey.shade400,
-                fontSize: 14,
+              onPressed: () {},
+              child: Text(
+                "view all",
+                style: GoogleFonts.manrope(
+                  color: Colors.grey.shade400,
+                  fontSize: 14,
+                ),
               ),
-            ))
+            ),
           ],
         ),
         SizedBox(height: 8),
@@ -1415,9 +1589,8 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // Left sidebar with tabs (bookkeeper style)
-
               Container(
-               width: MediaQuery.of(context).size.width,
+                width: MediaQuery.of(context).size.width,
                 height: 80,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -1452,9 +1625,16 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
                       children: [
                         // Content based on selected tab
                         if (selectedRequestTab == 0)
-                          Expanded(child: _buildRequestContent(newRequests, 'new requests'))
+                          Expanded(
+                            child: _buildRequestContent(
+                              newRequests,
+                              'new requests',
+                            ),
+                          )
                         else
-                          Expanded(child: _buildQuotesContent(myQuotes, 'my bids')),
+                          Expanded(
+                            child: _buildQuotesContent(myQuotes, 'my bids'),
+                          ),
                       ],
                     ),
                   ),
@@ -1929,7 +2109,8 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
         LayoutBuilder(
           builder: (context, constraints) {
             final double itemWidth =
-                (constraints.maxWidth - 16);// 3 items per row with 16px spacing
+                (constraints.maxWidth -
+                16); // 3 items per row with 16px spacing
 
             return Wrap(
               spacing: 16,
@@ -2069,7 +2250,8 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
         LayoutBuilder(
           builder: (context, constraints) {
             final double itemWidth =
-                (constraints.maxWidth - 16); // 3 items per row with 16px spacing
+                (constraints.maxWidth -
+                16); // 3 items per row with 16px spacing
 
             return Wrap(
               spacing: 16,
@@ -2398,26 +2580,18 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
                         context,
                         PageRouteBuilder(
                           pageBuilder:
-                              (
-                              context,
-                              animation,
-                              secondaryAnimation,
-                              ) => RequestInfoWidget(request: request),
+                              (context, animation, secondaryAnimation) =>
+                                  RequestInfoWidget(request: request),
                           transitionsBuilder:
-                              (
-                              context,
-                              animation,
-                              secondaryAnimation,
-                              child,
-                              ) {
-                            return SlideTransition(
-                              position: Tween<Offset>(
-                                begin: Offset(1.0, 0.0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            );
-                          },
+                              (context, animation, secondaryAnimation, child) {
+                                return SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: Offset(1.0, 0.0),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: child,
+                                );
+                              },
                         ),
                       );
                     },
@@ -4502,22 +4676,24 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
       );
     }
 
-    final List<dynamic> currentTransactions = selectedSubIndex == 0 ? paidOrders : refundedOrders;
-    
+    final List<dynamic> currentTransactions = selectedSubIndex == 0
+        ? paidOrders
+        : refundedOrders;
+
     if (currentTransactions.isEmpty) {
       return Center(
         child: Column(
           children: [
             Icon(
-              selectedSubIndex == 0 ? Icons.monetization_on_outlined : Icons.money_off_outlined,
+              selectedSubIndex == 0
+                  ? Icons.monetization_on_outlined
+                  : Icons.money_off_outlined,
               size: 64,
               color: Colors.grey[400],
             ),
             SizedBox(height: 16),
             Text(
-              selectedSubIndex == 0 
-                ? 'No earnings yet'
-                : 'No refunds yet',
+              selectedSubIndex == 0 ? 'No earnings yet' : 'No refunds yet',
               style: GoogleFonts.manrope(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -4527,8 +4703,8 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
             SizedBox(height: 8),
             Text(
               selectedSubIndex == 0
-                ? 'Paid orders will appear here'
-                : 'Refunded orders will appear here',
+                  ? 'Paid orders will appear here'
+                  : 'Refunded orders will appear here',
               style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[500]),
               textAlign: TextAlign.center,
             ),
@@ -4592,15 +4768,18 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
   }
 
   Widget _buildTransactionItem(Map<String, dynamic> transaction) {
-    final String title = transaction['product_name'] ?? 
-                        transaction['title'] ?? 
-                        transaction['description'] ?? 
-                        'Order';
-    
-    final String amount = 'R${transaction['amount'] ?? transaction['total_amount'] ?? transaction['price'] ?? '0'}';
-    
-    final String status = transaction['status']?.toString().toUpperCase() ?? 'UNKNOWN';
-    
+    final String title =
+        transaction['product_name'] ??
+        transaction['title'] ??
+        transaction['description'] ??
+        'Order';
+
+    final String amount =
+        'R${transaction['amount'] ?? transaction['total_amount'] ?? transaction['price'] ?? '0'}';
+
+    final String status =
+        transaction['status']?.toString().toUpperCase() ?? 'UNKNOWN';
+
     // Format date
     String dateStr = 'Unknown date';
     try {
@@ -4629,9 +4808,9 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
             decoration: BoxDecoration(
               color: Colors.transparent,
               border: Border.all(
-                color: selectedSubIndex == 0 
-                    ? Color(0xFF04AD01) 
-                    : Color(0xFFE74C3C)
+                color: selectedSubIndex == 0
+                    ? Color(0xFF04AD01)
+                    : Color(0xFFE74C3C),
               ),
               shape: BoxShape.circle,
             ),
@@ -4672,7 +4851,7 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: selectedSubIndex == 0 
+                        color: selectedSubIndex == 0
                             ? Color(0xFF04AD01).withOpacity(0.1)
                             : Color(0xFFE74C3C).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
@@ -4680,7 +4859,7 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
                       child: Text(
                         status,
                         style: GoogleFonts.manrope(
-                          color: selectedSubIndex == 0 
+                          color: selectedSubIndex == 0
                               ? Color(0xFF04AD01)
                               : Color(0xFFE74C3C),
                           fontSize: 10,
@@ -5512,8 +5691,7 @@ class _SellerMobileDashboardState extends State<SellerMobileDashboard>
   void _showRequestInfoDialog(
     BuildContext context,
     Map<String, dynamic> request,
-  )
-  {
+  ) {
     final requestId = request['request_id']?.toString() ?? '';
     final title = request['title']?.toString() ?? '';
     final description = request['description']?.toString() ?? '';

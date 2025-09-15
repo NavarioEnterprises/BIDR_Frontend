@@ -87,6 +87,17 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
   // Validation error states
   Map<String, String?> _fieldErrors = {};
   Map<String, bool> _fieldTouched = {};
+  
+  // Track if form has been submitted at least once
+  bool _hasAttemptedSubmit = false;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // Remove all focus listeners that were showing errors on focus loss
+    // We only want to show errors after the user attempts to submit
+  }
 
   @override
   void dispose() {
@@ -223,6 +234,7 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     setState(() {
       _fieldErrors.clear();
       _fieldTouched.clear();
+      _hasAttemptedSubmit = true; // Mark that user has attempted to submit
     });
 
     // Validate each field and collect errors
@@ -287,10 +299,21 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     return true;
   }
 
-  void _validateFieldRealTime(String fieldKey, String fieldName, String value) {
+  void _validateFieldRealTime(
+    String fieldKey,
+    String fieldName,
+    String value, {
+    bool showErrorsImmediately = false,
+  }) {
+    // Only validate and show errors if form has been submitted at least once
+    if (!_hasAttemptedSubmit && !showErrorsImmediately) {
+      return;
+    }
+
     String? error = _validateField(fieldName, value);
     setState(() {
       _fieldTouched[fieldKey] = true;
+      
       if (error != null) {
         _fieldErrors[fieldKey] = error;
       } else {
@@ -497,8 +520,10 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
     bool? integersOnly,
     bool? isName,
   }) {
-    bool hasError =
-        _fieldTouched[fieldKey] == true && _fieldErrors[fieldKey] != null;
+    // Only show errors if form has been attempted to submit
+    bool shouldShowError = _hasAttemptedSubmit && 
+                          _fieldTouched[fieldKey] == true && 
+                          _fieldErrors[fieldKey] != null;
 
     return CustomInputTransparent4(
       hintText: hintText.replaceAll('*', ''),
@@ -512,8 +537,8 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
       integersOnly: integersOnly,
       maxLength: integersOnly == true ? 15 : null,
       suffix: suffixIcon,
-      hasError: hasError,
-      errorText: _fieldErrors[fieldKey],
+      hasError: shouldShowError,
+      errorText: shouldShowError ? _fieldErrors[fieldKey] : null,
       onChanged: (value) {
         // Real-time validation and formatting
         if (integersOnly == true) {
@@ -548,15 +573,19 @@ class _BuyerSignUpPageState extends State<BuyerSignUpPage> {
           }
         }
 
-        // Real-time validation
-        _validateFieldRealTime(fieldKey, hintText, controller.text);
+        // Only validate if form has been submitted at least once
+        if (_hasAttemptedSubmit) {
+          _validateFieldRealTime(fieldKey, hintText, controller.text);
+        }
       },
       onSubmitted: (value) {
-        // Validate before moving to next field
-        _validateFieldRealTime(fieldKey, hintText, value);
-
-        if (_fieldErrors[fieldKey] != null) {
-          return; // Don't proceed if there's an error
+        // Don't validate on submit unless form has been attempted
+        if (_hasAttemptedSubmit) {
+          _validateFieldRealTime(fieldKey, hintText, value, showErrorsImmediately: true);
+          
+          if (_fieldErrors[fieldKey] != null) {
+            return; // Don't proceed if there's an error
+          }
         }
 
         if (nextFocusNode != null) {

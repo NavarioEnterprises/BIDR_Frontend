@@ -28,6 +28,7 @@ import '../../services/products_management_api_service.dart';
 import '../../services/shared_preferences.dart';
 import '../buyer/share_with_friends.dart';
 import '../buyer/support.dart';
+import '../buyer_dashboard.dart';
 import '../buyer_home.dart';
 import '../group_chat.dart';
 import '../mobileView/SellerDashboard/sellerMobileDashboard.dart';
@@ -527,6 +528,11 @@ class _SellerDashboardState extends State<SellerDashboard>
           isLoadingRequests = false;
         });
 
+        // Apply sorting after data is loaded and setState completes
+        if (mounted) {
+          _applySorting();
+        }
+
         print('New requests: ${newRequests.length}');
         print('Processed requests: ${processedRequests.length}');
         print('Total requests from API: ${(data['results'] ?? []).length}');
@@ -559,6 +565,11 @@ class _SellerDashboardState extends State<SellerDashboard>
           totalQuotes = response['total_count'] ?? 0;
           isLoadingQuotes = false;
         });
+
+        // Apply sorting after quotes data is loaded and setState completes
+        if (mounted) {
+          _applySorting();
+        }
 
         print('My quotes: ${myQuotes.length}');
       } else {
@@ -643,6 +654,11 @@ class _SellerDashboardState extends State<SellerDashboard>
           disputedOrders = results;
           isLoadingDisputes = false;
         });
+
+        // Apply sorting after disputed orders data is loaded and setState completes
+        if (mounted) {
+          _applySorting();
+        }
         print('Loaded ${disputedOrders.length} disputed orders');
       } else {
         setState(() {
@@ -811,6 +827,263 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   SortOption? _currentSort;
 
+  void _applySorting({bool shouldSetState = true}) {
+    if (_currentSort == null) return;
+
+    // Helper function to get comparable value from item
+    double _getSortValue(dynamic item) {
+      switch (_currentSort!) {
+        case SortOption.highToLow:
+        case SortOption.lowToHigh:
+          // Try to get price/budget from different possible fields
+          if (item['budget'] != null) {
+            final value = double.tryParse(item['budget'].toString()) ?? 0.0;
+            return value;
+          }
+          if (item['price'] != null) {
+            final value = double.tryParse(item['price'].toString()) ?? 0.0;
+            return value;
+          }
+          if (item['amount'] != null) {
+            final value = double.tryParse(item['amount'].toString()) ?? 0.0;
+            return value;
+          }
+          if (item['quote_amount'] != null) {
+            final value =
+                double.tryParse(item['quote_amount'].toString()) ?? 0.0;
+            return value;
+          }
+          if (item['total_amount'] != null) {
+            final value =
+                double.tryParse(item['total_amount'].toString()) ?? 0.0;
+            return value;
+          }
+          return 0.0;
+
+        case SortOption.rating:
+          // Try to get rating from different possible fields
+          if (item['rating'] != null) {
+            final value = double.tryParse(item['rating'].toString()) ?? 0.0;
+            return value;
+          }
+          if (item['seller_rating'] != null) {
+            final value =
+                double.tryParse(item['seller_rating'].toString()) ?? 0.0;
+            return value;
+          }
+          if (item['buyer_rating'] != null) {
+            final value =
+                double.tryParse(item['buyer_rating'].toString()) ?? 0.0;
+            return value;
+          }
+          return 0.0;
+
+        default:
+          return 0.0;
+      }
+    }
+
+    void _performSort() {
+      print('\n=== SORTING DEBUG - BEFORE SORTING ===');
+      print('Sort option: $_currentSort');
+
+      // Debug print before sorting
+      if (newRequests.isNotEmpty) {
+        print('\nNEW REQUESTS (${newRequests.length} items) - Before sorting:');
+        for (int i = 0; i < newRequests.length && i < 5; i++) {
+          final item = newRequests[i];
+          final value = _getSortValue(item);
+          // Show available keys for the first item
+          if (i == 0) {
+            print('  Available keys: ${item.keys.toList()}');
+          }
+          print(
+            '  [$i] Value: $value, Title: ${item['title'] ?? 'N/A'}, ID: ${item['id'] ?? 'N/A'}',
+          );
+          // Show which field provided the value
+          String sourceField = 'none';
+          if (item['budget'] != null)
+            sourceField = 'budget: ${item['budget']}';
+          else if (item['price'] != null)
+            sourceField = 'price: ${item['price']}';
+          else if (item['amount'] != null)
+            sourceField = 'amount: ${item['amount']}';
+          else if (item['quote_amount'] != null)
+            sourceField = 'quote_amount: ${item['quote_amount']}';
+          else if (item['total_amount'] != null)
+            sourceField = 'total_amount: ${item['total_amount']}';
+          print('    Source field: $sourceField');
+        }
+      }
+
+      if (myQuotes.isNotEmpty) {
+        print('\nMY QUOTES (${myQuotes.length} items) - Before sorting:');
+        for (int i = 0; i < myQuotes.length && i < 5; i++) {
+          final item = myQuotes[i];
+          final value = _getSortValue(item);
+          // Show available keys for the first item
+          if (i == 0) {
+            print('  Available keys: ${item.keys.toList()}');
+          }
+          print(
+            '  [$i] Value: $value, Amount: ${item['quote_amount'] ?? item['amount'] ?? 'N/A'}, ID: ${item['id'] ?? 'N/A'}',
+          );
+          // Show which field provided the value
+          String sourceField = 'none';
+          if (item['budget'] != null)
+            sourceField = 'budget: ${item['budget']}';
+          else if (item['price'] != null)
+            sourceField = 'price: ${item['price']}';
+          else if (item['amount'] != null)
+            sourceField = 'amount: ${item['amount']}';
+          else if (item['quote_amount'] != null)
+            sourceField = 'quote_amount: ${item['quote_amount']}';
+          else if (item['total_amount'] != null)
+            sourceField = 'total_amount: ${item['total_amount']}';
+          print('    Source field: $sourceField');
+        }
+      }
+
+      if (sellerOrders.isNotEmpty) {
+        print(
+          '\nSELLER ORDERS (${sellerOrders.length} items) - Before sorting:',
+        );
+        for (int i = 0; i < sellerOrders.length && i < 5; i++) {
+          final item = sellerOrders[i];
+          final value = _getSortValue(item);
+          // Show available keys for the first item
+          if (i == 0) {
+            print('  Available keys: ${item.keys.toList()}');
+          }
+          print(
+            '  [$i] Value: $value, Total: ${item['total_amount'] ?? 'N/A'}, Order: ${item['order_number'] ?? 'N/A'}',
+          );
+          // Show which field provided the value
+          String sourceField = 'none';
+          if (item['budget'] != null)
+            sourceField = 'budget: ${item['budget']}';
+          else if (item['price'] != null)
+            sourceField = 'price: ${item['price']}';
+          else if (item['amount'] != null)
+            sourceField = 'amount: ${item['amount']}';
+          else if (item['quote_amount'] != null)
+            sourceField = 'quote_amount: ${item['quote_amount']}';
+          else if (item['total_amount'] != null)
+            sourceField = 'total_amount: ${item['total_amount']}';
+          print('    Source field: $sourceField');
+        }
+      }
+
+      // Sort each list based on the selected option
+      switch (_currentSort!) {
+        case SortOption.highToLow:
+          newRequests.sort(
+            (a, b) => _getSortValue(b).compareTo(_getSortValue(a)),
+          );
+          processedRequests.sort(
+            (a, b) => _getSortValue(b).compareTo(_getSortValue(a)),
+          );
+          myQuotes.sort((a, b) => _getSortValue(b).compareTo(_getSortValue(a)));
+          sellerOrders.sort(
+            (a, b) => _getSortValue(b).compareTo(_getSortValue(a)),
+          );
+          disputedOrders.sort(
+            (a, b) => _getSortValue(b).compareTo(_getSortValue(a)),
+          );
+          break;
+
+        case SortOption.lowToHigh:
+          newRequests.sort(
+            (a, b) => _getSortValue(a).compareTo(_getSortValue(b)),
+          );
+          processedRequests.sort(
+            (a, b) => _getSortValue(a).compareTo(_getSortValue(b)),
+          );
+          myQuotes.sort((a, b) => _getSortValue(a).compareTo(_getSortValue(b)));
+          sellerOrders.sort(
+            (a, b) => _getSortValue(a).compareTo(_getSortValue(b)),
+          );
+          disputedOrders.sort(
+            (a, b) => _getSortValue(a).compareTo(_getSortValue(b)),
+          );
+          break;
+
+        case SortOption.rating:
+          newRequests.sort(
+            (a, b) => _getSortValue(b).compareTo(_getSortValue(a)),
+          );
+          processedRequests.sort(
+            (a, b) => _getSortValue(b).compareTo(_getSortValue(a)),
+          );
+          myQuotes.sort((a, b) => _getSortValue(b).compareTo(_getSortValue(a)));
+          sellerOrders.sort(
+            (a, b) => _getSortValue(b).compareTo(_getSortValue(a)),
+          );
+          disputedOrders.sort(
+            (a, b) => _getSortValue(b).compareTo(_getSortValue(a)),
+          );
+          break;
+
+        default:
+          break;
+      }
+
+      print('\n=== SORTING DEBUG - AFTER SORTING ===');
+
+      // Debug print after sorting
+      if (newRequests.isNotEmpty) {
+        print('\nNEW REQUESTS (${newRequests.length} items) - After sorting:');
+        for (int i = 0; i < newRequests.length && i < 5; i++) {
+          final item = newRequests[i];
+          final value = _getSortValue(item);
+          print(
+            '  [$i] Value: $value, Title: ${item['title'] ?? 'N/A'}, ID: ${item['id'] ?? 'N/A'}',
+          );
+        }
+      }
+
+      if (myQuotes.isNotEmpty) {
+        print('\nMY QUOTES (${myQuotes.length} items) - After sorting:');
+        for (int i = 0; i < myQuotes.length && i < 5; i++) {
+          final item = myQuotes[i];
+          final value = _getSortValue(item);
+          print(
+            '  [$i] Value: $value, Amount: ${item['quote_amount'] ?? item['amount'] ?? 'N/A'}, ID: ${item['id'] ?? 'N/A'}',
+          );
+        }
+      }
+
+      if (sellerOrders.isNotEmpty) {
+        print(
+          '\nSELLER ORDERS (${sellerOrders.length} items) - After sorting:',
+        );
+        for (int i = 0; i < sellerOrders.length && i < 5; i++) {
+          final item = sellerOrders[i];
+          final value = _getSortValue(item);
+          print(
+            '  [$i] Value: $value, Total: ${item['total_amount'] ?? 'N/A'}, Order: ${item['order_number'] ?? 'N/A'}',
+          );
+        }
+      }
+
+      print('=== END SORTING DEBUG ===\n');
+    }
+
+    if (shouldSetState && mounted) {
+      setState(() {
+        _performSort();
+      });
+      print('🔄 setState called - UI should rebuild now');
+    } else {
+      _performSort();
+      print('🔄 Sort performed without setState');
+    }
+
+    print('Applied sorting: $_currentSort');
+    print('New requests count after sorting: ${newRequests.length}');
+    print('My quotes count after sorting: ${myQuotes.length}');
+  }
+
   @override
   Widget build(BuildContext context) {
     // Show mobile version for screens smaller than 800px
@@ -826,11 +1099,14 @@ class _SellerDashboardState extends State<SellerDashboard>
           SellerDashboardHeader(
             headerName: 'Seller Dashboard',
             initialSort: _currentSort,
+            tabActiveIndex: tabActiveIndex,
             onSortChanged: (option) {
-              setState(() {
-                _currentSort = option;
-              });
-              print('Sort changed to: $option');
+              print('\n🔄 SORT CALLBACK TRIGGERED');
+              print('Previous sort: $_currentSort');
+              print('New sort: $option');
+              _currentSort = option;
+              _applySorting();
+              print('Sort change completed ✅\n');
             },
           ),
           // Orange Navigation Bar
@@ -1246,6 +1522,11 @@ class _SellerDashboardState extends State<SellerDashboard>
             print('DEBUG: Order keys: ${ordersData.first.keys.toList()}');
           }
         });
+
+        // Apply sorting after orders data is loaded and setState completes
+        if (mounted) {
+          _applySorting();
+        }
       } else {
         setState(() {
           ordersError = 'Failed to load orders: ${response.statusCode}';
@@ -2012,8 +2293,8 @@ class _SellerDashboardState extends State<SellerDashboard>
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
-                  color: Constants.ctaColorLight,
-                  strokeWidth: 2,
+                  strokeWidth: 1.5,
+                  color: Constants.ftaColorLight,
                 ),
               ),
               const SizedBox(height: 8),
@@ -2129,6 +2410,7 @@ class _SellerDashboardState extends State<SellerDashboard>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(height: 24),
           // Header
           Row(
             children: [
@@ -2141,17 +2423,6 @@ class _SellerDashboardState extends State<SellerDashboard>
                 ),
               ),
               Spacer(),
-              if (isLoadingRequests)
-                SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Constants.ftaColorLight,
-                    ),
-                  ),
-                ),
             ],
           ),
           SizedBox(height: 16),
@@ -2190,7 +2461,10 @@ class _SellerDashboardState extends State<SellerDashboard>
             Center(
               child: Padding(
                 padding: EdgeInsets.all(32),
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  color: Constants.ftaColorLight,
+                ),
               ),
             )
           // Main content with tabs
@@ -2449,9 +2723,8 @@ class _SellerDashboardState extends State<SellerDashboard>
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Constants.ctaColorLight,
-                                    ),
+                                    strokeWidth: 1.5,
+                                    color: Constants.ftaColorLight,
                                   ),
                                   SizedBox(height: 16),
                                   Text(
@@ -2620,7 +2893,8 @@ class _SellerDashboardState extends State<SellerDashboard>
         padding: EdgeInsets.all(64),
         child: Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Constants.ftaColorLight),
+            strokeWidth: 1.5,
+            color: Constants.ftaColorLight,
           ),
         ),
       );
@@ -2731,7 +3005,14 @@ class _SellerDashboardState extends State<SellerDashboard>
                 final request = entry.value;
                 final globalIndex = startIndex + index + 1;
 
+                // Use a unique key based on request ID for proper widget tracking
+                final uniqueKey =
+                    request['id']?.toString() ??
+                    request['request_id']?.toString() ??
+                    '${request['budget']}_${request['created_at']}_$globalIndex';
+
                 return IntrinsicHeight(
+                  key: ValueKey(uniqueKey),
                   child: SizedBox(
                     width: itemWidth,
                     child: _buildOriginalLeadCard(request, globalIndex),
@@ -2757,7 +3038,8 @@ class _SellerDashboardState extends State<SellerDashboard>
         padding: EdgeInsets.all(64),
         child: Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Constants.ftaColorLight),
+            strokeWidth: 1.5,
+            color: Constants.ftaColorLight,
           ),
         ),
       );
@@ -2872,7 +3154,14 @@ class _SellerDashboardState extends State<SellerDashboard>
                 final quote = entry.value;
                 final globalIndex = startIndex + index + 1;
 
+                // Use a unique key based on quote ID or fallback for proper widget tracking
+                final uniqueKey =
+                    quote['id']?.toString() ??
+                    quote['quote_id']?.toString() ??
+                    '${quote['quote_amount']}_${quote['created_at']}_$globalIndex';
+
                 return IntrinsicHeight(
+                  key: ValueKey(uniqueKey),
                   child: SizedBox(
                     width: itemWidth,
                     child: _buildOriginalLeadCard(
@@ -3124,9 +3413,8 @@ class _SellerDashboardState extends State<SellerDashboard>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Constants.ctaColorLight,
-                                  ),
+                                  strokeWidth: 1.5,
+                                  color: Constants.ftaColorLight,
                                 ),
                                 SizedBox(height: 16),
                                 Text(
@@ -3299,7 +3587,8 @@ class _SellerDashboardState extends State<SellerDashboard>
               // Circular progress indicator
               CircularProgressIndicator(
                 value: progress,
-                strokeWidth: 2,
+                strokeWidth: 1.5,
+                color: Constants.ftaColorLight,
                 backgroundColor: label == "D"
                     ? Colors.grey.shade600
                     : Colors.orange.shade50,
@@ -3860,10 +4149,8 @@ class _SellerDashboardState extends State<SellerDashboard>
                                 height: 40,
                                 child: Center(
                                   child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.grey,
-                                    ),
+                                    strokeWidth: 1.5,
+                                    color: Constants.ftaColorLight,
                                   ),
                                 ),
                               )
@@ -4148,7 +4435,10 @@ class _SellerDashboardState extends State<SellerDashboard>
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
+                CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  color: Constants.ftaColorLight,
+                ),
                 SizedBox(width: 20),
                 Text('Submitting bid...'),
               ],
@@ -4635,9 +4925,8 @@ class _SellerDashboardState extends State<SellerDashboard>
                               builder: (BuildContext context) {
                                 return Center(
                                   child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.orange,
-                                    ),
+                                    strokeWidth: 1.5,
+                                    color: Constants.ftaColorLight,
                                   ),
                                 );
                               },
@@ -5073,7 +5362,10 @@ class _SellerDashboardState extends State<SellerDashboard>
       return Center(
         child: Padding(
           padding: EdgeInsets.all(32),
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            strokeWidth: 1.5,
+            color: Constants.ftaColorLight,
+          ),
         ),
       );
     }
@@ -5490,7 +5782,10 @@ class _SellerDashboardState extends State<SellerDashboard>
         width: MediaQuery.of(context).size.width * 0.5,
         height: 300,
         child: Center(
-          child: CircularProgressIndicator(color: Constants.ctaColorLight),
+          child: CircularProgressIndicator(
+            strokeWidth: 1.5,
+            color: Constants.ftaColorLight,
+          ),
         ),
       );
     }
@@ -7000,7 +7295,8 @@ class _SellerDashboardState extends State<SellerDashboard>
         child: Padding(
           padding: EdgeInsets.all(32),
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Constants.ctaColorLight),
+            strokeWidth: 1.5,
+            color: Constants.ftaColorLight,
           ),
         ),
       );
@@ -8647,10 +8943,69 @@ class _SellerDashboardState extends State<SellerDashboard>
     ];
   }
 
+  void _navigateToDetailScreen(dynamic request, int index) {
+    try {
+      if (request?.category == null) {
+        _showErrorSnackBar("Cannot open request details: Invalid request data");
+        return;
+      }
+
+      switch (request.category) {
+        case "VEHICLE_SPARES":
+        case "Vehicle Spares":
+          // Convert ProductRequestItem to AutoSparesRequest if needed
+          dynamic autoSpareData;
+          if (request.runtimeType.toString().contains('ProductRequestItem')) {
+            autoSpareData = request.toAutoSparesRequest().autoSpares;
+          } else {
+            autoSpareData = request.autoSpares ?? request.autoSpare;
+          }
+
+          SparesDetailScreen.showAsDialog(
+            context,
+            index: index,
+            request: request,
+            autoSpare: autoSpareData,
+            bids: request.sellerOffers ?? request.quotes ?? [],
+          );
+          break;
+
+        case "TYRES_RIMS":
+        case "Vehicle Tyres and Rims":
+          RimTyreDetailScreen.showAsDialog(
+            context,
+            index: index,
+            request: request,
+            rimTyre: request.rimTyre,
+            bids: request.sellerOffers ?? [],
+          );
+          break;
+
+        case "ELECTRONICS":
+        case "Consumer Electronics":
+          ConsumerElectronicsDetailScreen.showAsDialog(
+            context,
+            index: index,
+            request: request,
+            consumerElectronics: request.consumerElectronics,
+            bids: request.sellerOffers ?? [],
+          );
+          break;
+
+        default:
+          _showErrorSnackBar("Unknown request category: ${request.category}");
+      }
+    } catch (e) {
+      print('Navigation error: $e');
+      _showErrorSnackBar("Error opening request details");
+    }
+  }
+
   void _showRequestInfoDialog(
     BuildContext context,
     Map<String, dynamic> request,
   ) {
+    print("request data2: $request");
     final requestId = request['request_id']?.toString() ?? '';
     final title = request['title']?.toString() ?? '';
     final description = request['description']?.toString() ?? '';
@@ -8665,6 +9020,8 @@ class _SellerDashboardState extends State<SellerDashboard>
     final maxBudget = request['max_budget']?.toString() ?? '';
     final urgencyTimeline = request['urgency_timeline']?.toString() ?? '';
     final images = request['images'] ?? [];
+    final productImages = request['product_images'] ?? [];
+    final vinPhotoUrl = request['vin_photo_url']?.toString() ?? '';
     final quantity = request['quantity']?.toString() ?? '';
     final conditionPreference =
         request['condition_preference']?.toString() ?? '';
@@ -8673,6 +9030,24 @@ class _SellerDashboardState extends State<SellerDashboard>
     final electronicsData = request['consumer_electronics_data'] ?? {};
     final tyresRimsData = request['vehicle_tyres_rims_data'] ?? {};
 
+    // Combine all image sources
+    final allImages = <String>[];
+    if (productImages is List) {
+      allImages.addAll(
+        productImages
+            .map((img) => img.toString())
+            .where((img) => img.isNotEmpty),
+      );
+    }
+    if (images is List) {
+      allImages.addAll(
+        images.map((img) => img.toString()).where((img) => img.isNotEmpty),
+      );
+    }
+    if (vinPhotoUrl.isNotEmpty) {
+      allImages.add(vinPhotoUrl);
+    }
+
     // Format the request number for display
     final requestNumber = requestId.substring(0, 6).toUpperCase();
 
@@ -8680,490 +9055,204 @@ class _SellerDashboardState extends State<SellerDashboard>
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
-        if (category == 'VEHICLE_SPARES') {
-          // Use the exact design from _SparesDetailScreenState
-          return Dialog(
-            backgroundColor: Colors.transparent,
-            insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.8,
-              height: MediaQuery.of(context).size.height * 0.9,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  // Header
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Request #$requestNumber Information',
-                          style: GoogleFonts.manrope(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Constants.ctaColorLight,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: Icon(Icons.close, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.all(16),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Vehicle Details Card
-                          Expanded(
-                            child: _buildVehicleDetailCard(
-                              "Vehicle Details",
-                              Constants.ctaColorLight,
-                              vehicleSparesData.isNotEmpty
-                                  ? vehicleSparesData
-                                  : {
-                                      'VIN Number': 'Not specified',
-                                      'Manufacturer': 'Not specified',
-                                      'Make & Model': title.isNotEmpty
-                                          ? title
-                                          : 'Not specified',
-                                      'Year': 'Not specified',
-                                      'Type': 'Not specified',
-                                      'Condition':
-                                          conditionPreference.isNotEmpty
-                                          ? conditionPreference
-                                                .replaceAll('_', ' ')
-                                                .toLowerCase()
-                                                .split(' ')
-                                                .map(
-                                                  (word) => word.isNotEmpty
-                                                      ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                                      : word,
-                                                )
-                                                .join(' ')
-                                          : 'Not specified',
-                                    },
-                            ),
-                          ),
-                          SizedBox(width: 16),
-
-                          // Part Details Card
-                          Expanded(
-                            child: _buildVehicleDetailCard(
-                              "Part Details",
-                              Colors.orange,
-                              {
-                                'Part Name/Description':
-                                    vehicleSparesSummary.isNotEmpty
-                                    ? vehicleSparesSummary
-                                    : (title.isNotEmpty
-                                          ? title
-                                          : 'Not specified'),
-                                'Quantity': quantity.isNotEmpty
-                                    ? quantity
-                                    : 'Not specified',
-                                'Budget': budget.isNotEmpty
-                                    ? 'R$budget'
-                                    : 'Not specified',
-                                'Urgency': urgencyTimeline.isNotEmpty
-                                    ? urgencyTimeline
-                                          .replaceAll('_', ' ')
-                                          .toLowerCase()
-                                          .split(' ')
-                                          .map(
-                                            (word) => word.isNotEmpty
-                                                ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                                : word,
-                                          )
-                                          .join(' ')
-                                    : 'Not specified',
-                                'Description': description.isNotEmpty
-                                    ? description
-                                    : 'No description provided',
-                                'Product Images': images.isNotEmpty
-                                    ? '${images.length} image(s) available'
-                                    : 'No images',
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 16),
-
-                          // More Details Card
-                          Expanded(
-                            child: _buildVehicleDetailCard(
-                              "More Details",
-                              Colors.orange,
-                              {
-                                ...productSpecifications,
-                                'Request ID': requestNumber,
-                                'Created': createdAt.isNotEmpty
-                                    ? DateTime.tryParse(
-                                            createdAt,
-                                          )?.toString().split(' ')[0] ??
-                                          createdAt
-                                    : 'Not specified',
-                                'Category': category
-                                    .replaceAll('_', ' ')
-                                    .toLowerCase()
-                                    .split(' ')
-                                    .map(
-                                      (word) => word.isNotEmpty
-                                          ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                          : word,
-                                    )
-                                    .join(' '),
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        } else {
-          // For other categories, use simplified design
-          return Dialog(
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            height: MediaQuery.of(context).size.height * 0.8,
+            decoration: BoxDecoration(
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              width: MediaQuery.of(context).size.width * 0.9,
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.8,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Header
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
-                      ),
+            child: Column(
+              children: [
+                // Header
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Request Information',
-                          style: GoogleFonts.manrope(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: Icon(Icons.close, color: Colors.grey[600]),
-                          padding: EdgeInsets.zero,
-                          constraints: BoxConstraints(),
-                        ),
-                      ],
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey[200]!),
                     ),
                   ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Request #$requestNumber - Images',
+                        style: GoogleFonts.manrope(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Constants.ctaColorLight,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.close, color: Colors.grey[600]),
+                        splashRadius: 20,
+                      ),
+                    ],
+                  ),
+                ),
 
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Request summary card
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                color: Colors.orange,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'REQUEST #$requestNumber',
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  title.isNotEmpty
-                                      ? title
-                                      : (description.isNotEmpty
-                                            ? description
-                                            : 'No title provided'),
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 14,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.orange[100],
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    category
-                                        .replaceAll('_', ' ')
-                                        .toLowerCase()
-                                        .split(' ')
-                                        .map(
-                                          (word) => word.isNotEmpty
-                                              ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                              : word,
-                                        )
-                                        .join(' '),
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 12,
-                                      color: Colors.orange[700],
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(height: 24),
-
-                          // Three sections in a row
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                // Images content
+                Expanded(
+                  child: allImages.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // Product Details
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Product Details',
-                                      style: GoogleFonts.manrope(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.orange,
-                                      ),
-                                    ),
-                                    SizedBox(height: 12),
-                                    _buildDetailItem(
-                                      'Category',
-                                      category.isNotEmpty
-                                          ? category
-                                                .replaceAll('_', ' ')
-                                                .toLowerCase()
-                                                .split(' ')
-                                                .map(
-                                                  (word) => word.isNotEmpty
-                                                      ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                                      : word,
-                                                )
-                                                .join(' ')
-                                          : 'Not specified',
-                                    ),
-                                    if (electronicsData['brand'] != null)
-                                      _buildDetailItem(
-                                        'Brand',
-                                        electronicsData['brand']?.toString() ??
-                                            'Not specified',
-                                      ),
-                                    if (electronicsData['model'] != null)
-                                      _buildDetailItem(
-                                        'Model',
-                                        electronicsData['model']?.toString() ??
-                                            'Not specified',
-                                      ),
-                                    if (tyresRimsData['tyre_brand'] != null)
-                                      _buildDetailItem(
-                                        'Tyre Brand',
-                                        tyresRimsData['tyre_brand']
-                                                ?.toString() ??
-                                            'Not specified',
-                                      ),
-                                    _buildDetailItem(
-                                      'Quantity',
-                                      quantity.isNotEmpty
-                                          ? quantity
-                                          : 'Not specified',
-                                    ),
-                                    if (conditionPreference.isNotEmpty)
-                                      _buildDetailItem(
-                                        'Condition',
-                                        conditionPreference
-                                            .replaceAll('_', ' ')
-                                            .toLowerCase()
-                                            .split(' ')
-                                            .map(
-                                              (word) => word.isNotEmpty
-                                                  ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                                  : word,
-                                            )
-                                            .join(' '),
-                                      ),
-                                  ],
-                                ),
+                              Icon(
+                                Icons.image_not_supported_outlined,
+                                size: 64,
+                                color: Colors.grey[400],
                               ),
-
-                              SizedBox(width: 24),
-
-                              // Budget and Timeline
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Budget and Timeline',
-                                      style: GoogleFonts.manrope(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.orange,
-                                      ),
-                                    ),
-                                    SizedBox(height: 12),
-                                    _buildDetailItem(
-                                      'Budget',
-                                      budget.isNotEmpty
-                                          ? 'R$budget'
-                                          : 'Not specified',
-                                    ),
-                                    if (maxBudget.isNotEmpty)
-                                      _buildDetailItem(
-                                        'Max Budget',
-                                        'R$maxBudget',
-                                      ),
-                                    _buildDetailItem(
-                                      'Urgency Required',
-                                      urgencyTimeline.isNotEmpty
-                                          ? urgencyTimeline
-                                                .replaceAll('_', ' ')
-                                                .toLowerCase()
-                                                .split(' ')
-                                                .map(
-                                                  (word) => word.isNotEmpty
-                                                      ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                                      : word,
-                                                )
-                                                .join(' ')
-                                          : 'Not specified',
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              SizedBox(width: 24),
-
-                              // Features and Specifications
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Features and Specifications',
-                                      style: GoogleFonts.manrope(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.orange,
-                                      ),
-                                    ),
-                                    SizedBox(height: 12),
-                                    if (productSpecifications.isNotEmpty)
-                                      ...productSpecifications.entries
-                                          .map(
-                                            (entry) => _buildDetailItem(
-                                              entry.key
-                                                  .toString()
-                                                  .replaceAll('_', ' ')
-                                                  .split(' ')
-                                                  .map(
-                                                    (word) => word.isNotEmpty
-                                                        ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                                        : word,
-                                                  )
-                                                  .join(' '),
-                                              entry.value.toString(),
-                                            ),
-                                          )
-                                          .toList(),
-                                    if (description.isNotEmpty)
-                                      _buildDetailItem(
-                                        'Description',
-                                        description,
-                                      ),
-                                    if (images.isNotEmpty)
-                                      _buildDetailItem(
-                                        'Images',
-                                        '${images.length} image(s) available',
-                                      ),
-                                  ],
+                              SizedBox(height: 16),
+                              Text(
+                                'No images available',
+                                style: GoogleFonts.manrope(
+                                  fontSize: 16,
+                                  color: Colors.grey[600],
                                 ),
                               ),
                             ],
                           ),
+                        )
+                      : Padding(
+                          padding: EdgeInsets.all(20),
+                          child: GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 16,
+                                  mainAxisSpacing: 16,
+                                  childAspectRatio: 1,
+                                ),
+                            itemCount: allImages.length,
+                            itemBuilder: (context, index) {
+                              final imageUrl = allImages[index];
+                              final fullImageUrl = _getFullImageUrl(imageUrl);
 
-                          if (description.isNotEmpty) ...[
-                            SizedBox(height: 24),
-                            Text(
-                              'Additional Notes1',
-                              style: GoogleFonts.manrope(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            SizedBox(height: 12),
-                            Text(
-                              description,
-                              style: GoogleFonts.manrope(
-                                fontSize: 14,
-                                color: Colors.grey[700],
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                              return InkWell(
+                                onTap: () {
+                                  // Show full-screen image viewer
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => Dialog(
+                                      backgroundColor: Colors.black,
+                                      insetPadding: EdgeInsets.zero,
+                                      child: Stack(
+                                        children: [
+                                          Center(
+                                            child: InteractiveViewer(
+                                              child: Image.network(
+                                                fullImageUrl,
+                                                fit: BoxFit.contain,
+                                                errorBuilder:
+                                                    (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) {
+                                                      return Container(
+                                                        color: Colors.grey[900],
+                                                        child: Center(
+                                                          child: Icon(
+                                                            Icons.broken_image,
+                                                            color: Colors
+                                                                .grey[600],
+                                                            size: 48,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 40,
+                                            right: 20,
+                                            child: IconButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.white,
+                                              ),
+                                              iconSize: 32,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                    color: Colors.grey[100],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(11),
+                                    child: Image.network(
+                                      fullImageUrl,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                            if (loadingProgress == null)
+                                              return child;
+                                            return Center(
+                                              child: CircularProgressIndicator(
+                                                value:
+                                                    loadingProgress
+                                                            .expectedTotalBytes !=
+                                                        null
+                                                    ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes!
+                                                    : null,
+                                                strokeWidth: 2,
+                                                color: Constants.ftaColorLight,
+                                              ),
+                                            );
+                                          },
+                                      errorBuilder: (context, error, stackTrace) {
+                                        print(
+                                          'Image error for URL: $fullImageUrl',
+                                        );
+                                        print('Error: $error');
+                                        return Container(
+                                          color: Colors.grey[200],
+                                          child: Center(
+                                            child: Icon(
+                                              Icons.broken_image,
+                                              color: Colors.grey[400],
+                                              size: 32,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                ),
+              ],
             ),
-          );
-        }
+          ),
+        );
       },
     );
   }
@@ -9421,7 +9510,14 @@ class _SellerDashboardState extends State<SellerDashboard>
                 final index = entry.key;
                 final bid = entry.value;
                 final globalIndex = startIndex + index + 1;
+                // Use a unique key based on bid ID for proper widget tracking
+                final uniqueKey =
+                    bid['id']?.toString() ??
+                    bid['order_id']?.toString() ??
+                    '${bid['amount']}_${bid['created_at']}_$globalIndex';
+
                 return IntrinsicHeight(
+                  key: ValueKey(uniqueKey),
                   child: SizedBox(
                     width: itemWidth,
                     child: _buildApprovedBidCard(bid),
@@ -9551,7 +9647,14 @@ class _SellerDashboardState extends State<SellerDashboard>
                 final index = entry.key;
                 final bid = entry.value;
                 final globalIndex = startIndex + index + 1;
+                // Use a unique key based on bid ID for proper widget tracking
+                final uniqueKey =
+                    bid['id']?.toString() ??
+                    bid['order_id']?.toString() ??
+                    '${bid['amount']}_${bid['created_at']}_$globalIndex';
+
                 return IntrinsicHeight(
+                  key: ValueKey(uniqueKey),
                   child: SizedBox(
                     width: itemWidth,
                     child: _buildPaidBidCard(bid),
@@ -9607,7 +9710,8 @@ class _SellerDashboardState extends State<SellerDashboard>
         padding: EdgeInsets.all(64),
         child: Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Constants.ftaColorLight),
+            strokeWidth: 1.5,
+            color: Constants.ftaColorLight,
           ),
         ),
       );
@@ -9681,7 +9785,14 @@ class _SellerDashboardState extends State<SellerDashboard>
                 final index = entry.key;
                 final bid = entry.value;
                 final globalIndex = startIndex + index + 1;
+                // Use a unique key based on bid ID for proper widget tracking
+                final uniqueKey =
+                    bid['id']?.toString() ??
+                    bid['order_id']?.toString() ??
+                    '${bid['amount']}_${bid['created_at']}_$globalIndex';
+
                 return IntrinsicHeight(
+                  key: ValueKey(uniqueKey),
                   child: SizedBox(
                     width: itemWidth,
                     child: _buildCompletedBidCard(bid),
@@ -9955,7 +10066,9 @@ class _SellerDashboardState extends State<SellerDashboard>
     final currency = order['currency'] ?? 'ZAR';
     // Use buyer_id to generate a buyer name since we don't have buyer details
     final buyerId = order['buyer_id']?.toString() ?? '';
-    final buyerName = buyerId.isNotEmpty ? 'Buyer ${buyerId.substring(0, 8)}...' : 'Unknown Buyer';
+    final buyerName = buyerId.isNotEmpty
+        ? 'Buyer ${buyerId.substring(0, 8)}...'
+        : 'Unknown Buyer';
     print("dfggh $order");
     final orderStatus =
         order['status']?.toString().toUpperCase() ?? 'COMPLETED';
@@ -10108,7 +10221,9 @@ class _SellerDashboardState extends State<SellerDashboard>
   Widget _buildApprovedBidCard(Map<String, dynamic> bid) {
     final requestId = bid['request_id'] ?? '';
     // Use request description method to get proper product name from request details
-    final title = bid['request_details'] != null ? _getRequestDescription2(bid) : (bid['title'] ?? 'Product Request');
+    final title = bid['request_details'] != null
+        ? _getRequestDescription2(bid)
+        : (bid['title'] ?? 'Product Request');
     final createdAt = bid['created_at'] ?? '';
     final totalAmount = bid['total_amount'] ?? '0';
     final currency = bid['currency'] ?? 'ZAR';
@@ -10189,8 +10304,8 @@ class _SellerDashboardState extends State<SellerDashboard>
                     height: 20,
                     child: CircularProgressIndicator(
                       value: progressValue / 100,
-                      strokeWidth: 2,
-                      backgroundColor: Colors.grey[300],
+                      strokeWidth: 1.5,
+                      color: Constants.ftaColorLight,
                       valueColor: const AlwaysStoppedAnimation<Color>(
                         Color(0xFFF5A623),
                       ),
@@ -10714,7 +10829,10 @@ class _SellerDashboardState extends State<SellerDashboard>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(color: Constants.ctaColorLight),
+                CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  color: Constants.ftaColorLight,
+                ),
                 SizedBox(height: 16),
                 Text(
                   'Loading details...',
@@ -11448,6 +11566,16 @@ class _SellerDashboardState extends State<SellerDashboard>
       },
     );
   }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: GoogleFonts.manrope()),
+        backgroundColor: Colors.red[600],
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
 }
 
 // Seller Spares Detail Screen
@@ -11699,20 +11827,6 @@ class _SellerSparesDetailScreenState extends State<SellerSparesDetailScreen> {
     }
 
     return allImages;
-  }
-
-  String _getFullImageUrl(String imagePath) {
-    // If it's already a full URL, return as is
-    if (imagePath.startsWith('http')) {
-      return imagePath;
-    }
-    // Remove leading slash if present
-    final cleanPath = imagePath.startsWith('/')
-        ? imagePath.substring(1)
-        : imagePath;
-    // Build full URL using the products service URL
-    String baseUrl = GlobalVariables.productsServiceUrl;
-    return '$baseUrl$cleanPath';
   }
 
   String _formatDate(String? dateStr) {
@@ -12480,4 +12594,18 @@ String _formatDateTime(DateTime dateTime) {
   } else {
     return 'Just now';
   }
+}
+
+String _getFullImageUrl(String imagePath) {
+  // If it's already a full URL, return as is
+  if (imagePath.startsWith('http')) {
+    return imagePath;
+  }
+  // Remove leading slash if present
+  final cleanPath = imagePath.startsWith('/')
+      ? imagePath.substring(1)
+      : imagePath;
+  // Build full URL using the products service URL
+  String baseUrl = GlobalVariables.productsServiceUrl;
+  return '$baseUrl$cleanPath';
 }

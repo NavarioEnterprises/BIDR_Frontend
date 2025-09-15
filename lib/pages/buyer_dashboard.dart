@@ -4815,16 +4815,7 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
   final Set<String> _cancelledRequests = {};
   int _currentProductImageIndex = 0;
   Map<String, dynamic>? _getProductSpecifications() {
-    try {
-      if (widget.request.runtimeType.toString().contains('AutoSparesRequest')) {
-        AutoSpares productRequest = widget.autoSpare;
-        return productRequest.moreFields.toJson();
-      }
-      return null;
-    } catch (e) {
-      print('Error getting product specifications: $e');
-      return null;
-    }
+    return widget.autoSpare.moreFields.toJson();
   }
 
   // Helper method to get part number

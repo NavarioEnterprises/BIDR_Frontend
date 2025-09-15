@@ -1,5 +1,6 @@
 import 'package:bidr/constants/Constants.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../customWdget/appbar.dart';
 import '../buyer_home.dart';
 import '../mobileView/breakpoints.dart';
@@ -328,6 +329,8 @@ class _BusinessLandingPageState extends State<BusinessLandingPage>
                             child: ElevatedButton(
                               onPressed: () {
                                 print('Join as a Business pressed');
+                                // Navigate to business signup with parameters for adding seller role
+                                context.go('/register/seller?fromBuyer=true&addSellerRole=true&userData_email=${Constants.currentUser?.email ?? ''}&userData_firstName=${Constants.currentUser?.firstName ?? ''}&userData_lastName=${Constants.currentUser?.lastName ?? ''}&userData_uid=${Constants.currentUser?.uid ?? Constants.myUid ?? ''}&userData_userId=${Constants.currentUser?.id ?? Constants.userId ?? ''}');
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Constants.ctaColorLight,

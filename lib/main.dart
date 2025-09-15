@@ -14,6 +14,7 @@ import 'authentication/login.dart';
 import 'authentication/registration/business_signup.dart';
 import 'authentication/registration/buyer_signup.dart';
 import 'authentication/splashscreen.dart';
+import 'authentication/reset_password.dart';
 import 'constants/Constants.dart';
 import 'models/user.dart';
 import 'config/environment_config.dart';
@@ -27,7 +28,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Set the environment configuration
-  AppConfig.setEnvironment(EnvironmentType.uat);
+  AppConfig.setEnvironment(EnvironmentType.dev);
 
   // Check if user is logged in
   final bool isLoggedIn =
@@ -147,13 +148,17 @@ class MyApp extends StatelessWidget {
         '/faq',
         '/policies',
       ];
+      
+      // Pattern to match reset password routes
+      final resetPasswordPattern = RegExp(r'^/reset_password/[^/]+/[^/]+/?$');
 
       final protectedRoutes = ['/dashboard'];
 
       // If not authenticated, redirect to login for protected routes
       if (!isAuthenticated &&
           (protectedRoutes.contains(state.matchedLocation) ||
-              !publicRoutes.contains(state.matchedLocation))) {
+              (!publicRoutes.contains(state.matchedLocation) && 
+               !resetPasswordPattern.hasMatch(state.matchedLocation)))) {
         print('Router Debug - Redirecting to /login because not authenticated');
         return '/login';
       }
@@ -188,28 +193,105 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: '/login',
         name: 'login',
-        builder: (BuildContext context, GoRouterState state) =>
-            const LoginPage(),
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const LoginPage(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  // Fade transition for web-like navigation
+                  return FadeTransition(opacity: animation, child: child);
+                },
+            transitionDuration: const Duration(milliseconds: 300),
+          );
+        },
       ),
 
       // Registration Routes
       GoRoute(
         path: '/register',
         name: 'register',
-        builder: (BuildContext context, GoRouterState state) =>
-            SplashScreen(), // Role selection screen
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: SplashScreen(), // Role selection screen
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  // Fade transition for web-like navigation
+                  return FadeTransition(opacity: animation, child: child);
+                },
+            transitionDuration: const Duration(milliseconds: 300),
+          );
+        },
       ),
       GoRoute(
         path: '/register/buyer',
         name: 'register-buyer',
-        builder: (BuildContext context, GoRouterState state) =>
-            const BuyerSignUpPage(userRole: 'buyer'),
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const BuyerSignUpPage(userRole: 'buyer'),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  // Fade transition for web-like navigation
+                  return FadeTransition(opacity: animation, child: child);
+                },
+            transitionDuration: const Duration(milliseconds: 300),
+          );
+        },
       ),
       GoRoute(
         path: '/register/seller',
         name: 'register-seller',
-        builder: (BuildContext context, GoRouterState state) =>
-            const BusinessSignUpPage(),
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          // Extract query parameters
+          final isProceedingFromBuyer = state.uri.queryParameters['fromBuyer'] == 'true';
+          final isAddingSellerRole = state.uri.queryParameters['addSellerRole'] == 'true';
+          final existingUserData = <String, String>{};
+          
+          // Extract user data from query parameters if provided
+          state.uri.queryParameters.forEach((key, value) {
+            if (key.startsWith('userData_')) {
+              final actualKey = key.substring('userData_'.length);
+              existingUserData[actualKey] = value;
+            }
+          });
+          
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: BusinessSignUpPage(
+              isProceedingFromBuyer: isProceedingFromBuyer,
+              isAddingSellerRole: isAddingSellerRole,
+              existingUserData: existingUserData.isNotEmpty ? existingUserData : null,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  // Fade transition for web-like navigation
+                  return FadeTransition(opacity: animation, child: child);
+                },
+            transitionDuration: const Duration(milliseconds: 300),
+          );
+        },
+      ),
+
+      // Password Reset Route
+      GoRoute(
+        path: '/reset_password/:uid/:token',
+        name: 'reset-password',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final uid = state.pathParameters['uid']!;
+          final token = state.pathParameters['token']!;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: ResetPasswordScreen(uid: uid, token: token),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  // Fade transition for web-like navigation
+                  return FadeTransition(opacity: animation, child: child);
+                },
+            transitionDuration: const Duration(milliseconds: 300),
+          );
+        },
       ),
 
       // Dashboard Route (Role-based home)

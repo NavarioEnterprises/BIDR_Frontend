@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../constants/Constants.dart';
 import '../customWdget/custom_input2.dart';
+import '../customWdget/custom_dialogs.dart';
 import '../services/shared_preferences.dart';
 import '../pages/buyer_home.dart';
 import '../pages/seller/seller_home_dashboard.dart';
@@ -39,11 +40,11 @@ class _LoginPageState extends State<LoginPage> {
 
   void _handleLogin() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields'),
-          backgroundColor: Colors.red,
-        ),
+      CustomDialogs.showErrorDialog(
+        context,
+        'Please enter both your email address and password to continue.',
+        heading: 'Missing Information',
+        onRetry: () => _handleLogin(),
       );
       return;
     }
@@ -153,11 +154,18 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       // Show error message
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invalid email or password'),
-            backgroundColor: Colors.red,
-          ),
+        final errorMessage = response != null && response['error'] != null 
+            ? response['error'].toString() 
+            : 'Invalid email or password';
+        
+        final normalizedMessage = ErrorMessageUtils.normalizeErrorMessage(errorMessage);
+        final heading = ErrorMessageUtils.getErrorHeading(errorMessage);
+        
+        CustomDialogs.showErrorDialog(
+          context,
+          normalizedMessage,
+          heading: heading,
+          onRetry: () => _handleLogin(),
         );
       }
     }
@@ -175,71 +183,33 @@ class _LoginPageState extends State<LoginPage> {
 
   void _showRoleSelectionDialog(String userRole) {
     final roles = userRole.split(',');
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Select Role',
-            style: GoogleFonts.manrope(
-              fontWeight: FontWeight.bold,
-              color: Constants.ftaColorLight,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'You have access to multiple roles. Please select how you would like to login:',
-                style: GoogleFonts.manrope(fontSize: 14),
-              ),
-              const SizedBox(height: 20),
-              ...roles.map(
-                (role) => Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _navigateToRoleDashboard(role.trim());
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Constants.ctaColorLight,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      role.trim() == 'buyer'
-                          ? 'Login as Buyer'
-                          : 'Login as Seller',
-                      style: GoogleFonts.manrope(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
+    CustomDialogs.showRoleSelectionDialog(
+      context,
+      roles,
+      onRoleSelected: (selectedRole) async {
+        // Save selected role to SharedPreferences
+        await Sharedprefs.saveUserRoleSharedPreference(selectedRole);
+        
+        // Update Constants with selected role
+        Constants.myCategoryRole = selectedRole;
+        
+        // Update the current user's role temporarily for this session
+        if (Constants.currentUser != null) {
+          Constants.currentUser!.role = selectedRole;
+        }
+        
+        print('Role selected: $selectedRole');
+        print('Role saved to SharedPreferences and Constants');
+        
+        // Navigate to appropriate dashboard
+        _navigateToRoleDashboard(selectedRole);
       },
     );
   }
 
   void _navigateToRoleDashboard(String role) {
-    if (role.trim() == 'buyer') {
-      context.go('/dashboard');
-    } else if (role.trim() == 'seller') {
-      context.go('/home');
-    } else {
-      // Fallback to generic dashboard route
-      context.go('/dashboard');
-    }
+    // Always navigate to /dashboard - the HomeRouter will handle role-based routing
+    context.go('/dashboard');
   }
 
   @override
@@ -574,11 +544,11 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
 
   void _handleLogin() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields'),
-          backgroundColor: Colors.red,
-        ),
+      CustomDialogs.showErrorDialog(
+        context,
+        'Please enter both your email address and password to continue.',
+        heading: 'Missing Information',
+        onRetry: () => _handleLogin(),
       );
       return;
     }
@@ -688,11 +658,18 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
     } else {
       // Show error message
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invalid email or password'),
-            backgroundColor: Colors.red,
-          ),
+        final errorMessage = response != null && response['error'] != null 
+            ? response['error'].toString() 
+            : 'Invalid email or password';
+        
+        final normalizedMessage = ErrorMessageUtils.normalizeErrorMessage(errorMessage);
+        final heading = ErrorMessageUtils.getErrorHeading(errorMessage);
+        
+        CustomDialogs.showErrorDialog(
+          context,
+          normalizedMessage,
+          heading: heading,
+          onRetry: () => _handleLogin(),
         );
       }
     }
@@ -700,71 +677,33 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
 
   void _showRoleSelectionDialog(String userRole) {
     final roles = userRole.split(',');
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Select Role',
-            style: GoogleFonts.manrope(
-              fontWeight: FontWeight.bold,
-              color: Constants.ftaColorLight,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'You have access to multiple roles. Please select how you would like to login:',
-                style: GoogleFonts.manrope(fontSize: 14),
-              ),
-              const SizedBox(height: 20),
-              ...roles.map(
-                (role) => Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _navigateToRoleDashboard(role.trim());
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Constants.ctaColorLight,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      role.trim() == 'buyer'
-                          ? 'Login as Buyer'
-                          : 'Login as Seller',
-                      style: GoogleFonts.manrope(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
+    CustomDialogs.showRoleSelectionDialog(
+      context,
+      roles,
+      onRoleSelected: (selectedRole) async {
+        // Save selected role to SharedPreferences
+        await Sharedprefs.saveUserRoleSharedPreference(selectedRole);
+        
+        // Update Constants with selected role
+        Constants.myCategoryRole = selectedRole;
+        
+        // Update the current user's role temporarily for this session
+        if (Constants.currentUser != null) {
+          Constants.currentUser!.role = selectedRole;
+        }
+        
+        print('Role selected: $selectedRole');
+        print('Role saved to SharedPreferences and Constants');
+        
+        // Navigate to appropriate dashboard
+        _navigateToRoleDashboard(selectedRole);
       },
     );
   }
 
   void _navigateToRoleDashboard(String role) {
-    if (role.trim() == 'buyer') {
-      context.go('/home');
-    } else if (role.trim() == 'seller') {
-      context.go('/dashboard');
-    } else {
-      // Fallback to generic dashboard route
-      context.go('/dashboard');
-    }
+    // Always navigate to /dashboard - the HomeRouter will handle role-based routing
+    context.go('/dashboard');
   }
 
   @override

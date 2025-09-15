@@ -22,7 +22,7 @@ class ProfileManagement extends StatefulWidget {
 class _ProfileManagementState extends State<ProfileManagement>
     with TickerProviderStateMixin {
   // Main sidebar selection
-  String selectedTab = 'Edit Profile';
+  String selectedTab = 'Edit Seller Profile';
 
   // Seller profile sidebar selection
   String selectedSellerTab = 'Personal Details';
@@ -41,7 +41,7 @@ class _ProfileManagementState extends State<ProfileManagement>
   late Animation<double> _sidebarFadeAnimation;
   late Animation<double> _sellerSidebarSlideAnimation;
 
-  // Controllers for Edit Profile
+  // Controllers (legacy - no longer used)
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController mobileNumberController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -79,10 +79,48 @@ class _ProfileManagementState extends State<ProfileManagement>
 
   // Controllers for Company Account
   final TextEditingController bankNameController = TextEditingController();
-  final TextEditingController bankAccountNumberController =
-      TextEditingController();
   final TextEditingController bankBranchCodeController =
       TextEditingController();
+  final TextEditingController accountTypeController = TextEditingController();
+  final TextEditingController bankAccountNumberController =
+      TextEditingController();
+  final TextEditingController accountHolderController = TextEditingController();
+
+  // Selected values for dropdowns
+  String? _selectedBank;
+  String? _selectedBranchCode;
+  String? _selectedAccountType;
+
+  // South African Banks with branch codes (same as business_signup.dart)
+  static const Map<String, String> _southAfricanBanks = {
+    'ABSA Bank': '632005',
+    'Standard Bank': '051001',
+    'First National Bank (FNB)': '250655',
+    'Nedbank': '198765',
+    'Capitec Bank': '470010',
+    'African Bank': '430000',
+    'Investec Bank': '580105',
+    'Discovery Bank': '679000',
+    'TymeBank': '678910',
+    'Bidvest Bank': '462005',
+    'Sasfin Bank': '683000',
+    'Mercantile Bank': '450105',
+    'Grindrod Bank': '584000',
+    'Ithala Bank': '410506',
+    'Bank of Athens': '410010',
+    'China Construction Bank': '679001',
+    'Habib Overseas Bank': '587000',
+    'HBZ Bank': '570000',
+    'Albaraka Bank': '800000',
+    'Postbank': '460005',
+  };
+
+  final List<String> _accountTypes = [
+    'Savings',
+    'Current',
+    'Business',
+    'Cheque',
+  ];
 
   // Controllers for Change Password
   final TextEditingController newPasswordController = TextEditingController();
@@ -100,11 +138,9 @@ class _ProfileManagementState extends State<ProfileManagement>
 
   // Category selections
   Map<String, bool> categories = {
-    'Engine Parts': false,
-    'Body Parts': false,
-    'Suspension Parts': false,
-    'Transmission Parts': false,
-    'Batteries': false,
+    'Vehicle Spares': false,
+    'Vehicle Tyres and Rims': false,
+    'Consumer Electronics': false,
   };
 
   bool registeredName = false;
@@ -178,6 +214,9 @@ class _ProfileManagementState extends State<ProfileManagement>
     _slideController.forward();
     _scaleController.forward();
     _sidebarAnimationController.forward();
+
+    // Since 'Edit Seller Profile' is the default, animate the seller sidebar on initial load
+    _sellerSidebarAnimationController.forward();
 
     // Load seller profile data
     _loadSellerProfile();
@@ -286,31 +325,77 @@ class _ProfileManagementState extends State<ProfileManagement>
     gpsLocationController.text = ''; // GPS coordinates not in flat structure
     googleMapsLinkController.text = ''; // Google maps link not in response
 
-    // Contact Information  
+    // Contact Information
     contactPersonNameController.text = data['contact_person_name'] ?? '';
     contactPersonPhoneController.text = data['contact_person_telephone'] ?? '';
     contactPersonEmailController.text = data['contact_person_email'] ?? '';
     workflowEmailController.text = data['platform_workflow_email'] ?? '';
 
-    // Banking Information - not in current response structure
-    bankNameController.text = '';
-    bankAccountNumberController.text = '';
-    bankBranchCodeController.text = '';
+    // Banking Information - retrieve from banking_info in API response
+    final bankingInfo = data['banking_info'] ?? {};
+    bankNameController.text = bankingInfo['bank_name'] ?? '';
+    bankAccountNumberController.text = bankingInfo['account_number'] ?? '';
+    bankBranchCodeController.text = bankingInfo['branch_code'] ?? '';
+    accountTypeController.text = bankingInfo['account_type'] ?? '';
+    accountHolderController.text = bankingInfo['account_holder'] ?? '';
+
+    // Sync dropdown state variables with loaded data
+    if (bankingInfo['bank_name'] != null &&
+        bankingInfo['bank_name'].toString().isNotEmpty) {
+      _selectedBank = bankingInfo['bank_name'];
+    }
+    if (bankingInfo['branch_code'] != null &&
+        bankingInfo['branch_code'].toString().isNotEmpty) {
+      _selectedBranchCode = bankingInfo['branch_code'];
+    }
+    if (bankingInfo['account_type'] != null &&
+        bankingInfo['account_type'].toString().isNotEmpty) {
+      _selectedAccountType = bankingInfo['account_type'];
+    }
 
     // Display preferences
     displayTradingNameController.text = data['trading_name'] ?? '';
     registeredName = false; // Default since display preference not in response
 
-    // Categories
+    // Categories - handle both product_category and product_subcategory
+    final productCategory = data['product_category'];
     final productSubcategory = data['product_subcategory'];
+
+    // Reset all categories first
+    categories.forEach((key, value) {
+      categories[key] = false;
+    });
+
+    // Handle main categories from product_category
+    if (productCategory != null && productCategory.toString().isNotEmpty) {
+      final categoryList = productCategory
+          .toString()
+          .split(',')
+          .map((e) => e.trim())
+          .toList();
+      print('Processing category list: $categoryList');
+
+      for (String category in categoryList) {
+        print('Checking if category "$category" exists in categories map...');
+        if (categories.containsKey(category)) {
+          categories[category] = true;
+          print('✓ Set "$category" to true');
+        } else {
+          print('✗ Category "$category" not found in categories map');
+        }
+      }
+    }
+
+    // Handle subcategory mapping for specific parts
     if (productSubcategory != null) {
-      // Reset all categories first
+      print('Processing subcategory: $productSubcategory');
       categories.forEach((key, value) {
-        categories[key] = false;
-      });
-      // Set the selected category
-      categories.forEach((key, value) {
-        categories[key] = _mapBackendCategoryToFrontend(productSubcategory, key);
+        if (_mapBackendCategoryToFrontend(productSubcategory, key)) {
+          categories[key] = true;
+          print(
+            '✓ Set subcategory "$key" to true based on "$productSubcategory"',
+          );
+        }
       });
     }
 
@@ -319,16 +404,32 @@ class _ProfileManagementState extends State<ProfileManagement>
     print('Trading name: ${tradingNameController.text}');
     print('Registration number: ${registrationNumberController.text}');
     print('VAT number: ${vatNumberController.text}');
+    print('Banking info - Bank name: ${bankNameController.text}');
+    print('Banking info - Account number: ${bankAccountNumberController.text}');
+    print('Banking info - Branch code: ${bankBranchCodeController.text}');
+    print('Banking info - Account type: ${accountTypeController.text}');
+    print('Banking info - Account holder: ${accountHolderController.text}');
+    print('Product category: $productCategory');
+    print('Product subcategory: $productSubcategory');
+    print('Banking info from API: ${data['banking_info']}');
+    print(
+      'Selected categories: ${categories.entries.where((e) => e.value).map((e) => e.key).toList()}',
+    );
   }
 
-
-  bool _mapBackendCategoryToFrontend(String backendCategory, String frontendCategory) {
+  bool _mapBackendCategoryToFrontend(
+    String backendCategory,
+    String frontendCategory,
+  ) {
     final mappings = {
       'engine_parts': 'Engine Parts',
       'body_parts': 'Body Parts',
       'suspension_parts': 'Suspension Parts',
       'transmission_parts': 'Transmission Parts',
       'batteries': 'Batteries',
+      'vehicle_spares': 'Vehicle Spares', // Map to the main category
+      'tyres_rims': 'Vehicle Tyres and Rims',
+      'consumer_electronics': 'Consumer Electronics',
     };
     return mappings[backendCategory] == frontendCategory;
   }
@@ -407,12 +508,14 @@ class _ProfileManagementState extends State<ProfileManagement>
       'bank_name': bankNameController.text,
       'account_number': bankAccountNumberController.text,
       'branch_code': bankBranchCodeController.text,
+      'account_type': accountTypeController.text,
+      'account_holder': accountHolderController.text,
     };
 
     // TODO: Integrate with proper banking info endpoint when available
     // For now, just show success message
     _showSuccessSnackBar('Company Account information saved locally');
-    
+
     if (kDebugMode) {
       print('Banking info to be saved: $bankingData');
     }
@@ -422,22 +525,35 @@ class _ProfileManagementState extends State<ProfileManagement>
   Future<void> _saveCompanyCategories() async {
     final selectedCategories = categories.entries
         .where((entry) => entry.value)
+        .map((entry) => entry.key) // Use the frontend category names
+        .toList();
+
+    final selectedBackendCategories = categories.entries
+        .where((entry) => entry.value)
         .map((entry) => _mapFrontendCategoryToBackend(entry.key))
         .toList();
 
     final categoryData = {
-      'product_category': selectedCategories.isNotEmpty ? 'Auto Parts' : null,
-      'product_subcategory': selectedCategories.isNotEmpty ? selectedCategories.first : null,
+      'product_category': selectedCategories.isNotEmpty
+          ? selectedCategories.join(', ')
+          : null,
+      'product_subcategory': selectedBackendCategories.isNotEmpty
+          ? selectedBackendCategories.first
+          : null,
     };
+
+    if (kDebugMode) {
+      print('Saving categories - Frontend: $selectedCategories');
+      print('Saving categories - Backend: $selectedBackendCategories');
+      print('Category data to save: $categoryData');
+    }
 
     await _updateSellerInfo('Company Categories', categoryData);
   }
 
   /// Save displayed on platform preferences
   Future<void> _saveDisplayedOnPlatform() async {
-    final sellerData = {
-      'trading_name': displayTradingNameController.text,
-    };
+    final sellerData = {'trading_name': displayTradingNameController.text};
 
     final profileData = {
       'display_name_preference': registeredName ? 'registered' : 'trading',
@@ -453,7 +569,10 @@ class _ProfileManagementState extends State<ProfileManagement>
   }
 
   /// Update seller basic information
-  Future<void> _updateSellerInfo(String section, Map<String, dynamic> data) async {
+  Future<void> _updateSellerInfo(
+    String section,
+    Map<String, dynamic> data,
+  ) async {
     try {
       setState(() => isLoadingProfile = true);
 
@@ -505,13 +624,16 @@ class _ProfileManagementState extends State<ProfileManagement>
 
   String _mapFrontendCategoryToBackend(String frontendCategory) {
     final mappings = {
+      'Vehicle Spares': 'vehicle_spares',
+      'Vehicle Tyres and Rims': 'tyres_rims',
+      'Consumer Electronics': 'consumer_electronics',
       'Engine Parts': 'engine_parts',
       'Body Parts': 'body_parts',
       'Suspension Parts': 'suspension_parts',
       'Transmission Parts': 'transmission_parts',
       'Batteries': 'batteries',
     };
-    return mappings[frontendCategory] ?? 'engine_parts';
+    return mappings[frontendCategory] ?? 'vehicle_spares';
   }
 
   void _showSuccessSnackBar(String message) {
@@ -582,10 +704,6 @@ class _ProfileManagementState extends State<ProfileManagement>
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-                  _buildMenuItem(
-                    'Edit Profile',
-                    HugeIcons.strokeRoundedEditUser02,
-                  ),
                   _buildMenuItem(
                     'Edit Seller Profile',
                     HugeIcons.strokeRoundedEdit02,
@@ -696,8 +814,7 @@ class _ProfileManagementState extends State<ProfileManagement>
     String title,
     IconData icon, {
     bool isDestructive = false,
-  })
-  {
+  }) {
     final bool isSelected = selectedTab == title;
     final bool isSignOutSelected = title == "Sign Out";
     final bool isDeleteSelected = title == "Delete Account";
@@ -751,8 +868,7 @@ class _ProfileManagementState extends State<ProfileManagement>
     String title,
     IconData icon, {
     bool isDestructive = false,
-  })
-  {
+  }) {
     final bool isSelected = selectedSellerTab == title;
     final Color textColor = isDestructive
         ? Constants.ftaColorLight.withOpacity(0.55)
@@ -844,8 +960,6 @@ class _ProfileManagementState extends State<ProfileManagement>
 
   Widget _buildContent() {
     switch (selectedTab) {
-      case 'Edit Profile':
-        return _buildEditProfile();
       case 'Edit Seller Profile':
         return _buildSellerProfileContent();
       case 'Change Password':
@@ -853,7 +967,8 @@ class _ProfileManagementState extends State<ProfileManagement>
       case 'Get Quotes':
         return _buildComingSoonWidget(
           title: 'Get Quotes',
-          subtitle: 'View and manage all quotes received from suppliers in one place',
+          subtitle:
+              'View and manage all quotes received from suppliers in one place',
           icon: HugeIcons.strokeRoundedQuotes,
         );
       case 'Message Board':
@@ -944,7 +1059,7 @@ class _ProfileManagementState extends State<ProfileManagement>
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () => _onMenuItemSelected('Edit Profile'),
+                  onPressed: () => _onMenuItemSelected('Edit Seller Profile'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Constants.ftaColorLight,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -1034,20 +1149,26 @@ class _ProfileManagementState extends State<ProfileManagement>
   Widget _buildSellerProfileContent() {
     // Show loading state
     if (isLoadingProfile && sellerProfileData == null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(color: Constants.ctaColorLight),
-            SizedBox(height: 16),
-            Text(
-              'Loading profile data...',
-              style: GoogleFonts.manrope(
-                fontSize: 16,
-                color: Colors.grey[600],
+      return Container(
+        height: 400,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                strokeWidth: 1.5,
+                color: Constants.ftaColorLight,
               ),
-            ),
-          ],
+              SizedBox(height: 16),
+              Text(
+                'Loading profile data...',
+                style: GoogleFonts.manrope(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -1058,11 +1179,7 @@ class _ProfileManagementState extends State<ProfileManagement>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
+            Icon(Icons.error_outline, size: 64, color: Colors.red),
             SizedBox(height: 16),
             Text(
               'Failed to load profile',
@@ -1076,16 +1193,10 @@ class _ProfileManagementState extends State<ProfileManagement>
             Text(
               profileError!,
               textAlign: TextAlign.center,
-              style: GoogleFonts.manrope(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.manrope(fontSize: 14, color: Colors.grey[600]),
             ),
             SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadSellerProfile,
-              child: Text('Retry'),
-            ),
+            ElevatedButton(onPressed: _loadSellerProfile, child: Text('Retry')),
           ],
         ),
       );
@@ -1204,15 +1315,7 @@ class _ProfileManagementState extends State<ProfileManagement>
             TextInputAction.next,
             3,
           ),
-          const SizedBox(height: 20),
-          _buildAnimatedInputField(
-            'VAT Number',
-            'Enter VAT Number',
-            vatNumber2Controller,
-            FocusNode(),
-            TextInputAction.next,
-            4,
-          ),
+
           const SizedBox(height: 20),
           _buildAnimatedInputField(
             'Website URL',
@@ -1333,40 +1436,49 @@ class _ProfileManagementState extends State<ProfileManagement>
             ),
           ),
           const SizedBox(height: 40),
-          _buildAnimatedDropdownField(
-            'Bank Account Type',
-            'Enter Bank Account Type',
-            0,
-          ),
+
+          // 1. Bank Name (dropdown)
+          _buildAnimatedBankDropdownField('Bank Name*', 'Select Bank', 0),
           const SizedBox(height: 20),
-          _buildAnimatedInputField(
-            'Bank Name',
-            'Enter Bank Name',
-            bankNameController,
-            FocusNode(),
-            TextInputAction.next,
+
+          // 2. Branch Code (auto-populated, read-only)
+          _buildAnimatedBranchCodeField(
+            'Branch Code*',
+            'Select a bank first',
             1,
           ),
           const SizedBox(height: 20),
-          _buildAnimatedInputField(
-            'Bank Account Number',
-            'Enter Bank Account Number',
-            bankAccountNumberController,
-            FocusNode(),
-            TextInputAction.next,
+
+          // 3. Account Type (dropdown)
+          _buildAnimatedAccountTypeDropdownField(
+            'Account Type*',
+            'Select Account Type',
             2,
           ),
           const SizedBox(height: 20),
+
+          // 4. Account Number
           _buildAnimatedInputField(
-            'Bank Branch Code',
-            'Enter Bank Branch Code',
-            bankBranchCodeController,
+            'Account Number*',
+            'Enter Account Number',
+            bankAccountNumberController,
             FocusNode(),
-            TextInputAction.done,
+            TextInputAction.next,
             3,
           ),
+          const SizedBox(height: 20),
+
+          // 5. Account Holder Name
+          _buildAnimatedInputField(
+            'Account Holder Name*',
+            'Enter Account Holder Name',
+            accountHolderController,
+            FocusNode(),
+            TextInputAction.done,
+            4,
+          ),
           const SizedBox(height: 40),
-          _buildAnimatedSaveButton(4),
+          _buildAnimatedSaveButton(5),
         ],
       ),
     );
@@ -1412,14 +1524,7 @@ class _ProfileManagementState extends State<ProfileManagement>
             ),
           ),
           const SizedBox(height: 40),
-          _buildAnimatedCheckboxField('Registered Name', registeredName, (
-            value,
-          ) {
-            setState(() {
-              registeredName = value!;
-            });
-          }, 0),
-          const SizedBox(height: 20),
+
           _buildAnimatedInputField(
             'Trading Name',
             'Enter Trading Name',
@@ -1434,7 +1539,6 @@ class _ProfileManagementState extends State<ProfileManagement>
       ),
     );
   }
-
 
   Widget _buildChangePassword() {
     return Column(
@@ -1614,50 +1718,526 @@ class _ProfileManagementState extends State<ProfileManagement>
   }
 
   Widget _buildDropdownField(String label, String hint) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.height * 0.5,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Text(
-              label,
-              style: GoogleFonts.manrope(
-                fontSize: 13,
-                fontWeight: FontWeight.w300,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(360),
-              border: Border.all(color: Colors.grey[300]!),
-            ),
-            child: DropdownButtonFormField<String>(
-              decoration: InputDecoration(
-                hintText: hint,
-                hintStyle: GoogleFonts.manrope(
-                  color: Colors.grey[500],
-                  fontSize: 12,
-                  fontWeight: FontWeight.w300,
-                ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-              ),
-              items: const [],
-              onChanged: (value) {},
-              icon: const Icon(Icons.arrow_drop_down),
-            ),
-          ),
-        ],
+    // Create a controller for the dropdown display
+    final dropdownController = TextEditingController();
+    final accountTypes = ['Savings', 'Current', 'Business', 'Cheque'];
+    String? selectedAccountType;
+
+    return GestureDetector(
+      onTap: () => _showAccountTypeSelectionDialog(
+        dropdownController,
+        accountTypes,
+        selectedAccountType,
       ),
+      child: AbsorbPointer(
+        child: CustomInputTransparent4(
+          hintText: hint,
+          labelText: label,
+          controller: dropdownController,
+          focusNode: FocusNode(),
+          textInputAction: TextInputAction.next,
+          isPasswordField: false,
+          isEditable: false,
+          onChanged: (value) {
+            // Handled by dialog
+          },
+          onSubmitted: (value) {
+            // Handled by dialog
+          },
+          suffix: Icon(Icons.arrow_drop_down, color: const Color(0xFF666666)),
+        ),
+      ),
+    );
+  }
+
+  void _showAccountTypeSelectionDialog(
+    TextEditingController controller,
+    List<String> options,
+    String? selectedValue,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: Colors.white,
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.5,
+              maxWidth: 300,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Select Account Type',
+                        style: GoogleFonts.manrope(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF333333),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.close, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(height: 1),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: options.length,
+                    itemBuilder: (context, index) {
+                      String option = options[index];
+                      bool isSelected = selectedValue == option;
+
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            controller.text = option;
+                          });
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Constants.ctaColorLight.withOpacity(0.1)
+                                : Colors.transparent,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  option,
+                                  style: GoogleFonts.manrope(
+                                    color: isSelected
+                                        ? Constants.ctaColorLight
+                                        : const Color(0xFF333333),
+                                    fontSize: 16,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                              if (isSelected)
+                                Icon(
+                                  Icons.check,
+                                  color: Constants.ctaColorLight,
+                                  size: 20,
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // New animated dropdown methods for Company Account section
+  Widget _buildAnimatedBankDropdownField(String label, String hint, int index) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: 300 + (index * 100)),
+      curve: Curves.easeOutCubic,
+      builder: (context, animation, child) {
+        return Transform.translate(
+          offset: Offset((1 - animation) * 30, 0),
+          child: Opacity(
+            opacity: animation,
+            child: _buildBankDropdownField(label, hint),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAnimatedBranchCodeField(String label, String hint, int index) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: 300 + (index * 100)),
+      curve: Curves.easeOutCubic,
+      builder: (context, animation, child) {
+        return Transform.translate(
+          offset: Offset((1 - animation) * 30, 0),
+          child: Opacity(
+            opacity: animation,
+            child: _buildBranchCodeField(label, hint),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAnimatedAccountTypeDropdownField(
+    String label,
+    String hint,
+    int index,
+  ) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: 300 + (index * 100)),
+      curve: Curves.easeOutCubic,
+      builder: (context, animation, child) {
+        return Transform.translate(
+          offset: Offset((1 - animation) * 30, 0),
+          child: Opacity(
+            opacity: animation,
+            child: _buildAccountTypeDropdownField(label, hint),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBankDropdownField(String label, String hint) {
+    // Only update if _selectedBank is not null and different from current value
+    if (_selectedBank != null && _selectedBank != bankNameController.text) {
+      print(
+        'Updating bank name controller from $_selectedBank to ${bankNameController.text}',
+      );
+      bankNameController.text = _selectedBank!;
+    }
+
+    if (kDebugMode) {
+      print(
+        'Bank dropdown field - _selectedBank: $_selectedBank, controller: ${bankNameController.text}',
+      );
+    }
+
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.35,
+      child: GestureDetector(
+        onTap: () => _showBankSelectionDialogProfile(),
+        child: AbsorbPointer(
+          child: CustomInputTransparent4(
+            hintText: hint,
+            labelText: label,
+            controller: bankNameController,
+            focusNode: FocusNode(),
+            textInputAction: TextInputAction.next,
+            isPasswordField: false,
+            isEditable: false,
+            onChanged: (value) {
+              // Handled by dialog
+            },
+            onSubmitted: (value) {
+              // Handled by dialog
+            },
+            suffix: Icon(Icons.arrow_drop_down, color: const Color(0xFF666666)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBranchCodeField(String label, String hint) {
+    // Only update if _selectedBranchCode is not null and different from current value
+    if (_selectedBranchCode != null &&
+        _selectedBranchCode != bankBranchCodeController.text) {
+      print(
+        'Updating branch code controller from $_selectedBranchCode to ${bankBranchCodeController.text}',
+      );
+      bankBranchCodeController.text = _selectedBranchCode!;
+    }
+
+    if (kDebugMode) {
+      print(
+        'Branch code field - _selectedBranchCode: $_selectedBranchCode, controller: ${bankBranchCodeController.text}',
+      );
+    }
+
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.35,
+      child: CustomInputTransparent4(
+        hintText: hint,
+        labelText: label,
+        controller: bankBranchCodeController,
+        focusNode: FocusNode(),
+        textInputAction: TextInputAction.next,
+        isPasswordField: false,
+        isEditable: false,
+        onChanged: (value) {
+          // Read-only field
+        },
+        onSubmitted: (value) {
+          // Read-only field
+        },
+      ),
+    );
+  }
+
+  Widget _buildAccountTypeDropdownField(String label, String hint) {
+    // Only update if _selectedAccountType is not null and different from current value
+    if (_selectedAccountType != null && _selectedAccountType != accountTypeController.text) {
+      print('Updating account type controller from $_selectedAccountType to ${accountTypeController.text}');
+      accountTypeController.text = _selectedAccountType!;
+    }
+    
+    if (kDebugMode) {
+      print('Account type field - _selectedAccountType: $_selectedAccountType, controller: ${accountTypeController.text}');
+    }
+    
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.35,
+      child: GestureDetector(
+        onTap: () => _showAccountTypeSelectionDialogProfile(),
+        child: AbsorbPointer(
+          child: CustomInputTransparent4(
+            hintText: hint,
+            labelText: label,
+            controller: accountTypeController,
+            focusNode: FocusNode(),
+            textInputAction: TextInputAction.next,
+            isPasswordField: false,
+            isEditable: false,
+            onChanged: (value) {
+              // Handled by dialog
+            },
+            onSubmitted: (value) {
+              // Handled by dialog
+            },
+            suffix: Icon(Icons.arrow_drop_down, color: const Color(0xFF666666)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showBankSelectionDialogProfile() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: Colors.white,
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+              maxWidth: 400,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Select Bank',
+                        style: GoogleFonts.manrope(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF333333),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.close, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(height: 1),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _southAfricanBanks.keys.length,
+                    itemBuilder: (context, index) {
+                      String bank = _southAfricanBanks.keys.elementAt(index);
+                      bool isSelected = _selectedBank == bank;
+
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            _selectedBank = bank;
+                            _selectedBranchCode = _southAfricanBanks[bank];
+                            bankNameController.text = bank;
+                            bankBranchCodeController.text =
+                                _selectedBranchCode ?? '';
+                          });
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Constants.ctaColorLight.withOpacity(0.1)
+                                : Colors.transparent,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  bank,
+                                  style: GoogleFonts.manrope(
+                                    color: isSelected
+                                        ? Constants.ctaColorLight
+                                        : const Color(0xFF333333),
+                                    fontSize: 16,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                              if (isSelected)
+                                Icon(
+                                  Icons.check,
+                                  color: Constants.ctaColorLight,
+                                  size: 20,
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAccountTypeSelectionDialogProfile() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: Colors.white,
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.5,
+              maxWidth: 300,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Select Account Type',
+                        style: GoogleFonts.manrope(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF333333),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.close, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(height: 1),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _accountTypes.length,
+                    itemBuilder: (context, index) {
+                      String accountType = _accountTypes[index];
+                      bool isSelected = _selectedAccountType == accountType;
+
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            _selectedAccountType = accountType;
+                            accountTypeController.text = accountType;
+                          });
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Constants.ctaColorLight.withOpacity(0.1)
+                                : Colors.transparent,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  accountType,
+                                  style: GoogleFonts.manrope(
+                                    color: isSelected
+                                        ? Constants.ctaColorLight
+                                        : const Color(0xFF333333),
+                                    fontSize: 16,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                              if (isSelected)
+                                Icon(
+                                  Icons.check,
+                                  color: Constants.ctaColorLight,
+                                  size: 20,
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1669,7 +2249,10 @@ class _ProfileManagementState extends State<ProfileManagement>
       builder: (context, animation, child) {
         return Transform.scale(
           scale: animation.clamp(0.0, 1.0),
-          child: Opacity(opacity: animation.clamp(0.0, 1.0), child: _buildSaveButton()),
+          child: Opacity(
+            opacity: animation.clamp(0.0, 1.0),
+            child: _buildSaveButton(),
+          ),
         );
       },
     );
@@ -1677,12 +2260,12 @@ class _ProfileManagementState extends State<ProfileManagement>
 
   Widget _buildSaveButton() {
     return SizedBox(
-      width:MediaQuery.of(context).size.width*0.35,
+      width: MediaQuery.of(context).size.width * 0.35,
       child: ElevatedButton(
         onPressed: isLoadingProfile ? null : () => _handleSaveAction(),
         style: ElevatedButton.styleFrom(
           backgroundColor: Constants.ctaColorLight,
-          padding:  EdgeInsets.symmetric(vertical: 16),
+          padding: EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(360),
           ),
@@ -1708,7 +2291,7 @@ class _ProfileManagementState extends State<ProfileManagement>
     int index, {
     bool isPassword = false,
     int maxLines = 1,
-        final Function(String)? onSubmitted,
+    final Function(String)? onSubmitted,
   }) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
@@ -1734,18 +2317,19 @@ class _ProfileManagementState extends State<ProfileManagement>
       },
     );
   }
+
   Widget _buildCustomInputField(
-      String label,
-      String hintText,
-      TextEditingController controller,
-      FocusNode focusNode,
-      TextInputAction textInputAction, {
-        bool isPassword = false,
-        int maxLines = 1,
-        final Function(String)? onSubmitted,
-      }) {
+    String label,
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    TextInputAction textInputAction, {
+    bool isPassword = false,
+    int maxLines = 1,
+    final Function(String)? onSubmitted,
+  }) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width*0.35,
+      width: MediaQuery.of(context).size.width * 0.35,
       child: CustomInputTransparent4(
         hintText: hintText,
         labelText: hintText,
@@ -1756,7 +2340,7 @@ class _ProfileManagementState extends State<ProfileManagement>
             : TextInputAction.done,
         isPasswordField: false,
         onChanged: (value) {},
-        onSubmitted:onSubmitted??(value){},
+        onSubmitted: onSubmitted ?? (value) {},
       ),
     );
   }

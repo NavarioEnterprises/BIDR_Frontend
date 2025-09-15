@@ -140,9 +140,12 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
         builder: (context, typography, spacing) {
           return Column(
             children: [
-              Container(height: 365, child: MobileBuyerDashboardGrid(_transactionKey)),
+              Container(
+                height: 365,
+                child: MobileBuyerDashboardGrid(_transactionKey),
+              ),
               Expanded(
-                child:  _buildContent(dashboardIndex, typography, spacing),
+                child: _buildContent(dashboardIndex, typography, spacing),
               ),
             ],
           );
@@ -539,7 +542,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
     final isCancelled = _cancelledRequests.contains(requestId);
 
     return Padding(
-      padding: const EdgeInsets.only(left: 24,right: 24, bottom: 16, top: 12),
+      padding: const EdgeInsets.only(left: 24, right: 24, bottom: 16, top: 12),
       child: Container(
         padding: EdgeInsets.all(spacing.paddingMedium),
         width: double.infinity,
@@ -642,7 +645,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                             Spacer(),
                             GestureDetector(
                               onTap: () =>
-                                  _navigateToDetailScreen(request, index),
+                                  _navigateToDetailScreenMobile(request, index),
                               child: ResponsiveText(
                                 text: "View Details",
                                 type: TextType.normal,
@@ -2225,7 +2228,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
 
   // Old navigation method removed - now using sidebar navigation
 
-  void _navigateToDetailScreen(dynamic request, int index) {
+  void _navigateToDetailScreenMobile(dynamic request, int index) {
     try {
       if (request?.category == null) {
         _showErrorSnackBar("Cannot open request details: Invalid request data");
@@ -2235,34 +2238,46 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       switch (request.category) {
         case "VEHICLE_SPARES":
         case "Vehicle Spares":
-          SparesDetailScreen.showAsDialog(
+          Navigator.push(
             context,
-            index: index,
-            request: request,
-            autoSpare: request.autoSpares ?? request.autoSpare,
-            bids: request.sellerOffers ?? [],
+            MaterialPageRoute<void>(
+              builder: (context) => SparesDetailPage(
+                index: index,
+                request: request,
+                autoSpare: request.autoSpares ?? request.autoSpare,
+                bids: request.sellerOffers ?? [],
+              ),
+            ),
           );
           break;
 
         case "TYRES_RIMS":
         case "Vehicle Tyres and Rims":
-          RimTyreDetailScreen.showAsDialog(
+          Navigator.push(
             context,
-            index: index,
-            request: request,
-            rimTyre: request.rimTyre,
-            bids: request.sellerOffers ?? [],
+            MaterialPageRoute<void>(
+              builder: (context) => RimTyreDetailPage(
+                index: index,
+                request: request,
+                rimTyre: request.rimTyre,
+                bids: request.sellerOffers ?? [],
+              ),
+            ),
           );
           break;
 
         case "ELECTRONICS":
         case "Consumer Electronics":
-          ConsumerElectronicsDetailScreen.showAsDialog(
+          Navigator.push(
             context,
-            index: index,
-            request: request,
-            consumerElectronics: request.consumerElectronics,
-            bids: request.sellerOffers ?? [],
+            MaterialPageRoute<void>(
+              builder: (context) => ConsumerElectronicsDetailPage(
+                index: index,
+                request: request,
+                consumerElectronics: request.consumerElectronics,
+                bids: request.sellerOffers ?? [],
+              ),
+            ),
           );
           break;
 
@@ -2643,7 +2658,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                             Spacer(),
                             GestureDetector(
                               onTap: () =>
-                                  _navigateToDetailScreen(request, index),
+                                  _navigateToDetailScreenMobile(request, index),
                               child: Text(
                                 "View Details",
                                 style: GoogleFonts.manrope(
@@ -3895,7 +3910,7 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
                     ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        _navigateToDetailScreen(request, 1);
+                        _navigateToDetailScreenMobile(request, 1);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Constants.ftaColorLight,
@@ -5648,17 +5663,16 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "Spare Details - Request #${widget.index}",
-                  style: GoogleFonts.manrope(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0),
+                  child: Text(
+                    "Spare Details - Request #${widget.index}",
+                    style: GoogleFonts.manrope(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.close, color: Colors.grey.shade700),
-                  onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
@@ -5669,7 +5683,7 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                 children: [
                   SizedBox(height: 32),
                   Padding(
-                    padding: EdgeInsets.only(left: 64, right: 64),
+                    padding: EdgeInsets.only(left: 16, right: 16),
                     child: Center(
                       child: Container(
                         width: double.infinity,
@@ -5883,16 +5897,16 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                   SizedBox(height: 32),
 
                   Padding(
-                    padding: EdgeInsets.only(left: 64, right: 64),
+                    padding: EdgeInsets.only(left: 16, right: 16),
                     child: Center(
                       child: Container(
                         width: double.infinity,
                         constraints: BoxConstraints(maxWidth: 1600),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // Vehicle Details Card
-                            Expanded(
+                            IntrinsicHeight(
                               child: _buildDetailCard(
                                 "Vehicle Details",
                                 Constants.ctaColorLight,
@@ -5932,9 +5946,9 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(width: 16),
+                            SizedBox(height: 24),
                             // Part Details Card
-                            Expanded(
+                            IntrinsicHeight(
                               child: _buildDetailCard(
                                 "Part Details",
                                 Colors.orange,
@@ -5976,9 +5990,9 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(width: 16),
+                            SizedBox(height: 24),
                             // More Details Card
-                            Expanded(
+                            IntrinsicHeight(
                               child: _buildDetailCard(
                                 "More Details",
                                 Colors.orange,
@@ -6640,7 +6654,7 @@ class _ConsumerElectronicsDetailScreenState
                 children: [
                   SizedBox(height: 32),
                   Padding(
-                    padding: EdgeInsets.only(left: 64, right: 64),
+                    padding: EdgeInsets.only(left: 16, right: 16),
                     child: Center(
                       child: Container(
                         width: double.infinity,
@@ -6853,7 +6867,7 @@ class _ConsumerElectronicsDetailScreenState
                   ),
                   SizedBox(height: 32),
                   Padding(
-                    padding: EdgeInsets.only(left: 64, right: 64),
+                    padding: EdgeInsets.only(left: 16, right: 16),
                     child: Center(
                       child: Container(
                         width: double.infinity,
@@ -8089,7 +8103,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                 children: [
                   SizedBox(height: 32),
                   Padding(
-                    padding: EdgeInsets.only(left: 64, right: 64),
+                    padding: EdgeInsets.only(left: 16, right: 16),
                     child: Center(
                       child: Container(
                         width: double.infinity,
@@ -8302,16 +8316,16 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                   ),
                   SizedBox(height: 32),
                   Padding(
-                    padding: EdgeInsets.only(left: 64, right: 64),
+                    padding: EdgeInsets.only(left: 16, right: 16),
                     child: Center(
                       child: Container(
                         width: double.infinity,
                         constraints: BoxConstraints(maxWidth: 1600),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // Product Details Card
-                            Expanded(
+                            IntrinsicHeight(
                               child: _buildDetailCard(
                                 "Product Details",
                                 Constants.ctaColorLight,
@@ -8355,9 +8369,9 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(width: 32),
+                            SizedBox(height: 24),
                             // Vehicle & Brand Details Card
-                            Expanded(
+                            IntrinsicHeight(
                               child: _buildDetailCard(
                                 "Vehicle & Brand Details",
                                 Colors.orange,
@@ -8391,8 +8405,9 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(width: 32),
-                            Expanded(
+                            SizedBox(height: 24),
+                            // Service Requirements Card
+                            IntrinsicHeight(
                               child: _buildDetailCard(
                                 "Service Requirements",
                                 Colors.orange,
@@ -9686,7 +9701,6 @@ class MobileBuyerDashboardGrid extends StatelessWidget {
   final GlobalKey transactionKey;
   const MobileBuyerDashboardGrid(this.transactionKey, {super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -9708,10 +9722,7 @@ class MobileBuyerDashboardGrid extends StatelessWidget {
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 16,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                     child: Column(
                       children: [
                         // Top row with BIDR logo, title, and notification
@@ -9721,11 +9732,7 @@ class MobileBuyerDashboardGrid extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(
-                  left: 16.0,
-                  right: 16,
-                  top: 16,
-                ),
+                padding: const EdgeInsets.only(left: 16.0, right: 16, top: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -9822,26 +9829,18 @@ class MobileBuyerDashboardGrid extends StatelessWidget {
                         context,
                         PageRouteBuilder(
                           pageBuilder:
-                              (
-                              context,
-                              animation,
-                              secondaryAnimation,
-                              ) => ShareWidgetMobile(),
+                              (context, animation, secondaryAnimation) =>
+                                  ShareWidgetMobile(),
                           transitionsBuilder:
-                              (
-                              context,
-                              animation,
-                              secondaryAnimation,
-                              child,
-                              ) {
-                            return SlideTransition(
-                              position: Tween<Offset>(
-                                begin: Offset(1.0, 0.0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            );
-                          },
+                              (context, animation, secondaryAnimation, child) {
+                                return SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: Offset(1.0, 0.0),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: child,
+                                );
+                              },
                         ),
                       );
                     },
@@ -9850,7 +9849,8 @@ class MobileBuyerDashboardGrid extends StatelessWidget {
 
                   // Transaction Management card
                   _buildFullWidthCard(
-                    title: 'Transaction Management', //TransactionMobileDashboard(key: _transactionKey);
+                    title:
+                        'Transaction Management', //TransactionMobileDashboard(key: _transactionKey);
                     icon: Icons.check_box,
                     onTap: () {
                       // Navigate to transactions
@@ -9858,26 +9858,20 @@ class MobileBuyerDashboardGrid extends StatelessWidget {
                         context,
                         PageRouteBuilder(
                           pageBuilder:
-                              (
-                              context,
-                              animation,
-                              secondaryAnimation,
-                              ) => TransactionMobileDashboard(key: transactionKey),
+                              (context, animation, secondaryAnimation) =>
+                                  TransactionMobileDashboard(
+                                    key: transactionKey,
+                                  ),
                           transitionsBuilder:
-                              (
-                              context,
-                              animation,
-                              secondaryAnimation,
-                              child,
-                              ) {
-                            return SlideTransition(
-                              position: Tween<Offset>(
-                                begin: Offset(1.0, 0.0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            );
-                          },
+                              (context, animation, secondaryAnimation, child) {
+                                return SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: Offset(1.0, 0.0),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: child,
+                                );
+                              },
                         ),
                       );
                     },
@@ -10033,6 +10027,113 @@ class MobileBuyerDashboardGrid extends StatelessWidget {
       ),
     );
   }
+}
 
+// Page wrapper classes for detail screens
+class SparesDetailPage extends StatelessWidget {
+  final int index;
+  final dynamic request;
+  final dynamic autoSpare;
+  final List<dynamic> bids;
 
+  const SparesDetailPage({
+    super.key,
+    required this.index,
+    required this.request,
+    this.autoSpare,
+    required this.bids,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Spares Details'),
+        backgroundColor: Constants.ftaColorLight,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SparesDetailScreen(
+        index: index,
+        request: request,
+        autoSpare: autoSpare,
+        bids: bids,
+      ),
+    );
+  }
+}
+
+class RimTyreDetailPage extends StatelessWidget {
+  final int index;
+  final dynamic request;
+  final dynamic rimTyre;
+  final List<dynamic> bids;
+
+  const RimTyreDetailPage({
+    super.key,
+    required this.index,
+    required this.request,
+    this.rimTyre,
+    required this.bids,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Tyres & Rims Details'),
+        backgroundColor: Constants.ftaColorLight,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: RimTyreDetailScreen(
+        index: index,
+        request: request,
+        rimTyre: rimTyre,
+        bids: bids,
+      ),
+    );
+  }
+}
+
+class ConsumerElectronicsDetailPage extends StatelessWidget {
+  final int index;
+  final dynamic request;
+  final dynamic consumerElectronics;
+  final List<dynamic> bids;
+
+  const ConsumerElectronicsDetailPage({
+    super.key,
+    required this.index,
+    required this.request,
+    this.consumerElectronics,
+    required this.bids,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Electronics Details'),
+        backgroundColor: Constants.ftaColorLight,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: ConsumerElectronicsDetailScreen(
+        index: index,
+        request: request,
+        consumerElectronics: consumerElectronics,
+        bids: bids,
+      ),
+    );
+  }
 }

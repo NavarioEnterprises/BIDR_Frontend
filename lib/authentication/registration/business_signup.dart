@@ -33,11 +33,13 @@ import '../../services/shared_preferences.dart';
 class BusinessSignUpPage extends StatefulWidget {
   final bool isProceedingFromBuyer;
   final Map<String, String>? existingUserData;
+  final bool isAddingSellerRole;
 
   const BusinessSignUpPage({
     super.key,
     this.isProceedingFromBuyer = false,
     this.existingUserData,
+    this.isAddingSellerRole = false,
   });
 
   @override
@@ -93,7 +95,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   final TextEditingController _platformWorkflowEmailController =
       TextEditingController();
 
-  // Step 3 - Bank Account Controllers
+  // Step 3 - , Account Controllers
   final TextEditingController _bankNameController = TextEditingController();
   final TextEditingController _accountNumberController =
       TextEditingController();
@@ -101,9 +103,19 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   final TextEditingController _accountHolderController =
       TextEditingController();
 
-  // Selected bank and branch code
+  // Selected bank, branch code, and account type
   String? _selectedBank;
   String? _selectedBranchCode;
+  String? _selectedAccountType;
+
+  // Account types
+  static const List<String> _accountTypes = [
+    'Current Account',
+    'Savings Account', 
+    'Business Account',
+    'Transmission Account',
+    'Cheque Account',
+  ];
 
   // South African Banks with branch codes
   static const Map<String, String> _southAfricanBanks = {
@@ -297,6 +309,13 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         steps[0].isCompleted = true; // User Information
         steps[1].isCompleted = true; // OTP Verification
       }
+      
+      // Ensure PageView is synchronized immediately
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (pageController.hasClients) {
+          pageController.jumpToPage(currentStep);
+        }
+      });
     }
 
     // Load saved form progress
@@ -841,8 +860,38 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   Future<Map<String, dynamic>?> _submitBusinessRegistration() async {
     try {
       // Prepare the business registration data according to Django backend structure
+      // Get user ID from current user or existing user data
+      String? authUserId = Constants.currentUser?.uid ?? Constants.myUid;
+      
+      // If still null and proceeding from buyer, try SharedPreferences
+      if (authUserId == null && widget.isProceedingFromBuyer) {
+        try {
+          final savedLoginData = await Sharedprefs.getCompleteLoginDataSharedPreference();
+          if (savedLoginData != null && savedLoginData.isNotEmpty) {
+            final loginData = jsonDecode(savedLoginData);
+            authUserId = loginData['user']?['uid']?.toString() ?? loginData['user']?['id']?.toString();
+          }
+        } catch (e) {
+          print('Error getting user ID from SharedPreferences: $e');
+        }
+      }
+      
+      // Check existing user data for user ID
+      if (authUserId == null && widget.existingUserData != null) {
+        authUserId = widget.existingUserData!['uid'] ?? widget.existingUserData!['userId'];
+      }
+      
+      print('🔍 Auth User ID: $authUserId');
+      print('🔍 Constants.currentUser: ${Constants.currentUser}');
+      print('🔍 Constants.myUid: ${Constants.myUid}');
+      
+      // Validate that we have a user ID
+      if (authUserId == null || authUserId.isEmpty) {
+        throw Exception('User authentication required. Please log in again.');
+      }
+      
       final businessRegistrationData = {
-        "auth_user_id": Constants.currentUser?.uid,
+        "auth_user_id": authUserId,
         'seller': {
           'registered_company_name': _companyNameController.text,
           'trading_name': _tradingNameController.text,
@@ -877,6 +926,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           'bank_name': _selectedBank ?? '',
           'account_number': _accountNumberController.text,
           'branch_code': _selectedBranchCode ?? '',
+          'account_type': _selectedAccountType ?? '',
           'account_holder': _accountHolderController.text,
         },
         'product_categories': selectedCategories,
@@ -887,6 +937,7 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
       print(
         '🔍 First category: ${selectedCategories.isNotEmpty ? selectedCategories.first : "NONE"}',
       );
+      print('🔍 Selected account type: $_selectedAccountType');
       print('🔍 Business registration data:');
       print('   - product_category: ${businessRegistrationData['seller']}');
 
@@ -904,9 +955,11 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         // If this is a buyer adding seller role, update the user role
         if (widget.isProceedingFromBuyer && widget.existingUserData != null) {
           try {
+            // When adding seller role to existing buyer, set role to 'both'
+            final newRole = widget.isAddingSellerRole ? 'both' : 'seller';
             final roleUpdateResult = await authApiService.updateUserRole(
               email: widget.existingUserData!['email']!,
-              newRole: 'seller',
+              newRole: newRole,
             );
             if (roleUpdateResult != null &&
                 roleUpdateResult['success'] == true) {
@@ -1198,12 +1251,11 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         }
       } else {
         // Handle null response
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registration failed. Please try again.'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
+        CustomDialogs.showErrorDialog(
+          context,
+          'We were unable to process your registration at this time. Please check your information and try again.',
+          heading: 'Registration Failed',
+          onRetry: () => _handleSignUp(),
         );
       }
     } catch (e) {
@@ -1211,12 +1263,11 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
         _isLoading = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred: $e'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
+      CustomDialogs.showErrorDialog(
+        context,
+        'An unexpected error occurred while processing your registration. Please try again.',
+        heading: 'Registration Error',
+        onRetry: () => _handleSignUp(),
       );
     }
   }
@@ -2175,72 +2226,47 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   }
 
   Widget _buildLocationDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Location*',
-          style: GoogleFonts.manrope(
-            color: const Color(0xFF333333),
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: Colors.black, width: 2),
-            color: Colors.white,
-          ),
-          child: InkWell(
-            onTap: _showLocationPickerDialog,
-            borderRadius: BorderRadius.circular(30),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.location_on,
-                    color:
-                        _selectedLocationText != null &&
-                            _selectedLocationText!.isNotEmpty
-                        ? Constants.ctaColorLight
-                        : const Color(0xFF666666),
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      _selectedLocationText != null &&
-                              _selectedLocationText!.isNotEmpty
-                          ? _selectedLocationText!
-                          : 'Select Location on Map',
-                      style: GoogleFonts.manrope(
-                        color:
-                            _selectedLocationText != null &&
-                                _selectedLocationText!.isNotEmpty
-                            ? const Color(0xFF333333)
-                            : const Color(0xFF999999),
-                        fontSize: 16,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.map_outlined,
-                    color: const Color(0xFF666666),
-                    size: 18,
-                  ),
-                ],
+    // Use CustomInputTransparent4 with a tap gesture for consistency
+    return GestureDetector(
+      onTap: _showLocationPickerDialog,
+      child: AbsorbPointer(
+        child: CustomInputTransparent4(
+          hintText: 'Select Location on Map',
+          labelText: 'Location*',
+          controller: _locationController,
+          focusNode: FocusNode(), // Dummy focus node since it's read-only
+          textInputAction: TextInputAction.next,
+          isPasswordField: false,
+          isEditable: false,
+          onChanged: (value) {
+            // Read-only field, no changes
+          },
+          onSubmitted: (value) {
+            // Read-only field, no submission
+          },
+          suffix: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.location_on,
+                color:
+                    _selectedLocationText != null &&
+                        _selectedLocationText!.isNotEmpty
+                    ? Constants.ctaColorLight
+                    : const Color(0xFF666666),
+                size: 20,
               ),
-            ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.map_outlined,
+                color: const Color(0xFF666666),
+                size: 18,
+              ),
+              const SizedBox(width: 12),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -2278,98 +2304,286 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   // Get coordinates from physical address
 
   Widget _buildBankDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Bank Name*',
-          style: GoogleFonts.manrope(
-            color: const Color(0xFF333333),
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+    // Create a controller for the dropdown display
+    _bankNameController.text = _selectedBank ?? '';
+
+    return GestureDetector(
+      onTap: () => _showBankSelectionDialog(),
+      child: AbsorbPointer(
+        child: CustomInputTransparent4(
+          hintText: 'Select Bank',
+          labelText: 'Bank Name*',
+          controller: _bankNameController,
+          focusNode: focusNodes['bankName']!,
+          textInputAction: TextInputAction.next,
+          isPasswordField: false,
+          isEditable: false,
+          onChanged: (value) {
+            // Handled by dialog
+          },
+          onSubmitted: (value) {
+            // Handled by dialog
+          },
+          suffix: Icon(Icons.arrow_drop_down, color: const Color(0xFF666666)),
         ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: Colors.black, width: 2),
-            color: Colors.white,
+      ),
+    );
+  }
+
+  void _showBankSelectionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: _selectedBank,
-              hint: Text(
-                'Select Bank',
-                style: GoogleFonts.manrope(
-                  color: const Color(0xFF999999),
-                  fontSize: 16,
-                ),
-              ),
-              items: _southAfricanBanks.keys.map((String bank) {
-                return DropdownMenuItem<String>(
-                  value: bank,
-                  child: Text(
-                    bank,
-                    style: GoogleFonts.manrope(
-                      color: const Color(0xFF333333),
-                      fontSize: 16,
-                    ),
+          backgroundColor: Colors.white,
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+              maxWidth: 400,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Select Bank',
+                        style: GoogleFonts.manrope(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF333333),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.close, color: Colors.grey),
+                      ),
+                    ],
                   ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedBank = newValue;
-                  _selectedBranchCode = newValue != null
-                      ? _southAfricanBanks[newValue]
-                      : null;
-                  _bankNameController.text = newValue ?? '';
-                  _branchCodeController.text = _selectedBranchCode ?? '';
-                });
-              },
+                ),
+                Divider(height: 1),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _southAfricanBanks.keys.length,
+                    itemBuilder: (context, index) {
+                      String bank = _southAfricanBanks.keys.elementAt(index);
+                      bool isSelected = _selectedBank == bank;
+
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            _selectedBank = bank;
+                            _selectedBranchCode = _southAfricanBanks[bank];
+                            _bankNameController.text = bank;
+                            _branchCodeController.text =
+                                _selectedBranchCode ?? '';
+                          });
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Constants.ctaColorLight.withOpacity(0.1)
+                                : Colors.transparent,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  bank,
+                                  style: GoogleFonts.manrope(
+                                    color: isSelected
+                                        ? Constants.ctaColorLight
+                                        : const Color(0xFF333333),
+                                    fontSize: 16,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                              if (isSelected)
+                                Icon(
+                                  Icons.check,
+                                  color: Constants.ctaColorLight,
+                                  size: 20,
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+        );
+      },
+    );
+  }
+
+  void _showAccountTypeSelectionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: Colors.white,
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.5,
+              maxWidth: 300,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Select Account Type',
+                        style: GoogleFonts.manrope(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF333333),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.close, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(height: 1),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _accountTypes.length,
+                    itemBuilder: (context, index) {
+                      String accountType = _accountTypes[index];
+                      bool isSelected = _selectedAccountType == accountType;
+
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            _selectedAccountType = accountType;
+                          });
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Constants.ctaColorLight.withOpacity(0.1)
+                                : Colors.transparent,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  accountType,
+                                  style: GoogleFonts.manrope(
+                                    color: isSelected
+                                        ? Constants.ctaColorLight
+                                        : const Color(0xFF333333),
+                                    fontSize: 16,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                              if (isSelected)
+                                Icon(
+                                  Icons.check,
+                                  color: Constants.ctaColorLight,
+                                  size: 20,
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildBranchCodeField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Branch Code*',
-          style: GoogleFonts.manrope(
-            color: const Color(0xFF333333),
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+    // Update branch code controller
+    _branchCodeController.text = _selectedBranchCode ?? '';
+
+    return CustomInputTransparent4(
+      hintText: 'Select a bank first',
+      labelText: 'Branch Code*',
+      controller: _branchCodeController,
+      focusNode: focusNodes['branchCode']!,
+      textInputAction: TextInputAction.next,
+      isPasswordField: false,
+      isEditable: false,
+      onChanged: (value) {
+        // Read-only field
+      },
+      onSubmitted: (value) {
+        // Read-only field
+      },
+    );
+  }
+
+  Widget _buildAccountTypeDropdown() {
+    return GestureDetector(
+      onTap: () => _showAccountTypeSelectionDialog(),
+      child: AbsorbPointer(
+        child: CustomInputTransparent4(
+          hintText: 'Select Account Type',
+          labelText: 'Account Type*',
+          controller: TextEditingController(text: _selectedAccountType ?? ''),
+          focusNode: FocusNode(),
+          textInputAction: TextInputAction.next,
+          isPasswordField: false,
+          isEditable: false,
+          onChanged: (value) {
+            // Handled by dialog
+          },
+          onSubmitted: (value) {
+            // Handled by dialog
+          },
+          suffix: Icon(Icons.arrow_drop_down, color: const Color(0xFF666666)),
         ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: Colors.black, width: 2),
-            color: Colors.white,
-          ),
-          child: Text(
-            _selectedBranchCode ?? 'Select a bank first',
-            style: GoogleFonts.manrope(
-              color: _selectedBranchCode != null
-                  ? const Color(0xFF333333)
-                  : const Color(0xFF999999),
-              fontSize: 16,
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -2384,6 +2598,9 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
           const SizedBox(height: 24),
           // Branch Code (auto-filled, read-only)
           _buildBranchCodeField(),
+          const SizedBox(height: 24),
+          // Account Type Dropdown
+          _buildAccountTypeDropdown(),
           const SizedBox(height: 24),
           _buildInputField(
             'Account Number*',
@@ -2631,51 +2848,24 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     FocusNode focusNode, {
     bool showPinIcon = false,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.manrope(
-            color: const Color(0xFF333333),
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black, width: 2),
-            color: Colors.white,
-          ),
-          child: TextFormField(
-            controller: controller,
-            focusNode: focusNode,
-            maxLines: 4,
-            minLines: 4,
-            style: GoogleFonts.manrope(
-              color: const Color(0xFF333333),
-              fontSize: 16,
-            ),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: GoogleFonts.manrope(
-                color: const Color(0xFF999999),
-                fontSize: 16,
-              ),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-              suffixIcon: showPinIcon
-                  ? Icon(Icons.location_pin, color: const Color(0xFF666666))
-                  : null,
-            ),
-          ),
-        ),
-      ],
+    // Use CustomInputTransparent4 for consistency
+    return CustomInputTransparent4(
+      hintText: hint.replaceAll('*', ''),
+      labelText: label,
+      controller: controller,
+      focusNode: focusNode,
+      textInputAction: TextInputAction.next,
+      isPasswordField: false,
+      maxLines: 4,
+      suffix: showPinIcon
+          ? Icon(Icons.location_on, color: Constants.ctaColorLight, size: 20)
+          : null,
+      onChanged: (value) {
+        // Any additional handling if needed
+      },
+      onSubmitted: (value) {
+        // Move to next field if needed
+      },
     );
   }
 
@@ -2691,177 +2881,31 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
     bool isPassword = false,
     Widget? suffixIcon,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.manrope(
-            color: const Color(0xFF333333),
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        FutureBuilder<List<String>>(
-          future: FormDataService.getFieldSuggestions(fieldKey),
-          builder: (context, snapshot) {
-            final suggestions = snapshot.data ?? [];
-
-            return Autocomplete<String>(
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                if (textEditingValue.text.isEmpty) {
-                  return suggestions.take(
-                    5,
-                  ); // Show recent suggestions when empty
-                }
-                return suggestions
-                    .where((String suggestion) {
-                      return suggestion.toLowerCase().contains(
-                        textEditingValue.text.toLowerCase(),
-                      );
-                    })
-                    .take(5);
-              },
-              fieldViewBuilder:
-                  (
-                    context,
-                    fieldController,
-                    fieldFocusNode,
-                    onEditingComplete,
-                  ) {
-                    // Sync with our main controller
-                    if (controller.text != fieldController.text) {
-                      fieldController.text = controller.text;
-                    }
-
-                    // Add listener to update main controller
-                    fieldController.addListener(() {
-                      if (controller.text != fieldController.text) {
-                        controller.text = fieldController.text;
-                      }
-                    });
-
-                    return Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: Colors.black, width: 2),
-                        color: Colors.white,
-                      ),
-                      child: TextFormField(
-                        controller: fieldController,
-                        focusNode: focusNode,
-                        keyboardType: integersOnly
-                            ? TextInputType.number
-                            : TextInputType.text,
-                        obscureText: isPassword,
-                        style: GoogleFonts.manrope(
-                          color: const Color(0xFF333333),
-                          fontSize: 16,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: hint,
-                          hintStyle: GoogleFonts.manrope(
-                            color: const Color(0xFF999999),
-                            fontSize: 16,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
-                          suffixIcon: suffixIcon,
-                        ),
-                        onEditingComplete: onEditingComplete,
-                        onChanged: (value) {
-                          // Save suggestion when user types
-                          if (value.trim().isNotEmpty) {
-                            FormDataService.saveFieldSuggestion(
-                              fieldKey,
-                              value.trim(),
-                            );
-                          }
-                        },
-                      ),
-                    );
-                  },
-              optionsViewBuilder: (context, onSelected, options) {
-                if (options.isEmpty) return Container();
-
-                return Align(
-                  alignment: Alignment.topLeft,
-                  child: Material(
-                    elevation: 4,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 300,
-                      constraints: const BoxConstraints(maxHeight: 200),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.black),
-                      ),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: options.length,
-                        itemBuilder: (context, index) {
-                          final option = options.elementAt(index);
-                          return InkWell(
-                            onTap: () => onSelected(option),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: index < options.length - 1
-                                        ? Colors.black
-                                        : Colors.transparent,
-                                    width: 1,
-                                  ),
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.history,
-                                    size: 16,
-                                    color: const Color(0xFF666666),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      option,
-                                      style: GoogleFonts.manrope(
-                                        color: const Color(0xFF333333),
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                );
-              },
-              onSelected: (String selection) {
-                controller.text = selection;
-                FormDataService.saveFieldSuggestion(fieldKey, selection);
-              },
-            );
-          },
-        ),
-      ],
+    // Simply use the same style as _buildUserInformationForm
+    return _buildCustomTextField(
+      label,
+      controller,
+      focusNode,
+      null,
+      integersOnly: integersOnly,
+      isName: isName,
+      isEmail: isEmail,
+      isPassword: isPassword,
+      suffixIcon: suffixIcon,
     );
   }
 
   Widget _buildYearAutocomplete() {
+    return _buildCustomTextField(
+      'Year Established*',
+      _yearEstablishedController,
+      focusNodes['yearEstablished']!,
+      focusNodes['websiteUrl'], // Next focus node
+      integersOnly: true,
+    );
+  }
+
+  Widget _buildYearAutocomplete_old() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -3047,45 +3091,39 @@ class _BusinessSignUpPageState extends State<BusinessSignUpPage> {
   }
 
   Widget _buildFileUploadField() {
+    // Create a dummy controller to hold the upload status text
+    final uploadStatusController = TextEditingController(
+      text: _uploadedDocuments.isNotEmpty
+          ? '${_uploadedDocuments.length} document(s) uploaded'
+          : '',
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Upload CIPC Documents',
-          style: GoogleFonts.manrope(
-            fontSize: 14,
-            fontWeight: FontWeight.w300,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 8),
         GestureDetector(
           onTap: _pickFiles,
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: Colors.black, width: 2),
-              color: Colors.white,
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.cloud_upload_outlined,
-                  color: Color(0xFF999999),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  _uploadedDocuments.isNotEmpty
-                      ? '${_uploadedDocuments.length} document(s) uploaded'
-                      : 'Upload CIPC Documents',
-                  style: GoogleFonts.manrope(
-                    color: Color(0xFF999999),
-                    fontSize: 16,
-                  ),
-                ),
-              ],
+          child: AbsorbPointer(
+            child: CustomInputTransparent4(
+              hintText: 'Upload CIPC Documents',
+              labelText: 'Upload CIPC Documents',
+              controller: uploadStatusController,
+              focusNode: FocusNode(), // Dummy focus node since it's read-only
+              textInputAction: TextInputAction.next,
+              isPasswordField: false,
+              isEditable: false,
+              onChanged: (value) {
+                // Read-only field, no changes
+              },
+              onSubmitted: (value) {
+                // Read-only field, no submission
+              },
+              suffix: Icon(
+                Icons.cloud_upload_outlined,
+                color: _uploadedDocuments.isNotEmpty
+                    ? Constants.ctaColorLight
+                    : const Color(0xFF999999),
+              ),
             ),
           ),
         ),

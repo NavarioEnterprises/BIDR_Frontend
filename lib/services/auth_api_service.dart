@@ -23,15 +23,21 @@ class AuthApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         var jsonResponse = jsonDecode(responseBody);
-        print('Role selected successfully: $jsonResponse');
+        if (kDebugMode) {
+          print('Role selected successfully: $jsonResponse');
+        }
         return jsonResponse['role'];
       } else {
-        print('Failed to select role: ${response.statusCode}');
-        print(response.reasonPhrase);
+        if (kDebugMode) {
+          print('Failed to select role: ${response.statusCode}');
+          print(response.reasonPhrase);
+        }
         return null;
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
       return null;
     }
   }
@@ -60,9 +66,11 @@ class AuthApiService {
       'delivery_method': deliveryMethod,
     });
 
-    print('Making request to: $url');
-    print('Headers: $headers');
-    print('Body: $body');
+    if (kDebugMode) {
+      print('Making request to: $url');
+      print('Headers: $headers');
+      print('Body: $body');
+    }
 
     try {
       final response = await http.post(url, headers: headers, body: body);
@@ -70,13 +78,17 @@ class AuthApiService {
       if (kDebugMode) {
         print('Response Status: ${response.statusCode}');
       }
-      print('Response Headers: ${response.headers}');
-      print('Response Body: ${response.body}');
+      if (kDebugMode) {
+        print('Response Headers: ${response.headers}');
+        print('Response Body: ${response.body}');
+      }
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Success case
         final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-        print('User registered successfully: $jsonResponse');
+        if (kDebugMode) {
+          print('User registered successfully: $jsonResponse');
+        }
         if (jsonResponse["success"] == true) {
           Constants.currentUser = User.fromJson(jsonResponse["user"]);
           if (kDebugMode) {
@@ -105,7 +117,9 @@ class AuthApiService {
         }
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
       return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
@@ -122,11 +136,15 @@ class AuthApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         var jsonResponse = jsonDecode(responseBody);
-        print('OTP verified: $jsonResponse');
+        if (kDebugMode) {
+          print('OTP verified: $jsonResponse');
+        }
         return {'success': true, 'data': jsonResponse};
       } else {
-        print('OTP verification failed: ${response.statusCode}');
-        print(response.reasonPhrase);
+        if (kDebugMode) {
+          print('OTP verification failed: ${response.statusCode}');
+          print(response.reasonPhrase);
+        }
         try {
           var errorResponse = jsonDecode(responseBody);
           return {
@@ -138,7 +156,9 @@ class AuthApiService {
         }
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
       return {'success': false, 'error': 'Network error occurred'};
     }
   }
@@ -163,11 +183,15 @@ class AuthApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         var jsonResponse = jsonDecode(responseBody);
-        print('OTP resent successfully: $jsonResponse');
+        if (kDebugMode) {
+          print('OTP resent successfully: $jsonResponse');
+        }
         return {'success': true, 'data': jsonResponse};
       } else {
-        print('OTP resend failed: ${response.statusCode}');
-        print(response.reasonPhrase);
+        if (kDebugMode) {
+          print('OTP resend failed: ${response.statusCode}');
+          print(response.reasonPhrase);
+        }
         try {
           var errorResponse = jsonDecode(responseBody);
           return {
@@ -179,7 +203,9 @@ class AuthApiService {
         }
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
       return {'success': false, 'error': 'Network error occurred'};
     }
   }
@@ -196,17 +222,21 @@ class AuthApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         var jsonResponse = jsonDecode(responseBody);
-        print('Login successful: $jsonResponse');
+        if (kDebugMode) {
+          print('Login successful: $jsonResponse');
+        }
 
         // Debug the response structure
-        print(
-          'Response contains success: ${jsonResponse.containsKey('success')}',
-        );
-        print('Success value: ${jsonResponse['success']}');
-        print(
-          'Response contains access_token: ${jsonResponse.containsKey('access_token')}',
-        );
-        print('Access token value: ${jsonResponse['access_token']}');
+        if (kDebugMode) {
+          print(
+            'Response contains success: ${jsonResponse.containsKey('success')}',
+          );
+          print('Success value: ${jsonResponse['success']}');
+          print(
+            'Response contains access_token: ${jsonResponse.containsKey('access_token')}',
+          );
+          print('Access token value: ${jsonResponse['access_token']}');
+        }
 
         // Store tokens and user data locally
         // Check for success using either 'success: true' or 'message: Login successful'
@@ -215,18 +245,26 @@ class AuthApiService {
             (jsonResponse['message'] == 'Login successful');
 
         if (isLoginSuccessful) {
-          print('Entering token storage logic...');
+          if (kDebugMode) {
+            print('Entering token storage logic...');
+          }
           // Save access token
           final accessToken = jsonResponse['access_token'];
-          print('Access token to save: $accessToken');
+          if (kDebugMode) {
+            print('Access token to save: $accessToken');
+          }
           if (accessToken != null) {
             final result =
                 await Sharedprefs.saveUserAccessTokenSharedPreference(
                   accessToken,
                 );
-            print('Access token saved successfully: $result');
+            if (kDebugMode) {
+              print('Access token saved successfully: $result');
+            }
           } else {
-            print('Access token is null, not saving');
+            if (kDebugMode) {
+              print('Access token is null, not saving');
+            }
           }
 
           // Save refresh token
@@ -292,12 +330,16 @@ class AuthApiService {
 
         return jsonResponse;
       } else {
-        print('Login failed: ${response.statusCode}');
-        print(response.reasonPhrase);
+        if (kDebugMode) {
+          print('Login failed: ${response.statusCode}');
+          print(response.reasonPhrase);
+        }
         return null;
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
       return null;
     }
   }
@@ -314,13 +356,19 @@ class AuthApiService {
 
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(responseBody);
-        print('User profile: $jsonResponse');
+        if (kDebugMode) {
+          print('User profile: $jsonResponse');
+        }
       } else {
-        print('Failed to fetch profile: ${response.statusCode}');
-        print(response.reasonPhrase);
+        if (kDebugMode) {
+          print('Failed to fetch profile: ${response.statusCode}');
+          print(response.reasonPhrase);
+        }
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
     }
   }
 
@@ -336,13 +384,19 @@ class AuthApiService {
       String responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        print('Logged out successfully');
+        if (kDebugMode) {
+          print('Logged out successfully');
+        }
       } else {
-        print('Logout failed: ${response.statusCode}');
-        print(response.reasonPhrase);
+        if (kDebugMode) {
+          print('Logout failed: ${response.statusCode}');
+          print(response.reasonPhrase);
+        }
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
     }
   }
 
@@ -368,13 +422,19 @@ class AuthApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         var jsonResponse = jsonDecode(responseBody);
-        print('Seller registered: $jsonResponse');
+        if (kDebugMode) {
+          print('Seller registered: $jsonResponse');
+        }
       } else {
-        print('Register seller failed: ${response.statusCode}');
-        print(response.reasonPhrase);
+        if (kDebugMode) {
+          print('Register seller failed: ${response.statusCode}');
+          print(response.reasonPhrase);
+        }
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
     }
   }
 
@@ -388,21 +448,27 @@ class AuthApiService {
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode(businessData);
 
-    print('Making business registration request to: $url');
-    print('Headers: $headers');
-    print('Body: $body');
+    if (kDebugMode) {
+      print('Making business registration request to: $url');
+      print('Headers: $headers');
+      print('Body: $body');
+    }
 
     try {
       final response = await http.post(url, headers: headers, body: body);
 
-      print('Business Registration Response Status: ${response.statusCode}');
-      print('Business Registration Response Headers: ${response.headers}');
-      print('Business Registration Response Body: ${response.body}');
+      if (kDebugMode) {
+        print('Business Registration Response Status: ${response.statusCode}');
+        print('Business Registration Response Headers: ${response.headers}');
+        print('Business Registration Response Body: ${response.body}');
+      }
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Success case
         final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-        print('Business registration submitted successfully: $jsonResponse');
+        if (kDebugMode) {
+          print('Business registration submitted successfully: $jsonResponse');
+        }
         return {
           'success': true,
           'data': jsonResponse,
@@ -432,7 +498,9 @@ class AuthApiService {
         }
       }
     } catch (e) {
-      print('Error occurred in business registration: $e');
+      if (kDebugMode) {
+        print('Error occurred in business registration: $e');
+      }
       return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
@@ -456,13 +524,19 @@ class AuthApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         var jsonResponse = jsonDecode(responseBody);
-        print('Document uploaded: $jsonResponse');
+        if (kDebugMode) {
+          print('Document uploaded: $jsonResponse');
+        }
       } else {
-        print('Document upload failed: ${response.statusCode}');
-        print(response.reasonPhrase);
+        if (kDebugMode) {
+          print('Document upload failed: ${response.statusCode}');
+          print(response.reasonPhrase);
+        }
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
     }
   }
 
@@ -490,13 +564,19 @@ class AuthApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         var jsonResponse = jsonDecode(responseBody);
-        print('Bank info submitted: $jsonResponse');
+        if (kDebugMode) {
+          print('Bank info submitted: $jsonResponse');
+        }
       } else {
-        print('Bank info submission failed: ${response.statusCode}');
-        print(response.reasonPhrase);
+        if (kDebugMode) {
+          print('Bank info submission failed: ${response.statusCode}');
+          print(response.reasonPhrase);
+        }
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
     }
   }
 
@@ -522,11 +602,15 @@ class AuthApiService {
 
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(responseBody);
-        print('Profile updated successfully: $jsonResponse');
+        if (kDebugMode) {
+          print('Profile updated successfully: $jsonResponse');
+        }
         return jsonResponse;
       } else {
-        print('Profile update failed: ${response.statusCode}');
-        print('Response: $responseBody');
+        if (kDebugMode) {
+          print('Profile update failed: ${response.statusCode}');
+          print('Response: $responseBody');
+        }
         return {
           'success': false,
           'statusCode': response.statusCode,
@@ -534,7 +618,9 @@ class AuthApiService {
         };
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
       return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
@@ -555,11 +641,15 @@ class AuthApiService {
 
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(responseBody);
-        print('Password reset requested successfully: $jsonResponse');
+        if (kDebugMode) {
+          print('Password reset requested successfully: $jsonResponse');
+        }
         return jsonResponse;
       } else {
-        print('Password reset request failed: ${response.statusCode}');
-        print('Response: $responseBody');
+        if (kDebugMode) {
+          print('Password reset request failed: ${response.statusCode}');
+          print('Response: $responseBody');
+        }
         return {
           'success': false,
           'statusCode': response.statusCode,
@@ -567,7 +657,79 @@ class AuthApiService {
         };
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
+      return {'success': false, 'error': 'Network or parsing error: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>?> resetPassword({
+    required String uid,
+    required String token,
+    required String password,
+  }) async {
+    var url = Uri.parse(
+      '${GlobalVariables.authServiceUrl}password-reset/',
+    );
+    var request = http.Request('POST', url);
+    request.headers['Content-Type'] = 'application/json';
+    
+    final bodyData = {
+      'uid': uid,
+      'token': token,
+      'password': password,
+      'confirm_password': password,
+    };
+    
+    request.body = jsonEncode(bodyData);
+
+    if (kDebugMode) {
+      print('=== Reset Password API Call ===');
+      print('URL: $url');
+      print('Headers: ${request.headers}');
+      print('Body: ${jsonEncode(bodyData)}');
+    }
+
+    try {
+      http.StreamedResponse response = await request.send();
+      String responseBody = await response.stream.bytesToString();
+
+      if (kDebugMode) {
+        print('Response Status Code: ${response.statusCode}');
+        print('Response Body: $responseBody');
+      }
+
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(responseBody);
+        if (kDebugMode) {
+          print('Password reset successful: $jsonResponse');
+        }
+        return jsonResponse;
+      } else {
+        if (kDebugMode) {
+          print('Password reset failed: ${response.statusCode}');
+          print('Response: $responseBody');
+        }
+        try {
+          var errorResponse = jsonDecode(responseBody);
+          return {
+            'success': false,
+            'statusCode': response.statusCode,
+            'error': errorResponse['error'] ?? 'Password reset failed',
+          };
+        } catch (e) {
+          return {
+            'success': false,
+            'statusCode': response.statusCode,
+            'error': responseBody,
+          };
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error occurred in resetPassword: $e');
+      }
       return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
@@ -597,11 +759,15 @@ class AuthApiService {
 
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(responseBody);
-        print('Password changed successfully: $jsonResponse');
+        if (kDebugMode) {
+          print('Password changed successfully: $jsonResponse');
+        }
         return jsonResponse;
       } else {
-        print('Password change failed: ${response.statusCode}');
-        print('Response: $responseBody');
+        if (kDebugMode) {
+          print('Password change failed: ${response.statusCode}');
+          print('Response: $responseBody');
+        }
         try {
           var errorResponse = jsonDecode(responseBody);
           return {
@@ -621,7 +787,9 @@ class AuthApiService {
         }
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
       return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
@@ -639,11 +807,15 @@ class AuthApiService {
       String responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        print('Account deleted successfully');
+        if (kDebugMode) {
+          print('Account deleted successfully');
+        }
         return {'success': true, 'message': 'Account deleted successfully'};
       } else {
-        print('Account deletion failed: ${response.statusCode}');
-        print('Response: $responseBody');
+        if (kDebugMode) {
+          print('Account deletion failed: ${response.statusCode}');
+          print('Response: $responseBody');
+        }
         return {
           'success': false,
           'statusCode': response.statusCode,
@@ -651,7 +823,9 @@ class AuthApiService {
         };
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
       return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
@@ -665,7 +839,9 @@ class AuthApiService {
       await logout(accessToken, refreshToken);
       return {'success': true, 'message': 'Signed out successfully'};
     } catch (e) {
-      print('Error during sign out: $e');
+      if (kDebugMode) {
+        print('Error during sign out: $e');
+      }
       return {'success': false, 'error': 'Sign out error: $e'};
     }
   }
@@ -807,11 +983,15 @@ class AuthApiService {
 
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(responseBody);
-        print('User profile retrieved successfully: $jsonResponse');
+        if (kDebugMode) {
+          print('User profile retrieved successfully: $jsonResponse');
+        }
         return jsonResponse;
       } else {
-        print('Get user profile failed: ${response.statusCode}');
-        print('Response: $responseBody');
+        if (kDebugMode) {
+          print('Get user profile failed: ${response.statusCode}');
+          print('Response: $responseBody');
+        }
         return {
           'success': false,
           'statusCode': response.statusCode,
@@ -819,7 +999,9 @@ class AuthApiService {
         };
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
       return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
@@ -841,11 +1023,15 @@ class AuthApiService {
 
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(responseBody);
-        print('Support message sent successfully: $jsonResponse');
+        if (kDebugMode) {
+          print('Support message sent successfully: $jsonResponse');
+        }
         return jsonResponse;
       } else {
-        print('Send support message failed: ${response.statusCode}');
-        print('Response: $responseBody');
+        if (kDebugMode) {
+          print('Send support message failed: ${response.statusCode}');
+          print('Response: $responseBody');
+        }
         return {
           'success': false,
           'statusCode': response.statusCode,
@@ -853,7 +1039,9 @@ class AuthApiService {
         };
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
       return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
@@ -880,11 +1068,15 @@ class AuthApiService {
 
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(responseBody);
-        print('Quote request sent successfully: $jsonResponse');
+        if (kDebugMode) {
+          print('Quote request sent successfully: $jsonResponse');
+        }
         return jsonResponse;
       } else {
-        print('Quote request failed: ${response.statusCode}');
-        print('Response: $responseBody');
+        if (kDebugMode) {
+          print('Quote request failed: ${response.statusCode}');
+          print('Response: $responseBody');
+        }
         return {
           'success': false,
           'statusCode': response.statusCode,
@@ -892,7 +1084,9 @@ class AuthApiService {
         };
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
       return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
@@ -924,11 +1118,15 @@ class AuthApiService {
 
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(responseBody);
-        print('Seller earning history retrieved successfully');
+        if (kDebugMode) {
+          print('Seller earning history retrieved successfully');
+        }
         return jsonResponse;
       } else {
-        print('Get seller earning history failed: ${response.statusCode}');
-        print('Response: $responseBody');
+        if (kDebugMode) {
+          print('Get seller earning history failed: ${response.statusCode}');
+          print('Response: $responseBody');
+        }
         return {
           'success': false,
           'statusCode': response.statusCode,
@@ -936,7 +1134,9 @@ class AuthApiService {
         };
       }
     } catch (e) {
-      print('Error occurred: $e');
+      if (kDebugMode) {
+        print('Error occurred: $e');
+      }
       return {'success': false, 'error': 'Network or parsing error: $e'};
     }
   }
@@ -957,14 +1157,20 @@ class AuthApiService {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        print('User status check: $jsonResponse');
+        if (kDebugMode) {
+          print('User status check: $jsonResponse');
+        }
         return jsonResponse;
       } else {
-        print('User status check failed: ${response.statusCode}');
+        if (kDebugMode) {
+          print('User status check failed: ${response.statusCode}');
+        }
         return null;
       }
     } catch (e) {
-      print('Error checking user status: $e');
+      if (kDebugMode) {
+        print('Error checking user status: $e');
+      }
       return null;
     }
   }
@@ -986,10 +1192,14 @@ class AuthApiService {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        print('User role updated: $jsonResponse');
+        if (kDebugMode) {
+          print('User role updated: $jsonResponse');
+        }
         return jsonResponse;
       } else {
-        print('User role update failed: ${response.statusCode}');
+        if (kDebugMode) {
+          print('User role update failed: ${response.statusCode}');
+        }
         final errorResponse = jsonDecode(response.body);
         return {
           'success': false,
@@ -997,7 +1207,9 @@ class AuthApiService {
         };
       }
     } catch (e) {
-      print('Error updating user role: $e');
+      if (kDebugMode) {
+        print('Error updating user role: $e');
+      }
       return {'success': false, 'error': 'Network error occurred'};
     }
   }

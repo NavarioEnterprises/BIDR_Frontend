@@ -19,7 +19,8 @@ import '../../../customWdget/appbar.dart';
 import '../../../customWdget/custom_input2.dart';
 import '../../../models/alert.dart';
 import '../../../notifier/my_notifier.dart';
-import '../../../services/products_management_api_service copy.dart';
+import '../../../services/auth_api_service.dart';
+import '../../../services/products_management_api_service.dart';
 import '../../buyer/blog.dart';
 import '../../buyer/contact_form.dart';
 import '../../buyer/join_as_business.dart';
@@ -932,6 +933,146 @@ class _BuyerHomeMobilePageState extends State<BuyerHomeMobilePage>
         ),
       ),
     );
+  }
+
+  // Missing APIs from desktop version - High Priority
+  Future<Map<String, dynamic>?> getRequestsByBuyer() async {
+    try {
+      final result = await ApiService.getRequestsByBuyer();
+      return result;
+    } catch (e) {
+      print('Error getting buyer requests: $e');
+      return null;
+    }
+  }
+
+  Future<List<dynamic>?> getQuotesForRequest(String requestId) async {
+    try {
+      final result = await ApiService.getQuotesForRequest(requestId);
+      if (result['success'] == true && result['quotes'] != null) {
+        return result['quotes'] as List<dynamic>;
+      }
+      return null;
+    } catch (e) {
+      print('Error getting quotes for request: $e');
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getUserProfile() async {
+    try {
+      final profile = await AuthApiService().getUserProfile(
+        uid: Constants.currentUser!.uid,
+      );
+      return profile;
+    } catch (e) {
+      print('Error getting user profile: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateProfile(Map<String, dynamic> profileData) async {
+    try {
+      final result = await AuthApiService().updateProfile(
+        accessToken: '',
+        firstName: '',
+        lastName: '',
+        phoneNumber: '',
+      );
+      return result != null;
+    } catch (e) {
+      print('Error updating profile: $e');
+      return false;
+    }
+  }
+
+  Future<bool> signOut() async {
+    try {
+      final result = await AuthApiService().signOut(
+        accessToken: '',
+        refreshToken: '',
+      );
+      return result != null;
+    } catch (e) {
+      print('Error signing out: $e');
+      return false;
+    }
+  }
+
+  // Missing APIs - Medium Priority
+  Future<Map<String, dynamic>?> getProductRequestDetails(
+    String requestId,
+  ) async {
+    try {
+      final details = await ApiService.getProductRequestDetails(requestId);
+      return details;
+    } catch (e) {
+      print('Error getting product request details: $e');
+      return null;
+    }
+  }
+
+  Future<bool> changePassword(String oldPassword, String newPassword) async {
+    try {
+      final result = await AuthApiService().changePassword(
+        currentPassword: oldPassword,
+        newPassword: newPassword,
+      );
+      return result != null;
+    } catch (e) {
+      print('Error changing password: $e');
+      return false;
+    }
+  }
+
+  Future<bool> requestPasswordReset(String email) async {
+    try {
+      final result = await AuthApiService().requestPasswordReset(email: email);
+      return result != null;
+    } catch (e) {
+      print('Error requesting password reset: $e');
+      return false;
+    }
+  }
+
+  // Missing APIs - Low Priority (Advanced Features)
+  Future<bool> updateOrderStatus(String orderId, String status) async {
+    try {
+      final result = await ApiService.updateOrderStatus(
+        orderId: orderId,
+        status: status,
+      );
+      return result != null;
+    } catch (e) {
+      print('Error updating order status: $e');
+      return false;
+    }
+  }
+
+  Future<bool> flagRequest(String requestId, String reason) async {
+    try {
+      final result = await ApiService.flagRequest(
+        requestId: requestId,
+        reason: reason,
+        authUserUid: Constants.currentUser?.uid ?? '',
+      );
+      return result['success'] == true;
+    } catch (e) {
+      print('Error flagging request: $e');
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getSellerOrdersSummary(String sellerId) async {
+    try {
+      final summary = await ApiService.getSellerOrdersSummary(
+        authUserUid: sellerId,
+      );
+      return summary;
+    } catch (e) {
+      print('Error getting seller orders summary: $e');
+      return null;
+    }
   }
 }
 

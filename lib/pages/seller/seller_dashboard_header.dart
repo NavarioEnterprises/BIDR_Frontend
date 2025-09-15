@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/models/alert.dart';
@@ -10,12 +11,14 @@ class SellerDashboardHeader extends StatefulWidget {
   final String headerName;
   final SortOption? initialSort;
   final Function(SortOption?)? onSortChanged;
+  final int tabActiveIndex;
 
   const SellerDashboardHeader({
-    super.key, 
+    super.key,
     required this.headerName,
     this.initialSort,
     this.onSortChanged,
+    this.tabActiveIndex = 0,
   });
 
   @override
@@ -55,7 +58,9 @@ class _SellerDashboardHeaderState extends State<SellerDashboardHeader>
     try {
       // Simple initial load without complex refresh logic
       final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
-      print('Initializing notifications for seller UUID: $userUuid');
+      if (kDebugMode) {
+        print('Initializing notifications for seller UUID: $userUuid');
+      }
 
       if (userUuid.isNotEmpty) {
         setState(() {
@@ -77,7 +82,9 @@ class _SellerDashboardHeaderState extends State<SellerDashboardHeader>
         }
       }
     } catch (e) {
-      print('Error initializing notifications: $e');
+      if (kDebugMode) {
+        print('Error initializing notifications: $e');
+      }
       if (mounted) {
         setState(() {
           notifications = [];
@@ -101,7 +108,9 @@ class _SellerDashboardHeaderState extends State<SellerDashboardHeader>
     try {
       // Use the user's UUID from Constants
       final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
-      print('Loading notifications for seller UUID: $userUuid');
+      if (kDebugMode) {
+        print('Loading notifications for seller UUID: $userUuid');
+      }
 
       if (userUuid.isNotEmpty) {
         final fetchedNotifications = await _notificationApiService
@@ -113,7 +122,9 @@ class _SellerDashboardHeaderState extends State<SellerDashboardHeader>
           });
         }
       } else {
-        print('No user UUID found');
+        if (kDebugMode) {
+          print('No user UUID found');
+        }
         if (mounted) {
           setState(() {
             notifications = [];
@@ -121,7 +132,9 @@ class _SellerDashboardHeaderState extends State<SellerDashboardHeader>
         }
       }
     } catch (e) {
-      print('Error loading notifications from API: $e');
+      if (kDebugMode) {
+        print('Error loading notifications from API: $e');
+      }
       // On error, just set empty notifications
       if (mounted) {
         setState(() {
@@ -136,7 +149,9 @@ class _SellerDashboardHeaderState extends State<SellerDashboardHeader>
 
     try {
       final userUuid = Constants.currentUser?.uid ?? Constants.myUid;
-      print('Loading unread count for seller UUID: $userUuid');
+      if (kDebugMode) {
+        print('Loading unread count for seller UUID: $userUuid');
+      }
 
       if (userUuid.isNotEmpty) {
         final unreadCount = await _notificationApiService
@@ -149,7 +164,9 @@ class _SellerDashboardHeaderState extends State<SellerDashboardHeader>
         }
       }
     } catch (e) {
-      print('Error loading unread notification count: $e');
+      if (kDebugMode) {
+        print('Error loading unread notification count: $e');
+      }
       if (mounted) {
         setState(() {
           _unreadCount = 0;
@@ -172,7 +189,9 @@ class _SellerDashboardHeaderState extends State<SellerDashboardHeader>
         _loadUnreadCount(),
       ]).timeout(const Duration(seconds: 15));
     } catch (e) {
-      print('Error refreshing notifications: $e');
+      if (kDebugMode) {
+        print('Error refreshing notifications: $e');
+      }
       // Set empty state on error
       if (mounted) {
         setState(() {
@@ -202,12 +221,18 @@ class _SellerDashboardHeaderState extends State<SellerDashboardHeader>
           // Recalculate unread count from notifications
           _unreadCount = notifications.where((n) => !n.read).length;
         });
-        print('Notification marked as read: $notificationId');
+        if (kDebugMode) {
+          print('Notification marked as read: $notificationId');
+        }
       } else {
-        print('Failed to mark notification as read: $notificationId');
+        if (kDebugMode) {
+          print('Failed to mark notification as read: $notificationId');
+        }
       }
     } catch (e) {
-      print('Error marking notification as read: $e');
+      if (kDebugMode) {
+        print('Error marking notification as read: $e');
+      }
     }
   }
 
@@ -1020,7 +1045,7 @@ class _SellerDashboardHeaderState extends State<SellerDashboardHeader>
                 ),
               ),
             ),
-            if (widget.onSortChanged != null) ...[
+            if (widget.tabActiveIndex == 0 && widget.onSortChanged != null) ...[
               SizedBox(width: 15),
               SellerSortDropdownMenu(
                 initialValue: widget.initialSort,

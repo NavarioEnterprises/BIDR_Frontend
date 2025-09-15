@@ -42,4 +42,24 @@ class WebNotification {
       'created_at': createdAt.toIso8601String(),
     };
   }
+
+  WebNotification copyWith({
+    String? id,
+    String? title,
+    String? body,
+    String? description,
+    String? type,
+    bool? read,
+    DateTime? createdAt,
+  }) {
+    return WebNotification(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      description: description ?? this.description,
+      type: type ?? this.type,
+      read: read ?? this.read,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }

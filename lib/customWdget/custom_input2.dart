@@ -1069,8 +1069,10 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
   @override
   Widget build(BuildContext context) {
     Color borderColor = widget.hasError == true ? Colors.red : Colors.black;
-    Color focusedBorderColor = widget.hasError == true ? Colors.red : Colors.black;
-    
+    Color focusedBorderColor = widget.hasError == true
+        ? Colors.red
+        : Colors.black;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1101,7 +1103,7 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
               border: InputBorder.none,
               hintText: widget.hintText,
               labelText: widget.labelText,
-              errorText: widget.hasError == true ? widget.errorText : null,
+              // Remove errorText from InputDecoration to prevent duplicate errors
               errorStyle: TextStyle(
                 color: Colors.red,
                 fontSize: 12,
@@ -1126,7 +1128,9 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
                     )
                   : null,
               filled: true,
-              fillColor: widget.hasError == true ? Colors.red.withOpacity(0.05) : Colors.transparent,
+              fillColor: widget.hasError == true
+                  ? Colors.red.withOpacity(0.05)
+                  : Colors.transparent,
               hintStyle: GoogleFonts.inter(
                 textStyle: TextStyle(
                   fontSize: 13,
@@ -1144,13 +1148,17 @@ class _CustomInputTransparent4State extends State<CustomInputTransparent4> {
               ),
               contentPadding: EdgeInsets.only(left: 16, top: 16),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor, width: widget.hasError == true ? 2 : 1),
+                borderSide: BorderSide(
+                  color: borderColor,
+                  width: widget.hasError == true ? 2 : 1,
+                ),
                 borderRadius: BorderRadius.circular(36),
               ),
               disabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.withOpacity(0.55)),
+                borderSide: BorderSide(color: Colors.black),
                 borderRadius: BorderRadius.circular(36),
               ),
+
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: focusedBorderColor, width: 2),
                 borderRadius: BorderRadius.circular(36),
@@ -1461,7 +1469,7 @@ class CustomErrorDropdown<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     Color borderColor = hasError ? Colors.red : Colors.black;
     Color focusedBorderColor = hasError ? Colors.red : Colors.black;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1479,7 +1487,10 @@ class CustomErrorDropdown<T> extends StatelessWidget {
               ),
               contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: borderColor, width: hasError ? 2 : 1),
+                borderSide: BorderSide(
+                  color: borderColor,
+                  width: hasError ? 2 : 1,
+                ),
                 borderRadius: BorderRadius.circular(36),
               ),
               focusedBorder: OutlineInputBorder(
@@ -1495,7 +1506,9 @@ class CustomErrorDropdown<T> extends StatelessWidget {
                 borderRadius: BorderRadius.circular(36),
               ),
               filled: true,
-              fillColor: hasError ? Colors.red.withOpacity(0.05) : Colors.transparent,
+              fillColor: hasError
+                  ? Colors.red.withOpacity(0.05)
+                  : Colors.transparent,
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<T>(
