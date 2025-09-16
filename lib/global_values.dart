@@ -1,5 +1,5 @@
-import 'package:bidr/models/alert.dart';
 import 'package:bidr/config/environment_config.dart';
+import 'package:bidr/models/alert.dart';
 
 import 'models/request_models.dart';
 
@@ -21,9 +21,9 @@ class GlobalVariables {
     pitchCircleDiameter: '114.3',
     preferredBrand: 'Michelin',
     tyreConstructionType: 'Radial',
-    fitmentRequired: true,
-    balancingRequired: true,
-    tyreRotationRequired: false,
+    fitmentRequired: "",
+    balancingRequired: "",
+    tyreRotationRequired: "",
     imageUrls: [],
   );
 
@@ -53,6 +53,10 @@ class GlobalVariables {
     mileage: '180000',
     fuelType: 'Petrol',
     bodyType: 'Sedan',
+    preferredBrand: '',
+    fitmentRequired: '',
+    balancingRequired: '',
+    tyreRotationRequired: '',
   );
 
   static AutoSpares autoSparesItem = AutoSpares(

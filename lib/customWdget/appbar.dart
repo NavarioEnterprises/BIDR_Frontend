@@ -26,6 +26,10 @@ MyNotifier? myNotifier1;
 final appBarValueNotifier = ValueNotifier<int>(0);
 
 class _HeaderSectionState extends State<HeaderSection> {
+  bool _isHoveringLogo = false;
+  Map<int, bool> _navButtonHoverStates = {};
+  Map<String, bool> _buttonHoverStates = {};
+  
   void initState() {
     myNotifier1 = MyNotifier(appBarValueNotifier, context);
     appBarValueNotifier.addListener(_onValueChanged);
@@ -90,17 +94,27 @@ class _HeaderSectionState extends State<HeaderSection> {
   Widget _buildResponsiveLogo(BuildContext context) {
     final bool isMobile = Breakpoints.isMobile(context);
 
-    return GestureDetector(
-      onTap: () {
-        Constants.buyerAppBarValue = 0;
-        appBarValueNotifier.value++;
-        buyerHomeValueNotifier.value++;
-      },
-      child: Image.asset(
-        "lib/assets/images/bidr_logo1.png",
-        fit: BoxFit.contain,
-        height: isMobile ? 50 : 60,
-        width: isMobile ? 80 : 96,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHoveringLogo = true),
+      onExit: (_) => setState(() => _isHoveringLogo = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          Constants.buyerAppBarValue = 0;
+          appBarValueNotifier.value++;
+          buyerHomeValueNotifier.value++;
+        },
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          transform: Matrix4.identity()
+            ..scale(_isHoveringLogo ? 1.05 : 1.0),
+          child: Image.asset(
+            "lib/assets/images/bidr_logo1.png",
+            fit: BoxFit.contain,
+            height: isMobile ? 50 : 60,
+            width: isMobile ? 80 : 96,
+          ),
+        ),
       ),
     );
   }
@@ -405,49 +419,67 @@ class _HeaderSectionState extends State<HeaderSection> {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
     final bool isSelected = index == Constants.buyerAppBarValue;
+    final String hoverKey = 'drawer_$index';
+    final bool isHovering = _buttonHoverStates[hoverKey] ?? false;
 
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: spacing.marginSmall,
-        vertical: 0,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(36),
-          bottomRight: Radius.circular(36),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _buttonHoverStates[hoverKey] = true),
+      onExit: (_) => setState(() => _buttonHoverStates[hoverKey] = false),
+      cursor: SystemMouseCursors.click,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        margin: EdgeInsets.symmetric(
+          horizontal: spacing.marginSmall,
+          vertical: 0,
         ),
-        color: isSelected
-            ? Constants.ftaColorLight.withOpacity(0.1)
-            : Colors.transparent,
-      ),
-      child: ListTile(
-        onTap: onTap,
-        leading: Icon(
-          icon,
-          color: isSelected ? Constants.ctaColorLight : Colors.grey[600],
-          size: typography.large,
-        ),
-        title: Text(
-          title,
-          style: GoogleFonts.manrope(
-            color: isSelected ? Constants.ftaColorLight : Colors.black87,
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(36),
+            bottomRight: Radius.circular(36),
           ),
+          color: isSelected
+              ? Constants.ftaColorLight.withOpacity(0.1)
+              : isHovering
+                ? Constants.ctaColorLight.withOpacity(0.05)
+                : Colors.transparent,
         ),
-        trailing: isSelected
-            ? Container(
-                width: 4,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: Constants.ctaColorLight,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              )
-            : null,
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: spacing.paddingMedium,
-          vertical: spacing.paddingSmall / 2,
+        child: ListTile(
+          onTap: onTap,
+          leading: Icon(
+            icon,
+            color: isSelected 
+              ? Constants.ctaColorLight 
+              : isHovering 
+                ? Constants.ctaColorLight
+                : Colors.grey[600],
+            size: typography.large,
+          ),
+          title: Text(
+            title,
+            style: GoogleFonts.manrope(
+              color: isSelected 
+                ? Constants.ftaColorLight 
+                : isHovering
+                  ? Constants.ctaColorLight
+                  : Colors.black87,
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            ),
+          ),
+          trailing: isSelected
+              ? Container(
+                  width: 4,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: Constants.ctaColorLight,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                )
+              : null,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: spacing.paddingMedium,
+            vertical: spacing.paddingSmall / 2,
+          ),
         ),
       ),
     );
@@ -466,69 +498,92 @@ class _HeaderSectionState extends State<HeaderSection> {
       // User is logged in - show appropriate dashboard based on role
       switch (userRole.toLowerCase()) {
         case 'seller':
-          return ElevatedButton(
-            onPressed: () {
-              Constants.buyerAppBarValue = 7;
-              appBarValueNotifier.value++;
-              buyerHomeValueNotifier.value++;
-              sellerHomeMobileValueNotifier.value++;
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Constants.ctaColorLight,
-              foregroundColor: Colors.white,
-              elevation: 3,
-              //minimumSize: Size(MediaQuery.of(context).size.width, 45),
-              padding: EdgeInsets.symmetric(
-                horizontal: isMobile
-                    ? spacing.paddingMedium
-                    : spacing.paddingLarge,
-                vertical: spacing.paddingSmall,
+          final bool isHoveringSellerBtn = _buttonHoverStates['seller'] ?? false;
+          return MouseRegion(
+            onEnter: (_) => setState(() => _buttonHoverStates['seller'] = true),
+            onExit: (_) => setState(() => _buttonHoverStates['seller'] = false),
+            cursor: SystemMouseCursors.click,
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 200),
+              transform: Matrix4.identity()
+                ..scale(isHoveringSellerBtn ? 1.05 : 1.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Constants.buyerAppBarValue = 7;
+                  appBarValueNotifier.value++;
+                  buyerHomeValueNotifier.value++;
+                  sellerHomeMobileValueNotifier.value++;
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isHoveringSellerBtn
+                    ? Constants.ctaColorLight.withOpacity(0.8)
+                    : Constants.ctaColorLight,
+                  foregroundColor: Colors.white,
+                  elevation: isHoveringSellerBtn ? 6 : 3,
+                  //minimumSize: Size(MediaQuery.of(context).size.width, 45),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile
+                        ? spacing.paddingMedium
+                        : spacing.paddingLarge,
+                    vertical: spacing.paddingSmall,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
+                child: Text(
+                  Constants.myDisplayname,
+                  style: GoogleFonts.manrope(fontSize: typography.normal),
+                ),
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
-            ),
-            child: Text(
-              Constants.myDisplayname,
-              style: GoogleFonts.manrope(fontSize: typography.normal),
             ),
           );
         case 'buyer':
-          return Container(
-            constraints: BoxConstraints(maxWidth: 250, maxHeight: 55), //
-            child: ElevatedButton(
-              onPressed: () {
-                if (mounted) {
-                  Constants.buyerAppBarValue = 6;
-                  appBarValueNotifier.value++;
-                  buyerHomeValueNotifier.value++;
-                  buyerHomeMobileValueNotifier.value++;
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Constants.ctaColorLight,
-                foregroundColor: Colors.white,
-                elevation: 3,
-                // minimumSize: Size(MediaQuery.of(context).size.width, 45),
-                padding: EdgeInsets.symmetric(
-                  horizontal: isMobile
-                      ? spacing.paddingMedium
-                      : spacing.paddingLarge,
-                  vertical: spacing.paddingSmall,
+          final bool isHoveringBuyerBtn = _buttonHoverStates['buyer'] ?? false;
+          return MouseRegion(
+            onEnter: (_) => setState(() => _buttonHoverStates['buyer'] = true),
+            onExit: (_) => setState(() => _buttonHoverStates['buyer'] = false),
+            cursor: SystemMouseCursors.click,
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 200),
+              transform: Matrix4.identity()
+                ..scale(isHoveringBuyerBtn ? 1.05 : 1.0),
+              constraints: BoxConstraints(maxWidth: 250, maxHeight: 55), //
+              child: ElevatedButton(
+                onPressed: () {
+                  if (mounted) {
+                    Constants.buyerAppBarValue = 6;
+                    appBarValueNotifier.value++;
+                    buyerHomeValueNotifier.value++;
+                    buyerHomeMobileValueNotifier.value++;
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isHoveringBuyerBtn
+                    ? Constants.ctaColorLight.withOpacity(0.8)
+                    : Constants.ctaColorLight,
+                  foregroundColor: Colors.white,
+                  elevation: isHoveringBuyerBtn ? 6 : 3,
+                  // minimumSize: Size(MediaQuery.of(context).size.width, 45),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile
+                        ? spacing.paddingMedium
+                        : spacing.paddingLarge,
+                    vertical: spacing.paddingSmall,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
+                child: Text(
+                  Constants.myDisplayname,
+                  style: GoogleFonts.manrope(
+                    fontSize: typography.normal,
+                    color: Colors.black,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              child: Text(
-                Constants.myDisplayname,
-                style: GoogleFonts.manrope(
-                  fontSize: typography.normal,
-                  color: Colors.black,
-                ),
-                maxLines: 1,
-
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           );
@@ -553,25 +608,38 @@ class _HeaderSectionState extends State<HeaderSection> {
     final typography = ResponsiveTypography.getTypography(context);
     final spacing = ResponsiveSpacing.getSpacing(context);
     final bool isMobile = Breakpoints.isMobile(context);
+    final bool isHovering = _buttonHoverStates['login'] ?? false;
 
-    return ElevatedButton(
-      onPressed: () => context.go('/login'),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Constants.ctaColorLight,
-        //minimumSize: Size(MediaQuery.of(context).size.width, 45),
-        padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? spacing.paddingMedium : spacing.paddingLarge,
-          vertical: spacing.paddingSmall,
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      child: Text(
-        'Login',
-        style: GoogleFonts.manrope(
-          color: Colors.black,
-
-          fontWeight: FontWeight.w700,
-          fontSize: typography.normal,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _buttonHoverStates['login'] = true),
+      onExit: (_) => setState(() => _buttonHoverStates['login'] = false),
+      cursor: SystemMouseCursors.click,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        transform: Matrix4.identity()
+          ..scale(isHovering ? 1.05 : 1.0),
+        child: ElevatedButton(
+          onPressed: () => context.go('/login'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isHovering 
+              ? Constants.ctaColorLight.withOpacity(0.8)
+              : Constants.ctaColorLight,
+            //minimumSize: Size(MediaQuery.of(context).size.width, 45),
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? spacing.paddingMedium : spacing.paddingLarge,
+              vertical: spacing.paddingSmall,
+            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: isHovering ? 6 : 3,
+          ),
+          child: Text(
+            'Login',
+            style: GoogleFonts.manrope(
+              color: Colors.black,
+              fontWeight: FontWeight.w700,
+              fontSize: typography.normal,
+            ),
+          ),
         ),
       ),
     );
@@ -599,38 +667,57 @@ class _HeaderSectionState extends State<HeaderSection> {
 
   Widget _navButton(String text, int index, VoidCallback onPressed) {
     final typography = ResponsiveTypography.getTypography(context);
+    final bool isHovering = _navButtonHoverStates[index] ?? false;
+    final bool isActive = index == Constants.buyerAppBarValue;
 
     return Flexible(
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                text,
-                style: GoogleFonts.manrope(
-                  color: index == Constants.buyerAppBarValue
-                      ? Constants.ftaColorLight
-                      : Colors.black45,
-                  fontSize: 15,
-                  fontWeight: index == Constants.buyerAppBarValue
-                      ? FontWeight.bold
-                      : FontWeight.w600,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _navButtonHoverStates[index] = true),
+        onExit: (_) => setState(() => _navButtonHoverStates[index] = false),
+        cursor: SystemMouseCursors.click,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(8),
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            transform: Matrix4.identity()
+              ..scale(isHovering ? 1.05 : 1.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  text,
+                  style: GoogleFonts.manrope(
+                    color: isActive
+                        ? Constants.ftaColorLight
+                        : isHovering 
+                          ? Constants.ctaColorLight
+                          : Colors.black45,
+                    fontSize: 15,
+                    fontWeight: isActive
+                        ? FontWeight.bold
+                        : FontWeight.w600,
+                    shadows: isHovering && !isActive ? [
+                      Shadow(
+                        color: Constants.ctaColorLight.withOpacity(0.3),
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      )
+                    ] : [],
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 4),
-              AnimatedContainer(
-                duration: Duration(milliseconds: 200),
-                height: 2,
-                width: index == Constants.buyerAppBarValue ? 40 : 0,
-                color: Constants.ctaColorLight,
-              ),
-            ],
+                SizedBox(height: 4),
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  height: 2,
+                  width: isActive ? 40 : isHovering ? 20 : 0,
+                  color: Constants.ctaColorLight,
+                ),
+              ],
+            ),
           ),
         ),
       ),

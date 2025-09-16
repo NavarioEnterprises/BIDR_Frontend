@@ -28,7 +28,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Set the environment configuration
-  AppConfig.setEnvironment(EnvironmentType.dev);
+  AppConfig.setEnvironment(EnvironmentType.uat);
 
   // Check if user is logged in
   final bool isLoggedIn =
@@ -148,7 +148,7 @@ class MyApp extends StatelessWidget {
         '/faq',
         '/policies',
       ];
-      
+
       // Pattern to match reset password routes
       final resetPasswordPattern = RegExp(r'^/reset_password/[^/]+/[^/]+/?$');
 
@@ -157,8 +157,8 @@ class MyApp extends StatelessWidget {
       // If not authenticated, redirect to login for protected routes
       if (!isAuthenticated &&
           (protectedRoutes.contains(state.matchedLocation) ||
-              (!publicRoutes.contains(state.matchedLocation) && 
-               !resetPasswordPattern.hasMatch(state.matchedLocation)))) {
+              (!publicRoutes.contains(state.matchedLocation) &&
+                  !resetPasswordPattern.hasMatch(state.matchedLocation)))) {
         print('Router Debug - Redirecting to /login because not authenticated');
         return '/login';
       }
@@ -245,10 +245,12 @@ class MyApp extends StatelessWidget {
         name: 'register-seller',
         pageBuilder: (BuildContext context, GoRouterState state) {
           // Extract query parameters
-          final isProceedingFromBuyer = state.uri.queryParameters['fromBuyer'] == 'true';
-          final isAddingSellerRole = state.uri.queryParameters['addSellerRole'] == 'true';
+          final isProceedingFromBuyer =
+              state.uri.queryParameters['fromBuyer'] == 'true';
+          final isAddingSellerRole =
+              state.uri.queryParameters['addSellerRole'] == 'true';
           final existingUserData = <String, String>{};
-          
+
           // Extract user data from query parameters if provided
           state.uri.queryParameters.forEach((key, value) {
             if (key.startsWith('userData_')) {
@@ -256,13 +258,15 @@ class MyApp extends StatelessWidget {
               existingUserData[actualKey] = value;
             }
           });
-          
+
           return CustomTransitionPage(
             key: state.pageKey,
             child: BusinessSignUpPage(
               isProceedingFromBuyer: isProceedingFromBuyer,
               isAddingSellerRole: isAddingSellerRole,
-              existingUserData: existingUserData.isNotEmpty ? existingUserData : null,
+              existingUserData: existingUserData.isNotEmpty
+                  ? existingUserData
+                  : null,
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {

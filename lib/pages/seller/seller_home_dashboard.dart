@@ -1,23 +1,23 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:bidr/constants/Constants.dart';
+
 import 'package:bidr/config/environment_config.dart';
+import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/global_values.dart';
 import 'package:bidr/pages/notification.dart';
 import 'package:bidr/pages/seller/profile_management.dart';
 import 'package:bidr/pages/seller/rating_and_review.dart';
 import 'package:bidr/pages/seller/seller_dashboard_header.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
-import "package:universal_html/html.dart" as html;
 import 'package:motion_toast/motion_toast.dart';
-import 'package:badges/badges.dart' as badges;
-import '../../customWdget/appbar.dart';
+import "package:universal_html/html.dart" as html;
+
 import '../../customWdget/dropdownMenu.dart';
 import '../../models/alert.dart';
 import '../../models/request_models.dart';
@@ -25,7 +25,6 @@ import '../../services/auth_api_service.dart';
 import '../../services/chat_service.dart';
 import '../../services/notification_api_service.dart';
 import '../../services/products_management_api_service.dart';
-import '../../services/shared_preferences.dart';
 import '../buyer/share_with_friends.dart';
 import '../buyer/support.dart';
 import '../buyer_dashboard.dart';
@@ -33,7 +32,6 @@ import '../buyer_home.dart';
 import '../group_chat.dart';
 import '../mobileView/SellerDashboard/sellerMobileDashboard.dart';
 import 'enter_pin.dart';
-import 'seller_dashboard_mobile.dart';
 
 enum LeadStatus { open, closed, unsuccessful, pending, inProgress }
 
@@ -2809,7 +2807,9 @@ class _SellerDashboardState extends State<SellerDashboard>
                   ),
                   Expanded(
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        //_navigateToDetailScreen(request, 1);
+                      },
                       style: TextButton.styleFrom(
                         foregroundColor: Constants.ftaColorLight,
                         padding: EdgeInsets.symmetric(vertical: 4),
@@ -3184,7 +3184,7 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   // Updated card design to match screenshot
   Widget _buildOriginalLeadCard(
-    Map<String, dynamic> request,
+    dynamic request,
     int requestNumber, {
     String? buttonText,
   }) {
@@ -3495,7 +3495,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                   ),
                   InkWell(
                     onTap: () {
-                      _showRequestInfoDialog(context, request);
+                      _navigateToDetailScreen(request, 1);
                     },
                     child: Text(
                       'Full Description',
@@ -8944,61 +8944,261 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   void _navigateToDetailScreen(dynamic request, int index) {
+    String category = "";
+    var requestDetails = request['request_details'];
+    if (requestDetails != null) {
+      category = requestDetails?['category'];
+    } else {
+      category = request?['category'];
+      requestDetails = request;
+    }
+    print("sdhdkj ${category} ");
+
     try {
-      if (request?.category == null) {
+      if (category == null) {
         _showErrorSnackBar("Cannot open request details: Invalid request data");
         return;
       }
 
-      switch (request.category) {
+      switch (category) {
         case "VEHICLE_SPARES":
         case "Vehicle Spares":
-          // Convert ProductRequestItem to AutoSparesRequest if needed
-          dynamic autoSpareData;
-          if (request.runtimeType.toString().contains('ProductRequestItem')) {
-            autoSpareData = request.toAutoSparesRequest().autoSpares;
-          } else {
-            autoSpareData = request.autoSpares ?? request.autoSpare;
-          }
-
-          SparesDetailScreen.showAsDialog(
-            context,
-            index: index,
-            request: request,
-            autoSpare: autoSpareData,
-            bids: request.sellerOffers ?? request.quotes ?? [],
-          );
+          _navigateToAutoSparesDetail(request, requestDetails, index);
           break;
 
         case "TYRES_RIMS":
         case "Vehicle Tyres and Rims":
-          RimTyreDetailScreen.showAsDialog(
-            context,
-            index: index,
-            request: request,
-            rimTyre: request.rimTyre,
-            bids: request.sellerOffers ?? [],
-          );
+          _navigateToRimTyreDetail(request, requestDetails, index);
           break;
 
         case "ELECTRONICS":
         case "Consumer Electronics":
-          ConsumerElectronicsDetailScreen.showAsDialog(
-            context,
-            index: index,
-            request: request,
-            consumerElectronics: request.consumerElectronics,
-            bids: request.sellerOffers ?? [],
-          );
+          _navigateToElectronicsDetail(request, requestDetails, index);
           break;
 
         default:
-          _showErrorSnackBar("Unknown request category: ${request.category}");
+          _showErrorSnackBar("Unknown request category: $category");
       }
     } catch (e) {
       print('Navigation error: $e');
-      _showErrorSnackBar("Error opening request details");
+      _showErrorSnackBar("Error opening request details: ${e.toString()}");
     }
+  }
+
+  void _navigateToAutoSparesDetail(
+    dynamic request,
+    Map<String, dynamic> requestDetails,
+    int index,
+  ) {
+    try {
+      // Create AutoSparesRequest from the response data
+
+      // Extract product specifications
+      final productSpecs = requestDetails['product_specifications'] ?? {};
+
+      // Create AutoSpares object
+      final autoSpares = AutoSpares(
+        vehicleDetails: VehicleDetails(
+          vin: productSpecs['vin_number'] ?? '',
+          manufacturer: productSpecs['vehicle_make'] ?? '',
+          makeModel:
+              '${productSpecs['vehicle_make'] ?? ''} ${productSpecs['vehicle_model'] ?? ''}'
+                  .trim(),
+          year: productSpecs['vehicle_year']?.toString() ?? '',
+          type: productSpecs['vehicle_type'] ?? '',
+          condition: productSpecs['condition_preference'] ?? 'NEW',
+        ),
+        partDetails: PartDetails(
+          partName: productSpecs['part_name'] ?? requestDetails['title'] ?? '',
+          quantity: productSpecs['quantity'] ?? 1,
+          location: requestDetails['buyer_location']?['address'] ?? '',
+          maxDistanceKm: 50, // Default value
+          urgency:
+              productSpecs['urgency'] ??
+              requestDetails['urgency_timeline'] ??
+              '1_WEEK',
+          productDescription:
+              productSpecs['description'] ??
+              requestDetails['description'] ??
+              '',
+          imageUrls: [],
+        ),
+        moreFields: MoreFields.fromJson({
+          'part_number': productSpecs['part_number'],
+          'transmission_type': productSpecs['transmission_type'],
+          'fuel_type': productSpecs['fuel_type'],
+          'body_type': productSpecs['body_type'],
+          'mileage': productSpecs['mileage'],
+          'engine_size': productSpecs['engine_size'],
+          'vehicle_type': productSpecs['vehicle_type'],
+        }),
+      );
+      final autoSparesRequest = AutoSparesRequest(
+        id: request['request_id'] ?? '',
+        category: requestDetails['category'] ?? 'VEHICLE_SPARES',
+        createdAt:
+            DateTime.tryParse(requestDetails['created_at'] ?? '') ??
+            DateTime.now(),
+        productImages: List<String>.from(
+          requestDetails['product_images'] ?? [],
+        ),
+        images: List<String>.from(requestDetails['product_images'] ?? []),
+        vinImageUrl: requestDetails['vin_photo_url'],
+        status: '',
+        autoSpares: autoSpares,
+        sellerOffers: [],
+        // Add other required fields with default values or from requestDetails
+      );
+
+      SparesDetailScreen.showAsDialog(
+        context,
+        index: index,
+        request: autoSparesRequest,
+        autoSpare: autoSpares,
+        bids:
+            [], // You can extract quotes/offers from the response if available
+      );
+    } catch (e) {
+      print('Error creating AutoSpares detail: $e');
+      _showErrorSnackBar("Error opening vehicle spares details");
+    }
+  }
+
+  void _navigateToRimTyreDetail(
+    dynamic request,
+    Map<String, dynamic> requestDetails,
+    int index,
+  ) {
+    try {
+      // Create RimTyreRequest from the response data
+
+      final productSpecs = requestDetails['product_specifications'] ?? {};
+
+      // Create RimTyre object - you'll need to adapt this based on your RimTyre model
+      final rimTyre = RimTyre(
+        productDetails: RimTyreProductDetails(
+          tyreWidthMm: (productSpecs['tyre_width_mm'] ?? 0),
+          sidewallProfile: productSpecs['sidewall_profile'].toString(),
+          wheelRimDiameterInches:
+              productSpecs['wheel_rim_diameter_inches'] ?? '',
+          tyreType: productSpecs['tyre_type'] ?? '',
+          quantity: productSpecs['quantity'] ?? 1,
+          urgency:
+              productSpecs['urgency'] ??
+              requestDetails['urgency_timeline'] ??
+              '1_WEEK',
+        ),
+        moreFields: RimTyreMoreFields(
+          vehicleType: productSpecs['vehicle_type'] ?? '',
+          preferredBrand: productSpecs['preferred_brand'] ?? '',
+          pitchCircleDiameter: productSpecs['pitch_circle_diameter'] ?? '',
+          tyreConstructionType: productSpecs['tyre_construction_type'] ?? '',
+          description:
+              productSpecs['description'] ??
+              requestDetails['description'] ??
+              '',
+          fitmentRequired: productSpecs['fitment_required'] ?? "",
+          balancingRequired: productSpecs['balancing_required'] ?? "",
+          tyreRotationRequired: productSpecs['tyre_rotation_required'] ?? "",
+          imageUrls: List<String>.from(requestDetails['product_images'] ?? []),
+        ),
+      );
+      final rimTyreRequest = RimTyreRequest(
+        id: request['request_id'] ?? '',
+        category: requestDetails['category'] ?? 'TYRES_RIMS',
+        createdAt:
+            DateTime.tryParse(requestDetails['created_at'] ?? '') ??
+            DateTime.now(),
+        status: '',
+        rimTyre: rimTyre,
+        sellerOffers: [],
+        // Add other required fields
+      );
+
+      RimTyreDetailScreen.showAsDialog(
+        context,
+        index: index,
+        request: rimTyreRequest,
+        rimTyre: rimTyre,
+        bids: [],
+      );
+    } catch (e) {
+      print('Error creating RimTyre detail: $e');
+      _showErrorSnackBar("Error opening rim/tyre details");
+    }
+  }
+
+  void _navigateToElectronicsDetail(
+    dynamic request,
+    Map<String, dynamic> requestDetails,
+    int index,
+  ) {
+    try {
+      // Create ConsumerElectronicsRequest from the response data
+
+      final productSpecs = requestDetails['product_specifications'] ?? {};
+
+      // Create ConsumerElectronics object - adapt based on your model
+      final consumerElectronics = ConsumerElectronics(
+        productDetails: ProductDetails(
+          typeOfElectronics: productSpecs['type_of_electronics'] ?? '',
+          brandPreference: productSpecs['brand_preference'] ?? '',
+          modelSeries: productSpecs['model_series'],
+          quantityNeeded: productSpecs['quantity'] ?? 1,
+        ),
+        featuresAndSpecs: FeaturesAndSpecs(
+          purpose: productSpecs['purpose'] ?? '',
+          conditionPreference: productSpecs['condition_preference'] ?? 'NEW',
+          requiredFeatures: productSpecs['required_features'],
+          additionalComments: productSpecs['additional_comments'],
+          documentsOrImages: List<String>.from(
+            requestDetails['product_images'] ?? [],
+          ),
+        ),
+        budgetTimeline: BudgetTimeline(
+          minPrice: double.parse(productSpecs['min_price']!.toString()),
+          maxPrice: double.parse(productSpecs['max_price']!.toString()),
+          urgency:
+              productSpecs['urgency'] ??
+              requestDetails['urgency_timeline'] ??
+              '1_WEEK',
+          needsInstallation: productSpecs['needs_installation'] ?? false,
+        ),
+      );
+      final electronicsRequest = ConsumerElectronicsRequest(
+        id: request['request_id'] ?? '',
+        category: requestDetails['category'] ?? 'ELECTRONICS',
+        createdAt:
+            DateTime.tryParse(requestDetails['created_at'] ?? '') ??
+            DateTime.now(),
+        status: '',
+        consumerElectronics: consumerElectronics,
+        sellerOffers: [],
+        // Add other required fields
+      );
+
+      ConsumerElectronicsDetailScreen.showAsDialog(
+        context,
+        index: index,
+        request: electronicsRequest,
+        consumerElectronics: consumerElectronics,
+        bids: [],
+      );
+    } catch (e) {
+      print('Error creating Electronics detail: $e');
+      _showErrorSnackBar("Error opening electronics details");
+    }
+  }
+
+  // Helper method for error display
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      ),
+    );
   }
 
   void _showRequestInfoDialog(
@@ -11564,16 +11764,6 @@ class _SellerDashboardState extends State<SellerDashboard>
           },
         );
       },
-    );
-  }
-
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message, style: GoogleFonts.manrope()),
-        backgroundColor: Colors.red[600],
-        duration: Duration(seconds: 3),
-      ),
     );
   }
 }

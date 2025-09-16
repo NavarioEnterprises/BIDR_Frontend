@@ -1,28 +1,28 @@
 import 'dart:async';
+import 'dart:convert';
+
 import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/customWdget/customCard.dart';
 import 'package:bidr/global_values.dart';
-import 'package:bidr/pages/buyer_home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:hugeicons/hugeicons.dart';
+
 import '../../../customWdget/dropdownMenu.dart';
 import '../../../customWdget/mobileBottomNavBar.dart';
 import '../../../models/product_request_api.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
 import '../../../models/request_models.dart';
 import '../../../services/chat_service.dart';
 import '../../../services/products_management_api_service.dart';
+import '../../group_chat.dart';
 import '../breakpoints.dart';
 import '../landingPage/landingMobileController.dart';
 import '../landingPage/landingMobileViewPage.dart';
 import 'accountManagementMobile.dart';
 import 'shareMobile.dart';
 import 'transactionMobileDashboard.dart';
-import '../../group_chat.dart';
 
 class BuyerMobileDashboard extends StatefulWidget {
   @override
@@ -4797,6 +4797,10 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       mileage: '0',
       fuelType: 'Unknown',
       bodyType: 'Unknown',
+      preferredBrand: '',
+      fitmentRequired: '',
+      balancingRequired: '',
+      tyreRotationRequired: '',
     );
 
     final autoSpares = AutoSpares(
@@ -4839,9 +4843,9 @@ class _BuyerMobileDashboardState extends State<BuyerMobileDashboard> {
       pitchCircleDiameter: '114.3',
       preferredBrand: _extractBrandFromTitle(item.title),
       tyreConstructionType: 'Radial',
-      fitmentRequired: true,
-      balancingRequired: true,
-      tyreRotationRequired: false,
+      fitmentRequired: "",
+      balancingRequired: "",
+      tyreRotationRequired: "",
       imageUrls: [],
     );
 
@@ -8414,24 +8418,24 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                 [
                                   _buildDetailItem(
                                     "Fitment Required",
-                                    widget.rimTyre.moreFields.fitmentRequired
-                                        ? "Yes"
-                                        : "No",
+                                    widget.rimTyre.moreFields.fitmentRequired ??
+                                        "No",
                                   ),
                                   _buildDetailItem(
                                     "Balancing Required",
-                                    widget.rimTyre.moreFields.balancingRequired
-                                        ? "Yes"
-                                        : "No",
+                                    widget
+                                            .rimTyre
+                                            .moreFields
+                                            .balancingRequired ??
+                                        "No",
                                   ),
                                   _buildDetailItem(
                                     "Tyre Rotation Required",
                                     widget
                                             .rimTyre
                                             .moreFields
-                                            .tyreRotationRequired
-                                        ? "Yes"
-                                        : "No",
+                                            .tyreRotationRequired ??
+                                        "No",
                                   ),
                                   _buildDetailItem(
                                     "Product Images",

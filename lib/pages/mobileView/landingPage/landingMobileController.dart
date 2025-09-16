@@ -55,16 +55,18 @@ class _LandingMobileControllerState extends State<LandingMobileController> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.white,
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+        body: SingleChildScrollView(
           child: Column(
             children: [
-              Expanded(child: _pages[currentIndex]),
               SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height:310,
-                  child: BottomMobileBar()),
+                height: MediaQuery.of(context).size.height - 100,
+                child: _pages[currentIndex],
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: 310,
+                child: BottomMobileBar(),
+              ),
             ],
           ),
         ),

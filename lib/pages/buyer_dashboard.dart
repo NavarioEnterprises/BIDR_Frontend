@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+
 import 'package:bidr/constants/Constants.dart';
 import 'package:bidr/customWdget/customCard.dart';
 import 'package:bidr/global_values.dart';
@@ -6,17 +8,15 @@ import 'package:bidr/pages/buyer_home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:hugeicons/hugeicons.dart';
-import '../config/environment_config.dart';
+
 import '../customWdget/appbar.dart';
 import '../customWdget/dropdownMenu.dart';
-import '../models/request_models.dart';
 import '../models/product_request_api.dart';
+import '../models/request_models.dart';
 import '../services/chat_service.dart';
 import '../services/products_management_api_service.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
 import 'buyer/account_management.dart';
 import 'buyer/share_with_friends.dart';
 import 'buyer/support.dart';
@@ -31,14 +31,18 @@ class BuyerDashboardScreen extends StatefulWidget {
 class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   List<ProductRequestItem> _productRequests = [];
   bool _isLoading = true;
+  bool _isInitialLoad = true;
   String? _error;
   Map<String, String> _bidSortOptions = {}; // Track sort option per request ID
   Set<String> _cancelledRequests = {}; // Track cancelled request IDs
   Map<String, bool> _expandedSellerNotes =
       {}; // Track expanded seller notes by quote ID
+  Map<String, bool> _navItemHoverStates =
+      {}; // Track hover states for nav items
 
   // Auto-refresh timer
   Timer? _refreshTimer;
+  Timer? _countdownTimer;
   final GlobalKey _transactionKey = GlobalKey();
 
   // Filter state variables
@@ -53,6 +57,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     super.initState();
     _fetchProductRequests();
     _startAutoRefresh();
+    _startCountdownTimer();
     print(
       "Buyer Dashboard Initialized ${Constants.myUid} xx ${Constants.currentUser!.uid}",
     );
@@ -61,11 +66,23 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   @override
   void dispose() {
     _refreshTimer?.cancel();
+    _countdownTimer?.cancel();
     super.dispose();
   }
 
   int dashboardIndex = 0;
   bool isActive = false;
+
+  // Start countdown timer that updates every second
+  void _startCountdownTimer() {
+    _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          // This will trigger a rebuild every second, updating all countdowns
+        });
+      }
+    });
+  }
 
   // Start auto-refresh timer for background updates every 20 seconds
   void _startAutoRefresh() {
@@ -74,8 +91,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       if (mounted) {
         // Refresh data based on current tab
         if (dashboardIndex == 0) {
-          // My Dashboard - refresh product requests
-          _fetchProductRequests();
+          // My Dashboard - refresh product requests without showing loading
+          _fetchProductRequests(showLoading: false);
         } else if (dashboardIndex == 2) {
           // Transaction Management - refresh orders
           _refreshTransactionManagement();
@@ -125,7 +142,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                       dashboardIndex = 0;
                       setState(() {});
                       // Reload product requests when navigating to My Dashboard
-                      _fetchProductRequests();
+                      _fetchProductRequests(showLoading: false);
                     },
                     HugeIcons.strokeRoundedDashboardSquare01,
                     "My Dashboard",
@@ -1431,33 +1448,61 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     String title,
     bool isActive,
   ) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextButton.icon(
-          onPressed: voidCallBack,
-          icon: Icon(icon, color: Colors.white, size: 22),
-          label: Text(
-            title,
-            style: GoogleFonts.manrope(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+    final bool isHovering = _navItemHoverStates[title] ?? false;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _navItemHoverStates[title] = true),
+      onExit: (_) => setState(() => _navItemHoverStates[title] = false),
+      cursor: SystemMouseCursors.click,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        transform: Matrix4.identity()..scale(isHovering ? 1.05 : 1.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton.icon(
+              onPressed: voidCallBack,
+              icon: AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                child: Icon(
+                  icon,
+                  color: isHovering ? Colors.orange : Colors.white,
+                  size: 22,
+                ),
+              ),
+              label: AnimatedDefaultTextStyle(
+                duration: Duration(milliseconds: 200),
+                style: GoogleFonts.manrope(
+                  color: isHovering ? Colors.orange : Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  shadows: isHovering
+                      ? [
+                          Shadow(
+                            color: Colors.orange.withOpacity(0.5),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Text(title),
+              ),
             ),
-          ),
+            if (isActive) ...[
+              SizedBox(width: 8),
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          ],
         ),
-        if (isActive) ...[
-          SizedBox(width: 8),
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: Colors.orange,
-              shape: BoxShape.circle,
-            ),
-          ),
-        ],
-      ],
+      ),
     );
   }
 
@@ -1516,6 +1561,212 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     } catch (e) {
       print('Navigation error: $e');
       _showErrorSnackBar("Error opening request details");
+    }
+  }
+
+  void _navigateToAutoSparesDetail(
+    dynamic request,
+    //Map<String, dynamic> requestDetails,
+    int index,
+  ) {
+    try {
+      // Create AutoSparesRequest from the response data
+
+      // Extract product specifications
+      final productSpecs = request['product_specifications'] ?? {};
+
+      // Create AutoSpares object
+      final autoSpares = AutoSpares(
+        vehicleDetails: VehicleDetails(
+          vin: productSpecs['vin_number'] ?? '',
+          manufacturer: productSpecs['vehicle_make'] ?? '',
+          makeModel:
+              '${productSpecs['vehicle_make'] ?? ''} ${productSpecs['vehicle_model'] ?? ''}'
+                  .trim(),
+          year: productSpecs['vehicle_year']?.toString() ?? '',
+          type: productSpecs['vehicle_type'] ?? '',
+          condition: productSpecs['condition_preference'] ?? 'NEW',
+        ),
+        partDetails: PartDetails(
+          partName: productSpecs['part_name'] ?? request['title'] ?? '',
+          quantity: productSpecs['quantity'] ?? 1,
+          location: request['buyer_location']?['address'] ?? '',
+          maxDistanceKm: 50, // Default value
+          urgency:
+              productSpecs['urgency'] ??
+              request['urgency_timeline'] ??
+              '1_WEEK',
+          productDescription:
+              productSpecs['description'] ?? request['description'] ?? '',
+          imageUrls: List<String>.from(productSpecs['product_images'] ?? []),
+        ),
+        moreFields: MoreFields.fromJson({
+          'part_number': productSpecs['part_number'],
+          'transmission_type': productSpecs['transmission_type'],
+          'fuel_type': productSpecs['fuel_type'],
+          'body_type': productSpecs['body_type'],
+          'mileage': productSpecs['mileage'],
+          'engine_size': productSpecs['engine_size'],
+          'vehicle_type': productSpecs['vehicle_type'],
+        }),
+      );
+
+      final autoSparesRequest = AutoSparesRequest(
+        id: request['request_id'] ?? '',
+        category: request['category'] ?? 'VEHICLE_SPARES',
+        createdAt:
+            DateTime.tryParse(request['created_at'] ?? '') ?? DateTime.now(),
+        productImages: List<String>.from(productSpecs['product_images'] ?? []),
+        images: List<String>.from(productSpecs['product_images'] ?? []),
+        vinImageUrl: productSpecs['vin_photo'],
+        status: request['status'] ?? '',
+        autoSpares: autoSpares,
+        sellerOffers: [],
+        // Add other required fields with default values or from requestDetails
+      );
+
+      SparesDetailScreen.showAsDialog(
+        context,
+        index: index,
+        request: autoSparesRequest,
+        autoSpare: autoSpares,
+        bids: List.from(request['quotes'] ?? []),
+      );
+    } catch (e) {
+      print('Error creating AutoSpares detail: $e');
+      _showErrorSnackBar("Error opening vehicle spares details");
+    }
+  }
+
+  void _navigateToRimTyreDetail(
+    dynamic request,
+    Map<String, dynamic> requestDetails,
+    int index,
+  ) {
+    try {
+      // Create RimTyreRequest from the response data
+
+      final productSpecs = requestDetails['product_specifications'] ?? {};
+
+      // Create RimTyre object - you'll need to adapt this based on your RimTyre model
+      final rimTyre = RimTyre(
+        productDetails: RimTyreProductDetails(
+          tyreWidthMm: productSpecs['tyre_width'] ?? 0,
+          sidewallProfile: productSpecs['sidewall_profile'].toString(),
+          wheelRimDiameterInches:
+              productSpecs['wheel_rim_diameter']?.toString() ?? '',
+          tyreType: productSpecs['select_tyres_rims'] ?? '',
+          quantity: productSpecs['quantity'] ?? 1,
+          urgency:
+              productSpecs['urgency'] ??
+              requestDetails['urgency_timeline'] ??
+              '1_WEEK',
+        ),
+        moreFields: RimTyreMoreFields(
+          vehicleType: productSpecs['vehicle_type'] ?? '',
+          preferredBrand: productSpecs['preferred_brand'] ?? '',
+          pitchCircleDiameter: productSpecs['pitch_circle_diameter'] ?? '',
+          tyreConstructionType: productSpecs['tyre_construction_type'] ?? '',
+          description:
+              productSpecs['description_of_item'] ??
+              requestDetails['description'] ??
+              '',
+          fitmentRequired: productSpecs['fitment_required'] ?? "",
+          balancingRequired: productSpecs['balancing_required'] ?? "",
+          tyreRotationRequired: productSpecs['tyre_rotation_required'] ?? "",
+          imageUrls: List<String>.from(productSpecs['product_images'] ?? []),
+        ),
+      );
+
+      final rimTyreRequest = RimTyreRequest(
+        id: requestDetails['request_id'] ?? '',
+        category: requestDetails['category'] ?? 'TYRES_RIMS',
+        createdAt:
+            DateTime.tryParse(requestDetails['created_at'] ?? '') ??
+            DateTime.now(),
+        status: requestDetails['status'] ?? '',
+        rimTyre: rimTyre,
+        sellerOffers: [],
+        // Add other required fields
+      );
+
+      RimTyreDetailScreen.showAsDialog(
+        context,
+        index: index,
+        request: rimTyreRequest,
+        rimTyre: rimTyre,
+        bids: List.from(requestDetails['quotes'] ?? []),
+      );
+    } catch (e) {
+      print('Error creating RimTyre detail: $e');
+      _showErrorSnackBar("Error opening rim/tyre details");
+    }
+  }
+
+  void _navigateToElectronicsDetail(
+    dynamic request,
+    Map<String, dynamic> requestDetails,
+    int index,
+  ) {
+    try {
+      // Create ConsumerElectronicsRequest from the response data
+
+      final productSpecs = requestDetails['product_specifications'] ?? {};
+
+      // Create ConsumerElectronics object - adapt based on your model
+      final consumerElectronics = ConsumerElectronics(
+        productDetails: ProductDetails(
+          typeOfElectronics: productSpecs['electronics_type'] ?? '',
+          brandPreference: productSpecs['brand_preference'] ?? '',
+          modelSeries: productSpecs['model_series'],
+          quantityNeeded: productSpecs['quantity_needed'] ?? 1,
+        ),
+        featuresAndSpecs: FeaturesAndSpecs(
+          purpose: productSpecs['purpose'] ?? '',
+          conditionPreference: productSpecs['condition_preference'] ?? 'NEW',
+          requiredFeatures: productSpecs['required_features'],
+          additionalComments: productSpecs['additional_comments'],
+          documentsOrImages: List<String>.from(
+            productSpecs['product_images'] ?? [],
+          ),
+        ),
+        budgetTimeline: BudgetTimeline(
+          minPrice:
+              double.tryParse(productSpecs['min_price']?.toString() ?? '0') ??
+              0.0,
+          maxPrice:
+              double.tryParse(productSpecs['max_price']?.toString() ?? '0') ??
+              0.0,
+          urgency:
+              productSpecs['urgency'] ??
+              requestDetails['urgency_timeline'] ??
+              '1_WEEK',
+          needsInstallation: productSpecs['needs_installation'] ?? false,
+        ),
+      );
+
+      final electronicsRequest = ConsumerElectronicsRequest(
+        id: requestDetails['request_id'] ?? '',
+        category: requestDetails['category'] ?? 'ELECTRONICS',
+        createdAt:
+            DateTime.tryParse(requestDetails['created_at'] ?? '') ??
+            DateTime.now(),
+        status: requestDetails['status'] ?? '',
+        consumerElectronics: consumerElectronics,
+        sellerOffers: [],
+        // Add other required fields
+      );
+
+      ConsumerElectronicsDetailScreen.showAsDialog(
+        context,
+        index: index,
+        request: electronicsRequest,
+        consumerElectronics: consumerElectronics,
+        bids: List.from(requestDetails['quotes'] ?? []),
+      );
+    } catch (e) {
+      print('Error creating Electronics detail: $e');
+      _showErrorSnackBar("Error opening electronics details");
     }
   }
 
@@ -1759,6 +2010,9 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     final bidsToShow = bids
         .take(2)
         .toList(); // Show only 2 bids like in screenshot
+    if (request is RimTyreRequest) {
+      print("dhgdhdggdh ${request.rimTyre.moreFields.preferredBrand}");
+    }
 
     return Padding(
       padding: const EdgeInsets.all(3.0),
@@ -3772,9 +4026,9 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     return "${bidTime.day.toString().padLeft(2, '0')}/${bidTime.month.toString().padLeft(2, '0')}/${bidTime.year} - ${bidTime.hour.toString().padLeft(2, '0')}:${bidTime.minute.toString().padLeft(2, '0')} ${bidTime.hour >= 12 ? 'PM' : 'AM'}";
   }
 
-  Future<void> _fetchProductRequests() async {
+  Future<void> _fetchProductRequests({bool showLoading = true}) async {
     setState(() {
-      _isLoading = true;
+      _isLoading = showLoading && _isInitialLoad;
       _error = null;
     });
 
@@ -3805,6 +4059,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
         setState(() {
           _productRequests = apiResponse.results;
           _isLoading = false;
+          _isInitialLoad = false;
         });
 
         // Populate GlobalVariables with API data
@@ -3818,6 +4073,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
         setState(() {
           _error = 'Failed to load requests: ${result['message']}';
           _isLoading = false;
+          _isInitialLoad = false;
         });
       }
     } catch (e) {
@@ -3825,6 +4081,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       setState(() {
         _error = 'Network Error3: $e';
         _isLoading = false;
+        _isInitialLoad = false;
       });
     }
   }
@@ -3865,6 +4122,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
           setState(() {
             _productRequests = apiResponse.results;
             _isLoading = false;
+            _isInitialLoad = false;
             _error = null;
           });
         } catch (parseError) {
@@ -3990,6 +4248,10 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       mileage: specs['mileage']?.toString() ?? '0',
       fuelType: specs['fuel_type']?.toString() ?? 'Unknown',
       bodyType: specs['body_type']?.toString() ?? 'Unknown',
+      preferredBrand: specs['preferred_brand']?.toString() ?? '',
+      fitmentRequired: specs['fitment_required']?.toString() ?? '',
+      balancingRequired: specs['balancing_required']?.toString() ?? '',
+      tyreRotationRequired: specs['tyre_rotation_required']?.toString() ?? '',
     );
 
     final autoSpares = AutoSpares(
@@ -4028,11 +4290,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       tyreWidthMm: match != null ? int.tryParse(match.group(1)!) ?? 205 : 205,
       sidewallProfile: match != null ? match.group(2)! : '55',
       wheelRimDiameterInches: match != null ? match.group(3)! : '16',
-      tyreType: item.title.contains('RIMS')
-          ? 'Rims'
-          : item.title.contains('TYRES')
-          ? 'Tyres'
-          : 'Both',
+      tyreType: item.title,
       quantity: item.quantity ?? 4,
       urgency: _mapUrgencyTimeline(item.urgencyTimeline),
     );
@@ -4048,9 +4306,9 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       pitchCircleDiameter: '114.3',
       preferredBrand: _extractBrandFromTitle(item.title),
       tyreConstructionType: 'Radial',
-      fitmentRequired: true,
-      balancingRequired: true,
-      tyreRotationRequired: false,
+      fitmentRequired: "",
+      balancingRequired: "",
+      tyreRotationRequired: "",
       imageUrls: productImageUrls,
     );
 
@@ -4598,7 +4856,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
         // Refresh the grid after a short delay
         Future.delayed(Duration(seconds: 2), () {
-          _fetchProductRequests();
+          _fetchProductRequests(showLoading: false);
         });
       } else {
         // Handle API error
@@ -7675,7 +7933,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                             ),
                                           ),
                                           child: Text(
-                                            "Cancel",
+                                            "Cancel ",
                                             style: GoogleFonts.manrope(
                                               color: Colors.red.shade500,
                                               fontSize: 12,
@@ -7925,24 +8183,18 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                                 [
                                   _buildDetailItem(
                                     "Fitment Required",
-                                    widget.rimTyre.moreFields.fitmentRequired
-                                        ? "Yes"
-                                        : "No",
+                                    widget.rimTyre.moreFields.fitmentRequired,
                                   ),
                                   _buildDetailItem(
                                     "Balancing Required",
-                                    widget.rimTyre.moreFields.balancingRequired
-                                        ? "Yes"
-                                        : "No",
+                                    widget.rimTyre.moreFields.balancingRequired,
                                   ),
                                   _buildDetailItem(
                                     "Tyre Rotation Required",
                                     widget
-                                            .rimTyre
-                                            .moreFields
-                                            .tyreRotationRequired
-                                        ? "Yes"
-                                        : "No",
+                                        .rimTyre
+                                        .moreFields
+                                        .tyreRotationRequired,
                                   ),
                                   _buildDetailItem(
                                     "Product Images",
@@ -8721,6 +8973,7 @@ String _getRequestDescription(dynamic request) {
       return "Vehicle Spares Request";
     } else if (request is RimTyreRequest) {
       // Transformed model
+      print("dfhgdfghdghdghdgh ${request}");
       if (request.rimTyre?.productDetails != null) {
         final tyreType = request.rimTyre.productDetails.tyreType ?? "Tyres";
         final tyreWidth = request.rimTyre.productDetails.tyreWidthMm ?? 0;
@@ -8728,7 +8981,7 @@ String _getRequestDescription(dynamic request) {
         final rimDiameter =
             request.rimTyre.productDetails.wheelRimDiameterInches ?? "";
         final brand =
-            request.rimTyre.moreFields?.preferredBrand ?? "Various Brands";
+            request.rimTyre.moreFields.preferredBrand ?? "Various Brands";
         return "$tyreType, $tyreWidth/$sidewall" + "R$rimDiameter, $brand";
       }
       return "Tyre/Rim Request";

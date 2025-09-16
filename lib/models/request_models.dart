@@ -276,8 +276,16 @@ class MoreFields {
   final String mileage;
   final String fuelType;
   final String bodyType;
+  final String preferredBrand;
+  final String fitmentRequired;
+  final String balancingRequired;
+  final String tyreRotationRequired;
 
   MoreFields({
+    required this.preferredBrand,
+    required this.fitmentRequired,
+    required this.balancingRequired,
+    required this.tyreRotationRequired,
     required this.partNumber,
     required this.transmissionType,
     required this.mileage,
@@ -293,6 +301,10 @@ class MoreFields {
 
       fuelType: json['fuel_type'] ?? '',
       bodyType: json['body_type'] ?? '',
+      preferredBrand: json['preferred_brand'] ?? '',
+      fitmentRequired: json['fitment_required'] ?? '',
+      balancingRequired: json['balancing_required'] ?? '',
+      tyreRotationRequired: json['tyre_rotation_required'] ?? '',
     );
   }
 
@@ -303,6 +315,10 @@ class MoreFields {
       'mileage': mileage,
       'fuel_type': fuelType,
       'body_type': bodyType,
+      'preferred_brand': preferredBrand,
+      'fitment_required': fitmentRequired,
+      'balancing_required': balancingRequired,
+      'tyre_rotation_required': tyreRotationRequired,
     };
   }
 }
@@ -615,9 +631,9 @@ class RimTyreMoreFields {
   final String pitchCircleDiameter;
   final String preferredBrand;
   final String tyreConstructionType; // e.g., Radial
-  final bool fitmentRequired;
-  final bool balancingRequired;
-  final bool tyreRotationRequired;
+  final String fitmentRequired;
+  final String balancingRequired;
+  final String tyreRotationRequired;
   final List<String> imageUrls; // file paths or URLs
 
   RimTyreMoreFields({

@@ -537,7 +537,7 @@ class _BidrOTPVerificationScreenState extends State<BidrOTPVerificationScreen>
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
-                                    'Enter the six digit code that we sent to \nyour registered cellphone to verify your account.',
+                                    'Enter the six digit code that we sent to \nyour registered email address to verify your account.',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Colors.grey.shade600,
@@ -676,7 +676,7 @@ class _BidrOTPVerificationScreenState extends State<BidrOTPVerificationScreen>
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'Enter the six digit code that we sent to \nyour registered cellphone to verify your account.',
+                              'Enter the six digit code that we sent to \nyour registered email address to verify your account.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.grey.shade600,
@@ -1295,7 +1295,7 @@ class _SellerOTPVerificationScreenState
                                   ),
                                   const SizedBox(height: 12),
                                   Text(
-                                    'Enter the six digit code that we sent to your registered cellphone verify your account.',
+                                    'Enter the six digit code that we sent to your registered email address to verify your account.',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Colors.grey,
@@ -1402,7 +1402,7 @@ class _SellerOTPVerificationScreenState
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              'Enter the six digit code that we sent to your registered cellphone verify your account.',
+                              'Enter the six digit code that we sent to your registered email address to verify your account.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.grey.shade600,

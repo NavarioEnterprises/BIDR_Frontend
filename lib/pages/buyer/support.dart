@@ -2165,6 +2165,8 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
   bool _isOverlayShown = false;
   bool _isLoadingNotifications = false;
   int _unreadCount = 0;
+  bool _isHoveringText = false;
+  bool _isHoveringIcon = false;
   final NotificationApiService _notificationApiService =
       NotificationApiService();
 
@@ -3095,52 +3097,90 @@ class _BuyerDashboardHeaderState extends State<BuyerDashboardHeader>
         padding: EdgeInsets.only(left: 68, right: 68, top: 8, bottom: 8),
         child: Row(
           children: [
-            Text(
-              widget.headerName,
-              style: TextStyle(
-                color: Constants.ftaColorLight,
-                fontSize: 16,
-                fontFamily: 'YuGothic',
+            MouseRegion(
+              onEnter: (_) => setState(() => _isHoveringText = true),
+              onExit: (_) => setState(() => _isHoveringText = false),
+              cursor: SystemMouseCursors.click,
+              child: AnimatedDefaultTextStyle(
+                duration: Duration(milliseconds: 200),
+                style: TextStyle(
+                  color: _isHoveringText 
+                    ? Constants.ftaColorLight.withOpacity(0.7) 
+                    : Constants.ftaColorLight,
+                  fontSize: 16,
+                  fontFamily: 'YuGothic',
+                  decoration: _isHoveringText ? TextDecoration.underline : TextDecoration.none,
+                  decorationColor: Constants.ftaColorLight.withOpacity(0.7),
+                  decorationThickness: 2,
+                  shadows: _isHoveringText ? [
+                    Shadow(
+                      color: Constants.ftaColorLight.withOpacity(0.3),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    )
+                  ] : [],
+                ),
+                child: Text(widget.headerName),
               ),
             ),
             Spacer(),
-            badges.Badge(
-              position: badges.BadgePosition.topEnd(top: -6, end: -6),
+            MouseRegion(
+              onEnter: (_) => setState(() => _isHoveringIcon = true),
+              onExit: (_) => setState(() => _isHoveringIcon = false),
+              cursor: SystemMouseCursors.click,
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                transform: Matrix4.identity()
+                  ..scale(_isHoveringIcon ? 1.1 : 1.0),
+                child: badges.Badge(
+                  position: badges.BadgePosition.topEnd(top: -6, end: -6),
 
-              showBadge: _unreadCount > 0,
-              ignorePointer: true,
-              badgeContent: Text(
-                _unreadCount.toString(),
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Constants.ftaColorLight,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              badgeAnimation: badges.BadgeAnimation.rotation(
-                animationDuration: const Duration(seconds: 1),
-                colorChangeAnimationDuration: const Duration(seconds: 1),
-                loopAnimation: false,
-                curve: Curves.fastOutSlowIn,
-                colorChangeAnimationCurve: Curves.easeInCubic,
-              ),
-              badgeStyle: badges.BadgeStyle(
-                shape: badges.BadgeShape.circle,
-                badgeColor: Colors.white,
-                padding: const EdgeInsets.all(5),
-                borderRadius: BorderRadius.circular(10),
-                elevation: 3,
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Constants.ftaColorLight,
-                ),
-                child: Icon(
-                  HugeIcons.strokeRoundedNotification01,
-                  size: 18,
-                  color: Colors.white,
+                  showBadge: _unreadCount > 0,
+                  ignorePointer: true,
+                  badgeContent: Text(
+                    _unreadCount.toString(),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Constants.ftaColorLight,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  badgeAnimation: badges.BadgeAnimation.rotation(
+                    animationDuration: const Duration(seconds: 1),
+                    colorChangeAnimationDuration: const Duration(seconds: 1),
+                    loopAnimation: false,
+                    curve: Curves.fastOutSlowIn,
+                    colorChangeAnimationCurve: Curves.easeInCubic,
+                  ),
+                  badgeStyle: badges.BadgeStyle(
+                    shape: badges.BadgeShape.circle,
+                    badgeColor: Colors.white,
+                    padding: const EdgeInsets.all(5),
+                    borderRadius: BorderRadius.circular(10),
+                    elevation: 3,
+                  ),
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 200),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _isHoveringIcon 
+                        ? Constants.ftaColorLight.withOpacity(0.8)
+                        : Constants.ftaColorLight,
+                      boxShadow: _isHoveringIcon ? [
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.3),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                        )
+                      ] : [],
+                    ),
+                    child: Icon(
+                      HugeIcons.strokeRoundedNotification01,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ),

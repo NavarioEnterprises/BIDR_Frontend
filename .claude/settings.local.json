@@ -58,7 +58,8 @@
       "Bash(sed:*)",
       "Bash(flutter run:*)",
       "Bash(kill:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

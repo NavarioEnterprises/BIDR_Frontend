@@ -33,6 +33,11 @@
   <title>BIDR</title>
   <link rel="manifest" href="manifest.json">
 
+  <!-- Cache Control Meta Tags -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <!-- Google Maps JavaScript API -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAegBp2UyTEJZnrmWBBPk0hU-C0bjR0cKA&libraries=places&callback=initGoogleMaps"></script>
   
@@ -53,8 +58,41 @@
       document.head.appendChild(script);
     }
   </script>
+
+  <!-- Cache Busting Script -->
+  <script>
+    // Force cache refresh on page load
+    (function() {
+      // Clear service worker cache
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+          }
+        });
+      }
+      
+      // Clear application cache (deprecated but still used by some browsers)
+      if (window.applicationCache) {
+        window.applicationCache.addEventListener('updateready', function() {
+          window.applicationCache.swapCache();
+          window.location.reload();
+        });
+      }
+      
+      // Add timestamp to prevent caching
+      window.CACHE_BUSTER = Date.now();
+    })();
+  </script>
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <script>
+    // Enhanced cache busting for Flutter assets
+    const cacheBuster = Date.now();
+    const script = document.createElement('script');
+    script.src = `flutter_bootstrap.js?v=${cacheBuster}`;
+    script.async = true;
+    document.body.appendChild(script);
+  </script>
 </body>
 </html>

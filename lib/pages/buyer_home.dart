@@ -58,6 +58,8 @@ class _BuyerHomePageState extends State<BuyerHomePage>
   int index = 0;
   List<WebNotification> notifications = [];
   double _maxDistance = 0;
+  Map<int, bool> _categoryHoverStates = {};
+  bool _imagesPreloaded = false;
 
   // Animation Controllers
   late AnimationController _fadeController;
@@ -119,6 +121,24 @@ class _BuyerHomePageState extends State<BuyerHomePage>
 
     // Start animations
     _startAnimations();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Preload category images only once to prevent flickering
+    if (!_imagesPreloaded) {
+      _preloadCategoryImages();
+      _imagesPreloaded = true;
+    }
+  }
+
+  void _preloadCategoryImages() {
+    for (var category in categories) {
+      precacheImage(AssetImage(category["icon"]!), context);
+      precacheImage(AssetImage(category["icon2"]!), context);
+    }
   }
 
   void _startAnimations() async {
@@ -1054,7 +1074,7 @@ class _BuyerHomePageState extends State<BuyerHomePage>
             children: List.generate(categories.length, (index) {
               var category = categories[index];
               return TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: 0.0, end: 1.0),
+                tween: Tween<double>(begin: 0.01, end: 1.0),
                 duration: Duration(milliseconds: 800 + (index * 200)),
                 builder: (context, value, child) {
                   return Transform.translate(
@@ -1094,63 +1114,88 @@ class _BuyerHomePageState extends State<BuyerHomePage>
     VoidCallback onPressed,
   ) {
     final bool isSelected = index == selectedIndex;
+    final bool isHovering = _categoryHoverStates[index] ?? false;
 
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      child: InkWell(
-        onTap: onPressed,
-        highlightColor: Colors.white,
-        hoverColor: Colors.white,
-        splashColor: Colors.white,
-        focusColor: Colors.white,
-        borderRadius: BorderRadius.circular(360),
-        child: AnimatedContainer(
-          duration: Duration(milliseconds: 200),
-          transform: Matrix4.identity()..scale(isSelected ? 0.9 : 0.8),
-          child: Column(
-            children: [
-              AnimatedContainer(
-                duration: Duration(milliseconds: 300),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(360),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _categoryHoverStates[index] = true),
+      onExit: (_) => setState(() => _categoryHoverStates[index] = false),
+      cursor: SystemMouseCursors.click,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        child: InkWell(
+          onTap: onPressed,
+          highlightColor: Colors.white,
+          hoverColor: Colors.white,
+          splashColor: Colors.white,
+          focusColor: Colors.white,
+          borderRadius: BorderRadius.circular(360),
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            transform: Matrix4.identity()..scale(isSelected ? 0.9 : 0.8),
+            child: Column(
+              children: [
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(360),
 
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: Colors.orange.withOpacity(0.05),
-                            blurRadius: 6,
-                            offset: Offset(0, 1),
-                          ),
-                        ]
-                      : [],
-                ),
-                child: AnimatedScale(
-                  scale: isSelected ? 0.82 : 0.8,
-                  duration: Duration(milliseconds: 200),
-                  child: Image.asset(
-                    isSelected ? iconImage : iconImage2,
-                    fit: BoxFit.contain,
+                    boxShadow: isSelected || isHovering
+                        ? [
+                            BoxShadow(
+                              color: isHovering && !isSelected
+                                  ? Constants.ctaColorLight.withOpacity(0.15)
+                                  : Colors.orange.withOpacity(0.05),
+                              blurRadius: isHovering && !isSelected ? 12 : 6,
+                              spreadRadius: isHovering && !isSelected ? 2 : 0,
+                              offset: Offset(
+                                0,
+                                isHovering && !isSelected ? 3 : 1,
+                              ),
+                            ),
+                          ]
+                        : [],
+                  ),
+                  child: AnimatedScale(
+                    scale: isSelected ? 0.82 : 0.8,
+                    duration: Duration(milliseconds: 200),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        AnimatedOpacity(
+                          opacity: isSelected || isHovering ? 0.0 : 1.0,
+                          duration: Duration(milliseconds: 200),
+                          child: Image.asset(iconImage2, fit: BoxFit.contain),
+                        ),
+                        AnimatedOpacity(
+                          opacity: isSelected || isHovering ? 1.0 : 0.0,
+                          duration: Duration(milliseconds: 200),
+                          child: Image.asset(iconImage, fit: BoxFit.contain),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 16),
-              AnimatedDefaultTextStyle(
-                duration: Duration(milliseconds: 200),
-                style: GoogleFonts.manrope(
-                  color: isSelected
-                      ? Constants.ftaColorLight
-                      : Constants.ftaColorLight.withOpacity(0.85),
-                  fontSize: isSelected ? 24 : 20,
-                  fontWeight: FontWeight.bold,
+                SizedBox(height: 16),
+                AnimatedDefaultTextStyle(
+                  duration: Duration(milliseconds: 200),
+                  style: GoogleFonts.manrope(
+                    color: isSelected
+                        ? Constants.ftaColorLight
+                        : isHovering
+                        ? Constants.ctaColorLight
+                        : Constants.ftaColorLight.withOpacity(0.85),
+                    fontSize: isSelected ? 24 : 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  child: Text(
+                    name,
+                    style: TextStyle(),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-                child: Text(
-                  name,
-                  style: TextStyle(),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -4441,8 +4486,12 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         if (kIsWeb) {
           // Try direct geocoding first since we have a good description
           try {
-            print('Trying direct geocoding for web with description: "${suggestion.description}"');
-            final coordinates = await _geocodeAddressWeb(suggestion.description ?? '');
+            print(
+              'Trying direct geocoding for web with description: "${suggestion.description}"',
+            );
+            final coordinates = await _geocodeAddressWeb(
+              suggestion.description ?? '',
+            );
             if (coordinates != null) {
               setState(() {
                 _selectedLocation = coordinates;
@@ -4454,11 +4503,13 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
           } catch (geocodeError) {
             print('Direct geocoding failed: $geocodeError');
           }
-          
+
           // If geocoding failed, try JavaScript geocoding as backup
           try {
             print('Trying JavaScript geocoding as backup');
-            final coordinates = await _geocodeAddressJS(suggestion.description ?? '');
+            final coordinates = await _geocodeAddressJS(
+              suggestion.description ?? '',
+            );
             if (coordinates != null) {
               setState(() {
                 _selectedLocation = coordinates;
@@ -4470,7 +4521,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
           } catch (jsError) {
             print('JavaScript geocoding failed: $jsError');
           }
-          
+
           // If JS geocoding failed, try JavaScript Places API as final backup
           try {
             print('Trying JavaScript Places API as final backup');
@@ -4544,7 +4595,9 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
         if (!kIsWeb) {
           try {
             print('Mobile fallback: using geocoding package');
-            final coordinates = await _geocodeAddress(suggestion.description ?? '');
+            final coordinates = await _geocodeAddress(
+              suggestion.description ?? '',
+            );
             if (coordinates != null) {
               setState(() {
                 _selectedLocation = coordinates;
@@ -4636,25 +4689,27 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
   // Web-specific geocoding method using Google Geocoding API
   Future<LatLng?> _geocodeAddressWeb(String address) async {
     if (!kIsWeb || address.isEmpty) return null;
-    
+
     try {
       final String apiKey = 'AIzaSyAegBp2UyWBBPk0hU-C0bjR0cKA';
       final String encodedAddress = Uri.encodeComponent(address);
-      final String url = 
+      final String url =
           'https://maps.googleapis.com/maps/api/geocode/json?address=$encodedAddress&key=$apiKey';
-      
+
       print('Web geocoding request: $url');
-      
+
       final response = await http.get(Uri.parse(url));
-      
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        
-        if (data['status'] == 'OK' && data['results'] != null && data['results'].isNotEmpty) {
+
+        if (data['status'] == 'OK' &&
+            data['results'] != null &&
+            data['results'].isNotEmpty) {
           final location = data['results'][0]['geometry']['location'];
           final double lat = location['lat']?.toDouble() ?? 0.0;
           final double lng = location['lng']?.toDouble() ?? 0.0;
-          
+
           if (lat != 0.0 || lng != 0.0) {
             print('Web geocoding successful: LatLng($lat, $lng)');
             return LatLng(lat, lng);
@@ -4678,14 +4733,14 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
     } catch (e) {
       print('Web geocoding error in VehicleDetailsQuoteForm: $e');
     }
-    
+
     return null;
   }
 
   // JavaScript-based geocoding method using Google Geocoder
   Future<LatLng?> _geocodeAddressJS(String address) async {
     if (!kIsWeb || address.isEmpty) return null;
-    
+
     try {
       // Wait for Google Maps API to be available
       final bool apiAvailable = await _waitForGoogleMapsAPI();
@@ -4695,7 +4750,7 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
       }
 
       final Completer<LatLng?> completer = Completer<LatLng?>();
-      
+
       // Call JavaScript function to geocode address
       js.context.callMethod('geocodeAddress', [
         address,
@@ -4704,10 +4759,12 @@ class _VehicleDetailsQuoteFormState extends State<VehicleDetailsQuoteForm> {
             if (results != null && results is List && results.isNotEmpty) {
               try {
                 // Convert the JS object to a Map
-                final Map<String, dynamic> resultMap = _convertJsObjectToMap(results[0]);
+                final Map<String, dynamic> resultMap = _convertJsObjectToMap(
+                  results[0],
+                );
                 final double lat = resultMap['latitude']?.toDouble() ?? 0.0;
                 final double lng = resultMap['longitude']?.toDouble() ?? 0.0;
-                
+
                 if (lat != 0.0 || lng != 0.0) {
                   print('JavaScript geocoding successful: LatLng($lat, $lng)');
                   completer.complete(LatLng(lat, lng));

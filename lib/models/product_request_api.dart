@@ -229,9 +229,13 @@ class ProductRequestItem {
     final moreFields = MoreFields(
       partNumber: specs['part_number']?.toString() ?? '',
       transmissionType: specs['transmission_type']?.toString() ?? 'Unknown',
-      mileage: specs['mileage']?.toString() ?? getMileage(),
+      mileage: specs['mileage']?.toString() ?? '0',
       fuelType: specs['fuel_type']?.toString() ?? 'Unknown',
       bodyType: specs['body_type']?.toString() ?? 'Unknown',
+      preferredBrand: specs['preferred_brand']?.toString() ?? '',
+      fitmentRequired: specs['fitment_required']?.toString() ?? '',
+      balancingRequired: specs['balancing_required']?.toString() ?? '',
+      tyreRotationRequired: specs['tyre_rotation_required']?.toString() ?? '',
     );
 
     // Create AutoSpares object
