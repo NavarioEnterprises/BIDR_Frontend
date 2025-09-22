@@ -85,7 +85,7 @@ class _SellerDashboardState extends State<SellerDashboard>
 
   // Navigation item hover states
   Map<String, bool> _navItemHoverStates = {};
-  
+
   // Button hover states for Request More Info and Full Description
   Map<String, bool> _buttonHoverStates = {};
 
@@ -1143,7 +1143,7 @@ class _SellerDashboardState extends State<SellerDashboard>
       body: Column(
         children: [
           SellerDashboardHeader(
-            headerName: 'Seller Dashboard',
+            headerName: 'Business Dashboard',
             initialSort: _currentSort,
             tabActiveIndex: tabActiveIndex,
             onSortChanged: (option) {
@@ -2754,122 +2754,154 @@ class _SellerDashboardState extends State<SellerDashboard>
                   Expanded(
                     child: MouseRegion(
                       cursor: SystemMouseCursors.click,
-                      onEnter: (_) => setState(() => _buttonHoverStates['request_more_info_lead_$uuid'] = true),
-                      onExit: (_) => setState(() => _buttonHoverStates['request_more_info_lead_$uuid'] = false),
+                      onEnter: (_) => setState(
+                        () =>
+                            _buttonHoverStates['request_more_info_lead_$uuid'] =
+                                true,
+                      ),
+                      onExit: (_) => setState(
+                        () =>
+                            _buttonHoverStates['request_more_info_lead_$uuid'] =
+                                false,
+                      ),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(8),
                         hoverColor: Constants.ctaColorLight.withOpacity(0.1),
                         splashColor: Constants.ctaColorLight.withOpacity(0.2),
                         onTap: () async {
-                        // Show loading indicator while creating/getting conversation
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (context) => Center(
-                            child: Container(
-                              padding: EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  CircularProgressIndicator(
-                                    strokeWidth: 1.5,
-                                    color: Constants.ftaColorLight,
-                                  ),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    'Loading conversation...',
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 14,
-                                      color: Colors.grey[700],
+                          // Show loading indicator while creating/getting conversation
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => Center(
+                              child: Container(
+                                padding: EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CircularProgressIndicator(
+                                      strokeWidth: 1.5,
+                                      color: Constants.ftaColorLight,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-
-                        try {
-                          // Create or get conversation for this request
-                          final conversationData =
-                              await ChatService.createOrGetConversationForRequest(
-                                uuid,
-                              );
-
-                          // Close loading dialog
-                          Navigator.of(context).pop();
-
-                          if (conversationData != null) {
-                            // Navigate to GroupChat with backend integration
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => GroupChatScreen(
-                                  groupChat: GroupChat(
-                                    uuid: uuid,
-                                    request: ProductRequest(
-                                      description: description,
+                                    SizedBox(height: 16),
+                                    Text(
+                                      'Loading conversation...',
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
+                                      ),
                                     ),
-                                    messages:
-                                        [], // Empty - will be loaded from backend
-                                  ),
+                                  ],
                                 ),
                               ),
-                            );
-                          } else {
-                            // Show error if backend returns null
+                            ),
+                          );
+
+                          try {
+                            // Create or get conversation for this request
+                            final conversationData =
+                                await ChatService.createOrGetConversationForRequest(
+                                  uuid,
+                                );
+
+                            // Close loading dialog
+                            Navigator.of(context).pop();
+
+                            if (conversationData != null) {
+                              // Navigate to GroupChat with backend integration
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => GroupChatScreen(
+                                    groupChat: GroupChat(
+                                      uuid: uuid,
+                                      request: ProductRequest(
+                                        description: description,
+                                      ),
+                                      messages:
+                                          [], // Empty - will be loaded from backend
+                                    ),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              // Show error if backend returns null
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Unable to create conversation. Please try again.',
+                                  ),
+                                  backgroundColor: Colors.red,
+                                  duration: Duration(seconds: 3),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            // Close loading dialog and show error
+                            Navigator.of(context).pop();
+
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  'Unable to create conversation. Please try again.',
+                                  'Failed to load conversation. Please try again.',
                                 ),
                                 backgroundColor: Colors.red,
                                 duration: Duration(seconds: 3),
                               ),
                             );
                           }
-                        } catch (e) {
-                          // Close loading dialog and show error
-                          Navigator.of(context).pop();
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Failed to load conversation. Please try again.',
-                              ),
-                              backgroundColor: Colors.red,
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                        }
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                        child: AnimatedDefaultTextStyle(
-                          duration: Duration(milliseconds: 200),
-                          style: GoogleFonts.manrope(
-                            fontSize: 11,
-                            fontWeight: _buttonHoverStates['request_more_info_lead_$uuid'] ?? false ? FontWeight.w700 : FontWeight.w500,
-                            color: _buttonHoverStates['request_more_info_lead_$uuid'] ?? false ? Constants.ctaColorLight.withOpacity(0.7) : Constants.ctaColorLight,
-                            decoration: _buttonHoverStates['request_more_info_lead_$uuid'] ?? false ? TextDecoration.underline : TextDecoration.none,
-                            decorationColor: Constants.ctaColorLight.withOpacity(0.7),
-                            decorationThickness: 1.5,
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 12,
                           ),
-                          child: Text('Request More Info'),
+                          child: AnimatedDefaultTextStyle(
+                            duration: Duration(milliseconds: 200),
+                            style: GoogleFonts.manrope(
+                              fontSize: 11,
+                              fontWeight:
+                                  _buttonHoverStates['request_more_info_lead_$uuid'] ??
+                                      false
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              color:
+                                  _buttonHoverStates['request_more_info_lead_$uuid'] ??
+                                      false
+                                  ? Constants.ctaColorLight.withOpacity(0.7)
+                                  : Constants.ctaColorLight,
+                              decoration:
+                                  _buttonHoverStates['request_more_info_lead_$uuid'] ??
+                                      false
+                                  ? TextDecoration.underline
+                                  : TextDecoration.none,
+                              decorationColor: Constants.ctaColorLight
+                                  .withOpacity(0.7),
+                              decorationThickness: 1.5,
+                            ),
+                            child: Text('Request More Info'),
+                          ),
                         ),
                       ),
-                    ),
                     ),
                   ),
                   Expanded(
                     child: MouseRegion(
                       cursor: SystemMouseCursors.click,
-                      onEnter: (_) => setState(() => _buttonHoverStates['full_description_lead_$uuid'] = true),
-                      onExit: (_) => setState(() => _buttonHoverStates['full_description_lead_$uuid'] = false),
+                      onEnter: (_) => setState(
+                        () =>
+                            _buttonHoverStates['full_description_lead_$uuid'] =
+                                true,
+                      ),
+                      onExit: (_) => setState(
+                        () =>
+                            _buttonHoverStates['full_description_lead_$uuid'] =
+                                false,
+                      ),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(8),
                         hoverColor: Constants.ftaColorLight.withOpacity(0.1),
@@ -2879,15 +2911,31 @@ class _SellerDashboardState extends State<SellerDashboard>
                           // _navigateToDetailScreen(request, 1);
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 12,
+                          ),
                           child: AnimatedDefaultTextStyle(
                             duration: Duration(milliseconds: 200),
                             style: GoogleFonts.manrope(
                               fontSize: 11,
-                              fontWeight: _buttonHoverStates['full_description_lead_$uuid'] ?? false ? FontWeight.w700 : FontWeight.w500,
-                              color: _buttonHoverStates['full_description_lead_$uuid'] ?? false ? Constants.ftaColorLight.withOpacity(0.7) : Constants.ftaColorLight,
-                              decoration: _buttonHoverStates['full_description_lead_$uuid'] ?? false ? TextDecoration.underline : TextDecoration.none,
-                              decorationColor: Constants.ftaColorLight.withOpacity(0.7),
+                              fontWeight:
+                                  _buttonHoverStates['full_description_lead_$uuid'] ??
+                                      false
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              color:
+                                  _buttonHoverStates['full_description_lead_$uuid'] ??
+                                      false
+                                  ? Constants.ftaColorLight.withOpacity(0.7)
+                                  : Constants.ftaColorLight,
+                              decoration:
+                                  _buttonHoverStates['full_description_lead_$uuid'] ??
+                                      false
+                                  ? TextDecoration.underline
+                                  : TextDecoration.none,
+                              decorationColor: Constants.ftaColorLight
+                                  .withOpacity(0.7),
                               decorationThickness: 1.5,
                             ),
                             child: Text('Full Description'),
@@ -3268,8 +3316,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     dynamic request,
     int requestNumber, {
     String? buttonText,
-  })
-  {
+  }) {
     final requestId = request['request_id'] ?? '';
     final description = request['seller_notes'] ?? request['description'] ?? '';
     final createdAt = request['created_at'] ?? '';
@@ -3535,8 +3582,14 @@ class _SellerDashboardState extends State<SellerDashboard>
                 children: [
                   MouseRegion(
                     cursor: SystemMouseCursors.click,
-                    onEnter: (_) => setState(() => _buttonHoverStates['request_more_info_$requestId'] = true),
-                    onExit: (_) => setState(() => _buttonHoverStates['request_more_info_$requestId'] = false),
+                    onEnter: (_) => setState(
+                      () => _buttonHoverStates['request_more_info_$requestId'] =
+                          true,
+                    ),
+                    onExit: (_) => setState(
+                      () => _buttonHoverStates['request_more_info_$requestId'] =
+                          false,
+                    ),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(8),
                       hoverColor: Colors.orange.withOpacity(0.1),
@@ -3632,9 +3685,21 @@ class _SellerDashboardState extends State<SellerDashboard>
                         duration: Duration(milliseconds: 200),
                         style: GoogleFonts.manrope(
                           fontSize: 14,
-                          fontWeight: _buttonHoverStates['request_more_info_$requestId'] ?? false ? FontWeight.w700 : FontWeight.w600,
-                          color: _buttonHoverStates['request_more_info_$requestId'] ?? false ? Colors.deepOrange : Colors.orange,
-                          decoration: _buttonHoverStates['request_more_info_$requestId'] ?? false ? TextDecoration.underline : TextDecoration.none,
+                          fontWeight:
+                              _buttonHoverStates['request_more_info_$requestId'] ??
+                                  false
+                              ? FontWeight.w700
+                              : FontWeight.w600,
+                          color:
+                              _buttonHoverStates['request_more_info_$requestId'] ??
+                                  false
+                              ? Colors.deepOrange
+                              : Colors.orange,
+                          decoration:
+                              _buttonHoverStates['request_more_info_$requestId'] ??
+                                  false
+                              ? TextDecoration.underline
+                              : TextDecoration.none,
                           decorationColor: Colors.deepOrange,
                           decorationThickness: 2,
                         ),
@@ -3644,8 +3709,14 @@ class _SellerDashboardState extends State<SellerDashboard>
                   ),
                   MouseRegion(
                     cursor: SystemMouseCursors.click,
-                    onEnter: (_) => setState(() => _buttonHoverStates['full_description_$requestId'] = true),
-                    onExit: (_) => setState(() => _buttonHoverStates['full_description_$requestId'] = false),
+                    onEnter: (_) => setState(
+                      () => _buttonHoverStates['full_description_$requestId'] =
+                          true,
+                    ),
+                    onExit: (_) => setState(
+                      () => _buttonHoverStates['full_description_$requestId'] =
+                          false,
+                    ),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(8),
                       hoverColor: Constants.ftaColorLight.withOpacity(0.1),
@@ -3657,13 +3728,25 @@ class _SellerDashboardState extends State<SellerDashboard>
                         duration: Duration(milliseconds: 200),
                         style: GoogleFonts.manrope(
                           fontSize: 14,
-                          fontWeight: _buttonHoverStates['full_description_$requestId'] ?? false ? FontWeight.w700 : FontWeight.w600,
-                          color: _buttonHoverStates['full_description_$requestId'] ?? false ? Constants.ftaColorLight : Colors.orange,
-                          decoration: _buttonHoverStates['full_description_$requestId'] ?? false ? TextDecoration.underline : TextDecoration.none,
+                          fontWeight:
+                              _buttonHoverStates['full_description_$requestId'] ??
+                                  false
+                              ? FontWeight.w700
+                              : FontWeight.w600,
+                          color:
+                              _buttonHoverStates['full_description_$requestId'] ??
+                                  false
+                              ? Constants.ftaColorLight
+                              : Colors.orange,
+                          decoration:
+                              _buttonHoverStates['full_description_$requestId'] ??
+                                  false
+                              ? TextDecoration.underline
+                              : TextDecoration.none,
                           decorationColor: Constants.ftaColorLight,
                           decorationThickness: 2,
                         ),
-                        child: Text('Full Description'),
+                        child: Text('Full Description3'),
                       ),
                     ),
                   ),
@@ -3788,13 +3871,11 @@ class _SellerDashboardState extends State<SellerDashboard>
     );
   }
 
-
   // Get remaining time breakdown for countdown
   Map<String, int> _getRemainingTimeBreakdown(
     DateTime? createdAt,
     String urgencyTimeline,
-  )
-  {
+  ) {
     if (createdAt == null) {
       return {
         'months': 0,
@@ -3884,8 +3965,6 @@ class _SellerDashboardState extends State<SellerDashboard>
       'seconds': seconds,
     };
   }
-
-
 
   // Pagination widget
   Widget _buildPagination(int totalPages, int totalItems) {
@@ -4179,8 +4258,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     BuildContext context,
     Map<String, dynamic> request, {
     bool isAlternateBid = false,
-  })
-  {
+  }) {
     // Fetch previous bids if this is an alternate bid
     if (isAlternateBid) {
       final requestId = request['request_id']?.toString();
@@ -4249,9 +4327,10 @@ class _SellerDashboardState extends State<SellerDashboard>
                     padding: EdgeInsets.all(16),
                     margin: EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: Colors.blue[50],
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.blue[200]!),
+                      border: Border.all(
+                        color: Constants.ctaColorLight!.withOpacity(0.15),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -4260,7 +4339,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                           children: [
                             Icon(
                               Icons.refresh,
-                              color: Colors.blue[700],
+                              color: Constants.ctaColorLight,
                               size: 18,
                             ),
                             SizedBox(width: 8),
@@ -4269,7 +4348,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                               style: GoogleFonts.manrope(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.blue[700],
+                                color: Constants.ctaColorLight,
                               ),
                             ),
                           ],
@@ -4294,42 +4373,6 @@ class _SellerDashboardState extends State<SellerDashboard>
                     ),
                   ),
 
-                // Previous bids section for alternate bids
-                if (isAlternateBid)
-                  Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.only(bottom: 16),
-                    child: StatefulBuilder(
-                      builder: (context, setState) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.history,
-                                  color: Colors.grey[600],
-                                  size: 16,
-                                ),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Your Previous Bids',
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-
                 Text(
                   'Best Price Advice',
                   style: GoogleFonts.manrope(
@@ -4349,7 +4392,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                 ),
                 SizedBox(height: 24),
                 Text(
-                  'Price*',
+                  'Bid*',
                   style: GoogleFonts.manrope(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -4364,7 +4407,7 @@ class _SellerDashboardState extends State<SellerDashboard>
                     color: Colors.black87,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Enter Price',
+                    hintText: 'Enter Bid',
                     hintStyle: GoogleFonts.manrope(
                       color: Colors.grey[400],
                       fontSize: 14,
@@ -4465,8 +4508,7 @@ class _SellerDashboardState extends State<SellerDashboard>
   Future<void> _handleSubmitBid(
     BuildContext context,
     Map<String, dynamic> request,
-  ) async
-  {
+  ) async {
     // Validate inputs
     final priceText = _priceController.text.trim();
     if (priceText.isEmpty) {
@@ -9046,6 +9088,7 @@ class _SellerDashboardState extends State<SellerDashboard>
   }
 
   void _navigateToDetailScreen(dynamic request, int index) {
+    print("dsjhsddsk ${request}");
     String category = "";
     var requestDetails = request['request_details'];
     if (requestDetails != null) {
@@ -9091,13 +9134,13 @@ class _SellerDashboardState extends State<SellerDashboard>
     dynamic request,
     Map<String, dynamic> requestDetails,
     int index,
-  )
-  {
+  ) {
     try {
       // Create AutoSparesRequest from the response data
 
       // Extract product specifications
       final productSpecs = requestDetails['product_specifications'] ?? {};
+      print("sahasks ${productSpecs}");
 
       // Create AutoSpares object
       final autoSpares = AutoSpares(
@@ -9113,9 +9156,14 @@ class _SellerDashboardState extends State<SellerDashboard>
         ),
         partDetails: PartDetails(
           partName: productSpecs['part_name'] ?? requestDetails['title'] ?? '',
-          quantity: productSpecs['quantity'] ?? 1,
+          quantity:
+              int.tryParse(productSpecs['quantity']?.toString() ?? '1') ?? 1,
           location: requestDetails['buyer_location']?['address'] ?? '',
-          maxDistanceKm:  productSpecs['max_distance_km'] ?? requestDetails['max_distance_km'] ?? '', // Default value
+          maxDistanceKm:
+              double.tryParse(
+                requestDetails['max_travel_distance']?.toString() ?? '0',
+              ) ??
+              0.0,
           urgency:
               productSpecs['urgency'] ??
               requestDetails['urgency_timeline'] ??
@@ -9126,14 +9174,18 @@ class _SellerDashboardState extends State<SellerDashboard>
               '',
           imageUrls: [],
         ),
+
         moreFields: MoreFields.fromJson({
-          'part_number': productSpecs['part_number'],
-          'transmission_type': productSpecs['transmission_type'],
-          'fuel_type': productSpecs['fuel_type'],
-          'body_type': productSpecs['body_type'],
-          'mileage': productSpecs['mileage'],
-          'engine_size': productSpecs['engine_size'],
-          'vehicle_type': productSpecs['vehicle_type'],
+          'part_number': productSpecs['part_number'] ?? "",
+          'transmission_type': productSpecs['transmission_type'] ?? "",
+          'fuel_type': productSpecs['fuel_type'] ?? "",
+          'body_type': productSpecs['body_type'] ?? "",
+          'mileage': productSpecs['mileage'] ?? "",
+          'preferred_brand': productSpecs['preferred_brand'] ?? '',
+          'fitment_required': productSpecs['fitment_required'] ?? 'NO',
+          'balancing_required': productSpecs['balancing_required'] ?? 'NO',
+          'tyre_rotation_required':
+              productSpecs['tyre_rotation_required'] ?? 'NO',
         }),
       );
       final productRequestItem = ProductRequestItem(
@@ -9142,19 +9194,29 @@ class _SellerDashboardState extends State<SellerDashboard>
         category: requestDetails['category'] ?? 'VEHICLE_SPARES',
         title: requestDetails['title'] ?? '',
         description: requestDetails['description'] ?? '',
-        quantity: productSpecs['quantity'] ?? 1,
+        quantity:
+            int.tryParse(productSpecs['quantity']?.toString() ?? '1') ?? 1,
         conditionPreference: productSpecs['condition_preference'] ?? 'NEW',
         currency: 'ZAR',
-        urgencyTimeline: productSpecs['urgency'] ?? requestDetails['urgency_timeline'] ?? '1_WEEK',
+        urgencyTimeline:
+            productSpecs['urgency'] ??
+            requestDetails['urgency_timeline'] ??
+            '1_WEEK',
         status: requestDetails['status'] ?? 'ACTIVE',
         viewCount: requestDetails['view_count'] ?? 0,
         quotes: [], // Empty quotes for seller view
-        productImages: List<String>.from(requestDetails['product_images'] ?? []),
+        productImages: List<String>.from(
+          requestDetails['product_images'] ?? [],
+        ),
         images: List<String>.from(requestDetails['product_images'] ?? []),
         vinPhotoUrl: requestDetails['vin_photo_url'],
         productSpecifications: productSpecs,
-        createdAt: DateTime.tryParse(requestDetails['created_at'] ?? '') ?? DateTime.now(),
-        updatedAt: DateTime.tryParse(requestDetails['updated_at'] ?? '') ?? DateTime.now(),
+        createdAt:
+            DateTime.tryParse(requestDetails['created_at'] ?? '') ??
+            DateTime.now(),
+        updatedAt:
+            DateTime.tryParse(requestDetails['updated_at'] ?? '') ??
+            DateTime.now(),
       );
 
       SparesDetailScreen.showAsDialog(
@@ -9175,8 +9237,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     dynamic request,
     Map<String, dynamic> requestDetails,
     int index,
-  )
-  {
+  ) {
     try {
       // Create RimTyreRequest from the response data
 
@@ -9241,8 +9302,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     dynamic request,
     Map<String, dynamic> requestDetails,
     int index,
-  )
-  {
+  ) {
     try {
       // Create ConsumerElectronicsRequest from the response data
 
@@ -10190,8 +10250,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     Map<String, dynamic> order,
     String pin,
     BuildContext context,
-  ) async
-  {
+  ) async {
     if (pin.length != 4) {
       _showErrorMessage('Please enter a 4-digit PIN');
       return;
@@ -10316,8 +10375,7 @@ class _SellerDashboardState extends State<SellerDashboard>
   Future<void> _navigateToSellerBidDetailScreen(
     Map<String, dynamic> bidData,
     String type,
-  ) async
-  {
+  ) async {
     try {
       // Show loading dialog
       showDialog(
@@ -10410,8 +10468,7 @@ class _SellerDashboardState extends State<SellerDashboard>
   Future<Map<String, dynamic>?> _fetchDetailedBidData(
     Map<String, dynamic> bidData,
     String type,
-  ) async
-  {
+  ) async {
     try {
       final requestId =
           bidData['request_id'] ??
@@ -10446,8 +10503,7 @@ class _SellerDashboardState extends State<SellerDashboard>
     String action,
     String notes,
     BuildContext context,
-  ) async
-  {
+  ) async {
     try {
       final String orderId = order['order_id'].toString();
       final String newStatus = action == 'approve'
@@ -11178,10 +11234,10 @@ class _SellerSparesDetailScreenState extends State<SellerSparesDetailScreen> {
                       'Year',
                       vehicle['year']?.toString() ?? 'N/A',
                     ),
-                    _buildDetailRow(
+                    /* _buildDetailRow(
                       'Engine Size',
                       '${vehicle['engine_size'] ?? 'N/A'}L',
-                    ),
+                    ),*/
                     _buildDetailRow('Fuel Type', vehicle['fuel_type'] ?? 'N/A'),
                   ]),
 

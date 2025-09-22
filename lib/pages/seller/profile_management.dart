@@ -1057,7 +1057,9 @@ class _ProfileManagementState extends State<ProfileManagement>
 
           Row(
             children: [
-              Expanded(
+              Spacer(),
+              Container(
+                width: 240,
                 child: OutlinedButton(
                   onPressed: () => _onMenuItemSelected('Edit Seller Profile'),
                   style: OutlinedButton.styleFrom(
@@ -1077,7 +1079,8 @@ class _ProfileManagementState extends State<ProfileManagement>
                 ),
               ),
               const SizedBox(width: 16),
-              Expanded(
+              Container(
+                width: 240,
                 child: ElevatedButton(
                   onPressed: _signOut,
                   style: ElevatedButton.styleFrom(
@@ -1993,15 +1996,20 @@ class _ProfileManagementState extends State<ProfileManagement>
 
   Widget _buildAccountTypeDropdownField(String label, String hint) {
     // Only update if _selectedAccountType is not null and different from current value
-    if (_selectedAccountType != null && _selectedAccountType != accountTypeController.text) {
-      print('Updating account type controller from $_selectedAccountType to ${accountTypeController.text}');
+    if (_selectedAccountType != null &&
+        _selectedAccountType != accountTypeController.text) {
+      print(
+        'Updating account type controller from $_selectedAccountType to ${accountTypeController.text}',
+      );
       accountTypeController.text = _selectedAccountType!;
     }
-    
+
     if (kDebugMode) {
-      print('Account type field - _selectedAccountType: $_selectedAccountType, controller: ${accountTypeController.text}');
+      print(
+        'Account type field - _selectedAccountType: $_selectedAccountType, controller: ${accountTypeController.text}',
+      );
     }
-    
+
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.35,
       child: GestureDetector(

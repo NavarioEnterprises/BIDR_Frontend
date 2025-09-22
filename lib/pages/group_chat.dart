@@ -43,6 +43,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   String? _suspensionMessage;
   bool _showModerationPanel = false;
 
+  // User title mapping for group chat
+  Map<String, String> _userTitleMap = {};
+  int _sellerCounter = 0;
+
   @override
   void initState() {
     super.initState();
@@ -140,11 +144,20 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
       if (messagesData != null) {
         setState(() {
+          // Clear existing mappings when loading fresh messages
+          _userTitleMap.clear();
+          _sellerCounter = 0;
+
           _backendMessages = messagesData
               .map(
                 (json) => ChatMessage.fromJson(json, Constants.myDisplayname),
               )
               .toList();
+
+          // Process messages in order to build user title mappings
+          for (var message in _backendMessages) {
+            _getUserTitle(message);
+          }
         });
         _scrollToBottom();
       }
@@ -426,43 +439,140 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   Future<String?> _showAttachmentTypeDialog() async {
     return await showDialog<String>(
       context: context,
+      barrierColor: Colors.black54,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Select Attachment Type',
-            style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(Icons.image, color: Colors.blue),
-                title: Text('Images'),
-                subtitle: Text('JPG, PNG, GIF (Max 10MB)'),
-                onTap: () => Navigator.of(context).pop('image'),
-              ),
-              ListTile(
-                leading: Icon(Icons.description, color: Colors.red),
-                title: Text('Documents'),
-                subtitle: Text('PDF, DOC, TXT (Max 10MB)'),
-                onTap: () => Navigator.of(context).pop('document'),
-              ),
-              ListTile(
-                leading: Icon(Icons.audiotrack, color: Colors.green),
-                title: Text('Audio'),
-                subtitle: Text('MP3, WAV, M4A (Max 10MB)'),
-                onTap: () => Navigator.of(context).pop('audio'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
+          child: Container(
+            padding: EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Select Attachment Type',
+                  style: GoogleFonts.manrope(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                SizedBox(height: 24),
+                _buildAttachmentOption(
+                  icon: Icons.image_rounded,
+                  iconColor: Colors.blue[600]!,
+                  title: 'Images',
+                  subtitle: 'JPG, PNG, GIF',
+                  onTap: () => Navigator.of(context).pop('image'),
+                ),
+                SizedBox(height: 12),
+                _buildAttachmentOption(
+                  icon: Icons.description_rounded,
+                  iconColor: Colors.red[600]!,
+                  title: 'Documents',
+                  subtitle: 'PDF, DOC, TXT',
+                  onTap: () => Navigator.of(context).pop('document'),
+                ),
+                SizedBox(height: 12),
+                _buildAttachmentOption(
+                  icon: Icons.audiotrack_rounded,
+                  iconColor: Colors.green[600]!,
+                  title: 'Audio',
+                  subtitle: 'MP3, WAV, M4A',
+                  onTap: () => Navigator.of(context).pop('audio'),
+                ),
+                SizedBox(height: 20),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.manrope(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildAttachmentOption({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[200]!),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: iconColor,
+                size: 24,
+              ),
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.manrope(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.manrope(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.grey[400],
+              size: 24,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -975,36 +1085,14 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                   Row(
                     children: [
                       Text(
-                        message.sender.name,
+                        message.sender.role,
                         style: GoogleFonts.manrope(
                           color: _getUserTextColor(message.sender.role),
                           fontSize: isReply ? 12 : 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      if (!isGenericName) ...[
-                        SizedBox(width: 8),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isReply ? 6 : 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: message.sender.role.contains("Seller")
-                                ? Constants.ctaColorLight
-                                : Constants.ftaColorLight,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            message.sender.role,
-                            style: GoogleFonts.manrope(
-                              color: _getUserTextColor(message.sender.role),
-                              fontSize: isReply ? 8 : 10,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
+
                       Spacer(),
                       Text(
                         _formatTime(message.timestamp),
@@ -1140,36 +1228,20 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                   Row(
                     children: [
                       Text(
-                        message.senderName,
+                        _getUserTitle(message),
                         style: GoogleFonts.manrope(
-                          color: _getUserTextColor(message.senderRole),
+                          color:
+                              message.senderRole.toLowerCase().contains(
+                                "seller",
+                              )
+                              ? Constants.ctaColorLight
+                              : Constants.ftaColorLight,
                           fontSize: isReply ? 12 : 14,
+
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      if (!isGenericName) ...[
-                        SizedBox(width: 8),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isReply ? 6 : 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: message.senderRole.contains("Seller")
-                                ? Constants.ctaColorLight
-                                : Constants.ftaColorLight,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            message.senderRole,
-                            style: GoogleFonts.manrope(
-                              color: Colors.white,
-                              fontSize: isReply ? 8 : 10,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
+
                       Spacer(),
                       Text(
                         _formatTime(message.timestamp),
@@ -1486,6 +1558,44 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     } else {
       return "Just now";
     }
+  }
+
+  /// Get user title based on role and unique user ID
+  String _getUserTitle(ChatMessage message) {
+    // If no sender ID, fallback to sender role
+
+    print(
+      "Getting title for user ID: ${message.id}, role: ${message.senderRole}",
+    );
+    if (message.senderName == null || message.senderName!.isEmpty) {
+      return message.senderRole;
+    }
+
+    // Check if we already have a title for this user
+    if (_userTitleMap.containsKey(message.senderName!)) {
+      return _userTitleMap[message.senderName!]!;
+    }
+
+    // Assign new title based on role
+    String title;
+    if (message.senderRole.toLowerCase().contains("buyer")) {
+      // Buyer is always just "Buyer" without a number
+      title = "Buyer";
+    } else if (message.senderRole.toLowerCase().contains("seller")) {
+      // Sellers get numbered titles
+      _sellerCounter++;
+      title = "Seller $_sellerCounter";
+    } else {
+      // Fallback to original role
+      title = message.senderRole;
+    }
+
+    // Store the mapping
+    _userTitleMap[message.senderName!] = title.replaceAll(
+      "user",
+      Constants.myDisplayname,
+    );
+    return title;
   }
 
   /// Show suspension dialog

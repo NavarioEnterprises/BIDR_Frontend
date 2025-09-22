@@ -56,14 +56,74 @@ class ApiService {
       //   request.headers['Authorization'] = 'Bearer $accessToken';
       // }
 
-      // Prepare vehicle spares data matching the VehicleSpares model exactly
-      Map<String, dynamic> vehicleSparesData = {
-        // Vehicle Information (required fields)
-        'vehicle_make': selectedManufacturer ?? 'Unknown',
-        'vehicle_model': selectedMakeModel ?? 'Unknown',
+      // Validate required fields
+      if (Constants.myUid.isEmpty) {
+        throw Exception('User ID is required');
+      }
+
+      // Prepare product specifications with all vehicle details
+      Map<String, dynamic> productSpecifications = {
+        // Vehicle Information (required fields with validation)
+        'vehicle_make': (selectedManufacturer?.isNotEmpty == true) ? selectedManufacturer! : 'Ford',
+        'vehicle_model': (selectedMakeModel?.isNotEmpty == true) ? selectedMakeModel! : 'Focus',
         'vehicle_year': selectedYear != null
-            ? int.tryParse(selectedYear!) ?? 2020
-            : 2020,
+            ? (int.tryParse(selectedYear!) ?? 2023)
+            : 2023,
+        'vehicle_type': _mapVehicleType(selectedType),
+
+        // Engine and VIN information
+        'engine_size': '', // Optional field
+        'vin_number': vinNumber.isNotEmpty ? vinNumber : '',
+        
+        // Additional vehicle details for product_specifications
+        'mileage': mileage.isNotEmpty ? mileage : '0',
+        'transmission_type': _mapTransmissionType(selectedTransmissionType),
+        'fuel_type': _mapFuelType(selectedFuelType), 
+        'body_type': _mapBodyType(selectedBodyType),
+
+        // Part specifications (required fields)
+        'part_name': partName.isNotEmpty ? partName : 'Vehicle Part',
+        'part_category': 'OTHER', // Default category
+        'part_number': partNumber.isNotEmpty ? partNumber : '',
+
+        // Request details (required fields)
+        'quantity': selectedQuantity != null
+            ? (int.tryParse(selectedQuantity!) ?? 1)
+            : 1,
+        'condition_preference': _mapConditionPreference(selectedNewUsedPart),
+        'urgency': _mapTimeframeToUrgency(selectedTimeframe),
+
+        // Additional details (optional fields)
+        'description': description.isNotEmpty ? description : 'Vehicle spare parts request',
+        'compatible_models': '',
+        'preferred_brand': '',
+        'avoid_brands': '',
+
+        // Installation and warranty (optional fields with proper defaults)
+        'installation_required': 'NO',
+        'warranty_required': 'NO',
+
+        // Budget information (optional)
+        'currency': 'ZAR',
+
+        // Location information
+        'location_info': {
+          'address': location.isNotEmpty
+              ? location
+              : 'Selected Location: ${locationLat ?? 0.0}, ${locationLng ?? 0.0}',
+          'lat': locationLat ?? 0.0,
+          'lng': locationLng ?? 0.0,
+        },
+      };
+      
+      // Prepare vehicle spares data for the VehicleSpares model (only fields that exist in the model)
+      Map<String, dynamic> vehicleSparesData = {
+        // Vehicle Information (required fields with validation)
+        'vehicle_make': (selectedManufacturer?.isNotEmpty == true) ? selectedManufacturer! : 'Ford',
+        'vehicle_model': (selectedMakeModel?.isNotEmpty == true) ? selectedMakeModel! : 'Focus',
+        'vehicle_year': selectedYear != null
+            ? (int.tryParse(selectedYear!) ?? 2023)
+            : 2023,
         'vehicle_type': _mapVehicleType(selectedType),
 
         // Engine and VIN information
@@ -77,13 +137,13 @@ class ApiService {
 
         // Request details (required fields)
         'quantity': selectedQuantity != null
-            ? int.tryParse(selectedQuantity!) ?? 1
+            ? (int.tryParse(selectedQuantity!) ?? 1)
             : 1,
         'condition_preference': _mapConditionPreference(selectedNewUsedPart),
         'urgency': _mapTimeframeToUrgency(selectedTimeframe),
 
         // Additional details (optional fields)
-        'description': description.isNotEmpty ? description : '',
+        'description': description.isNotEmpty ? description : 'Vehicle spare parts request',
         'compatible_models': '',
         'preferred_brand': '',
         'avoid_brands': '',
@@ -91,17 +151,9 @@ class ApiService {
         // Installation and warranty (optional fields with proper defaults)
         'installation_required': 'NO',
         'warranty_required': 'NO',
-        'warranty_duration': '',
-        'energy_efficiency_required': 'NO',
 
         // Budget information (optional)
         'currency': 'ZAR',
-
-        // Missing vehicle fields that were not being sent
-        'mileage': mileage.isNotEmpty ? mileage : '0',
-        'transmission_type': _mapTransmissionType(selectedTransmissionType),
-        'fuel_type': _mapFuelType(selectedFuelType),
-        'body_type': _mapBodyType(selectedBodyType),
 
         // Location information
         'location_info': {
@@ -117,7 +169,7 @@ class ApiService {
       request.fields.addAll({
         'category': 'VEHICLE_SPARES',
         'title': partName.isNotEmpty ? partName : 'Vehicle Spare Request',
-        'description': description,
+        'description': description.isNotEmpty ? description : 'Vehicle spare parts request',
         'buyer_location': jsonEncode({
           'address': location.isNotEmpty
               ? location
@@ -129,14 +181,14 @@ class ApiService {
         'quantity': selectedQuantity ?? '1',
         'urgency_timeline': _mapTimeframeToUrgency(selectedTimeframe),
         'max_travel_distance': maxDistance.round().toString(),
-        'product_specifications': jsonEncode(vehicleSparesData),
+        'product_specifications': jsonEncode(productSpecifications), // Add required field with all vehicle details
         'terms_accepted': 'true',
         'contact_consent': 'true',
         'buyer_id': Constants.myUid,
         'auth_user_uid': Constants.myUid,
       });
 
-      // Add vehicle_spares_data as a JSON string
+      // Add vehicle_spares_data as a JSON string (only once)
       request.fields['vehicle_spares_data'] = jsonEncode(vehicleSparesData);
 
       print('=== DEBUG JSON FIELDS ===');
@@ -222,23 +274,50 @@ class ApiService {
       print('Response body: ${response.body}');
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        return {
-          'success': true,
-          'message': 'Request submitted successfully',
-          'data': jsonDecode(response.body),
-        };
+        try {
+          final responseData = jsonDecode(response.body);
+          return {
+            'success': true,
+            'message': 'Request submitted successfully',
+            'data': responseData,
+          };
+        } catch (jsonError) {
+          print('JSON decode error: $jsonError');
+          return {
+            'success': true,
+            'message': 'Request submitted successfully (non-JSON response)',
+            'data': {'raw_response': response.body},
+          };
+        }
       } else {
+        // Handle error response
+        String errorMessage = 'Failed to submit request: ${response.statusCode}';
+        Map<String, dynamic> errorData = {};
+        
+        try {
+          errorData = jsonDecode(response.body);
+          if (errorData.containsKey('error')) {
+            errorMessage = errorData['error']['message'] ?? errorMessage;
+          } else if (errorData.containsKey('message')) {
+            errorMessage = errorData['message'];
+          }
+        } catch (jsonError) {
+          print('Error parsing error response JSON: $jsonError');
+          errorData = {'raw_error': response.body};
+        }
+
         return {
           'success': false,
-          'message': 'Failed to submit request: ${response.statusCode}',
-          'error': response.body,
+          'message': errorMessage,
+          'error': errorData,
+          'status_code': response.statusCode,
         };
       }
     } catch (e) {
-      print('Error submitting request1: $e');
+      print('Error submitting request: $e');
       return {
         'success': false,
-        'message': 'Network error occurred',
+        'message': 'Network error occurred: ${e.toString()}',
         'error': e.toString(),
       };
     }

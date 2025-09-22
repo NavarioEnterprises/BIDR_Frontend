@@ -37,6 +37,10 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
   bool _isSuspended = false;
   String? _suspensionMessage;
 
+  // User title mapping for group chat
+  Map<String, String> _userTitleMap = {};
+  int _sellerCounter = 0;
+
   @override
   void initState() {
     super.initState();
@@ -61,9 +65,10 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
     try {
       await _loadUserModerationStatus();
 
-      final conversationData = await ChatService.createOrGetConversationForRequest(
-        widget.groupChat.uuid,
-      );
+      final conversationData =
+          await ChatService.createOrGetConversationForRequest(
+            widget.groupChat.uuid,
+          );
 
       if (conversationData != null) {
         _backendConversation = ChatConversation.fromJson(conversationData);
@@ -124,9 +129,20 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
 
       if (messagesData != null) {
         setState(() {
+          // Clear existing mappings when loading fresh messages
+          _userTitleMap.clear();
+          _sellerCounter = 0;
+
           _backendMessages = messagesData
-              .map((json) => ChatMessage.fromJson(json, Constants.myDisplayname))
+              .map(
+                (json) => ChatMessage.fromJson(json, Constants.myDisplayname),
+              )
               .toList();
+
+          // Process messages in order to build user title mappings
+          for (var message in _backendMessages) {
+            _getUserTitle(message);
+          }
         });
         _scrollToBottom();
       }
@@ -179,7 +195,8 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
             _showSuspensionDialog();
           } else {
             _showMessageBlockedDialog(
-              messageResult['message'] ?? 'Message blocked due to content violations',
+              messageResult['message'] ??
+                  'Message blocked due to content violations',
               List<String>.from(messageResult['violations'] ?? []),
             );
           }
@@ -188,7 +205,8 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                messageResult['message'] ?? 'Failed to send message. Please try again.',
+                messageResult['message'] ??
+                    'Failed to send message. Please try again.',
                 style: GoogleFonts.inter(fontSize: 14),
               ),
               backgroundColor: const Color(0xFFEF4444),
@@ -220,7 +238,7 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
       final newMessage = Message(
         sender: User(
           name: Constants.myDisplayname,
-          role: "Buyer",
+          role: Constants.currentUser!.role,
           profileImageUrl: null,
         ),
         content: content,
@@ -299,7 +317,8 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
           ],
         ),
         actions: [
-          if (_userModerationStatus != null && _userModerationStatus!.activeStrikes > 0)
+          if (_userModerationStatus != null &&
+              _userModerationStatus!.activeStrikes > 0)
             IconButton(
               icon: Stack(
                 children: [
@@ -378,24 +397,28 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
           Expanded(
             child: _isLoading
                 ? Center(
-              child: CircularProgressIndicator(
-                color: Constants.ctaColorLight,
-              ),
-            )
+                    child: CircularProgressIndicator(
+                      color: Constants.ctaColorLight,
+                    ),
+                  )
                 : ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _useBackend
-                  ? _backendMessages.length
-                  : widget.groupChat.messages.length,
-              itemBuilder: (context, index) {
-                if (_useBackend) {
-                  return _buildBackendMessageItem(_backendMessages[index]);
-                } else {
-                  return _buildMessageItem(widget.groupChat.messages[index]);
-                }
-              },
-            ),
+                    controller: _scrollController,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: _useBackend
+                        ? _backendMessages.length
+                        : widget.groupChat.messages.length,
+                    itemBuilder: (context, index) {
+                      if (_useBackend) {
+                        return _buildBackendMessageItem(
+                          _backendMessages[index],
+                        );
+                      } else {
+                        return _buildMessageItem(
+                          widget.groupChat.messages[index],
+                        );
+                      }
+                    },
+                  ),
           ),
 
           // Reply indicator
@@ -405,9 +428,7 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
-                border: Border(
-                  top: BorderSide(color: Colors.grey[300]!),
-                ),
+                border: Border(top: BorderSide(color: Colors.grey[300]!)),
               ),
               child: Row(
                 children: [
@@ -479,9 +500,7 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                       decoration: BoxDecoration(
                         color: const Color(0xFFF3F4F6),
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: const Color(0xFFE5E7EB),
-                        ),
+                        border: Border.all(color: const Color(0xFFE5E7EB)),
                       ),
                       child: TextField(
                         controller: _messageController,
@@ -523,11 +542,7 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                     ),
                     child: IconButton(
                       onPressed: _sendMessage,
-                      icon: Icon(
-                        Icons.send,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                      icon: Icon(Icons.send, color: Colors.white, size: 20),
                       padding: EdgeInsets.zero,
                     ),
                   ),
@@ -542,7 +557,9 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
 
   Widget _buildMessageItem(Message message, {bool isReply = false}) {
     final isCurrentUser = message.sender.name == Constants.myDisplayname;
-    final alignment = isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final alignment = isCurrentUser
+        ? CrossAxisAlignment.end
+        : CrossAxisAlignment.start;
 
     return Container(
       margin: EdgeInsets.only(
@@ -557,9 +574,7 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: isCurrentUser
-                  ? Constants.ctaColorLight
-                  : Colors.white,
+              color: isCurrentUser ? Constants.ctaColorLight : Colors.white,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(isCurrentUser ? 16 : 4),
                 topRight: Radius.circular(isCurrentUser ? 4 : 16),
@@ -582,28 +597,13 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        message.sender.name,
+                        message.sender.role,
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: isCurrentUser ? Colors.white70 : Constants.ctaColorLight,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
                           color: isCurrentUser
-                              ? Colors.white.withOpacity(0.2)
-                              : Constants.ctaColorLight.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          message.sender.role,
-                          style: GoogleFonts.inter(
-                            fontSize: 10,
-                            color: isCurrentUser ? Colors.white : Constants.ctaColorLight,
-                          ),
+                              ? Colors.white70
+                              : Constants.ctaColorLight,
                         ),
                       ),
                     ],
@@ -614,7 +614,9 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                   message.content,
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: isCurrentUser ? Colors.white : const Color(0xFF374151),
+                    color: isCurrentUser
+                        ? Colors.white
+                        : const Color(0xFF374151),
                     height: 1.4,
                   ),
                 ),
@@ -623,7 +625,9 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                   _formatTime(message.timestamp),
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: isCurrentUser ? Colors.white70 : const Color(0xFF9CA3AF),
+                    color: isCurrentUser
+                        ? Colors.white70
+                        : const Color(0xFF9CA3AF),
                   ),
                 ),
               ],
@@ -652,7 +656,9 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
           // Replies
           if (message.replies.isNotEmpty) ...[
             const SizedBox(height: 8),
-            ...message.replies.map((reply) => _buildMessageItem(reply, isReply: true)),
+            ...message.replies.map(
+              (reply) => _buildMessageItem(reply, isReply: true),
+            ),
           ],
         ],
       ),
@@ -661,7 +667,9 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
 
   Widget _buildBackendMessageItem(ChatMessage message) {
     final isCurrentUser = message.senderName == Constants.myDisplayname;
-    final alignment = isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final alignment = isCurrentUser
+        ? CrossAxisAlignment.end
+        : CrossAxisAlignment.start;
 
     return Container(
       margin: EdgeInsets.only(
@@ -675,9 +683,7 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: isCurrentUser
-                  ? Constants.ctaColorLight
-                  : Colors.white,
+              color: isCurrentUser ? Constants.ctaColorLight : Colors.white,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(isCurrentUser ? 16 : 4),
                 topRight: Radius.circular(isCurrentUser ? 4 : 16),
@@ -704,12 +710,17 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: isCurrentUser ? Colors.white70 : Constants.ctaColorLight,
+                          color: isCurrentUser
+                              ? Colors.white70
+                              : Constants.ctaColorLight,
                         ),
                       ),
                       const SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: isCurrentUser
                               ? Colors.white.withOpacity(0.2)
@@ -717,10 +728,12 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          message.senderRole,
+                          _getUserTitle(message),
                           style: GoogleFonts.inter(
                             fontSize: 10,
-                            color: isCurrentUser ? Colors.white : Constants.ctaColorLight,
+                            color: isCurrentUser
+                                ? Colors.white
+                                : Constants.ctaColorLight,
                           ),
                         ),
                       ),
@@ -732,7 +745,9 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                   message.content,
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: isCurrentUser ? Colors.white : const Color(0xFF374151),
+                    color: isCurrentUser
+                        ? Colors.white
+                        : const Color(0xFF374151),
                     height: 1.4,
                   ),
                 ),
@@ -741,7 +756,9 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                   _formatTime(message.timestamp),
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: isCurrentUser ? Colors.white70 : const Color(0xFF9CA3AF),
+                    color: isCurrentUser
+                        ? Colors.white70
+                        : const Color(0xFF9CA3AF),
                   ),
                 ),
               ],
@@ -765,6 +782,37 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
     } else {
       return "Just now";
     }
+  }
+
+  /// Get user title based on role and unique user ID
+  String _getUserTitle(ChatMessage message) {
+    // If no sender ID, fallback to sender role
+    if (message.senderId == null || message.senderId!.isEmpty) {
+      return message.senderRole;
+    }
+
+    // Check if we already have a title for this user
+    if (_userTitleMap.containsKey(message.senderId!)) {
+      return _userTitleMap[message.senderId!]!;
+    }
+
+    // Assign new title based on role
+    String title;
+    if (message.senderRole.toLowerCase().contains("buyer")) {
+      // Buyer is always just "Buyer" without a number
+      title = "Buyer";
+    } else if (message.senderRole.toLowerCase().contains("seller")) {
+      // Sellers get numbered titles
+      _sellerCounter++;
+      title = "Seller $_sellerCounter";
+    } else {
+      // Fallback to original role
+      title = message.senderRole;
+    }
+
+    // Store the mapping
+    _userTitleMap[message.senderId!] = title;
+    return title;
   }
 
   // Moderation dialogs and notifications
@@ -955,24 +1003,29 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        ...violations.map((violation) => Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('• ', style: TextStyle(color: Color(0xFF92400E))),
-                              Expanded(
-                                child: Text(
-                                  violation,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    color: const Color(0xFF92400E),
+                        ...violations.map(
+                          (violation) => Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  '• ',
+                                  style: TextStyle(color: Color(0xFF92400E)),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    violation,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: const Color(0xFF92400E),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        )),
+                        ),
                       ],
                     ),
                   ),
@@ -1025,9 +1078,7 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
         ),
         backgroundColor: const Color(0xFFF59E0B),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         duration: const Duration(seconds: 4),
       ),
     );
@@ -1050,9 +1101,7 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
         ),
         backgroundColor: const Color(0xFFEF4444),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         duration: const Duration(seconds: 5),
         action: SnackBarAction(
           label: 'View',
@@ -1180,7 +1229,9 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                                       vertical: 6,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: _userModerationStatus!.activeStrikes > 0
+                                      color:
+                                          _userModerationStatus!.activeStrikes >
+                                              0
                                           ? const Color(0xFFFEF2F2)
                                           : const Color(0xFFF0FDF4),
                                       borderRadius: BorderRadius.circular(16),
@@ -1190,7 +1241,10 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                                       style: GoogleFonts.inter(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
-                                        color: _userModerationStatus!.activeStrikes > 0
+                                        color:
+                                            _userModerationStatus!
+                                                    .activeStrikes >
+                                                0
                                             ? const Color(0xFFDC2626)
                                             : const Color(0xFF059669),
                                       ),
@@ -1244,7 +1298,9 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFFE5E7EB)),
+                              border: Border.all(
+                                color: const Color(0xFFE5E7EB),
+                              ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1314,11 +1370,7 @@ class _GroupChatMobileState extends State<GroupChatMobile> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.gavel,
-                  size: 48,
-                  color: Constants.ctaColorLight,
-                ),
+                Icon(Icons.gavel, size: 48, color: Constants.ctaColorLight),
                 const SizedBox(height: 16),
                 Text(
                   'Appeal Moderation Action',

@@ -56,6 +56,10 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   String _sortBy = 'newest';
   SortOption? _currentSort;
 
+  // Pagination variables
+  int _currentPage = 1;
+  final int _itemsPerPage = 8;
+
   @override
   void initState() {
     super.initState();
@@ -192,38 +196,39 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 68, right: 68),
-                  child: Center(
-                    child: Container(
-                      width: double.infinity,
-                      constraints: BoxConstraints(maxWidth: 1600),
-                      height: 600,
-                      child: dashboardIndex == 0
-                          ? _buildRequestsGrid()
-                          : dashboardIndex == 1
-                          ? Container(
-                              width: MediaQuery.of(context).size.width * 0.35,
-                              height: 400,
-                              child: ShareWidget(),
-                            )
-                          : dashboardIndex == 2
-                          ? Column(
-                              children: [
-                                Expanded(
-                                  child: TransactionDashboard(
-                                    key: _transactionKey,
+                Container(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 68, right: 68),
+                    child: Center(
+                      child: Container(
+                        width: double.infinity,
+                        constraints: BoxConstraints(maxWidth: 1600),
+
+                        child: dashboardIndex == 0
+                            ? _buildRequestsGrid()
+                            : dashboardIndex == 1
+                            ? Container(
+                                width: MediaQuery.of(context).size.width * 0.35,
+                                height: 400,
+                                child: ShareWidget(),
+                              )
+                            : dashboardIndex == 2
+                            ? Column(
+                                children: [
+                                  Expanded(
+                                    child: TransactionDashboard(
+                                      key: _transactionKey,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            )
-                          : dashboardIndex == 3
-                          ? AccountManagementPage()
-                          : Container(),
+                                ],
+                              )
+                            : dashboardIndex == 3
+                            ? AccountManagementPage()
+                            : Container(),
+                      ),
                     ),
                   ),
                 ),
-                SizedBox(height: 24),
                 FooterSection(logo: "lib/assets/images/bidr_logo2.png"),
               ],
             ),
@@ -316,22 +321,203 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       return Center(child: _buildEmptyStateCard());
     }
 
+    // Calculate pagination
+    final totalItems = filteredRequests.length;
+    final totalPages = (totalItems / _itemsPerPage).ceil();
+
+    // Reset current page if it exceeds total pages
+    if (_currentPage > totalPages && totalPages > 0) {
+      _currentPage = 1;
+    }
+
+    // Get items for current page
+    final startIndex = (_currentPage - 1) * _itemsPerPage;
+    final endIndex = (startIndex + _itemsPerPage).clamp(0, totalItems);
+    final currentPageItems = filteredRequests.sublist(startIndex, endIndex);
+
+    return Container(
+      height: 1800,
+      child: SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            // Filter and Sort Controls
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: _buildFilterSortControls(filteredRequests.length),
+            ),
+            SizedBox(height: 16),
+            // Custom Grid with dynamic row heights
+            Container(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: _buildCustomGrid(currentPageItems),
+              ),
+            ),
+            // Pagination Controls
+            if (totalPages > 1) _buildPaginationControls(totalPages, 24.0, 16.0),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build pagination controls
+  Widget _buildPaginationControls(int totalPages, double topSpacing, double bottomSpacing) {
     return Column(
       children: [
-        // Filter and Sort Controls
-        Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: _buildFilterSortControls(filteredRequests.length),
+        SizedBox(height: topSpacing),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Previous button
+          _buildPaginationButton(
+            icon: Icons.chevron_left,
+            text: 'Previous',
+            onTap: _currentPage > 1
+                ? () {
+                    setState(() {
+                      _currentPage--;
+                    });
+                  }
+                : null,
+          ),
+          SizedBox(width: 16),
+          // Page numbers
+          ...List.generate(totalPages, (index) {
+            final pageNumber = index + 1;
+            // Show max 5 page numbers with current page in center when possible
+            if (totalPages <= 5 ||
+                pageNumber == 1 ||
+                pageNumber == totalPages ||
+                (pageNumber >= _currentPage - 1 &&
+                    pageNumber <= _currentPage + 1)) {
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4),
+                child: _buildPageNumberButton(pageNumber),
+              );
+            } else if (pageNumber == 2 && _currentPage > 3) {
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4),
+                child: Text('...', style: TextStyle(color: Colors.grey)),
+              );
+            } else if (pageNumber == totalPages - 1 &&
+                _currentPage < totalPages - 2) {
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4),
+                child: Text('...', style: TextStyle(color: Colors.grey)),
+              );
+            }
+            return SizedBox.shrink();
+          }),
+          SizedBox(width: 16),
+          // Next button
+          _buildPaginationButton(
+            icon: Icons.chevron_right,
+            text: 'Next',
+            onTap: _currentPage < totalPages
+                ? () {
+                    setState(() {
+                      _currentPage++;
+                    });
+                  }
+                : null,
+          ),
+        ],
+      ),
         ),
-        SizedBox(height: 16),
-        // Custom Grid with dynamic row heights
-        Flexible(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: _buildCustomGrid(filteredRequests),
+        SizedBox(height: bottomSpacing),
+      ],
+    );
+  }
+
+  /// Build pagination button (Previous/Next)
+  Widget _buildPaginationButton({
+    required IconData icon,
+    required String text,
+    VoidCallback? onTap,
+  }) {
+    final isEnabled = onTap != null;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isEnabled ? Colors.white : Colors.grey.shade100,
+          border: Border.all(
+            color: isEnabled ? Colors.grey.shade300 : Colors.grey.shade200,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (text == 'Previous') ...[
+              Icon(
+                icon,
+                size: 16,
+                color: isEnabled ? Colors.grey.shade700 : Colors.grey.shade400,
+              ),
+              SizedBox(width: 4),
+            ],
+            Text(
+              text,
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isEnabled ? Colors.grey.shade700 : Colors.grey.shade400,
+              ),
+            ),
+            if (text == 'Next') ...[
+              SizedBox(width: 4),
+              Icon(
+                icon,
+                size: 16,
+                color: isEnabled ? Colors.grey.shade700 : Colors.grey.shade400,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build page number button
+  Widget _buildPageNumberButton(int pageNumber) {
+    final isCurrentPage = pageNumber == _currentPage;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _currentPage = pageNumber;
+        });
+      },
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: isCurrentPage ? Constants.ctaColorLight : Colors.white,
+          border: Border.all(
+            color: isCurrentPage
+                ? Constants.ctaColorLight
+                : Colors.grey.shade300,
+          ),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Center(
+          child: Text(
+            pageNumber.toString(),
+            style: GoogleFonts.manrope(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isCurrentPage ? Colors.white : Colors.grey.shade700,
+            ),
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -434,13 +620,16 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
             cardsPerRow;
 
         return SingleChildScrollView(
-          child: Column(
-            children: _buildRows(
-              requests,
-              cardsPerRow,
-              cardWidth,
-              horizontalSpacing,
-              verticalSpacing,
+          child: Container(
+            height: 2500,
+            child: Column(
+              children: _buildRows(
+                requests,
+                cardsPerRow,
+                cardWidth,
+                horizontalSpacing,
+                verticalSpacing,
+              ),
             ),
           ),
         );
@@ -501,10 +690,11 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
   /// Calculate the maximum height needed for a row of cards
   double _calculateMaxRowHeight(List<dynamic> rowRequests) {
-    // Updated height calculations for modern card design
-    const double baseHeight = 350.0; // Base height for new design
-    const double bidCardHeight = 88.0; // Height per bid card in new design
-    const double viewMoreButtonHeight = 50.0;
+    // Updated height calculations for modern card design with more space
+    const double baseHeight =
+        450.0; // Increased base height to prevent overflow
+    const double bidCardHeight = 120.0; // Increased height per bid card
+    const double viewMoreButtonHeight = 60.0; // Increased button height
 
     double maxHeight = baseHeight;
 
@@ -939,6 +1129,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                               setState(() {
                                 _selectedCategory = tempSelectedCategory;
                                 _selectedStatus = tempSelectedStatus;
+                                _currentPage =
+                                    1; // Reset to first page when filters change
                               });
                               Navigator.of(context).pop();
                             },
@@ -1162,6 +1354,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   void _sortRequests(String sortType) {
     setState(() {
       _sortBy = sortType;
+      _currentPage = 1; // Reset to first page when sort changes
     });
   }
 
@@ -2278,12 +2471,13 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     final bidsToShow = bids.take(2).toList(); // Match new design
 
     // Use same constants as _calculateMaxRowHeight for consistency
-    const double baseHeight = 300.0; // Base height for new design
-    const double bidCardHeight = 88.0; // Height per bid card in new design
+    const double baseHeight =
+        450.0; // Increased base height to prevent overflow
+    const double bidCardHeight = 120.0; // Increased height per bid card
     final double dynamicHeight =
         baseHeight +
         (bidsToShow.length * bidCardHeight) +
-        (hasMoreThanTwoBids ? 50.0 : 0.0);
+        (hasMoreThanTwoBids ? 60.0 : 0.0); // Increased button height
 
     return _buildActiveRequestCardWithHeight(request, dynamicHeight, index);
   }
@@ -2564,20 +2758,27 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                 child: Column(
                   children: [
                     if (bidsToShow.isNotEmpty) ...[
-                      ...bidsToShow
-                          .map((bid) {
-                            int sellerId = _getSellerId(bid);
-                            Map<int, int> sellerIndexMap =
-                                _createSellerIndexMapping(bidsToShow);
-                            int sellerIndex = sellerIndexMap[sellerId] ?? 1;
+                      Expanded(
+                        child: Column(
+                          children: bidsToShow
+                              .map((bid) {
+                                int sellerId = _getSellerId(bid);
+                                Map<int, int> sellerIndexMap =
+                                    _createSellerIndexMapping(bidsToShow);
+                                int sellerIndex = sellerIndexMap[sellerId] ?? 1;
 
-                            return _buildModernSellerBid(
-                              bid,
-                              request,
-                              sellerIndex,
-                            );
-                          })
-                          .take(1),
+                                return Expanded(
+                                  child: _buildModernSellerBid(
+                                    bid,
+                                    request,
+                                    sellerIndex,
+                                  ),
+                                );
+                              })
+                              .take(1)
+                              .toList(),
+                        ),
+                      ),
                       if (hasMoreThanTwoBids) ...[
                         SizedBox(height: 16),
                         _buildViewAllBidsButton(bidsToShow, request),
@@ -2734,10 +2935,11 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
   // Add these helper methods to handle QuoteItem objects
   int _getSellerId(dynamic bid) {
+    print("fgghhg ${bid.runtimeType} $bid");
     try {
-      if (bid is Seller) {
+      if (bid is QuoteItem) {
         // For QuoteItem objects, sellerId is an ApiUser object
-        return bid.id; // Assuming ApiUser has an id property
+        return bid.sellerId.id; // Assuming ApiUser has an id property
       }
 
       if (bid is Map<String, dynamic>) {
@@ -3260,18 +3462,19 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     bool isExpanded = _expandedSellerNotes[quoteId] ?? false;
 
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Seller info and bid details
           Container(
             padding: EdgeInsets.all(16),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 // Header with seller name, timestamp, and accept button
                 Row(
@@ -5087,22 +5290,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                     height: 1.4,
                   ),
                 ),
-                SizedBox(height: 8),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    "Request ID: ${_getRequestId(request)}",
-                    style: GoogleFonts.manrope(
-                      fontSize: 12,
-                      color: Colors.grey[700],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
+
                 SizedBox(height: 24),
                 Row(
                   children: [
@@ -6461,10 +6649,10 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                     "Part Number",
                                     _getPartNumber(), // Use helper method
                                   ),
-                                  _buildDetailItem(
+                                  /* _buildDetailItem(
                                     "Engine Size",
                                     _getEngineSize(), // Add engine size
-                                  ),
+                                  ),*/
                                   _buildDetailItem(
                                     "Transmission Type",
                                     _getTransmissionType(), // Use helper method
@@ -6921,22 +7109,7 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                     height: 1.4,
                   ),
                 ),
-                SizedBox(height: 8),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    "Request ID: ${_getRequestId(widget.request)}",
-                    style: GoogleFonts.manrope(
-                      fontSize: 12,
-                      color: Colors.grey[700],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
+
                 SizedBox(height: 24),
                 Row(
                   children: [
@@ -7219,6 +7392,7 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -8447,22 +8621,7 @@ class _ConsumerElectronicsDetailScreenState
                     height: 1.4,
                   ),
                 ),
-                SizedBox(height: 8),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    "Request ID: ${_getRequestId(widget.request)}",
-                    style: GoogleFonts.manrope(
-                      fontSize: 12,
-                      color: Colors.grey[700],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
+
                 SizedBox(height: 24),
                 Row(
                   children: [
@@ -9903,22 +10062,7 @@ class _RimTyreDetailScreenState extends State<RimTyreDetailScreen> {
                     height: 1.4,
                   ),
                 ),
-                SizedBox(height: 8),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    "Request ID: ${_getRequestId(widget.request)}",
-                    style: GoogleFonts.manrope(
-                      fontSize: 12,
-                      color: Colors.grey[700],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
+
                 SizedBox(height: 24),
                 Row(
                   children: [

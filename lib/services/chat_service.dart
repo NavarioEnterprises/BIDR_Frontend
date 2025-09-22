@@ -617,6 +617,7 @@ class ChatMessage {
   final String content;
   final String senderName;
   final String senderRole;
+  final String? senderId;
   final DateTime timestamp;
   final String messageType;
   final bool isFromCurrentUser;
@@ -627,6 +628,7 @@ class ChatMessage {
     required this.content,
     required this.senderName,
     required this.senderRole,
+    this.senderId,
     required this.timestamp,
     this.messageType = 'text',
     this.isFromCurrentUser = false,
@@ -663,12 +665,14 @@ class ChatMessage {
     } else {
       senderRole = 'user';
     }
+    print("DSjhs $json");
 
     return ChatMessage(
       id: json['id']?.toString(),
       content: json['content']?.toString() ?? '',
       senderName: senderName,
       senderRole: senderRole,
+      senderId: json['sender_id']?.toString(),
       timestamp: DateTime.parse(
         json['created_at'] ?? DateTime.now().toIso8601String(),
       ),
@@ -684,6 +688,7 @@ class ChatMessage {
       'content': content,
       'sender_name': senderName,
       'sender_role': senderRole,
+      'sender_id': senderId,
       'timestamp': timestamp.toIso8601String(),
       'message_type': messageType,
       'is_from_current_user': isFromCurrentUser,

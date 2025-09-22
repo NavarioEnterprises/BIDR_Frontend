@@ -288,7 +288,7 @@ class _SupportMobileState extends State<SupportMobile>
           ),
           centerTitle: true,
         ),
-        body: SingleChildScrollView(
+        body: Container(
           child: Column(
             children: [
               Container(
@@ -492,7 +492,7 @@ class _SupportMobileState extends State<SupportMobile>
                             ),
                           ),
                           child: Text(
-                            'View My Ticket',
+                            'View My Tickets',
                             style: GoogleFonts.manrope(
                               color: Colors.white,
                               fontSize: typography.normal,
@@ -832,7 +832,7 @@ class _ViewMyTicketState extends State<ViewMyTicket>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
+          Container(
             child: _isLoadingTickets
                 ? Center(
                     child: CircularProgressIndicator(
@@ -874,6 +874,7 @@ class _ViewMyTicketState extends State<ViewMyTicket>
                     ),
                   )
                 : ListView.builder(
+                    shrinkWrap: true,
                     itemCount: tickets.length,
                     itemBuilder: (context, index) {
                       final ticket = tickets[index];
@@ -2125,170 +2126,175 @@ class _ChatMobileScreenState extends State<ChatMobileScreen>
           color: Colors.grey[50],
           child: Column(
             children: [
-            // Ticket Info Header
-            Container(
-              width: double.infinity,
-              margin: EdgeInsets.all(spacing.paddingMedium),
-              padding: EdgeInsets.all(spacing.paddingLarge),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Constants.ftaColorLight.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Icon(
-                          HugeIcons.strokeRoundedCustomerSupport,
-                          color: Constants.ftaColorLight,
-                          size: typography.medium,
-                        ),
-                      ),
-                      SizedBox(width: spacing.spacingSmall),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Assigned to ${widget.ticket.assignee?['name'] ?? 'Support Team'}',
-                              style: GoogleFonts.manrope(
-                                fontSize: typography.normal,
-                                fontWeight: FontWeight.w600,
-                                color: Constants.ftaColorLight,
-                              ),
-                            ),
-                            Text(
-                              'Created on ${widget.ticket.date}',
-                              style: GoogleFonts.manrope(
-                                fontSize: typography.normal * 0.85,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            // Messages List
-            Expanded(
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: spacing.paddingMedium),
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemCount: _messages.length,
-                  itemBuilder: (context, index) {
-                    return TweenAnimationBuilder<double>(
-                      duration: Duration(milliseconds: 600 + (index * 100)),
-                      tween: Tween(begin: 0.0, end: 1.0),
-                      builder: (context, value, child) {
-                        return Opacity(
-                          opacity: value,
-                          child: Transform.translate(
-                            offset: Offset(0, (20 * (1 - value)).toDouble()),
-                            child: _buildMessageBubble(_messages[index], index),
-                          ),
-                        );
-                      },
-                    );
-                  },
+              // Ticket Info Header
+              Container(
+                width: double.infinity,
+                margin: EdgeInsets.all(spacing.paddingMedium),
+                padding: EdgeInsets.all(spacing.paddingLarge),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[200]!),
                 ),
-              ),
-            ),
-
-            // Reply Input
-            Container(
-              padding: EdgeInsets.all(spacing.paddingMedium),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: Colors.grey[200]!)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Reply To Ticket',
-                    style: GoogleFonts.manrope(
-                      fontSize: typography.normal,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                  SizedBox(height: spacing.spacingSmall),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: TextField(
-                      controller: _replyController,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: 'Type your reply here...',
-                        hintStyle: GoogleFonts.manrope(
-                          color: Colors.grey[500],
-                          fontSize: typography.normal,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(spacing.paddingMedium),
-                      ),
-                      style: GoogleFonts.manrope(
-                        fontSize: typography.normal,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: spacing.spacingMedium),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      SizedBox(
-                        width: double.infinity,
-                        height: 40,
-                        child: ElevatedButton(
-                          onPressed: _sendReply,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Constants.ctaColorLight,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            elevation: 0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Constants.ftaColorLight.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          child: Icon(
+                            HugeIcons.strokeRoundedCustomerSupport,
+                            color: Constants.ftaColorLight,
+                            size: typography.medium,
+                          ),
+                        ),
+                        SizedBox(width: spacing.spacingSmall),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(Icons.send, size: 16, color: Colors.white),
-                              SizedBox(width: spacing.spacingSmall / 2),
                               Text(
-                                'Send',
+                                'Assigned to ${widget.ticket.assignee?['name'] ?? 'Support Team'}',
                                 style: GoogleFonts.manrope(
-                                  color: Colors.white,
                                   fontSize: typography.normal,
-                                  fontWeight: FontWeight.w500,
+                                  fontWeight: FontWeight.w600,
+                                  color: Constants.ftaColorLight,
+                                ),
+                              ),
+                              Text(
+                                'Created on ${widget.ticket.date}',
+                                style: GoogleFonts.manrope(
+                                  fontSize: typography.normal * 0.85,
+                                  color: Colors.grey[600],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+
+              // Messages List
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: spacing.paddingMedium,
+                  ),
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      return TweenAnimationBuilder<double>(
+                        duration: Duration(milliseconds: 600 + (index * 100)),
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        builder: (context, value, child) {
+                          return Opacity(
+                            opacity: value,
+                            child: Transform.translate(
+                              offset: Offset(0, (20 * (1 - value)).toDouble()),
+                              child: _buildMessageBubble(
+                                _messages[index],
+                                index,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              // Reply Input
+              Container(
+                padding: EdgeInsets.all(spacing.paddingMedium),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border(top: BorderSide(color: Colors.grey[200]!)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Reply To Ticket',
+                      style: GoogleFonts.manrope(
+                        fontSize: typography.normal,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    SizedBox(height: spacing.spacingSmall),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: TextField(
+                        controller: _replyController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          hintText: 'Type your reply here...',
+                          hintStyle: GoogleFonts.manrope(
+                            color: Colors.grey[500],
+                            fontSize: typography.normal,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(spacing.paddingMedium),
+                        ),
+                        style: GoogleFonts.manrope(
+                          fontSize: typography.normal,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: spacing.spacingMedium),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          height: 40,
+                          child: ElevatedButton(
+                            onPressed: _sendReply,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Constants.ctaColorLight,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.send, size: 16, color: Colors.white),
+                                SizedBox(width: spacing.spacingSmall / 2),
+                                Text(
+                                  'Send',
+                                  style: GoogleFonts.manrope(
+                                    color: Colors.white,
+                                    fontSize: typography.normal,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

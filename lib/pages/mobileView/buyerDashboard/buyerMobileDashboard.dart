@@ -6256,10 +6256,10 @@ class _SparesDetailScreenState extends State<SparesDetailScreen> {
                                       "Part Number",
                                       _getPartNumber(), // Use helper method
                                     ),
-                                    _buildDetailItem(
+                                    /* _buildDetailItem(
                                       "Engine Size",
                                       _getEngineSize(), // Add engine size
-                                    ),
+                                    ),*/
                                     _buildDetailItem(
                                       "Transmission Type",
                                       _getTransmissionType(), // Use helper method
@@ -10554,10 +10554,7 @@ class PaymentScreen extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Constants.ctaColorLight,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(360),
                   ),
@@ -10593,11 +10590,7 @@ class PaymentScreen extends StatelessWidget {
           height: 24,
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) {
-            return Icon(
-              Icons.credit_card,
-              color: Colors.grey[400],
-              size: 20,
-            );
+            return Icon(Icons.credit_card, color: Colors.grey[400], size: 20);
           },
         ),
       ),
