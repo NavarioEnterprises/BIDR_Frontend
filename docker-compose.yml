@@ -1,0 +1,16 @@
+version: '3.9'
+
+volumes:
+  uploads-volume:
+
+services:
+  web:
+    container_name: bidr
+    network_mode: host
+    build: .
+    ports:
+      - 8000:8000
+    volumes:
+      - ./static:/app/static
+      - ./media:/app/media
+      - ./uploads:/app/uploads

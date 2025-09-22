@@ -1,0 +1,13 @@
+{
+  "name": "bidr-flutter-web",
+  "version": "1.0.0",
+  "description": "BIDR Flutter Web Application",
+  "scripts": {
+    "clear-cache": "./clear_flutter_cache.sh",
+    "dev-clear": "./dev_clear_cache.sh",
+    "build": "flutter build web --web-renderer html --release",
+    "build-dev": "flutter build web --web-renderer html",
+    "serve": "flutter run -d chrome",
+    "clean": "flutter clean && flutter pub get"
+  }
+}

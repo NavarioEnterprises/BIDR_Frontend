@@ -1,0 +1,942 @@
+import 'dart:async';
+
+import 'package:bidr/authentication/successFailDialog.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../constants/Constants.dart';
+import '../customWdget/customCard.dart';
+import '../customWdget/custom_input2.dart';
+import '../services/auth_api_service.dart';
+import 'login.dart';
+
+// Main Password Reset Flow Widget
+class BidrPasswordResetFlow extends StatelessWidget {
+  const BidrPasswordResetFlow({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'BIDR Password Reset',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamily: 'YuGothic', primarySwatch: Colors.blue),
+      home: const BidrPasswordResetScreen(),
+    );
+  }
+}
+
+// Screen 1: Forgot Password
+class BidrPasswordResetScreen extends StatefulWidget {
+  const BidrPasswordResetScreen({super.key});
+
+  @override
+  State<BidrPasswordResetScreen> createState() =>
+      _BidrPasswordResetScreenState();
+}
+
+class _BidrPasswordResetScreenState extends State<BidrPasswordResetScreen>
+    with SingleTickerProviderStateMixin {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final FocusNode _emailFocusNode = FocusNode();
+  bool _isLoading = false;
+  bool _isHoveringLogo = false;
+
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _phoneController.dispose();
+    _emailFocusNode.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        body: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Stack(
+                fit: StackFit.loose,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(0),
+                      topLeft: Radius.circular(0),
+                    ),
+                    child: Image.asset(
+                      "lib/assets/images/sample.jpg",
+                      fit: BoxFit.cover,
+                      height: MediaQuery.of(context).size.height,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 4,
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(0),
+                    topRight: Radius.circular(0),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: 40,
+                      right: 40,
+                      bottom: 24,
+                      top: 24,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                context.go('/login');
+                                setState(() {});
+                              },
+                              style: IconButton.styleFrom(
+                                backgroundColor: Constants.ftaColorLight,
+                                foregroundColor: Constants.ctaColorLight,
+                                elevation: 5,
+                                shadowColor: Colors.black54,
+                              ),
+                              icon: Icon(
+                                CupertinoIcons.back,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Spacer(),
+                            _buildBidrLogo(),
+                            Spacer(),
+                            SizedBox(width: 40, height: 40),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+
+                        const Text(
+                          'Forgot Password',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontFamily: 'YuGothic',
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        const Text(
+                          'Enter your registered email address to begin the reset process and then click the Get OTP button',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                            height: 1.5,
+                            fontFamily: 'YuGothic',
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        Container(
+                          constraints: BoxConstraints(maxWidth: 500),
+                          width: (MediaQuery.of(context).size.width > 800)
+                              ? MediaQuery.of(context).size.width * 0.5
+                              : MediaQuery.of(context).size.width * 0.85,
+                          child: _buildCustomTextField(
+                            'Enter Email',
+                            _emailController,
+                            _emailFocusNode,
+                            null,
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        Container(
+                          constraints: BoxConstraints(maxWidth: 500),
+                          width: (MediaQuery.of(context).size.width > 800)
+                              ? MediaQuery.of(context).size.width * 0.5
+                              : MediaQuery.of(context).size.width * 0.85,
+                          child: _buildGetOTPButton(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomTextField(
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocusNode, {
+    Widget? suffixIcon,
+    bool? isPasswordField,
+  }) {
+    return CustomInputTransparent4(
+      hintText: hintText.replaceAll('*', ''),
+      labelText: hintText,
+      controller: controller,
+      focusNode: focusNode,
+      textInputAction: nextFocusNode != null
+          ? TextInputAction.next
+          : TextInputAction.done,
+      isPasswordField: isPasswordField ?? false,
+      suffix: suffixIcon,
+      onChanged: (value) {},
+      onSubmitted: (value) {
+        if (nextFocusNode != null) {
+          nextFocusNode.requestFocus();
+        }
+      },
+    );
+  }
+
+  Widget _buildBidrLogo() {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHoveringLogo = true),
+      onExit: (_) => setState(() => _isHoveringLogo = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {},
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          transform: Matrix4.identity()..scale(_isHoveringLogo ? 1.05 : 1.0),
+          child: Image.asset(
+            "lib/assets/images/bidr_logo_with_text.png",
+            fit: BoxFit.contain,
+            height: 90,
+            width: 90,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGetOTPButton() {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: double.infinity,
+        height: 45,
+        child: ElevatedButton(
+          onPressed: _isLoading ? null : _handleGetOTP,
+          style:
+              ElevatedButton.styleFrom(
+                backgroundColor: Constants.ctaColorLight,
+                foregroundColor: Constants.ftaColorLight,
+                elevation: _isLoading ? 2 : 8,
+                shadowColor: Colors.black54,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(360),
+                ),
+              ).copyWith(
+                elevation: WidgetStateProperty.resolveWith<double>((
+                  Set<WidgetState> states,
+                ) {
+                  if (states.contains(WidgetState.pressed)) return 2;
+                  if (states.contains(WidgetState.hovered)) return 12;
+                  return 8;
+                }),
+              ),
+          child: _isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : const Text(
+                  'Get OTP',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w300,
+                    fontFamily: 'YuGothic',
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  void _handleGetOTP() async {
+    if (_emailController.text.isEmpty) {
+      _showSnackBar('Please enter your email address');
+      return;
+    }
+
+    if (!_isValidEmail(_emailController.text)) {
+      _showSnackBar('Please enter a valid email address');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Import auth service
+      final AuthApiService authApiService = AuthApiService();
+
+      // Call password reset API
+      final result = await authApiService.requestPasswordReset(
+        context,
+        email: _emailController.text,
+      );
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (result != null && result['success'] == true) {
+          // Show success message
+          SmartDialogService.showSuccessDialog(
+            context: context,
+            title: 'Successful',
+            message: result['message'],
+            onPressed: () {},
+          );
+
+          /* Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  BidrOTPVerificationScreen(
+                    email: _emailController.text,
+                    phone: _emailController.text,
+                  ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return SlideTransition(
+                      position: Tween<Offset>(
+                        begin: Offset(1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    );
+                  },
+            ),
+          );*/
+        } else {
+          // Show error message
+          String errorMessage = 'Failed to send password reset email';
+          if (result != null && result['error'] != null) {
+            errorMessage = result['error']['email'][0].toString();
+            SmartDialogService.showErrorDialog(
+              context: context,
+              title: 'Connection Failed',
+              message: errorMessage,
+              buttonText: 'Retry',
+              onPressed: () {},
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        _showSnackBar('An error occurred. Please try again.');
+      }
+    }
+  }
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  void _showSnackBar(String message, {bool isSuccess = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isSuccess ? Colors.green : Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+}
+
+// Screen 2: OTP Verification
+
+// Screen 3: Reset Password
+class BidrResetPasswordScreen extends StatefulWidget {
+  final String email;
+
+  const BidrResetPasswordScreen({super.key, required this.email});
+
+  @override
+  State<BidrResetPasswordScreen> createState() =>
+      _BidrResetPasswordScreenState();
+}
+
+class _BidrResetPasswordScreenState extends State<BidrResetPasswordScreen>
+    with SingleTickerProviderStateMixin {
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final FocusNode _passwordFocusNode = FocusNode();
+  final FocusNode _confirmPasswordFocusNode = FocusNode();
+  bool _isLoading = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _passwordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildPasswordField(
+    String label,
+    String hint,
+    TextEditingController controller,
+    FocusNode focusNode,
+    bool obscureText,
+    VoidCallback toggleVisibility,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w300,
+              color: Colors.black,
+              fontFamily: 'YuGothic',
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        CustomInputTransparent4(
+          hintText: hint,
+          controller: controller,
+          focusNode: focusNode,
+          textInputAction: TextInputAction.next,
+          isPasswordField: obscureText,
+          integersOnly: false,
+          maxLines: 2,
+          suffix: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: IconButton(
+              icon: Icon(
+                obscureText ? Icons.visibility_off : Icons.visibility,
+                color: const Color(0xFF718096),
+              ),
+              onPressed: toggleVisibility,
+            ),
+          ),
+          onChanged: (value) {},
+          onSubmitted: (value) {},
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBidrLogo() {
+    return Column(
+      children: [
+        SizedBox(
+          width: 90,
+          height: 90,
+          child: Image.asset(
+            "lib/assets/images/bidr_logo.png",
+            fit: BoxFit.contain,
+            width: 90,
+            height: 90,
+          ),
+        ),
+        const SizedBox(height: 16),
+        RichText(
+          text: const TextSpan(
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 2,
+              fontFamily: 'YuGothic',
+            ),
+            children: [
+              TextSpan(
+                text: 'BI',
+                style: TextStyle(color: Color(0xFF1A365D)),
+              ),
+              TextSpan(
+                text: 'D',
+                style: TextStyle(color: Color(0xFFFFA500)),
+              ),
+              TextSpan(
+                text: 'R',
+                style: TextStyle(color: Color(0xFF1A365D)),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildResetButton() {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: double.infinity,
+        height: 45,
+        child: ElevatedButton(
+          onPressed: _isLoading ? null : _handleResetPassword,
+          style:
+              ElevatedButton.styleFrom(
+                backgroundColor: Constants.ctaColorLight,
+                foregroundColor: Colors.white,
+                elevation: _isLoading ? 2 : 8,
+                shadowColor: Constants.ctaColorLight.withValues(alpha: 0.3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(360),
+                ),
+              ).copyWith(
+                elevation: WidgetStateProperty.resolveWith<double>((
+                  Set<WidgetState> states,
+                ) {
+                  if (states.contains(WidgetState.pressed)) return 2;
+                  if (states.contains(WidgetState.hovered)) return 12;
+                  return 8;
+                }),
+              ),
+          child: _isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : const Text(
+                  'Reset Password',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                    fontFamily: 'YuGothic',
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  void _handleResetPassword() async {
+    if (_passwordController.text.isEmpty) {
+      _showSnackBar('Please enter your new password');
+      return;
+    }
+
+    if (_confirmPasswordController.text.isEmpty) {
+      _showSnackBar('Please confirm your password');
+      return;
+    }
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      _showSnackBar('Passwords do not match');
+      return;
+    }
+
+    if (_passwordController.text.length < 8) {
+      _showSnackBar('Password must be at least 8 characters long');
+      return;
+    }
+
+    // Additional password strength validation
+    if (!_isPasswordStrong(_passwordController.text)) {
+      _showSnackBar(
+        'Password must contain uppercase, lowercase, number and special character',
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate API call
+    await Future<void>.delayed(const Duration(seconds: 2));
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      _showSuccessDialog();
+    }
+  }
+
+  bool _isPasswordStrong(String password) {
+    // Check for at least one uppercase letter, one lowercase letter, one digit, and one special character
+    final hasUppercase = password.contains(RegExp(r'[A-Z]'));
+    final hasLowercase = password.contains(RegExp(r'[a-z]'));
+    final hasDigits = password.contains(RegExp(r'[0-9]'));
+    final hasSpecialCharacters = password.contains(
+      RegExp(r'[!@#$%^&*(),.?":{}|<>]'),
+    );
+
+    return hasUppercase && hasLowercase && hasDigits && hasSpecialCharacters;
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 28),
+              SizedBox(width: 12),
+              Text(
+                'Success!',
+                style: TextStyle(
+                  fontFamily: 'YuGothic',
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1A365D),
+                ),
+              ),
+            ],
+          ),
+          content: const Text(
+            'Your password has been reset successfully. You can now log in with your new password.',
+            style: TextStyle(
+              fontFamily: 'YuGothic',
+              fontSize: 16,
+              color: Color(0xFF718096),
+            ),
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                  //Navigator.of(context).popUntil((route) => route.isFirst); // Go back to login
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Constants.ctaColorLight,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: const Text(
+                  'Go to Login',
+                  style: TextStyle(
+                    fontFamily: 'YuGothic',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSnackBar(String message, {bool isSuccess = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: const TextStyle(fontFamily: 'YuGothic')),
+        backgroundColor: isSuccess ? Colors.green : Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: CustomCard(
+          color: Colors.white,
+          elevation: 5,
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height * 0.8,
+            constraints: BoxConstraints(maxWidth: 880, maxHeight: 670),
+            padding: EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.black.withOpacity(0.75),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Stack(
+                            fit: StackFit.loose,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(0),
+                                  topLeft: Radius.circular(0),
+                                ),
+                                child: Image.asset(
+                                  "lib/assets/images/sample.jpg",
+                                  fit: BoxFit.cover,
+                                  height: MediaQuery.of(context).size.height,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          flex: 4,
+                          child: Container(
+                            height: MediaQuery.of(context).size.height,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                bottomRight: Radius.circular(0),
+                                topRight: Radius.circular(0),
+                              ),
+                            ),
+                            child: SingleChildScrollView(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: 40,
+                                  right: 40,
+                                  bottom: 24,
+                                  top: 24,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          onPressed: () => setState(() {
+                                            Navigator.pop(context);
+                                          }),
+                                          style: IconButton.styleFrom(
+                                            backgroundColor:
+                                                Constants.ftaColorLight,
+                                            foregroundColor:
+                                                Constants.ctaColorLight,
+                                            elevation: 5,
+                                            shadowColor: Colors.black54,
+                                          ),
+                                          icon: Icon(
+                                            CupertinoIcons.back,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        _buildBidrLogo(),
+                                        Spacer(),
+                                        SizedBox(width: 40, height: 40),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 24),
+
+                                    const Text(
+                                      'Reset Password',
+                                      style: TextStyle(
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF1A365D),
+                                        fontFamily: 'YuGothic',
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 12),
+
+                                    const Text(
+                                      'Securely create a new password to restore access to your account.',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Color(0xFF718096),
+                                        fontSize: 15,
+                                        height: 1.5,
+                                        fontFamily: 'YuGothic',
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 32),
+
+                                    _buildPasswordField(
+                                      'Password',
+                                      'Enter Password',
+                                      _passwordController,
+                                      _passwordFocusNode,
+                                      _obscurePassword,
+                                      () {
+                                        setState(() {
+                                          _obscurePassword = !_obscurePassword;
+                                        });
+                                      },
+                                    ),
+
+                                    const SizedBox(height: 20),
+
+                                    _buildPasswordField(
+                                      'Confirm Password',
+                                      'Enter Confirm Password',
+                                      _confirmPasswordController,
+                                      _confirmPasswordFocusNode,
+                                      _obscureConfirmPassword,
+                                      () {
+                                        setState(() {
+                                          _obscureConfirmPassword =
+                                              !_obscureConfirmPassword;
+                                        });
+                                      },
+                                    ),
+
+                                    const SizedBox(height: 8),
+
+                                    // Password requirements
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: Constants.ftaColorLight,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Password requirements:',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400,
+                                              color: Constants.ftaColorLight,
+                                              fontFamily: 'YuGothic',
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            '•At least 8 characters long\n• Contains uppercase and lowercase letters\n• Contains numbers and special characters',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: Constants.ftaColorLight,
+                                              fontWeight: FontWeight.w300,
+                                              fontFamily: 'YuGothic',
+                                              height: 1.3,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 24),
+
+                                    _buildResetButton(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

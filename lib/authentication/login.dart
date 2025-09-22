@@ -1,0 +1,997 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../constants/Constants.dart';
+import '../customWdget/custom_dialogs.dart';
+import '../customWdget/custom_input2.dart';
+import '../models/user.dart';
+import '../services/auth_api_service.dart';
+import '../services/shared_preferences.dart';
+import 'otp_screen.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+  bool _isLoading = false;
+  bool _isHoveringLogo = false;
+  Map<int, bool> _navButtonHoverStates = {};
+  Map<String, bool> _buttonHoverStates = {};
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _handleLogin() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      CustomDialogs.showErrorDialog(
+        context,
+        'Please enter both your email address and password to continue.',
+        heading: 'Missing Information',
+        onRetry: () => _handleLogin(),
+        showRetryOption: false,
+        cancelText: 'Try Again',
+        cancelButtonOutlined: false,
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Call the API service to login
+    final authService = AuthApiService();
+    final response = await authService.login(
+      _emailController.text.trim(),
+      _passwordController.text,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (response != null) {
+      print('Login.dart: Login response received: $response');
+
+      // Ensure tokens are saved (backup to auth_api_service.dart logic)
+      // Check for success using either 'success: true' or 'message: Login successful'
+      bool isLoginSuccessful =
+          (response['success'] == true) ||
+          (response['message'] == 'Login successful');
+
+      if (isLoginSuccessful) {
+        final accessToken = response['access_token'];
+        final refreshToken = response['refresh_token'];
+
+        print(
+          'Login.dart: Saving tokens - access: ${accessToken != null}, refresh: ${refreshToken != null}',
+        );
+        print('Login.dart: Access token length: ${accessToken?.length ?? 0}');
+        print('Login.dart: Refresh token length: ${refreshToken?.length ?? 0}');
+
+        if (accessToken != null) {
+          await Sharedprefs.saveUserAccessTokenSharedPreference(accessToken);
+          print('Login.dart: Access token saved');
+        }
+
+        if (refreshToken != null) {
+          await Sharedprefs.saveUserRefreshTokenSharedPreference(refreshToken);
+          print('Login.dart: Refresh token saved');
+        }
+      }
+
+      // Check if OTP is verified
+      final bool isOtpVerified =
+          response['otp_verified'] ??
+          true; // Default to true for backward compatibility
+
+      if (!isOtpVerified) {
+        // User needs to verify OTP, navigate to OTP screen
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (context) => BidrOTPVerificationScreen(
+              email: _emailController.text.trim(),
+              phone: response['user']?['phone_number'] ?? '',
+              loginResponse: response,
+            ),
+          ),
+        );
+        return;
+      }
+
+      // Store complete login information as JSON
+      final loginResponseJson = jsonEncode(response);
+      await Sharedprefs.saveCompleteLoginDataSharedPreference(
+        loginResponseJson,
+      );
+
+      // Store login status
+      await Sharedprefs.saveUserLoggedInSharedPreference(true);
+
+      // Create user model and set as current user
+      final loginResponse = LoginResponse.fromJson(response);
+      Constants.currentUser = loginResponse.user;
+
+      // Store user role for backward compatibility
+      await Sharedprefs.saveUserRoleSharedPreference(loginResponse.user.role);
+
+      // Navigate based on user role
+      if (mounted && Constants.currentUser != null) {
+        // Update global constants from the user model
+        Constants.myUid = Constants.currentUser!.uid;
+        Constants.userId = Constants.currentUser!.id;
+        Constants.myCell = Constants.currentUser!.phoneNumber;
+        Constants.myDisplayname = Constants.currentUser!.fullName;
+        Constants.myCategoryRole = Constants.currentUser!.role;
+        Constants.myUsername = Constants.currentUser!.fullName;
+        Constants.myEmail = Constants.currentUser!.email;
+
+        // Check if user has dual roles (buyer,seller)
+        final userRole = Constants.currentUser!.role;
+        if (userRole.contains(',')) {
+          // User has multiple roles, show selection dialog
+          _showRoleSelectionDialog(userRole);
+        } else {
+          // Single role, navigate directly
+          _navigateToRoleDashboard(userRole);
+        }
+      }
+    } else {
+      // Show error message
+      if (mounted) {
+        final errorMessage = response != null && response['error'] != null
+            ? response['error'].toString()
+            : 'Invalid email or password';
+
+        final normalizedMessage = ErrorMessageUtils.normalizeErrorMessage(
+          errorMessage,
+        );
+        final heading = ErrorMessageUtils.getErrorHeading(errorMessage);
+
+        CustomDialogs.showErrorDialog(
+          context,
+          normalizedMessage,
+          heading: heading,
+          onRetry: () => _handleLogin(),
+          showRetryOption: false,
+          cancelText: 'Try Again',
+          cancelButtonOutlined: false,
+        );
+      }
+    }
+  }
+
+  void _handleForgotPassword() {
+    // Handle forgot password
+    print('Forgot password clicked');
+  }
+
+  void _handleSignUp() {
+    // Navigate to sign up page
+    print('Sign up clicked');
+  }
+
+  void _showRoleSelectionDialog(String userRole) {
+    final roles = userRole.split(',');
+    CustomDialogs.showRoleSelectionDialog(
+      context,
+      roles,
+      onRoleSelected: (selectedRole) async {
+        // Save selected role to SharedPreferences
+        await Sharedprefs.saveUserRoleSharedPreference(selectedRole);
+
+        // Update Constants with selected role
+        Constants.myCategoryRole = selectedRole;
+
+        // Update the current user's role temporarily for this session
+        if (Constants.currentUser != null) {
+          Constants.currentUser!.role = selectedRole;
+        }
+
+        print('Role selected: $selectedRole');
+        print('Role saved to SharedPreferences and Constants');
+
+        // Navigate to appropriate dashboard
+        _navigateToRoleDashboard(selectedRole);
+      },
+    );
+  }
+
+  void _navigateToRoleDashboard(String role) {
+    // Always navigate to /dashboard - the HomeRouter will handle role-based routing
+    context.go('/dashboard');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Padding(
+        padding: const EdgeInsets.all(0.0),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(border: null),
+          child: Row(
+            children: [
+              if (MediaQuery.of(context).size.width > 800)
+                Expanded(
+                  flex: 2,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(0),
+                      topLeft: Radius.circular(0),
+                    ),
+                    child: Image.asset(
+                      "lib/assets/covers/Group 1171275363.png",
+                      fit: BoxFit.cover,
+                      height: MediaQuery.of(context).size.height,
+                    ),
+                  ),
+                ),
+              Expanded(
+                flex: 4,
+                child: Container(
+                  height: MediaQuery.of(context).size.height,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.only(
+                      bottomRight: Radius.circular(0),
+                      topRight: Radius.circular(0),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Fixed spacing at top
+                          //const SizedBox(height: 60),
+                          MouseRegion(
+                            onEnter: (_) =>
+                                setState(() => _isHoveringLogo = true),
+                            onExit: (_) =>
+                                setState(() => _isHoveringLogo = false),
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: () {
+                                context.go('/');
+                              },
+                              child: AnimatedContainer(
+                                duration: Duration(milliseconds: 200),
+                                transform: Matrix4.identity()
+                                  ..scale(_isHoveringLogo ? 1.05 : 1.0),
+                                child: Image.asset(
+                                  "lib/assets/images/bidr_logo_with_text.png",
+                                  fit: BoxFit.contain,
+                                  height: 90,
+                                  width: 90,
+                                ),
+                              ),
+                            ),
+                          ),
+                          /* Center(
+                            child: Container(
+                              width: 130,
+                              height: 130,
+                              child: Image.asset(
+                                "lib/assets/images/bidr_logo_with_text.png",
+                                fit: BoxFit.contain,
+                                width: 90,
+                                height: 90,
+                              ),
+                            ),
+                          ),*/
+                          // Welcome back title
+                          const SizedBox(height: 24),
+                          Center(
+                            child: Text(
+                              'Welcome back! Sign In',
+                              style: GoogleFonts.manrope(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Subtitle
+                          Center(
+                            child: Text(
+                              'Sign in to existing account',
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Email input
+                          Container(
+                            constraints: BoxConstraints(maxWidth: 500),
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 8),
+                                _buildCustomTextField(
+                                  'Enter Email',
+                                  _emailController,
+                                  _emailFocusNode,
+                                  _passwordFocusNode,
+                                  isPasswordField: false,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Password input
+                          Container(
+                            constraints: BoxConstraints(maxWidth: 500),
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 8),
+                                _buildCustomTextField(
+                                  'Enter Password',
+                                  _passwordController,
+                                  _passwordFocusNode,
+                                  null,
+                                  isPasswordField: true,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Forgot password
+                          Container(
+                            constraints: BoxConstraints(maxWidth: 500),
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Builder(
+                                  builder: (context) {
+                                    bool isHovered = false;
+                                    return StatefulBuilder(
+                                      builder: (context, setState) {
+                                        return MouseRegion(
+                                          onEnter: (_) => setState(() => isHovered = true),
+                                          onExit: (_) => setState(() => isHovered = false),
+                                          child: TextButton(
+                                            onPressed: () {
+                                              context.go('/forgotpassword');
+                                            },
+                                            style: TextButton.styleFrom(
+                                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              minimumSize: Size.zero,
+                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                            ),
+                                            child: Text(
+                                              'Forgot Password?',
+                                              style: GoogleFonts.manrope(
+                                                color: isHovered ? Constants.ctaColorLight : Color(0xFF999999),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                decoration: isHovered ? TextDecoration.underline : TextDecoration.none,
+                                                decorationColor: Constants.ctaColorLight,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Sign in button
+                          Container(
+                            constraints: BoxConstraints(maxWidth: 500),
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
+                            height: 45,
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _handleLogin,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Constants.ctaColorLight,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
+                                      ),
+                                    )
+                                  : Text(
+                                      'Sign In',
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Sign up link
+                          Container(
+                            constraints: BoxConstraints(maxWidth: 500),
+                            width: (MediaQuery.of(context).size.width > 800)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.85,
+                            child: MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: Builder(
+                                builder: (context) {
+                                  bool isHovered = false;
+                                  return StatefulBuilder(
+                                    builder: (context, setState) {
+                                      return MouseRegion(
+                                        onEnter: (_) => setState(() => isHovered = true),
+                                        onExit: (_) => setState(() => isHovered = false),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            context.go('/register');
+                                          },
+                                          child: AnimatedContainer(
+                                            duration: Duration(milliseconds: 200),
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: 8,
+                                              horizontal: 12,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(8),
+                                              color: isHovered 
+                                                  ? Constants.ftaColorLight.withOpacity(0.1)
+                                                  : Colors.transparent,
+                                            ),
+                                            child: RichText(
+                                              textAlign: TextAlign.center,
+                                              text: TextSpan(
+                                                style: GoogleFonts.manrope(fontSize: 14),
+                                                children: [
+                                                  TextSpan(
+                                                    text: "Don't Have an Account? ",
+                                                    style: TextStyle(
+                                                      color: Color(0xFF999999),
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: ' Sign Up',
+                                                    style: TextStyle(
+                                                      color: isHovered 
+                                                          ? Constants.ctaColorLight
+                                                          : Constants.ftaColorLight,
+                                                      fontWeight: FontWeight.bold,
+                                                      letterSpacing: 1.1,
+                                                      decoration: isHovered 
+                                                          ? TextDecoration.underline 
+                                                          : TextDecoration.none,
+                                                      decorationColor: Constants.ctaColorLight,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          // Fixed spacing at bottom to match top
+                          const SizedBox(height: 12),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomTextField(
+    String hintText,
+    TextEditingController controller,
+    FocusNode focusNode,
+    FocusNode? nextFocusNode, {
+    Widget? suffixIcon,
+    bool? isPasswordField,
+  }) {
+    return CustomInputTransparent4(
+      hintText: hintText.replaceAll('*', ''),
+      labelText: hintText,
+      controller: controller,
+      focusNode: focusNode,
+      textInputAction: nextFocusNode != null
+          ? TextInputAction.next
+          : TextInputAction.done,
+      isPasswordField: isPasswordField ?? false,
+      suffix: suffixIcon,
+      onChanged: (value) {},
+      onSubmitted: (value) {
+        if (nextFocusNode != null) {
+          nextFocusNode.requestFocus();
+        }
+      },
+    );
+  }
+}
+
+// Responsive wrapper for different screen sizes
+class ResponsiveLoginPage extends StatelessWidget {
+  const ResponsiveLoginPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 600) {
+          // Mobile layout
+          return const LoginPage();
+        } else {
+          // Desktop/tablet layout
+          return const LoginPage();
+        }
+      },
+    );
+  }
+}
+
+// Mobile optimized version
+class MobileLoginPage extends StatefulWidget {
+  const MobileLoginPage({Key? key}) : super(key: key);
+
+  @override
+  State<MobileLoginPage> createState() => _MobileLoginPageState();
+}
+
+class _MobileLoginPageState extends State<MobileLoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+  bool _isLoading = false;
+
+  void _handleLogin() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      CustomDialogs.showErrorDialog(
+        context,
+        'Please enter both your email address and password to continue.',
+        heading: 'Missing Information',
+        onRetry: () => _handleLogin(),
+        showRetryOption: false,
+        cancelText: 'Try Again',
+        cancelButtonOutlined: false,
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Call the API service to login
+    final authService = AuthApiService();
+    final response = await authService.login(
+      _emailController.text.trim(),
+      _passwordController.text,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (response != null) {
+      print('Login.dart: Login response received: $response');
+
+      // Ensure tokens are saved (backup to auth_api_service.dart logic)
+      // Check for success using either 'success: true' or 'message: Login successful'
+      bool isLoginSuccessful =
+          (response['success'] == true) ||
+          (response['message'] == 'Login successful');
+
+      if (isLoginSuccessful) {
+        final accessToken = response['access_token'];
+        final refreshToken = response['refresh_token'];
+
+        print(
+          'Login.dart: Saving tokens - access: ${accessToken != null}, refresh: ${refreshToken != null}',
+        );
+        print('Login.dart: Access token length: ${accessToken?.length ?? 0}');
+        print('Login.dart: Refresh token length: ${refreshToken?.length ?? 0}');
+
+        if (accessToken != null) {
+          await Sharedprefs.saveUserAccessTokenSharedPreference(accessToken);
+          print('Login.dart: Access token saved');
+        }
+
+        if (refreshToken != null) {
+          await Sharedprefs.saveUserRefreshTokenSharedPreference(refreshToken);
+          print('Login.dart: Refresh token saved');
+        }
+      }
+
+      // Check if OTP is verified
+      final bool isOtpVerified =
+          response['otp_verified'] ??
+          true; // Default to true for backward compatibility
+
+      if (!isOtpVerified) {
+        // User needs to verify OTP, navigate to OTP screen
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (context) => BidrOTPVerificationScreen(
+              email: _emailController.text.trim(),
+              phone: response['user']?['phone_number'] ?? '',
+              loginResponse: response,
+            ),
+          ),
+        );
+        return;
+      }
+
+      // Store complete login information as JSON
+      final loginResponseJson = jsonEncode(response);
+      await Sharedprefs.saveCompleteLoginDataSharedPreference(
+        loginResponseJson,
+      );
+
+      // Store login status
+      await Sharedprefs.saveUserLoggedInSharedPreference(true);
+
+      // Create user model and set as current user
+      final loginResponse = LoginResponse.fromJson(response);
+      Constants.currentUser = loginResponse.user;
+
+      // Store user role for backward compatibility
+      await Sharedprefs.saveUserRoleSharedPreference(loginResponse.user.role);
+
+      // Navigate based on user role
+      if (mounted && Constants.currentUser != null) {
+        // Update global constants from the user model
+        Constants.myUid = Constants.currentUser!.uid;
+        Constants.userId = Constants.currentUser!.id;
+        Constants.myCell = Constants.currentUser!.phoneNumber;
+        Constants.myDisplayname = Constants.currentUser!.fullName;
+        Constants.myCategoryRole = Constants.currentUser!.role;
+        Constants.myUsername = Constants.currentUser!.fullName;
+        Constants.myEmail = Constants.currentUser!.email;
+
+        // Check if user has dual roles (buyer,seller)
+        final userRole = Constants.currentUser!.role;
+        if (userRole.contains(',')) {
+          // User has multiple roles, show selection dialog
+          _showRoleSelectionDialog(userRole);
+        } else {
+          // Single role, navigate directly
+          _navigateToRoleDashboard(userRole);
+        }
+      }
+    } else {
+      // Show error message
+      if (mounted) {
+        final errorMessage = response != null && response['error'] != null
+            ? response['error'].toString()
+            : 'Invalid email or password';
+
+        final normalizedMessage = ErrorMessageUtils.normalizeErrorMessage(
+          errorMessage,
+        );
+        final heading = ErrorMessageUtils.getErrorHeading(errorMessage);
+
+        CustomDialogs.showErrorDialog(
+          context,
+          normalizedMessage,
+          heading: heading,
+          onRetry: () => _handleLogin(),
+          showRetryOption: false,
+          cancelText: 'Try Again',
+          cancelButtonOutlined: false,
+        );
+      }
+    }
+  }
+
+  void _showRoleSelectionDialog(String userRole) {
+    final roles = userRole.split(',');
+    CustomDialogs.showRoleSelectionDialog(
+      context,
+      roles,
+      onRoleSelected: (selectedRole) async {
+        // Save selected role to SharedPreferences
+        await Sharedprefs.saveUserRoleSharedPreference(selectedRole);
+
+        // Update Constants with selected role
+        Constants.myCategoryRole = selectedRole;
+
+        // Update the current user's role temporarily for this session
+        if (Constants.currentUser != null) {
+          Constants.currentUser!.role = selectedRole;
+        }
+
+        print('Role selected: $selectedRole');
+        print('Role saved to SharedPreferences and Constants');
+
+        // Navigate to appropriate dashboard
+        _navigateToRoleDashboard(selectedRole);
+      },
+    );
+  }
+
+  void _navigateToRoleDashboard(String role) {
+    // Always navigate to /dashboard - the HomeRouter will handle role-based routing
+    context.go('/dashboard');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF1B365D), Color(0xFF2E4A6B)],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                // Form container
+                Container(
+                  padding: const EdgeInsets.all(30.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Welcome back! Sign In',
+                        style: GoogleFonts.manrope(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF333333),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Sign in to existing account',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          color: Color(0xFF666666),
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+
+                      // Email input
+                      CustomInputTransparent4(
+                        hintText: 'Enter Email',
+                        controller: _emailController,
+                        focusNode: _emailFocusNode,
+                        textInputAction: TextInputAction.next,
+                        isPasswordField: false,
+                        onChanged: (value) {},
+                        onSubmitted: (value) {
+                          _passwordFocusNode.requestFocus();
+                        },
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Password input
+                      CustomInputTransparent4(
+                        hintText: 'Enter Password',
+                        controller: _passwordController,
+                        focusNode: _passwordFocusNode,
+                        textInputAction: TextInputAction.done,
+                        isPasswordField: true,
+                        onChanged: (value) {},
+                        onSubmitted: (value) {
+                          _handleLogin();
+                        },
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Forgot password
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Builder(
+                          builder: (context) {
+                            bool isHovered = false;
+                            return StatefulBuilder(
+                              builder: (context, setState) {
+                                return MouseRegion(
+                                  onEnter: (_) => setState(() => isHovered = true),
+                                  onExit: (_) => setState(() => isHovered = false),
+                                  cursor: SystemMouseCursors.click,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      context.go('/forgotpassword');
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      minimumSize: Size.zero,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    child: Text(
+                                      'Forgot Password?',
+                                      style: GoogleFonts.manrope(
+                                        color: isHovered ? Constants.ctaColorLight : Color(0xFF999999),
+                                        fontSize: 12,
+                                        decoration: isHovered ? TextDecoration.underline : TextDecoration.none,
+                                        decorationColor: Constants.ctaColorLight,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+
+                      // Sign in button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _handleLogin,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Constants.ctaColorLight,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                          ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  'Sign In',
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Sign up link
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Don't Have an Account? ",
+                            style: GoogleFonts.manrope(
+                              color: Color(0xFF999999),
+                              fontSize: 12,
+                            ),
+                          ),
+                          Builder(
+                            builder: (context) {
+                              bool isHovered = false;
+                              return StatefulBuilder(
+                                builder: (context, setState) {
+                                  return MouseRegion(
+                                    onEnter: (_) => setState(() => isHovered = true),
+                                    onExit: (_) => setState(() => isHovered = false),
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        context.go('/register');
+                                      },
+                                      child: AnimatedContainer(
+                                        duration: Duration(milliseconds: 200),
+                                        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(4),
+                                          color: isHovered 
+                                              ? Constants.ctaColorLight.withOpacity(0.1)
+                                              : Colors.transparent,
+                                        ),
+                                        child: Text(
+                                          'Sign Up',
+                                          style: GoogleFonts.manrope(
+                                            color: isHovered 
+                                                ? Constants.ctaColorLight 
+                                                : Color(0xFF333333),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            decoration: isHovered 
+                                                ? TextDecoration.underline 
+                                                : TextDecoration.none,
+                                            decorationColor: Constants.ctaColorLight,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

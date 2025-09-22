@@ -1,0 +1,91 @@
+# Flutter Web Configuration
+# Handles client-side routing for Single Page Application (SPA)
+
+# Enable URL rewriting
+RewriteEngine On
+
+# Handle Flutter web routes - redirect all non-file requests to index.html
+# This is essential for client-side routing to work properly
+<IfModule mod_rewrite.c>
+  # Don't rewrite requests for existing files or directories
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  
+  # Don't rewrite requests for assets, API calls, or other specific paths
+  RewriteCond %{REQUEST_URI} !^/assets/
+  RewriteCond %{REQUEST_URI} !^/api/
+  RewriteCond %{REQUEST_URI} !^/favicon\.ico$
+  RewriteCond %{REQUEST_URI} !^/manifest\.json$
+  RewriteCond %{REQUEST_URI} !^/flutter_service_worker\.js$
+  
+  # Redirect all other requests to index.html for Flutter routing
+  RewriteRule ^.*$ /index.html [L,QSA]
+</IfModule>
+
+# Enable proper MIME types for web assets
+<IfModule mod_mime.c>
+  AddType image/png .png
+  AddType image/jpeg .jpg .jpeg
+  AddType image/gif .gif
+  AddType image/webp .webp
+  AddType image/svg+xml .svg
+  AddType image/avif .avif
+  AddType application/javascript .js
+  AddType text/css .css
+  AddType application/json .json
+  AddType application/manifest+json .webmanifest
+  AddType text/html .html
+</IfModule>
+
+# Enable CORS for assets
+<IfModule mod_headers.c>
+  # Allow CORS for assets
+  <FilesMatch "\.(png|jpg|jpeg|gif|webp|svg|avif|js|css|json|html)$">
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type"
+  </FilesMatch>
+  
+  # Security headers
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Disable caching completely for all files
+<IfModule mod_expires.c>
+  ExpiresActive off
+</IfModule>
+
+# Force no-cache headers for all files
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-cache, no-store, must-revalidate"
+  Header set Pragma "no-cache"
+  Header set Expires "0"
+</IfModule>
+
+# Compression for better performance
+<IfModule mod_deflate.c>
+  # Compress HTML, CSS, JavaScript, and other text files
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/json
+  AddOutputFilterByType DEFLATE text/xml
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE text/plain
+</IfModule>
+
+# Prevent access to sensitive files
+<Files "*.dart">
+  Order allow,deny
+  Deny from all
+</Files>
+
+<Files ".htaccess">
+  Order allow,deny
+  Deny from all
+</Files>
+
+# Prevent directory browsing
+Options -Indexes
